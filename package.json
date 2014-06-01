@@ -1,0 +1,25 @@
+{
+  "name": "lacona",
+  "version": "0.0.1",
+  "description": "Natural Language Parsing Framework",
+  "main": "lacona.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brandonhorst/lacona.git"
+  },
+  "keywords": [
+    "lingustic",
+    "natural",
+    "language",
+    "parsing"
+  ],
+  "author": "Brandon Horst",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/brandonhorst/lacona/issues"
+  },
+  "homepage": "https://github.com/brandonhorst/lacona"
+}
