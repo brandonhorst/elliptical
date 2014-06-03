@@ -7,6 +7,7 @@
 	{EventEmitter} = require 'events'
 	async = require 'async'
 	util = require 'util'
+	_ = require 'lodash'
 
 
 #Lacona
@@ -24,16 +25,17 @@
 			input = new InputOption(inputText)
 				
 			async.each @phrases, (phrase, done) =>
-				phrase.parse input, (err, output) =>
-					if err?
-						@emit 'error', err
-					if not output?
-						@emit 'error', Error("Lacona Error: parse returned #{output}")
-					else
-						@emit 'data', JSON.parse(JSON.stringify(output))
-					done()
+				phrase
+				.on 'data', (data) =>
+					@emit 'data', _.cloneDeep(data)
+				.on 'error', done
+				.on 'end', done
+				.parse input
 			, (err) =>
-				@emit 'end', err
+				if err?
+					@emit 'error', err
+				else
+					@emit 'end'
 
 	module.exports =
 		Parser: Parser

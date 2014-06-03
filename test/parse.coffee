@@ -79,11 +79,9 @@ describe 'Parser', ->
 		.on 'data', (data) ->
 			expect(data).to.exist
 			expect(data.suggestion).to.exist
-			expect(data.suggestion.words).to.have.length 2
+			expect(data.suggestion.words).to.have.length 1
+			expect(['choice test', 'canon in C']).to.contain data.suggestion.words[0].string
 			expect(data.suggestion.charactersComplete).to.equal 1
-			choiceStrings = (word.string for word in data.suggestion.words)
-			expect(choiceStrings).to.contain 'choice test'
-			expect(choiceStrings).to.contain 'canon in C'
 			dataCalled()	
 		.on 'end', ->
 			expect(dataCalled).to.have.been.called.twice

@@ -1,7 +1,11 @@
+#Includes
+
+	{EventEmitter} = require 'events'
+
 #Element
 
-	class Element
+	class Element extends EventEmitter
 		constructor: (options) ->
 			{@id, @optional} = options
 
-	module.exports = class
+	module.exports = Element

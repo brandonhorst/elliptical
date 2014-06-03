@@ -12,12 +12,17 @@
 			@children = (schemaUtil.schemaObject(child) for child in options.children)
 
 		parse: (input, next) ->
-			async.each @children, (child, done) ->
-				child.parse input, (err, output) ->
-					if err?
-						next(err)
-					else if output?
-						next(null, output)
-					done()
+			async.each @children, (child, done) =>
+				child
+				.on 'data', (data) =>
+					@emit 'data', data
+				.on 'error', done
+				.on 'end', done
+				.parse input
+			, (err) =>
+				if err?
+					@emit 'error', err
+				else
+					@emit 'end'
 
 	module.exports = Choice
