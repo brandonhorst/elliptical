@@ -1,19 +1,18 @@
-#Includes
-
-	Value = require './value'
-
 #Literal
 
-	class Literal extends Value
-		constructor: (options) ->
-			super options
-			{@display, @value} = options
+	module.exports =
+		scope:
+			literal: (inputString, suggestion, done) ->
+				suggestion
+					display: @display
+					value: @value
+				done(null)
 
-		suggestions: (inputString, done) ->
-			obj =
-				display: @display
-				value: @value
+		schema:
+			name: 'literal'
+			root:
+				type: 'value'
+				compute: 'literal'
 
-			done(null, obj)
 
-	module.exports = Literal
+

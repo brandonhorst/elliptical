@@ -31,13 +31,13 @@ There is no suggestion, but the text is complete - this belongs in the suggestio
 
 There is a suggestion, but this is a punctuation - tack it onto the end
 
-				else if self.completion.length is 0 and partOfSpeech is PartOfSpeech.punctuation
-					newSuggestion.words.append(newWord)
+				else if @completion.length is 0 and partOfSpeech is PartOfSpeech.punctuation
+					newSuggestion.words.push(newWord)
 
 This is a completion
 
 				else
-					newCompletion.append(newWord)
+					newCompletion.push(newWord)
 
 This is a part of the text
 
@@ -48,7 +48,7 @@ This is a part of the text
 This is a match, and fully consumed
 
 				if thisTextContainsString
-					self.match.append(newWord)
+					newMatch.push(newWord)
 					newText = @text.substring(string.length)
 
 This is a match, and partially consumed

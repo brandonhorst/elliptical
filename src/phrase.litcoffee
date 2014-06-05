@@ -2,22 +2,15 @@
 
 	{EventEmitter} = require 'events'
 
-	schemaUtil = require './schema-util'
 
 #Phrase
 
-	class Phrase extends EventEmitter
-		constructor: (options) ->
-			{@lang} = options
-			@root = schemaUtil.schemaObject(options.root)
-		parse: (input) ->
-			@root
-			.on 'data', (data) =>
-				@emit 'data', data
-			.on 'error', (err) =>
-				@emit 'err', err
-			.on 'end', =>
-				@emit 'end'
-			.parse input
+	class Phrase
+		constructor: (options, elementFactory) ->
+			{@name, @sentence} = options
+			@root = elementFactory.create(options.root)
+
+		parse: (input, context, data, done) ->
+			@root.parse input, context, data, done
 
 	module.exports = Phrase
