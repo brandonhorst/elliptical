@@ -18,7 +18,9 @@ gulp.task 'watch', ->
 	gulp.src [paths.test, paths.src], { read: false }
 	.pipe watch { emit: 'all' }, (files) ->
 		files
-		.pipe mocha()
+		.pipe mocha {reporter: 'spec'}
 		.on 'error', (err) ->
 			if not /tests? failed/.test(err.stack)
 				util.log err.stack
+			@emit 'end'
+	return
