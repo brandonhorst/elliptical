@@ -1,6 +1,7 @@
 gulp = require 'gulp'
 util = require 'gulp-util'
 mocha = require 'gulp-mocha'
+watch = require 'gulp-watch'
 
 paths =
 	test: 'test/**/*.coffee'
@@ -14,5 +15,10 @@ gulp.task 'test', ->
 		.on 'error', util.log
 	
 gulp.task 'watch', ->
-	gulp.watch paths.test, ['test']
-	gulp.watch paths.src, ['test']
+	gulp.src [paths.test, paths.src], { read: false }
+	.pipe watch { emit: 'all' }, (files) ->
+		files
+		.pipe mocha()
+		.on 'error', (err) ->
+			if not /tests? failed/.test(err.stack)
+				util.log err.stack

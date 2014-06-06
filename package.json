@@ -29,6 +29,7 @@
     "gulp": "^3.7.0",
     "gulp-mocha": "^0.4.1",
     "gulp-util": "^2.2.14",
+    "gulp-watch": "^0.6.5",
     "mocha": "^1.20.0"
   },
   "dependencies": {

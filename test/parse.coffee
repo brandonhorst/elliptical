@@ -430,8 +430,7 @@ describe 'Parser', ->
 			new Parser()
 			.use testCase.schema
 			.on 'data', (data) ->
-				console.log data
-				dataCalled()
+			dataCalled()
 				expect(data, testCase.desc).to.exist
 				expect(data.match, testCase.desc).to.exist
 				expect(data.match[0].string, testCase.desc).to.equal testCase.result
