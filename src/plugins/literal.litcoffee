@@ -2,11 +2,11 @@
 
 	module.exports =
 		scope:
-			literal: (inputString, suggestion, done) ->
-				suggestion
+			literal: (inputString, data, done) ->
+				data
 					display: @display
 					value: @value
-				done(null)
+				done()
 
 		schema:
 			name: 'literal'

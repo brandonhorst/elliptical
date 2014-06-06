@@ -14,7 +14,8 @@
 	class Parser extends EventEmitter
 		constructor: (@options) ->
 			@phrases = []
-			@use require('./literal')
+			@use require('./plugins/literal')
+			@use require('./plugins/freetext')
 
 		phraseAccessor: (name) =>
 			_.find @phrases, (phrase) ->

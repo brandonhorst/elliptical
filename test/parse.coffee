@@ -305,3 +305,102 @@ describe 'Parser', ->
 				done()
 			.parse(testCase.input)
 		, done
+
+
+
+	it 'handles a schema with a freetext', (done) ->
+		testCases = [
+			input: 'anything'
+			desc: 'anything'
+			schema:
+				root:
+					type: 'freetext'
+				sentence: true
+			result: 'anything'
+			matches: 1
+		,
+			input: 'anything'
+			desc: 'regex (accepted)'
+			schema:
+				root:
+					type: 'freetext'
+					regex: /anything/
+				sentence: true
+			result: 'anything'
+			matches: 1
+		,
+			input: 'anything'
+			desc: 'regex (rejected)'
+			schema:
+				root:
+					type: 'freetext'
+					regex: /nothing/
+				sentence: true
+			matches: 0
+		,
+			input: 'anything'
+			desc: 'string regex'
+			schema:
+				root:
+					type: 'freetext'
+					regex: 'anything'
+				sentence: true
+			result: 'anything'
+			matches: 1
+		]
+
+
+		async.each testCases, (testCase, done) ->
+			dataCalled = chai.spy()
+			new Parser()
+			.use testCase.schema
+			.on 'data', (data) ->
+				dataCalled()
+				expect(data, testCase.desc).to.exist
+				expect(data.match, testCase.desc).to.exist
+				expect(data.match, testCase.desc).to.have.length 1
+				expect(data.match[0].string, testCase.desc).to.equal testCase.result
+			.on 'end', ->
+				expect(dataCalled, testCase.desc).to.have.been.called.exactly(testCase.matches)
+				done()
+			.parse(testCase.input)
+		, done
+
+
+
+	it 'handles a freetext in a sequence', (done) ->
+		testCase =
+			input: 'anything'
+			desc: 'anything'
+			schema:
+				root:
+					type: 'sequence'
+					separator: null
+					children: [
+						type: 'freetext'
+					,
+						'thing'
+					]
+				sentence: true
+			result: ['any', 'thing']
+			matches: 2
+
+
+		dataCalled = chai.spy()
+
+		new Parser()
+		.use testCase.schema
+		.on 'data', (data) ->
+			dataCalled()
+			expect(data, testCase.desc).to.exist
+			expect(data.match, testCase.desc).to.exist
+			if data.suggestion.words.length > 0
+				expect(data.match[0].string, testCase.desc).to.equal testCase.input
+				expect(data.suggestion.words[0].string, testCase.desc).to.equal testCase.schema.root.children[1]
+			else
+				for i in [0...testCase.result.length]
+					expect(data.match[i].string, testCase.desc).to.equal testCase.result[i]
+		.on 'end', ->
+			expect(dataCalled, testCase.desc).to.have.been.called.exactly(testCase.matches)
+			done()
+		.parse(testCase.input)

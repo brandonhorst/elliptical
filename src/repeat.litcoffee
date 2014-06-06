@@ -24,7 +24,7 @@ If the separator gets data too, loop around. If either doesn't get data, we're d
 				parsesActive++
 				@child.parse input, context, (result) =>
 					data(result)
-					if _.isEmpty(result.suggestion)
+					if result.suggestion.words.length is 0
 						parseSeparator(result)
 				, (err) =>
 					if err?

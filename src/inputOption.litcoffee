@@ -7,7 +7,7 @@
 #InputOption
 
 	class InputOption
-		constructor: (@text = "", @match = [], @suggestion = {}, @completion = [], @result = {}) ->
+		constructor: (@text = "", @match = [], @suggestion = {words: []}, @completion = [], @result = {}) ->
 
 		handleString: (string, partOfSpeech, id, value) ->
 			newText = @text

@@ -1,4 +1,4 @@
 #StartsWith
 
-		String::startsWith = (str) ->
-			this.lastIndexOf(str, 0) == 0
+	String::startsWith = (str) ->
+		this.lastIndexOf(str, 0) == 0
