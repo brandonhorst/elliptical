@@ -404,3 +404,39 @@ describe 'Parser', ->
 			expect(dataCalled, testCase.desc).to.have.been.called.exactly(testCase.matches)
 			done()
 		.parse(testCase.input)
+
+	it 'handles an integer', (done) ->
+		testCases = [
+			input: '1234'
+			desc: 'valid'
+			schema:
+				root:
+					type: 'integer'
+				sentence: true
+			result: '1234'
+			matches: 1
+		,
+			input: '12b4'
+			desc: 'invalid'
+			schema:
+				root:
+					type: 'integer'
+				sentence: true
+			matches: 0
+		]
+
+		async.each testCases, (testCase, done) ->
+			dataCalled = chai.spy()
+			new Parser()
+			.use testCase.schema
+			.on 'data', (data) ->
+				console.log data
+				dataCalled()
+				expect(data, testCase.desc).to.exist
+				expect(data.match, testCase.desc).to.exist
+				expect(data.match[0].string, testCase.desc).to.equal testCase.result
+			.on 'end', ->
+				expect(dataCalled, testCase.desc).to.have.been.called.exactly(testCase.matches)
+				done()
+			.parse(testCase.input)
+		, done

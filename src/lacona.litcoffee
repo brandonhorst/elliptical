@@ -16,6 +16,7 @@
 			@phrases = []
 			@use require('./plugins/literal')
 			@use require('./plugins/freetext')
+			@use require('./plugins/integer')
 
 		phraseAccessor: (name) =>
 			_.find @phrases, (phrase) ->
