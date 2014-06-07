@@ -22,12 +22,15 @@ describe 'Parser', ->
 
 	it 'handles a schema with a single literal properly', (done) ->
 		testCases = [
+			input: 'l'
 			schema:
 				root: 'literal test'
 				sentence: true
 			matches: 1
 			suggestion: 'literal test'
+			result: {}
 		,
+			input: 'l'
 			schema:
 				root:
 					type: 'literal'
@@ -35,6 +38,20 @@ describe 'Parser', ->
 				sentence: true
 			matches: 1
 			suggestion: 'literal test'
+			result: {}
+		,
+			input: 'l'
+			schema:
+				root:
+					type: 'literal'
+					display: 'literal test'
+					value: 'test'
+					id: 'theLiteral'
+				sentence: true
+			matches: 1
+			suggestion: 'literal test'
+			result:
+				theLiteral: 'test'
 		]
 		async.each testCases, (testCase, done) ->
 			dataCalled = chai.spy()
@@ -47,11 +64,12 @@ describe 'Parser', ->
 				expect(data.suggestion.words).to.have.length 1
 				expect(data.suggestion.charactersComplete).to.equal 1
 				expect(data.suggestion.words[0].string).to.equal testCase.suggestion
+				expect(data.result).to.deep.equal testCase.result
 				dataCalled()
 			.on 'end', ->
 				expect(dataCalled).to.have.been.called.exactly(testCase.matches)
 				done()
-			.parse('l')
+			.parse(testCase.input)
 		, done
 
 	it 'handles a schema with a choice', (done) ->
@@ -67,6 +85,7 @@ describe 'Parser', ->
 					]
 				sentence: true
 			matches: 0
+			result: {}
 		,
 			input: 't'
 			desc: '1 match'
@@ -77,10 +96,10 @@ describe 'Parser', ->
 						'super'
 						'test'
 					]
-					separator: ' test '
 				sentence: true
 			matches: 1
-			results: ['test']
+			suggestions: ['test']
+			result: {}
 		,
 			input: 't'
 			desc: '2 matches'
@@ -91,21 +110,43 @@ describe 'Parser', ->
 						'test'
 						'turbulence'
 					]
-					separator: ''
 				sentence: true
 			matches: 2
-			results: ['test', 'turbulence']
+			suggestions: ['test', 'turbulence']
+			result: {}
+		,
+			input: 't'
+			desc: 'results'
+			schema:
+				root:
+					type: 'choice'
+					id: 'theChoice'
+					children: [
+						type: 'literal'
+						display: 'test'
+						value: 'should be'
+					,
+						type: 'literal'
+						display: 'nope'
+						value: 'wrong'
+					]
+				sentence: true
+			matches: 1
+			suggestions: ['test']
+			result:
+				theChoice: 'should be'
 		]
 		async.each testCases, (testCase, done) ->
 			dataCalled = chai.spy()
 			new Parser()
 			.use testCase.schema
 			.on 'data', (data) ->
-				expect(data).to.exist
-				expect(data.suggestion).to.exist
-				expect(data.suggestion.charactersComplete).to.equal 1
-				expect(data.suggestion.words).to.have.length 1
-				expect(testCase.results).to.contain data.suggestion.words[0].string
+				expect(data, testCase.desc).to.exist
+				expect(data.suggestion, testCase.desc).to.exist
+				expect(data.suggestion.charactersComplete, testCase.desc).to.equal 1
+				expect(data.suggestion.words, testCase.desc).to.have.length 1
+				expect(testCase.suggestions, testCase.desc).to.contain data.suggestion.words[0].string
+				expect(data.result, testCase.desc).to.deep.equal testCase.result
 				dataCalled()	
 			.on 'end', ->
 				expect(dataCalled).to.have.been.called.exactly(testCase.matches)
@@ -126,6 +167,7 @@ describe 'Parser', ->
 					]
 				sentence: true
 			matches: 1
+			result: {}
 			suggestions: ['man']
 		,
 			input: 'super test m'
@@ -140,6 +182,7 @@ describe 'Parser', ->
 					separator: ' test '
 				sentence: true
 			suggestions: ['man']
+			result: {}
 			matches: 1
 		,
 			input: 'superm'
@@ -154,6 +197,7 @@ describe 'Parser', ->
 					separator: ''
 				sentence: true
 			suggestions: ['man']
+			result: {}
 			matches: 1
 		,
 			input: 'superm'
@@ -172,8 +216,23 @@ describe 'Parser', ->
 					]
 					separator: ''
 				sentence: true
+			result: {}
 			suggestions: ['man', 'minnow']
 			matches: 2
+		,
+			input: 'super m'
+			desc: 'value'
+			schema:
+				root:
+					type: 'sequence'
+					children: [ 'super' , 'man' ]
+					id: 'test'
+					value: 'superman'
+				sentence: true
+			result:
+				test: 'superman'
+			suggestions: ['man']
+			matches: 1
 		]
 
 		async.each testCases, (testCase, done) ->
@@ -185,7 +244,8 @@ describe 'Parser', ->
 				expect(data.suggestion, testCase.desc).to.exist
 				expect(data.suggestion.charactersComplete, testCase.desc).to.equal 1
 				expect(data.suggestion.words, testCase.desc).to.have.length 1
-				expect(testCase.suggestions).to.contain data.suggestion.words[0].string
+				expect(testCase.suggestions, testCase.desc).to.contain data.suggestion.words[0].string
+				expect(data.result, testCase.desc).to.deep.equal testCase.result
 				dataCalled()
 			.on 'end', ->
 				expect(dataCalled, testCase.desc).to.have.been.called.exactly(testCase.matches)
@@ -430,7 +490,7 @@ describe 'Parser', ->
 			new Parser()
 			.use testCase.schema
 			.on 'data', (data) ->
-			dataCalled()
+				dataCalled()
 				expect(data, testCase.desc).to.exist
 				expect(data.match, testCase.desc).to.exist
 				expect(data.match[0].string, testCase.desc).to.equal testCase.result

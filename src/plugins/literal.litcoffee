@@ -13,6 +13,4 @@
 			root:
 				type: 'value'
 				compute: 'literal'
-
-
-
+				id: '@value'

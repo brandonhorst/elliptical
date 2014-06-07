@@ -9,6 +9,7 @@
 
 	class Queue extends Group
 		constructor: (options, factory) ->
+			super options
 			@children = (factory.create(child) for child in options.children)
 
 		handleParse: (input, context, data, done) ->

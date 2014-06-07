@@ -8,6 +8,7 @@
 
 	class Repeat extends Group
 		constructor: (options, factory) ->
+			super options
 			@child = factory.create(options.child)
 			@separator = factory.create(options.separator ? ' ')
 			@max = options.max ? Number.MAX_VALUE ####MAX/MIN ARE NOT YET IMPLEMENTED

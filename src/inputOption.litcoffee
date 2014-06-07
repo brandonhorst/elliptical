@@ -66,7 +66,8 @@ This is not a match at all
 
 Then, modify the result
 	
-			newResult[id] = value
+			if typeof value isnt 'undefined'
+				newResult[id] = value
 
 And send it on (if there is a match)
 			

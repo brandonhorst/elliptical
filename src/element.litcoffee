@@ -1,16 +1,13 @@
 #Includes
 
-	{EventEmitter} = require 'events'
-
 #Element
 
 	class Element
-		constructor: (options) ->
-			@id = options.id
-			@optional = options.optional ? false
+		@tempId: 0
 
-			delete options.id
-			delete options.optional
+		constructor: (options) ->
+			@id = options.id ? '@temp-' + (++@constructor.tempId)
+			@optional = options.optional ? false
 
 		parse: (input, context, data, done) ->
 			if @optional
@@ -21,6 +18,6 @@
 Abstract method handleParse
 
 		handleParse: (input, context, data, done) =>
-			throw Error('You must override abstract method handlParse')
+			throw Error('You must override abstract method handleParse')
 
 	module.exports = Element
