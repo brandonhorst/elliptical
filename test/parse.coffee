@@ -277,7 +277,8 @@ describe 'Parser', ->
 						'test'
 					]
 				sentence: true
-			result: 'test'
+			suggestion: 'test'
+			result: {}
 			matches: 1
 		,
 			input: 't'
@@ -290,7 +291,29 @@ describe 'Parser', ->
 						'turbulence'
 					]
 				sentence: true
-			result: 'test'
+			suggestion: 'test'
+			result: {}
+			matches: 1
+		,
+			input: 't'
+			desc: '2 options - pick first'
+			schema:
+				root:
+					type: 'queue'
+					id: 'myId'
+					children: [
+						type: 'literal'
+						display: 'test'
+						value: 'right one'
+					,
+						type: 'literal'
+						display: 'turbulence'
+						value: 'wrong one'
+
+					]
+				sentence: true
+			suggestion: 'test'
+			result: {myId: 'right one'}
 			matches: 1
 		]
 
@@ -304,7 +327,8 @@ describe 'Parser', ->
 				expect(data.suggestion, testCase.desc).to.exist
 				expect(data.suggestion.charactersComplete, testCase.desc).to.equal 1
 				expect(data.suggestion.words, testCase.desc).to.have.length 1
-				expect(data.suggestion.words[0].string, testCase.desc).to.equal testCase.result
+				expect(data.suggestion.words[0].string, testCase.desc).to.equal testCase.suggestion
+				expect(data.result, testCase.desc).to.deep.equal testCase.result
 				dataCalled()
 			.on 'end', ->
 				expect(dataCalled, testCase.desc).to.have.been.called.exactly(testCase.matches)

@@ -22,6 +22,8 @@ true is not an error, and the completion handler for the eachSeries call will de
 
 				child.parse input, context, (result) =>
 					hasData = true
+					if result.result[child.id]?
+						result.result[@id] = result.result[child.id]
 					data(result)
 				, (err) =>
 					if err?
