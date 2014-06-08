@@ -13,10 +13,9 @@
 
 		handleParse: (input, context, data, done) ->
 			async.each @children, (child, done) =>
-				child.parse input, context, (result) =>
-					if result.result[child.id]?
-						result.result[@id] = result.result[child.id]
-					data(result)
+				child.parse input, context, (option) =>
+					newResult = option.handleValue(@id, option.result[child.id])
+					data(newResult)
 				, done
 			, done
 

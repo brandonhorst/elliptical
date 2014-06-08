@@ -32,14 +32,13 @@ Remove the last separator, so that there is 1 separator between every child
 
 			parseChild = (childIndex, input) =>
 				parsesActive++
-				@children[childIndex].parse input, context, (result) =>
+				@children[childIndex].parse input, context, (option) =>
 
 					if childIndex is @children.length - 1
-						if typeof @value isnt 'undefined'
-							result.result[@id] = @value
-						data(result)
+						newResult = option.handleValue(@id, @value)
+						data(newResult)
 					else
-						parseChild(childIndex+1, result)
+						parseChild(childIndex+1, option)
 				, (err) =>
 					if err?
 						done(err)

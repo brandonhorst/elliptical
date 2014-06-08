@@ -1,6 +1,7 @@
 #Includes
 
 	_ = require 'lodash'
+	util = require 'util'
 
 	Group = require './group'
 
@@ -18,15 +19,23 @@
 
 Parse the child. If it gets data, pass the data on, then try the separator.
 If the separator gets data too, loop around. If either doesn't get data, we're done.
+If it already has a suggestion, we're also done - we will never suggest more than one repeat
 
 			parsesActive = 0
 
 			parseChild = (input) =>
 				parsesActive++
-				@child.parse input, context, (result) =>
-					data(result)
-					if result.suggestion.words.length is 0
-						parseSeparator(result)
+				@child.parse input, context, (option) =>
+					newResult = if util.isArray(option.result[@id]) then option.result[@id] else []
+					if typeof option.result[@child.id] isnt 'undefined'
+						newResult.push option.result[@child.id]
+					newOption = option.handleValue(@id, newResult)
+					newOption = newOption.handleValue(@child.id, undefined)
+
+					continueToSeparator = newOption.suggestion.words.length is 0 #store it, in case data changes it
+					data(newOption)
+					if continueToSeparator
+						parseSeparator(newOption)
 				, (err) =>
 					if err?
 						done(err)
@@ -37,8 +46,8 @@ If the separator gets data too, loop around. If either doesn't get data, we're d
 
 			parseSeparator = (input) =>
 				parsesActive++
-				@separator.parse input, context, (result) =>
-					parseChild(result)
+				@separator.parse input, context, (option) =>
+					parseChild(option)
 				, (err) =>
 					if err?
 						done(err)

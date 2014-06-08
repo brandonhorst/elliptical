@@ -20,11 +20,10 @@ true is not an error, and the completion handler for the eachSeries call will de
 			async.eachSeries @children, (child, done) =>
 				hasData = false
 
-				child.parse input, context, (result) =>
+				child.parse input, context, (option) =>
 					hasData = true
-					if result.result[child.id]?
-						result.result[@id] = result.result[child.id]
-					data(result)
+					newResult = option.handleValue(@id, option.result[child.id])
+					data(newResult)
 				, (err) =>
 					if err?
 						done(err)

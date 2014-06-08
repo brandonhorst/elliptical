@@ -39,7 +39,7 @@
 			async.each _.filter(@phrases, (item) -> item.sentence), (phrase, done) =>
 				phrase.parse input, null, (result) =>
 					if result.text is ''
-						@emit 'data', _.cloneDeep(result)
+						@emit 'data', result
 				, done
 
 			, (err) =>

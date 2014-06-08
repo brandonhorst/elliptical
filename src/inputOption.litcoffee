@@ -9,7 +9,15 @@
 	class InputOption
 		constructor: (@text = "", @match = [], @suggestion = {words: []}, @completion = [], @result = {}) ->
 
-		handleString: (string, partOfSpeech, id, value) ->
+		handleValue: (id, value) ->
+			newResult = _.cloneDeep(@result)
+			if typeof value is 'undefined'
+				delete newResult[id]
+			else
+				newResult[id] = value
+			return new InputOption(@text, @match, @suggestion, @completion, newResult)
+
+		handleString: (string, partOfSpeech) ->
 			newText = @text
 			newMatch = _.cloneDeep(@match)
 			newSuggestion = _.cloneDeep(@suggestion)
@@ -63,11 +71,6 @@ This is not a match at all
 
 				else
 					return null
-
-Then, modify the result
-	
-			if typeof value isnt 'undefined'
-				newResult[id] = value
 
 And send it on (if there is a match)
 			

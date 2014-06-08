@@ -15,8 +15,9 @@
 		handleParse: (input, context, data, done) ->
 			@scope[@options.compute].call context, input.text, (suggestion) =>
 				{value, display} = suggestion
-				output = input.handleString(display, @partOfSpeech, @id, value)
+				output = input.handleString(display, @partOfSpeech)
 				if output?
+					output = output.handleValue(@id, value)
 					data(output)
 			, done
 
