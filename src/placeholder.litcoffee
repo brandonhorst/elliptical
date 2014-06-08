@@ -3,7 +3,7 @@
 	_ = require 'lodash'
 	
 	Element = require './element'
-	InputOption = require './inputOption'
+	InputOption = require './input-option'
 
 #Placeholder
 

@@ -7,7 +7,7 @@
 
 	ElementFactory = require './element-factory'
 	Phrase = require './phrase'
-	InputOption = require './inputOption'
+	InputOption = require './input-option'
 
 #Lacona
 
