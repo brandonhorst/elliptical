@@ -1,6 +1,7 @@
 #Includes
 	
 	util = require 'util'
+	lutil = require '../lacona-util'
 
 #Freetext
 	
@@ -13,8 +14,7 @@
 					else
 						regex = new RegExp("^#{@regex}$")
 
-				for i in [0...inputString.length]
-					stringPart = inputString[..i]
+				for stringPart in lutil.splitString(inputString)
 					if not regex? or stringPart.match(regex)
 						data
 							display: stringPart
