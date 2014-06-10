@@ -530,9 +530,40 @@ describe 'Parser', ->
 			schema:
 				root:
 					type: 'integer'
-					id: 'test'
 				sentence: true
 			matches: 0
+		,
+			input: '12'
+			desc: 'more than max'
+			schema:
+				root:
+					type: 'integer'
+					max: 10
+				sentence: true
+			matches: 0
+		,
+			input: '12'
+			desc: 'less than min'
+			schema:
+				root:
+					type: 'integer'
+					min: 15
+				sentence: true
+			matches: 0
+		,
+			input: '12'
+			desc: 'single number (max and min are inclusive)'
+			schema:
+				root:
+					type: 'integer'
+					max: 12
+					min: 12
+					id: 'test'
+				sentence: true
+			match: '12'
+			result: 
+				test: 12
+			matches: 1
 		]
 
 		async.each testCases, (testCase, done) ->
