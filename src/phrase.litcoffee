@@ -7,7 +7,7 @@
 
 	class Phrase
 		constructor: (options, @scope, elementFactory) ->
-			{@name, @sentence} = options
+			{@name, @sentence, @evaluate} = options
 			@root = elementFactory.create(options.root)
 
 		parse: (input, context, data, done) ->
@@ -17,8 +17,8 @@
 			, done
 
 		getValue: (options, result) ->
-			if options.evaluate?
-				return @scope[options.evaluate].call(options, result)
+			if @evaluate?
+				return @scope[@evaluate].call(options, result)
 			else
 				return result['@value']
 
