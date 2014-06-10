@@ -1,11 +1,13 @@
 _ = require 'lodash'
 async = require 'async'
+moment = require 'moment'
 chai = require 'chai'
-spies = require 'chai-spies'
+chai.use require 'chai-spies'
+chai.use require 'chai-datetime'
+
 {Parser} = require '../src/lacona'
 
-chai.config.includeStack = true
-chai.use spies
+# chai.config.includeStack = true
 expect = chai.expect
 
 describe 'Parser', ->
@@ -481,12 +483,16 @@ describe 'Parser', ->
 					separator: null
 					children: [
 						type: 'freetext'
+						regex: /any/
+						id: 'test'
 					,
 						'thing'
 					]
 				sentence: true
-			result: ['any', 'thing']
-			matches: 2
+			match: ['any', 'thing']
+			result:
+				test: 'any'
+			matches: 1
 
 
 		dataCalled = chai.spy()
@@ -497,12 +503,9 @@ describe 'Parser', ->
 			dataCalled()
 			expect(data, testCase.desc).to.exist
 			expect(data.match, testCase.desc).to.exist
-			if data.suggestion.words.length > 0
-				expect(data.match[0].string, testCase.desc).to.equal testCase.input
-				expect(data.suggestion.words[0].string, testCase.desc).to.equal testCase.schema.root.children[1]
-			else
-				for i in [0...testCase.result.length]
-					expect(data.match[i].string, testCase.desc).to.equal testCase.result[i]
+			for i in [0...testCase.match.length]
+				expect(data.match[i].string, testCase.desc).to.equal testCase.match[i]
+			expect(data.result, testCase.desc).to.deep.equal testCase.result
 		.on 'end', ->
 			expect(dataCalled, testCase.desc).to.have.been.called.exactly(testCase.matches)
 			done()
@@ -515,8 +518,11 @@ describe 'Parser', ->
 			schema:
 				root:
 					type: 'integer'
+					id: 'test'
 				sentence: true
-			result: '1234'
+			match: '1234'
+			result:
+				test: 1234
 			matches: 1
 		,
 			input: '12b4'
@@ -524,6 +530,7 @@ describe 'Parser', ->
 			schema:
 				root:
 					type: 'integer'
+					id: 'test'
 				sentence: true
 			matches: 0
 		]
@@ -536,7 +543,70 @@ describe 'Parser', ->
 				dataCalled()
 				expect(data, testCase.desc).to.exist
 				expect(data.match, testCase.desc).to.exist
-				expect(data.match[0].string, testCase.desc).to.equal testCase.result
+				expect(data.match[0].string, testCase.desc).to.equal testCase.match
+				expect(data.result).to.deep.equal testCase.result
+			.on 'end', ->
+				expect(dataCalled, testCase.desc).to.have.been.called.exactly(testCase.matches)
+				done()
+			.parse(testCase.input)
+		, done
+
+	it 'handles an date (complete)', (done) ->
+		testCases = [
+			input: 'today'
+			desc: 'today'
+			schema:
+				root:
+					type: 'date'
+					id: 'test'
+				sentence: true
+			result:
+				test: moment({hour: 0}).toDate()
+			matches: 1
+		,
+			input: 'tomorrow'
+			desc: 'tomorrow'
+			schema:
+				root:
+					type: 'date'
+					id: 'test'
+				sentence: true
+			result:
+				test: moment({hour: 0}).add(1, 'd').toDate()
+			matches: 1
+		,
+			input: 'the day after tomorrow'
+			desc: 'the day after tomorrow'
+			schema:
+				root:
+					type: 'date'
+					id: 'test'
+				sentence: true
+			result:
+				test: moment({hour: 0}).add(2, 'd').toDate()
+			matches: 1
+		,
+			input: 'in 3 days'
+			desc: 'in n days'
+			schema:
+				root:
+					type: 'date'
+					id: 'test'
+				sentence: true
+			result:
+				test: moment({hour: 0}).add(3, 'd').toDate()
+			matches: 1
+		]
+
+		async.each testCases, (testCase, done) ->
+			dataCalled = chai.spy()
+			new Parser()
+			.use testCase.schema
+			.on 'data', (data) ->
+				dataCalled()
+				expect(data, testCase.desc).to.exist
+				expect(data.result, testCase.desc).to.exist
+				expect(data.result.test, testCase.desc).to.equalDate testCase.result.test
 			.on 'end', ->
 				expect(dataCalled, testCase.desc).to.have.been.called.exactly(testCase.matches)
 				done()

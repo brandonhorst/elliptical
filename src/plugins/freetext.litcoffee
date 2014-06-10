@@ -26,5 +26,7 @@
 			root:
 				type: 'value'
 				compute: 'checkRegex'
+				id: '@value'
+
 
 
