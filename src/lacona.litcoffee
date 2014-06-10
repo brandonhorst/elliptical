@@ -17,6 +17,7 @@
 			@use require('./plugins/literal')
 			@use require('./plugins/freetext')
 			@use require('./plugins/integer')
+			@use require('./plugins/date')
 
 		phraseAccessor: (name) =>
 			_.find @phrases, (phrase) ->
@@ -29,7 +30,7 @@
 				schema = [schema]
 			for phrase in schema
 				elementFactory = new ElementFactory(scope, @)
-				@phrases.push new Phrase(phrase, elementFactory)
+				@phrases.push new Phrase(phrase, scope, elementFactory)
 			return @
 
 

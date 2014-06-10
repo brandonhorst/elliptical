@@ -16,9 +16,14 @@
 		handleParse: (input, context, data, done) ->
 			oldResult = _.cloneDeep(input.result)
 
-			@phraseAccessor(@type).parse input, @options, (option) =>
+			phrase = @phraseAccessor(@type)
+
+			phrase.parse input, @options, (option) =>
+				value = phrase.getValue(@options, option.result)
+
 				newOption = new InputOption(option.text, option.match, option.suggestion, option.completion, oldResult)
-				newOption = newOption.handleValue(@id, option.result['@value'])
+				newOption = newOption.handleValue(@id, value)
+
 				data(newOption)
 			, done
 
