@@ -7,8 +7,8 @@
 	module.exports =
 		scope:
 			getDate: (result) ->
-				if result.relativeDate?
-					return moment({hour: 0}).add(result.relativeDate, 'd').toDate()
+				if result.relativeDay?
+					return moment({hour: 0}).add(result.relativeDay, 'd').toDate()
 				else
 					return moment().toDate()
 		schema: [
@@ -45,17 +45,17 @@
 				type: 'choice'
 				children: [
 					type: 'literal'
-					id: 'relativeDate'
+					id: 'relativeDay'
 					display: 'today'
 					value: 0
 				,
 					type: 'literal'
-					id: 'relativeDate'
+					id: 'relativeDay'
 					display: 'tomorrow'
 					value: 1
 				,
 					type: 'literal'
-					id: 'relativeDate'
+					id: 'relativeDay'
 					display: 'the day after tomorrow'
 					value: 2
 				,
@@ -64,7 +64,8 @@
 						'in'
 					,
 						type: 'integer'
-						id: 'relativeDate'
+						id: 'relativeDay'
+						min: 1
 					,
 						'days'
 					]
