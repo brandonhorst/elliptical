@@ -49,5 +49,22 @@
 				else
 					@emit 'end'
 
+	convertToHTML = (inputOption) ->
+		html = '<div class="option">'
+		html += '<span class="match">'
+		for match in inputOption.match
+			html += "<span class='word #{match.partOfSpeech}'>#{match.string}</span>"
+		html += '</span><span class="suggestion">'
+		for suggestion in inputOption.suggestion.words
+			html += "<span class='word #{suggestion.partOfSpeech}'>#{suggestion.string}</span>"
+		html += '</span><span class="completion">'
+		for completion in inputOption.completion
+			html += "<span class='word #{completion.partOfSpeech}'>#{completion.string}</span>"
+		html += '</span></div>'
+		
+		return html
+
 	module.exports =
 		Parser: Parser
+		convertToHTML: convertToHTML
+

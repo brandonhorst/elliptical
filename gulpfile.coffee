@@ -1,7 +1,12 @@
 gulp = require 'gulp'
-util = require 'gulp-util'
+browserify = require 'gulp-browserify'
+coffee = require 'gulp-coffee'
+jade = require 'gulp-jade'
 mocha = require 'gulp-mocha'
+rename = require 'gulp-rename'
 watch = require 'gulp-watch'
+uglify = require 'gulp-uglify'
+util = require 'gulp-util'
 
 paths =
 	test: 'test/**/*.coffee'
@@ -23,4 +28,24 @@ gulp.task 'watch', ->
 			if not /tests? failed/.test(err.stack)
 				util.log err.stack
 			@emit 'end'
+
+
+gulp.task 'build', ->
+	gulp.src 'src/lacona.litcoffee', {read: false}
+	.pipe browserify
+		transform: ['coffeeify']
+		extensions: ['.coffee', '.litcoffee']
+		standalone: 'lacona'
+	# .pipe uglify()
+	.pipe rename 'lacona.min.js'
+	.pipe gulp.dest 'build'
+
+gulp.task 'demo', ->
+	gulp.src 'demo/demo.litcoffee'
+	.pipe coffee()
+	.pipe gulp.dest 'demo'
+
+	gulp.src 'demo/index.jade'
+	.pipe jade()
+	.pipe gulp.dest ''
 	return
