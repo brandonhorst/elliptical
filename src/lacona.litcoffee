@@ -14,16 +14,16 @@
 	class Parser extends EventEmitter
 		constructor: (@options) ->
 			@phrases = []
-			@use require('./plugins/literal')
-			@use require('./plugins/freetext')
-			@use require('./plugins/integer')
-			@use require('./plugins/date')
+			@understand require('./plugins/literal')
+			@understand require('./plugins/freetext')
+			@understand require('./plugins/integer')
+			@understand require('./plugins/date')
 
 		phraseAccessor: (name) =>
 			_.find @phrases, (phrase) ->
 				phrase.name is name
 
-		use: (options) ->
+		understand: (options) ->
 			scope = options.scope
 			schema = if options.schema? then options.schema else options
 			if not util.isArray(schema)
@@ -61,7 +61,7 @@
 		for completion in inputOption.completion
 			html += "<span class='word #{completion.partOfSpeech}'>#{completion.string}</span>"
 		html += '</span></div>'
-		
+
 		return html
 
 	module.exports =

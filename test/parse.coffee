@@ -59,7 +59,7 @@ describe 'Parser', ->
 			dataCalled = chai.spy()
 
 			new Parser()
-			.use testCase.schema
+			.understand testCase.schema
 			.on 'data', (data) ->
 				expect(data).to.exist
 				expect(data.suggestion).to.exist
@@ -141,7 +141,7 @@ describe 'Parser', ->
 		async.each testCases, (testCase, done) ->
 			dataCalled = chai.spy()
 			new Parser()
-			.use testCase.schema
+			.understand testCase.schema
 			.on 'data', (data) ->
 				expect(data, testCase.desc).to.exist
 				expect(data.suggestion, testCase.desc).to.exist
@@ -240,7 +240,7 @@ describe 'Parser', ->
 		async.each testCases, (testCase, done) ->
 			dataCalled = chai.spy()
 			new Parser()
-			.use testCase.schema
+			.understand testCase.schema
 			.on 'data', (data) ->
 				expect(data, testCase.desc).to.exist
 				expect(data.suggestion, testCase.desc).to.exist
@@ -323,7 +323,7 @@ describe 'Parser', ->
 		async.each testCases, (testCase, done) ->
 			dataCalled = chai.spy()
 			new Parser()
-			.use testCase.schema
+			.understand testCase.schema
 			.on 'data', (data) ->
 				expect(data, testCase.desc).to.exist
 				expect(data.suggestion, testCase.desc).to.exist
@@ -396,7 +396,7 @@ describe 'Parser', ->
 		async.each testCases, (testCase, done) ->
 			dataCalled = chai.spy()
 			new Parser()
-			.use testCase.schema
+			.understand testCase.schema
 			.on 'data', (data) ->
 				dataCalled()
 				expect(data, testCase.desc).to.exist
@@ -458,7 +458,7 @@ describe 'Parser', ->
 		async.each testCases, (testCase, done) ->
 			dataCalled = chai.spy()
 			new Parser()
-			.use testCase.schema
+			.understand testCase.schema
 			.on 'data', (data) ->
 				dataCalled()
 				expect(data, testCase.desc).to.exist
@@ -498,7 +498,7 @@ describe 'Parser', ->
 		dataCalled = chai.spy()
 
 		new Parser()
-		.use testCase.schema
+		.understand testCase.schema
 		.on 'data', (data) ->
 			dataCalled()
 			expect(data, testCase.desc).to.exist
@@ -569,7 +569,7 @@ describe 'Parser', ->
 		async.each testCases, (testCase, done) ->
 			dataCalled = chai.spy()
 			new Parser()
-			.use testCase.schema
+			.understand testCase.schema
 			.on 'data', (data) ->
 				dataCalled()
 				expect(data, testCase.desc).to.exist
@@ -632,7 +632,7 @@ describe 'Parser', ->
 		async.each testCases, (testCase, done) ->
 			dataCalled = chai.spy()
 			new Parser()
-			.use testCase.schema
+			.understand testCase.schema
 			.on 'data', (data) ->
 				dataCalled()
 				expect(data, testCase.desc).to.exist
