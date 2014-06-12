@@ -7,7 +7,9 @@
 
 	class Phrase
 		constructor: (options, @scope, elementFactory) ->
-			{@name, @sentence, @evaluate, @extends, @precedes} = options
+			{@name, @sentence, @evaluate} = options
+			@extends = options.extends ? []
+			@precedes = options.precedes ? []
 			@root = elementFactory.create(options.root)
 
 		parse: (input, context, data, done) ->

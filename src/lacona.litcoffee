@@ -23,8 +23,8 @@
 			@understand require('./plugins/date')
 
 		phraseAccessor: (name) =>
-			_.find @phrases, (phrase) ->
-				phrase.name is name
+			_.filter @phrases, (phrase) ->
+				phrase.name is name or name in phrase.extends
 
 ###`understand`
 

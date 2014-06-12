@@ -74,6 +74,40 @@ describe 'Parser', ->
 			.parse(testCase.input)
 		, done
 
+	it 'handles phrases with extension', (done) ->
+		testCase =
+			input: 't'
+			desc: 'extension'
+			schemata: [
+				name: 'extended'
+				root: 'test'
+			,
+				name: 'extender'
+				extends: ['extended']
+				root: 'totally'
+			,
+				root:
+					type: 'extended'
+				sentence: true
+			]
+			matches: 2
+			suggestions: ['test', 'totally']
+
+		dataCalled = chai.spy()
+		new Parser()
+		.understand testCase.schemata[0]
+		.understand testCase.schemata[1]
+		.understand testCase.schemata[2]
+		.on 'data', (data) ->
+			expect(data, testCase.desc).to.exist
+			expect(testCase.suggestions, testCase.desc).to.contain data.suggestion.words[0].string
+			dataCalled()
+		.on 'end', ->
+			expect(dataCalled, testCase.desc).to.have.been.called.exactly(testCase.matches)
+			done()
+		.parse testCase.input
+
+
 	it 'handles a schema with a choice', (done) ->
 		testCases = [
 			input: 'test'
