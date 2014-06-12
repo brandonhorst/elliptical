@@ -14,6 +14,9 @@
 	class Parser extends EventEmitter
 		constructor: (@options) ->
 			@phrases = []
+
+			@middleware = []
+
 			@understand require('./plugins/literal')
 			@understand require('./plugins/freetext')
 			@understand require('./plugins/integer')
@@ -22,6 +25,10 @@
 		phraseAccessor: (name) =>
 			_.find @phrases, (phrase) ->
 				phrase.name is name
+
+###`understand`
+
+`understand` takes a schema and scope, and defines a set of words for Lacona to understand
 
 		understand: (options) ->
 			scope = options.scope
@@ -33,14 +40,24 @@
 				@phrases.push new Phrase(phrase, scope, elementFactory)
 			return @
 
+###`use`
+
+`use` defines middleware. It must be passed a function that accepts 2 arguments, an inputOption,
+and a callback that should be passed an error (or null) and a modulated inputOption. This will be passed
+to the `data` event (or the next middleware) rather than the inputOption itself.
+
+		use: (next) ->
+			@middleware.push next
 
 		parse: (inputText) ->
 			input = new InputOption(inputText)
 				
 			async.each _.filter(@phrases, (item) -> item.sentence), (phrase, done) =>
-				phrase.parse input, null, (result) =>
-					if result.text is ''
-						@emit 'data', result
+				phrase.parse input, null, (option) =>
+					if option.text is ''
+						@_applyMiddleware option, (err, finalOption) =>
+							return done(err) if err?
+							@emit 'data', finalOption
 				, done
 
 			, (err) =>
@@ -48,6 +65,15 @@
 					@emit 'error', err
 				else
 					@emit 'end'
+
+		_applyMiddleware: (data, done) ->
+			async.eachSeries @middleware, (call, done) ->
+				call data, (err, newData) ->
+					return done(err) if err?
+					data = newData
+			, (err) ->
+				done(err, data)
+
 
 	convertToHTML = (inputOption) ->
 		html = '<div class="option">'

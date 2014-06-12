@@ -7,7 +7,7 @@ chai.use require 'chai-datetime'
 
 {Parser} = require '../src/lacona'
 
-# chai.config.includeStack = true
+chai.config.includeStack = true
 expect = chai.expect
 
 describe 'Parser', ->
