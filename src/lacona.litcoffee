@@ -55,9 +55,11 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 			async.each _.filter(@phrases, (item) -> item.sentence), (phrase, done) =>
 				phrase.parse input, null, (option) =>
 					if option.text is ''
-						@_applyMiddleware option, (err, finalOption) =>
+						async.eachSeries @middleware, (call, done) =>
+							call option, done
+						, (err) =>
 							return done(err) if err?
-							@emit 'data', finalOption
+							@emit 'data', option
 				, done
 
 			, (err) =>
@@ -66,16 +68,8 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 				else
 					@emit 'end'
 
-		_applyMiddleware: (data, done) ->
-			async.eachSeries @middleware, (call, done) ->
-				call data, (err, newData) ->
-					return done(err) if err?
-					data = newData
-			, (err) ->
-				done(err, data)
 
-
-	convertToHTML = (inputOption) ->
+	convertToHTML = (inputOption, done) ->
 		html = '<div class="option">'
 		html += '<span class="match">'
 		for match in inputOption.match
@@ -88,7 +82,8 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 			html += "<span class='word #{completion.partOfSpeech}'>#{completion.string}</span>"
 		html += '</span></div>'
 
-		return html
+		inputOption.html = html
+		done()
 
 	module.exports =
 		Parser: Parser
