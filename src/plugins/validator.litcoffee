@@ -2,7 +2,7 @@
 
 	module.exports =
 		scope:
-			_validate: (inputString, data, done) ->
+			validate: (inputString, data, done) ->
 				@$call @validate, inputString, (err, isValid) ->
 					return done(err) if err?
 					if isValid
@@ -15,5 +15,5 @@
 			name: 'validator'
 			root:
 				type: 'value'
-				compute: '_validate'
+				compute: 'validate'
 				id: '@value'
