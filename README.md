@@ -314,7 +314,7 @@ Handles a text representation of a time. The exact phrases that it accepts depen
 `list` is used in instances where the available options are dynamic. It can be thought of as a `choice` full of a dynamic number of `literal`s. For example, you would use this if a user must enter the name of a Product, and the list of Products is pulled from a web service.
 
 	{
-		collect: String (Function(inputString, done)),
+		collect: String (Function(done)),
 		refresh: String ('initialize', 'parse') [default: 'initialize']
 	}
 

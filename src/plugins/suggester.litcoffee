@@ -12,7 +12,7 @@
 					data
 						display: suggestion
 						value: suggestion
-				done()
+					done()
 
 		schema:
 			name: 'suggester'

@@ -9,7 +9,7 @@
 						data
 							display: inputString
 							value: inputString
-				done()
+					done()
 
 		schema:
 			name: 'validator'

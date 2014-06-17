@@ -120,7 +120,8 @@ describe 'Parser', ->
 				sentence: true
 			scope:
 				validate: (input, done) ->
-					done(null, input is 'test')
+					process.nextTick ->
+						done(null, input is 'test')
 			result:
 				testId: 'test'
 			matches: 1
@@ -168,7 +169,8 @@ describe 'Parser', ->
 				sentence: true
 			scope:
 				suggest: (input, done) ->
-					done(null, "#{input} and more")
+					process.nextTick ->
+						done(null, "#{input} and more")
 			result1:
 				testId: 'test'
 			result2:
@@ -208,17 +210,17 @@ describe 'Parser', ->
 					id: 'testId'
 				sentence: true
 			scope:
-				collect: chai.spy (input, done) ->
-					done null, [
-						display: 'test'
-						value: 'test value'
-					,
-						display: 'tesla'
-						value: 'tesla motors'
-					]
+				collect: chai.spy (done) ->
+					process.nextTick ->
+						done null, [
+							display: 'test'
+							value: 'test value'
+						,
+							display: 'tesla'
+							value: 'tesla motors'
+						]
 			result:
 				testId: 'test value'
-			matches: 1
 
 		dataCalled = chai.spy()
 		new Parser()
@@ -232,9 +234,10 @@ describe 'Parser', ->
 			expect(data.result, testCase.desc).to.deep.equal testCase.result
 			dataCalled()	
 		.on 'end', ->
-			expect(testCase.scope.collect).to.have.been.called.once
-			expect(dataCalled).to.have.been.called.exactly(testCase.matches, testCase.desc)
-			done()
+			expect(testCase.scope.collect, testCase.desc).to.have.been.called.once
+			expect(dataCalled, testCase.desc).to.have.been.called.above(0)
+			if dataCalled.__spy.calls.length is 2
+				done()
 		.parse(testCase.input)
 
 
