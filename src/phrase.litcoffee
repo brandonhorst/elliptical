@@ -7,7 +7,7 @@
 
 	class Phrase
 		constructor: (options, @scope, elementFactory) ->
-			{@name, @sentence, @evaluate} = options
+			{@name, @evaluate, @run} = options
 			@extends = options.extends ? []
 			@precedes = options.precedes ? []
 			@root = elementFactory.create(options.root)

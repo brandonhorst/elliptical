@@ -27,7 +27,7 @@ describe 'Parser', ->
 			input: 'l'
 			schema:
 				root: 'literal test'
-				sentence: true
+				run: ''
 			matches: 1
 			suggestion: 'literal test'
 			result: {}
@@ -37,7 +37,7 @@ describe 'Parser', ->
 				root:
 					type: 'literal'
 					display: 'literal test'
-				sentence: true
+				run: ''
 			matches: 1
 			suggestion: 'literal test'
 			result: {}
@@ -49,7 +49,7 @@ describe 'Parser', ->
 					display: 'literal test'
 					value: 'test'
 					id: 'theLiteral'
-				sentence: true
+				run: ''
 			matches: 1
 			suggestion: 'literal test'
 			result:
@@ -88,7 +88,7 @@ describe 'Parser', ->
 			,
 				root:
 					type: 'extended'
-				sentence: true
+				run: ''
 			]
 			matches: 2
 			suggestions: ['test', 'totally']
@@ -117,7 +117,7 @@ describe 'Parser', ->
 					type: 'validator'
 					validate: 'validate'
 					id: 'testId'
-				sentence: true
+				run: ''
 			scope:
 				validate: (input, done) ->
 					process.nextTick ->
@@ -133,7 +133,7 @@ describe 'Parser', ->
 					type: 'validator'
 					validate: 'validate'
 					id: 'testId'
-				sentence: true
+				run: ''
 			scope:
 				validate: (input, done) ->
 					done(null, input isnt 'test')
@@ -166,7 +166,7 @@ describe 'Parser', ->
 					type: 'suggester'
 					suggest: 'suggest'
 					id: 'testId'
-				sentence: true
+				run: ''
 			scope:
 				suggest: (input, done) ->
 					process.nextTick ->
@@ -208,7 +208,7 @@ describe 'Parser', ->
 					type: 'list'
 					collect: 'collect'
 					id: 'testId'
-				sentence: true
+				run: ''
 			scope:
 				collect: chai.spy (done) ->
 					process.nextTick ->
@@ -252,7 +252,7 @@ describe 'Parser', ->
 						'super'
 						'man'
 					]
-				sentence: true
+				run: ''
 			matches: 0
 			result: {}
 		,
@@ -265,7 +265,7 @@ describe 'Parser', ->
 						'super'
 						'test'
 					]
-				sentence: true
+				run: ''
 			matches: 1
 			suggestions: ['test']
 			result: {}
@@ -279,7 +279,7 @@ describe 'Parser', ->
 						'test'
 						'turbulence'
 					]
-				sentence: true
+				run: ''
 			matches: 2
 			suggestions: ['test', 'turbulence']
 			result: {}
@@ -299,7 +299,7 @@ describe 'Parser', ->
 						display: 'nope'
 						value: 'wrong'
 					]
-				sentence: true
+				run: ''
 			matches: 1
 			suggestions: ['test']
 			result:
@@ -334,7 +334,7 @@ describe 'Parser', ->
 						'super'
 						'man'
 					]
-				sentence: true
+				run: ''
 			matches: 1
 			result: {}
 			suggestions: ['man']
@@ -349,7 +349,7 @@ describe 'Parser', ->
 						'man'
 					]
 					separator: ' test '
-				sentence: true
+				run: ''
 			suggestions: ['man']
 			result: {}
 			matches: 1
@@ -364,7 +364,7 @@ describe 'Parser', ->
 						'man'
 					]
 					separator: ''
-				sentence: true
+				run: ''
 			suggestions: ['man']
 			result: {}
 			matches: 1
@@ -384,7 +384,7 @@ describe 'Parser', ->
 						'man'
 					]
 					separator: ''
-				sentence: true
+				run: ''
 			result: {}
 			suggestions: ['man', 'minnow']
 			matches: 2
@@ -397,7 +397,7 @@ describe 'Parser', ->
 					children: [ 'super' , 'man' ]
 					id: 'test'
 					value: 'superman'
-				sentence: true
+				run: ''
 			result:
 				test: 'superman'
 			suggestions: ['man']
@@ -433,7 +433,7 @@ describe 'Parser', ->
 						'super'
 						'man'
 					]
-				sentence: true
+				run: ''
 			matches: 0
 		,
 			input: 't'
@@ -445,7 +445,7 @@ describe 'Parser', ->
 						'super'
 						'test'
 					]
-				sentence: true
+				run: ''
 			suggestion: 'test'
 			result: {}
 			matches: 1
@@ -459,7 +459,7 @@ describe 'Parser', ->
 						'test'
 						'turbulence'
 					]
-				sentence: true
+				run: ''
 			suggestion: 'test'
 			result: {}
 			matches: 1
@@ -480,7 +480,7 @@ describe 'Parser', ->
 						value: 'wrong one'
 
 					]
-				sentence: true
+				run: ''
 			suggestion: 'test'
 			result: {myId: 'right one'}
 			matches: 1
@@ -515,7 +515,7 @@ describe 'Parser', ->
 					type: 'repeat'
 					child: 'super'
 					separator: 'man'
-				sentence: true
+				run: ''
 			matches: 0
 		,
 			input: 't'
@@ -525,7 +525,7 @@ describe 'Parser', ->
 					type: 'repeat'
 					child: 'test'
 					separator: 'man'
-				sentence: true
+				run: ''
 			suggestion: 'test'
 			result: {}
 			matches: 1
@@ -537,7 +537,7 @@ describe 'Parser', ->
 					type: 'repeat'
 					child: 'test'
 					separator: ' man '
-				sentence: true
+				run: ''
 			suggestion: 'test'
 			result: {}
 			matches: 1
@@ -553,7 +553,7 @@ describe 'Parser', ->
 						display: 'test'
 						value: 'testVal'
 					separator: ' boi '
-				sentence: true
+				run: ''
 			suggestion: 'test'
 			result: {myId: ['testVal', 'testVal']}
 			matches: 1
@@ -587,7 +587,7 @@ describe 'Parser', ->
 			schema:
 				root:
 					type: 'freetext'
-				sentence: true
+				run: ''
 			result: 'anything'
 			matches: 1
 		,
@@ -597,7 +597,7 @@ describe 'Parser', ->
 				root:
 					type: 'freetext'
 					regex: /anything/
-				sentence: true
+				run: ''
 			result: 'anything'
 			matches: 1
 		,
@@ -607,7 +607,7 @@ describe 'Parser', ->
 				root:
 					type: 'freetext'
 					regex: /nothing/
-				sentence: true
+				run: ''
 			matches: 0
 		,
 			input: 'anything'
@@ -616,7 +616,7 @@ describe 'Parser', ->
 				root:
 					type: 'freetext'
 					regex: 'anything'
-				sentence: true
+				run: ''
 			result: 'anything'
 			matches: 1
 		]
@@ -655,7 +655,7 @@ describe 'Parser', ->
 					,
 						'thing'
 					]
-				sentence: true
+				run: ''
 			match: ['any', 'thing']
 			result:
 				test: 'any'
@@ -686,7 +686,7 @@ describe 'Parser', ->
 				root:
 					type: 'integer'
 					id: 'test'
-				sentence: true
+				run: ''
 			match: '1234'
 			result:
 				test: 1234
@@ -697,7 +697,7 @@ describe 'Parser', ->
 			schema:
 				root:
 					type: 'integer'
-				sentence: true
+				run: ''
 			matches: 0
 		,
 			input: '12'
@@ -706,7 +706,7 @@ describe 'Parser', ->
 				root:
 					type: 'integer'
 					max: 10
-				sentence: true
+				run: ''
 			matches: 0
 		,
 			input: '12'
@@ -715,7 +715,7 @@ describe 'Parser', ->
 				root:
 					type: 'integer'
 					min: 15
-				sentence: true
+				run: ''
 			matches: 0
 		,
 			input: '12'
@@ -726,7 +726,7 @@ describe 'Parser', ->
 					max: 12
 					min: 12
 					id: 'test'
-				sentence: true
+				run: ''
 			match: '12'
 			result: 
 				test: 12
@@ -757,7 +757,7 @@ describe 'Parser', ->
 				root:
 					type: 'date'
 					id: 'test'
-				sentence: true
+				run: ''
 			result:
 				test: moment({hour: 0}).toDate()
 			matches: 1
@@ -768,7 +768,7 @@ describe 'Parser', ->
 				root:
 					type: 'date'
 					id: 'test'
-				sentence: true
+				run: ''
 			result:
 				test: moment({hour: 0}).add(1, 'd').toDate()
 			matches: 1
@@ -779,7 +779,7 @@ describe 'Parser', ->
 				root:
 					type: 'date'
 					id: 'test'
-				sentence: true
+				run: ''
 			result:
 				test: moment({hour: 0}).add(2, 'd').toDate()
 			matches: 1
@@ -790,7 +790,7 @@ describe 'Parser', ->
 				root:
 					type: 'date'
 					id: 'test'
-				sentence: true
+				run: ''
 			result:
 				test: moment({hour: 0}).add(3, 'd').toDate()
 			matches: 1
@@ -810,3 +810,30 @@ describe 'Parser', ->
 				done()
 			.parse(testCase.input)
 		, done
+
+
+	it 'can run an inputOption', (done) ->
+		testCase =
+			input: 'test'
+			schema:
+				root: 'test'
+				run: 'run'
+			scope:
+				run: chai.spy (result, done) ->
+					done()
+
+		dataCalled = chai.spy()
+
+		inputOption = null
+		new Parser()
+		.understand {schema: testCase.schema, scope: testCase.scope}
+		.on 'data', (data) ->
+			inputOption = data
+			dataCalled()
+		.on 'end', ->
+			expect(dataCalled, testCase.desc).to.have.been.called.once
+			@run inputOption, (err) ->
+				expect(err).to.not.exist
+				expect(testCase.scope.run).to.have.been.called.once
+				done()
+		.parse(testCase.input)

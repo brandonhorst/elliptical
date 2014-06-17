@@ -55,7 +55,7 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 
 		parse: (inputText) ->
 				
-			async.each _.filter(@phrases, (item) -> item.sentence), (phrase, done) =>
+			async.each _.filter(@phrases, (item) -> item.run?), (phrase, done) =>
 				input = new InputOption(phrase, inputText)
 				phrase.parse input, null, (option) =>
 					if option.text is ''
@@ -74,7 +74,7 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 			return @
 
 		run: (inputOption, done) ->
-			inputOption.sentence
+			inputOption.sentence.scope[inputOption.sentence.run](inputOption.result, done)
 
 
 	convertToHTML = (inputOption, done) ->
