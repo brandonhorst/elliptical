@@ -1,4 +1,4 @@
-#Literal
+#Validator
 
 	module.exports =
 		scope:
