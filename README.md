@@ -22,9 +22,9 @@ You can see that these sentences are basically saying the same thing, but could 
 
 Lacona makes it easy. You provide a grammar explaining what it can expect:
 
-    "remind me to" <task-name> <date/time> OR <date/time>, "remind me to" <task-name>
+    "remind me to" <task name> <date and time> OR <date and time>, "remind me to" <task name>
 
-As long as Lacona knows what a <task-name> and a <date/time> look like, it is good to go. And, as it turns out, it knows _exactly_ what they look like.
+As long as Lacona knows what a `<task name>` and a `<date and time>` look like, it is good to go. And, as it turns out, it knows _exactly_ what they look like.
 
 Making a Lacona grammar to understand those options is easy:
 
