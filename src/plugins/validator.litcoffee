@@ -3,10 +3,12 @@
 	module.exports =
 		scope:
 			_validate: (inputString, data, done) ->
-				if @$call(@validate, inputString)
-					data
-						display: inputString
-						value: inputString
+				@$call @validate, inputString, (err, isValid) ->
+					return done(err) if err?
+					if isValid
+						data
+							display: inputString
+							value: inputString
 				done()
 
 		schema:

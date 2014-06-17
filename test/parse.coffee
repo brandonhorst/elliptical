@@ -119,8 +119,8 @@ describe 'Parser', ->
 					id: 'testId'
 				sentence: true
 			scope:
-				validate: (input) ->
-					input is 'test'
+				validate: (input, done) ->
+					done(null, input is 'test')
 			result:
 				testId: 'test'
 			matches: 1
@@ -134,8 +134,8 @@ describe 'Parser', ->
 					id: 'testId'
 				sentence: true
 			scope:
-				validate: (input) ->
-					input isnt 'test'
+				validate: (input, done) ->
+					done(null, input isnt 'test')
 			matches: 0
 
 		]
