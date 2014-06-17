@@ -156,6 +156,47 @@ describe 'Parser', ->
 			.parse(testCase.input)
 		, done
 
+	it 'handles a schema with a suggester', (done) ->
+		testCases = [
+			input: 'test'
+			desc: 'suggester'
+			schema:
+				root:
+					type: 'suggester'
+					suggest: 'suggest'
+					id: 'testId'
+				sentence: true
+			scope:
+				suggest: (input, done) ->
+					done(null, "#{input} and more")
+			result1:
+				testId: 'test'
+			result2:
+				testId: 'test and more'
+			suggestion2: 'test and more'
+			matches: 2
+		]
+		async.each testCases, (testCase, done) ->
+			dataCalled = chai.spy()
+			new Parser()
+			.understand {scope: testCase.scope, schema: testCase.schema}
+			.on 'data', (data) ->
+				expect(data, testCase.desc).to.exist
+				if data.match.length > 0
+					expect(data.match, testCase.desc).to.have.length 1
+					expect(data.match[0].string, testCase.desc).to.equal testCase.input
+					expect(data.result, testCase.desc).to.deep.equal testCase.result1
+				else
+					expect(data.suggestion.words, testCase.desc).to.have.length 1
+					expect(data.suggestion.words[0].string, testCase.desc).to.equal testCase.suggestion2
+					expect(data.result, testCase.desc).to.deep.equal testCase.result2
+				dataCalled()	
+			.on 'end', ->
+				expect(dataCalled).to.have.been.called.exactly(testCase.matches)
+				done()
+			.parse(testCase.input)
+		, done
+
 	it 'handles a schema with a choice', (done) ->
 		testCases = [
 			input: 'test'
