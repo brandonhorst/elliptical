@@ -25,7 +25,7 @@
 			@understand require('./plugins/suggester')
 			@understand require('./plugins/list')
 
-		phraseAccessor: (name) =>
+		_phraseAccessor: (name) =>
 			_.filter @phrases, (phrase) ->
 				phrase.name is name or name in phrase.extends
 

@@ -38,7 +38,7 @@ If it is just a string, it is interpreted as a literal with just a display prope
 				when 'queue'
 					element = new Queue(trueObject, @)
 				else
-					element = new Placeholder(trueObject, @scope, @lacona.phraseAccessor)
+					element = new Placeholder(trueObject, @scope, @lacona._phraseAccessor)
 
 			return element
 
