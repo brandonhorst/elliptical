@@ -16,7 +16,7 @@ I want to make a tool that reminds me to do something at a certain time. One sol
 * remind me to wash the car at 8am the day after tomorrow
 * remind me to wash the car tomorrow morning
 * remind me to wash the car on the morning of the 23rd
-* remind me to wash the car next monday at eight
+* remind me to wash the car next monday at 8
 
 You can see that these sentences are basically saying the same thing, but could go about it in different ways. But there are a limited number of possibilities. Nobody would say "remind wash the car to 8am of the tomorrow." You can see how parsing these options is a dizzying task.
 
@@ -82,7 +82,7 @@ Notice that the important bits are extracted, and provided in an easily-usable w
 
 Now the beauty is this: Let's I also want to support Spanish speakers. I could modify Grammar a bit, and accept strings like:
 
-	recuérdame lavar la coche mañana a las ocho
+	recuérdame lavar la coche mañana a las 8
 
 But the data returned would be in exactly the same format.
 
@@ -205,30 +205,151 @@ Any other properties provided will be used by the `phrase` specified by `type`
 ####`sequence`
 
 	{
-		children: [ element ] (required)
+		children: [ element ] (required),
 		separator: element (default: ' ')
 	}
 
 ####`queue`
 
 	{
-		children : [ element ] (required)
+		children : [ element ] (required),
 	}
 
 ####`repeat`
 	{
-		child: element (required)
+		child: element (required),
 		separator: element (default: ' ')
 	}
+
+###Static Elements
 
 ####`literal`
 
 	{
-		display: String (required)
+		display: String (required),
 		value: String
 	}
 
 Handles a single literal string `display`, and results in the value `value`.
+
+####`freetext`
+
+	{
+		regex: RegExp || String
+	}
+
+Handles any string that is matched by the passed in `RegExp` (or `String`, which is evaluated as a `RegExp`). The value is the same as the matched string.
+
+####`integer`
+
+	{
+		max: Number [default: 9007199254740992],
+		min: Number [default: -9007199254740992]
+	}
+
+Handles an integer. Will not accept a number with a decimal mark, but will allow thousands separators. Right now, it will not accept integers written out in words, but maybe someday.
+
+####`float` (not yet implemented)
+
+	{
+		max: Number [default: 9007199254740992],
+		min: Number [default: -9007199254740992]
+	}
+
+Handles a number with a decimal mark. Allows thousands separators.
+
+####`number` (not yet implemented)
+	
+	{
+		max: Number [default: 9007199254740992],
+		min: Number [default: -9007199254740992]
+	}
+
+	Shortcut for
+
+	{
+		type: 'choice'
+		children: [
+			{
+				type: 'integer',
+				max: '@max', min: '@min'
+			}, {
+				type: 'float',
+				max: '@max', min: '@min'
+			}
+		]
+	}
+
+####`date`
+
+	{
+		earliest: Date || Number [default: April 20th, 271821 BCE],
+		lastest: Date || Number [default: September 13th, 275760 CE]
+	}
+
+Handles a text representation of a date. The exact phrases that it accepts depends upon the language, but most constructs should be supported. For `earliest` and `latest`, the `Date` value is taken to mean an absolute date (the time portion is ignored), and a `Number` value is taken to mean a number of milliseconds away from right now. This relative date can be negative.
+
+####`time` (not yet implemented)
+
+	{
+		earliest: Date || Number [default: 00:00:00],
+		lastest: Date || Number [default: 23:59:59]
+	}
+
+Handles a text representation of a time. The exact phrases that it accepts depends upon the language, but most constructs should be supported. For `earliest` and `latest`, the `Date` value is taken to mean an absolute time (the date portion is ignored), and a `Number` value is taken to mean a number of milliseconds away from right now (looping at midnight). This relative date can be negative.
+
+####`datetime` (not yet implemented)
+
+	{
+		earliest: Date || Number [default: April 20th, 271821 BCE, 00:00:00],
+		lastest: Date || Number [default: September 13th, 275760 CE, 23:59:00]
+	}
+
+Handles a text representation of a time. The exact phrases that it accepts depends upon the language, but most constructs should be supported. For `earliest` and `latest`, the `Date` value is taken to mean an absolute time, and a `Number` value is taken to mean a number of milliseconds away from right now. This relative date can be negative.
+
+###Computed Elements
+
+####`list`
+
+`list` is used in instances where the available options are dynamic. It can be thought of as a `choice` full of a dynamic number of `literal`s. For example, you would use this if a user must enter the name of a Product, and the list of Products is pulled from a web service.
+
+	{
+		collect: String (Function(inputString, done)),
+		refresh: String ('initialize', 'parse') [default: 'initialize']
+	}
+
+`compute` must be the name of a function that accepts a single argument. That argument is a callback that accepts 2 arguments, an `error` if one occurred, or a `List` of `suggestion`:
+
+	[{
+		display: String
+		value: String
+	}]
+
+The `collect` function will be called the first time the `list` is called upon, and the returned `List` of `suggestion`s will be used for every evaulation.
+
+The `refresh` property governs how often `collect` is called - either immediately when it is passed into `understand` (`initialize`), or every time `Parser.parse` is called (`parse`). `initialize` should be used for data that should stay constant for the duration of the `Parser` lifespan, and `parse` should be used for data that changes more quickly. If you need to compute data within a single parse, you need to use `value`.
+
+####`suggester`
+
+`suggester` is used in instances where every input is acceptable, but it may be helpful to suggest more. It can be thought of as a `freetext` with opinions. It works much like Google Suggest - you can enter any query, but it suggests queries based upon your input.
+
+	{
+		suggest: String (Function(inputString, done))
+	}
+
+`suggest` must be the name of a function that accepts a single argument. That argument is a callback that accepts 2 arguments, an `Error` if one occurred, or a `List` of `String`, representing every suggestion. The value is always identical to the parsed string.
+
+`suggest` will be called every time the `suggester` is presented with new input string.
+
+####`validator`
+
+`validator` is used in instances where input can be either accepted or rejected, but no suggestions need to be made.
+
+	{
+		validate: String (function(inputString, done))
+	}
+
+`validate` must be the name of a function in the scope that accepts a single argument. That argument is a callback that accepts 2 arguments, an `Error` if one ocurred, and a `Boolean` representing if the input is valid or not.
 
 ####`value`
 
