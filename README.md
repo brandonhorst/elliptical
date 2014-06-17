@@ -1,7 +1,7 @@
 Lacona
 ======
 
-Lacona is a Javascript library for parsing and predicting natural language an arbitrary well-defined schema.
+Lacona is a Javascript library for parsing and predicting natural language according to an arbitrary well-defined schema.
 
 In other words, you tell Lacona how some language works, and it will help people write it, and tell you what they are saying.
 
