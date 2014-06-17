@@ -7,7 +7,7 @@
 #InputOption
 
 	class InputOption
-		constructor: (@text = "", @match = [], @suggestion = {words: []}, @completion = [], @result = {}) ->
+		constructor: (@sentence = null, @text = "", @match = [], @suggestion = {words: []}, @completion = [], @result = {}) ->
 
 		handleValue: (id, value) ->
 			newResult = _.cloneDeep(@result)
@@ -15,7 +15,10 @@
 				delete newResult[id]
 			else
 				newResult[id] = value
-			return new InputOption(@text, @match, @suggestion, @completion, newResult)
+			return new InputOption(@sentence, @text, @match, @suggestion, @completion, newResult)
+
+		replaceResult: (newResult) ->
+			return new InputOption(@sentence, @text, @match, @suggestion, @completion, newResult)
 
 		handleString: (string, partOfSpeech) ->
 			newText = @text
@@ -74,7 +77,7 @@ This is not a match at all
 
 And send it on (if there is a match)
 			
-			return new InputOption(newText, newMatch, newSuggestion, newCompletion, newResult)
+			return new InputOption(@sentence, newText, newMatch, newSuggestion, newCompletion, newResult)
 
 	module.exports = InputOption
 

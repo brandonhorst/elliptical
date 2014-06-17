@@ -54,9 +54,9 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 			return @
 
 		parse: (inputText) ->
-			input = new InputOption(inputText)
 				
 			async.each _.filter(@phrases, (item) -> item.sentence), (phrase, done) =>
+				input = new InputOption(phrase, inputText)
 				phrase.parse input, null, (option) =>
 					if option.text is ''
 						async.eachSeries @middleware, (call, done) =>
@@ -72,6 +72,9 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 				else
 					@emit 'end'
 			return @
+
+		run: (inputOption, done) ->
+			inputOption.sentence
 
 
 	convertToHTML = (inputOption, done) ->
