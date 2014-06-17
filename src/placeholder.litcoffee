@@ -9,10 +9,12 @@
 #Placeholder
 
 	class Placeholder extends Element
-		constructor: (options, @phraseAccessor) ->
+		constructor: (options, scope, @phraseAccessor) ->
 			super options
 			{@type} = options
 			@options = _.omit(options, 'type')
+			@options.$call = (func, args...) =>
+				scope[func].apply(@options, args)
 
 		handleParse: (input, context, data, done) ->
 			oldResult = _.cloneDeep(input.result)

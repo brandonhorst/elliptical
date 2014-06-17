@@ -108,6 +108,54 @@ describe 'Parser', ->
 		.parse testCase.input
 
 
+	it 'handles a schema with a validator', (done) ->
+		testCases = [
+			input: 'test'
+			desc: 'success'
+			schema:
+				root:
+					type: 'validator'
+					validate: 'validate'
+					id: 'testId'
+				sentence: true
+			scope:
+				validate: (input) ->
+					input is 'test'
+			result:
+				testId: 'test'
+			matches: 1
+		,
+			input: 'test'
+			desc: 'failure'
+			schema:
+				root:
+					type: 'validator'
+					validate: 'validate'
+					id: 'testId'
+				sentence: true
+			scope:
+				validate: (input) ->
+					input isnt 'test'
+			matches: 0
+
+		]
+		async.each testCases, (testCase, done) ->
+			dataCalled = chai.spy()
+			new Parser()
+			.understand {scope: testCase.scope, schema: testCase.schema}
+			.on 'data', (data) ->
+				expect(data, testCase.desc).to.exist
+				expect(data.match, testCase.desc).to.exist
+				expect(data.match, testCase.desc).to.have.length 1
+				expect(data.match[0].string, testCase.desc).to.equal testCase.input
+				expect(data.result, testCase.desc).to.deep.equal testCase.result
+				dataCalled()	
+			.on 'end', ->
+				expect(dataCalled).to.have.been.called.exactly(testCase.matches)
+				done()
+			.parse(testCase.input)
+		, done
+
 	it 'handles a schema with a choice', (done) ->
 		testCases = [
 			input: 'test'

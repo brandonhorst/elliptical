@@ -21,6 +21,9 @@
 			@understand require('./plugins/freetext')
 			@understand require('./plugins/integer')
 			@understand require('./plugins/date')
+			@understand require('./plugins/validator')
+			# @understand require('./plugins/suggester')
+			# @understand require('./plugins/list')
 
 		phraseAccessor: (name) =>
 			_.filter @phrases, (phrase) ->
