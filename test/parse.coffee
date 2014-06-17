@@ -197,6 +197,47 @@ describe 'Parser', ->
 			.parse(testCase.input)
 		, done
 
+	it 'handles a schema with a list', (done) ->
+		testCase =
+			input: 'test'
+			desc: 'list'
+			schema:
+				root:
+					type: 'list'
+					collect: 'collect'
+					id: 'testId'
+				sentence: true
+			scope:
+				collect: chai.spy (input, done) ->
+					done null, [
+						display: 'test'
+						value: 'test value'
+					,
+						display: 'tesla'
+						value: 'tesla motors'
+					]
+			result:
+				testId: 'test value'
+			matches: 1
+
+		dataCalled = chai.spy()
+		new Parser()
+		.understand {scope: testCase.scope, schema: testCase.schema}
+		.parse(testCase.input) #parse twice, to verify that caching works
+		.on 'data', (data) ->
+			expect(data, testCase.desc).to.exist
+			expect(data.match, testCase.desc).to.exist
+			expect(data.match, testCase.desc).to.have.length 1
+			expect(data.match[0].string, testCase.desc).to.equal testCase.input
+			expect(data.result, testCase.desc).to.deep.equal testCase.result
+			dataCalled()	
+		.on 'end', ->
+			expect(testCase.scope.collect).to.have.been.called.once
+			expect(dataCalled).to.have.been.called.exactly(testCase.matches, testCase.desc)
+			done()
+		.parse(testCase.input)
+
+
 	it 'handles a schema with a choice', (done) ->
 		testCases = [
 			input: 'test'
