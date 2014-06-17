@@ -22,8 +22,8 @@
 			@understand require('./plugins/integer')
 			@understand require('./plugins/date')
 			@understand require('./plugins/validator')
-			# @understand require('./plugins/suggester')
-			# @understand require('./plugins/list')
+			@understand require('./plugins/suggester')
+			@understand require('./plugins/list')
 
 		phraseAccessor: (name) =>
 			_.filter @phrases, (phrase) ->
@@ -51,6 +51,7 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 
 		use: (next) ->
 			@middleware.push next
+			return @
 
 		parse: (inputText) ->
 			input = new InputOption(inputText)
@@ -70,6 +71,7 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 					@emit 'error', err
 				else
 					@emit 'end'
+			return @
 
 
 	convertToHTML = (inputOption, done) ->
