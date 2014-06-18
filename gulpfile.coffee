@@ -28,20 +28,23 @@ gulp.task 'watch', ->
 				util.log err.stack
 			@emit 'end'
 
-gulp.task 'prepublish', ['browserify', 'build']
+gulp.task 'make', ['build', 'browserify', 'uglify']
 
-
-gulp.task 'browserify', ->
-	gulp.src 'src/lacona.litcoffee', {read: false}
-	.pipe browserify
-		transform: ['coffeeify']
-		extensions: ['.coffee', '.litcoffee']
-		standalone: 'lacona'
-	# .pipe uglify()
-	.pipe rename 'lacona.min.js'
-	.pipe gulp.dest 'browser'
 
 gulp.task 'build', ->
 	gulp.src 'src/**/*coffee'
 	.pipe coffee()
 	.pipe gulp.dest 'lib'
+
+gulp.task 'browserify', ['build'], ->
+	gulp.src 'lib/lacona.js', {read: false}
+	.pipe browserify {standalone: 'lacona'}
+	.pipe rename('lacona.js')
+	.pipe gulp.dest 'dist'
+
+gulp.task 'uglify', ['browserify'], ->
+	gulp.src 'dist/lacona.js'
+	.pipe uglify()
+	.pipe rename('lacona.min.js')
+	.pipe gulp.dest 'dist'
+

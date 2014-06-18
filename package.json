@@ -5,7 +5,7 @@
   "main": "lib/lacona.js",
   "scripts": {
     "test": "gulp test",
-    "prepublish": "gulp prepublish"
+    "prepublish": "gulp make"
   },
   "repository": {
     "type": "git",

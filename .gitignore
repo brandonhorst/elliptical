@@ -20,7 +20,7 @@ node_modules
 
 # Generated files
 lib
-browser
+dist
 
 # Sublime Workspace
 *.sublime-workspace
