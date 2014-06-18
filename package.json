@@ -4,7 +4,8 @@
   "description": "Natural Language Parsing Framework",
   "main": "lacona.js",
   "scripts": {
-    "test": "test"
+    "test": "gulp test",
+    "install": "gulp build"
   },
   "repository": {
     "type": "git",
