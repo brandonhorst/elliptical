@@ -18,9 +18,6 @@ coverage
 # see https://npmjs.org/doc/faq.html#Should-I-check-my-node_modules-folder-into-git
 node_modules
 
-# Generated files
-lib
-browser
-
-# Sublime Workspace
+# Sublime Stuff
 *.sublime-workspace
+*.sublime-project

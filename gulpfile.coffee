@@ -29,8 +29,10 @@ gulp.task 'watch', ->
 				util.log err.stack
 			@emit 'end'
 
+gulp.task 'prepublish', ['browserify', 'build']
 
-gulp.task 'build', ->
+
+gulp.task 'browserify', ->
 	gulp.src 'src/lacona.litcoffee', {read: false}
 	.pipe browserify
 		transform: ['coffeeify']
@@ -38,14 +40,9 @@ gulp.task 'build', ->
 		standalone: 'lacona'
 	# .pipe uglify()
 	.pipe rename 'lacona.min.js'
-	.pipe gulp.dest 'build'
+	.pipe gulp.dest 'browser'
 
-gulp.task 'demo', ->
-	gulp.src 'demo/demo.litcoffee'
+gulp.task 'build', ->
+	gulp.src 'src/**/*coffee'
 	.pipe coffee()
-	.pipe gulp.dest 'demo'
-
-	gulp.src 'demo/index.jade'
-	.pipe jade()
-	.pipe gulp.dest ''
-	return
+	.pipe gulp.dest 'lib'
