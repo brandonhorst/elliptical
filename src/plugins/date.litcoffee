@@ -1,16 +1,17 @@
 #Includes
 
-	moment = require 'moment'
-
 #Date
 
 	module.exports =
 		scope:
 			getDate: (result) ->
 				if result.relativeDay?
-					return moment({hour: 0}).add(result.relativeDay, 'd').toDate()
+					date = new Date()
+					date.setHours(0, 0, 0, 0)
+					date.setDate(date.getDate() + result.relativeDay)
+					return date
 				else
-					return moment().toDate()
+					return new Date()
 		schema: [
 			name: 'dayOfTheWeek'
 			root:

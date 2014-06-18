@@ -1,7 +1,6 @@
 gulp = require 'gulp'
 browserify = require 'gulp-browserify'
 coffee = require 'gulp-coffee'
-jade = require 'gulp-jade'
 mocha = require 'gulp-mocha'
 rename = require 'gulp-rename'
 watch = require 'gulp-watch'
