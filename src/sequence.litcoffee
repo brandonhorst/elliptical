@@ -1,7 +1,6 @@
 #Includes
 
 	_ = require 'lodash'
-	async = require 'async'
 
 	Group = require './group'
 
