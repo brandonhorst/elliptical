@@ -11,9 +11,9 @@
 			super options
 			@children = (factory.create(child) for child in options.children)
 
-		handleParse: (input, context, data, done) ->
+		handleParse: (input, lang, context, data, done) ->
 			async.each @children, (child, done) =>
-				child.parse input, context, (option) =>
+				child.parse input, lang, context, (option) =>
 					newResult = option.handleValue(@id, option.result[child.id])
 					data(newResult)
 				, done

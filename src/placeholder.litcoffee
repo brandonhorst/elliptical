@@ -16,13 +16,13 @@
 			@options.$call = (func, args...) =>
 				scope[func].apply(@options, args)
 
-		handleParse: (input, context, data, done) ->
+		handleParse: (input, lang, context, data, done) ->
 			oldResult = _.cloneDeep(input.result)
 
 			phrases = @phraseAccessor(@type)
 
 			async.each phrases, (phrase, done) =>
-				phrase.parse input, @options, (option) =>
+				phrase.parse input, lang, @options, (option) =>
 					value = phrase.getValue(@options, option.result)
 
 					newOption = option.replaceResult(oldResult)

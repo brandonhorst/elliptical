@@ -12,7 +12,7 @@
 			@options = options
 			@scope = scope
 
-		handleParse: (input, context, data, done) ->
+		handleParse: (input, lang, context, data, done) ->
 			@scope[@options.compute].call context, input.text, (suggestion) =>
 				{value, display} = suggestion
 				output = input.handleString(display, @partOfSpeech)

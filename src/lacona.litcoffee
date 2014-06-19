@@ -35,7 +35,7 @@
 
 		understand: (options) ->
 			scope = options.scope
-			schema = if options.schema? then options.schema else options
+			schema = options.schema ? options
 			if not util.isArray(schema)
 				schema = [schema]
 			for phrase in schema
@@ -53,11 +53,12 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 			@middleware.push next
 			return @
 
-		parse: (inputText) ->
-				
+		parse: (inputText, lang) ->
+			lang = lang ? window?.navigator?.language?.replace?('-', '_') ? process?.env?.LANG?.split?('.')?[0] ? 'default' #ALL THE QUESTION MARKS
+
 			async.each _.filter(@phrases, (item) -> item.run?), (phrase, done) =>
 				input = new InputOption(phrase, inputText)
-				phrase.parse input, null, (option) =>
+				phrase.parse input, lang, null, (option) =>
 					if option.text is ''
 						async.eachSeries @middleware, (call, done) =>
 							call option, done

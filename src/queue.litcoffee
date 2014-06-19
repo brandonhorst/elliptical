@@ -12,7 +12,7 @@
 			super options
 			@children = (factory.create(child) for child in options.children)
 
-		handleParse: (input, context, data, done) ->
+		handleParse: (input, lang, context, data, done) ->
 
 If we get data, stop iterating by passing a true, which will be detected in the callback.
 true is not an error, and the completion handler for the eachSeries call will detect this.
@@ -20,7 +20,7 @@ true is not an error, and the completion handler for the eachSeries call will de
 			async.eachSeries @children, (child, done) =>
 				hasData = false
 
-				child.parse input, context, (option) =>
+				child.parse input, lang, context, (option) =>
 					hasData = true
 					newResult = option.handleValue(@id, option.result[child.id])
 					data(newResult)

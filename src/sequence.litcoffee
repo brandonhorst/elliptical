@@ -26,12 +26,12 @@ Remove the last separator, so that there is 1 separator between every child
 
 ###Parse
 
-		handleParse: (input, context, data, done) ->
+		handleParse: (input, lang, context, data, done) ->
 			parsesActive = 0
 
 			parseChild = (childIndex, input) =>
 				parsesActive++
-				@children[childIndex].parse input, context, (option) =>
+				@children[childIndex].parse input, lang, context, (option) =>
 
 					if childIndex is @children.length - 1
 						newResult = option.handleValue(@id, @value)

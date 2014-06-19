@@ -5,7 +5,10 @@ chai = require 'chai'
 chai.use require 'chai-spies'
 chai.use require 'chai-datetime'
 
-{Parser} = require '../src/lacona'
+if lacona?
+	{Parser} = lacona
+else
+	{Parser} = require '../src/lacona'
 
 chai.config.includeStack = true
 expect = chai.expect
@@ -837,3 +840,72 @@ describe 'Parser', ->
 				expect(testCase.scope.run).to.have.been.called.once
 				done()
 		.parse(testCase.input)
+
+	it 'handles schemata in different languages', (done) ->
+		testCases = [
+			input: 'pr'
+			desc: 'basic language choice'
+			schema:
+				grammars: [
+					lang: ['en', 'default']
+					root: 'test'
+				,
+					lang: ['es']
+					root: 'prueba'
+				]
+				run: ''
+			matches: 1
+			suggestion: 'prueba'
+			language: 'es'
+		,
+			input: 'tr'
+			desc: 'language fallback'
+			schema:
+				grammars: [
+					lang: ['en_GB', 'default']
+					root: 'lorry'
+				,
+					lang: ['en']
+					root: 'truck'
+				]
+				run: ''
+			matches: 1
+			suggestion: 'truck'
+			language: 'en_US'
+		,
+			input: 'pr'
+			desc: 'default (browser)'
+			schema:
+				grammars: [
+					lang: ['es']
+					root: 'prueba'
+				,
+					lang: ['en', 'default']
+					root: 'test'
+				]
+				run: ''
+			matches: 1
+			suggestion: 'prueba'
+			setDefault: ->
+				if window?
+					window.navigator =
+						language: 'es_ES'
+				else if process?
+					process.env.LANG = 'es_ES.UTF-8'
+		]
+
+		async.each testCases, (testCase, done) ->
+			dataCalled = chai.spy()
+			if testCase.setDefault?
+				testCase.setDefault()
+
+			new Parser()
+			.understand testCase.schema
+			.on 'data', (data) ->
+				expect(data.suggestion.words[0].string, testCase.desc).to.equal testCase.suggestion
+				dataCalled()
+			.on 'end', ->
+				expect(dataCalled, testCase.desc).to.have.been.called.exactly(testCase.matches)
+				done()
+			.parse(testCase.input, testCase.language)
+		, done

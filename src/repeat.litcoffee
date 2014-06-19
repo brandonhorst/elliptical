@@ -15,7 +15,7 @@
 			@max = options.max ? Number.MAX_VALUE ####MAX/MIN ARE NOT YET IMPLEMENTED
 			@min = options.min ? Number.MIN_VALUE
 
-		handleParse: (input, context, data, done) ->
+		handleParse: (input, lang, context, data, done) ->
 
 Parse the child. If it gets data, pass the data on, then try the separator.
 If the separator gets data too, loop around. If either doesn't get data, we're done.
@@ -25,7 +25,7 @@ If it already has a suggestion, we're also done - we will never suggest more tha
 
 			parseChild = (input) =>
 				parsesActive++
-				@child.parse input, context, (option) =>
+				@child.parse input, lang, context, (option) =>
 					newResult = if util.isArray(option.result[@id]) then option.result[@id] else []
 					if typeof option.result[@child.id] isnt 'undefined'
 						newResult.push option.result[@child.id]
@@ -46,7 +46,7 @@ If it already has a suggestion, we're also done - we will never suggest more tha
 
 			parseSeparator = (input) =>
 				parsesActive++
-				@separator.parse input, context, (option) =>
+				@separator.parse input, lang, context, (option) =>
 					parseChild(option)
 				, (err) =>
 					if err?
