@@ -11,6 +11,34 @@ Of course, language is complicated, so Lacona provides some powerful tools to si
 
 Lacona is under _very active development_ right now. Absolutely nothing is set in stone, and absolutely nothing outside the `test` directory is expected to work properly. I'm _really_ excited about this project, and I'm hoping to have some cool demos out in the near future. Of course, if you would like to contribute, start opening up issues on [Github](https://github.com/brandonhorst/lacona) or find me on Twitter at [@brandonhorst](https://twitter.com/brandonhorst).
 
+#Installation
+
+	npm install lacona
+
+#Usage
+
+Lacona is written entirely in CoffeeScript. It ships with the CoffeeScript source (in `src`) as well as the compiled Javascript (in `lib`), which is used by default. It also ships with with a version that is perfectly functional in the browser, courtesy of Browserify, in the `dist` directory. The browser version exposes a single global variable, `lacona`.
+
+Note that these two built versions are not included in the git repo, as they can be built with `gulp build`, which is done automatically before uploading to npm. They can be removed with `gulp clean`.
+
+##Node
+
+	var lacona = require('lacona');
+	var parser = new lacona.Parser();
+
+##Browser
+
+	<script src="node_modules/dist/lacona.min.js"></script>
+	<script>
+		var parser = new lacona.Parser();
+	</script>
+
+#Testing
+
+BDD tests use Mocha and Chai. They can be run with `gulp test`. `gulp watch` will run the tests every time a source file is saved, which can be useful for development.
+
+Testing in the browser can be done automatically with `gulp phantom` (using PhantomJS). Alternatively, you can load up the tests in any browser by running `gulp build-browser-tests` and then opening `test/mocha.html`. The built files can be removed with `gulp clean-browser-tests` or just `gulp clean`.
+
 ##Let's Have an Example
 
 I want to make a tool that reminds me to do something at a certain time. One solution would be to provide a "description" input, a date-picker, and a time-picker. That would work fine, but let's try it with natural language. The tool should understand anything that you would say to a friend. For example:
