@@ -40,33 +40,21 @@ Making a Lacona grammar to understand those options is easy:
 					type: 'sequence'
 					children: [
 						'remind me to',
-						{
-							type: 'freetext'
-							id: 'taskName'
-						},
-						{
-							type: 'datetime'
-							id: 'dateAndTime'
-						}
+						{ type: 'freetext', id: 'taskName' },
+						{ type: 'datetime', id: 'dateAndTime' }
 					]
 				},
 				{
 					type: 'sequence'
 					children: [
-						{
-							type: 'datetime'
-							id: 'dateAndTime'
-						},
+						{ type: 'datetime', id: 'dateAndTime' },
 						', remind me to',
-						{
-							type: 'freetext'
-							id: 'taskName'
-						}
+						{ type: 'freetext', id: 'taskName' }
 					]
 				}
 			]
 		},
-		sentence: true
+		run: 'createReminder'
 	}
 
 That may look a bit complicated, but it's not. It's a JSON Object saying with a single `root` element, which is a `choice` between two `sequence`s. It can be thought of as a tree, and here's a diagram: #Diagram on draw.io#
@@ -95,9 +83,35 @@ But the data returned would be in exactly the same format.
 		dateAndTime: Date(Sat Jun 14 2014 8:00:00 GMT-0400 (EDT))
 	}
 
-Because the format is so general, you can accept sentences in any language at all:
+Because the format is so general, you can accept sentences in any language at all, even languages with distinctly different grammatical structures. In Japanese, the verbs generally come last. In Arabic, text is written right-to-left. In Chinese languages, spaces are not used. Even so, Lacona can make sense out of the texts and allow effective parsing.
 
-	#provide examples in other languages#
+By means of example, let's support Spanish in our Schema, shall we?
+
+	{
+		root: {
+			type: 'choice',
+			children: [
+				{
+					type: 'sequence'
+					children: [
+						'remind me to',
+						{ type: 'freetext', id: 'taskName' },
+						{ type: 'datetime', id: 'dateAndTime' }
+					]
+				},
+				{
+					type: 'sequence'
+					children: [
+						{ type: 'datetime', id: 'dateAndTime' },
+						', remind me to',
+						{ type: 'freetext', id: 'taskName' }
+					]
+				}
+			]
+		},
+		run: 'createReminder'
+	}
+
 
 #Reference
 
