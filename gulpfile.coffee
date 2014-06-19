@@ -1,7 +1,9 @@
 gulp = require 'gulp'
 browserify = require 'gulp-browserify'
+clean = require 'gulp-clean'
 coffee = require 'gulp-coffee'
 mocha = require 'gulp-mocha'
+phantom = require 'gulp-mocha-phantomjs'
 rename = require 'gulp-rename'
 watch = require 'gulp-watch'
 uglify = require 'gulp-uglify'
@@ -28,6 +30,33 @@ gulp.task 'watch', ->
 				util.log err.stack
 			@emit 'end'
 
+gulp.task '_compile-tests', ->
+	gulp.src 'test/**/*coffee'
+	.pipe coffee()
+	.pipe gulp.dest 'tmp'
+
+gulp.task '_browserify-tests', ['_compile-tests'], ->
+	gulp.src 'tmp/parse.js', {read: false}
+	.pipe browserify
+		ignore: ['../src/lacona']
+	.pipe rename
+		extname: '.browserify.js'
+	.pipe gulp.dest 'tmp'
+
+gulp.task 'phantom', ['build-browser-tests'], ->
+	gulp.src 'test/**/*.html'
+	.pipe phantom()
+
+gulp.task 'clean', ->
+	gulp.src ['dist', 'lib', 'tmp'], {read: false}
+	.pipe clean()
+
+gulp.task 'build-browser-tests', ['_browserify-tests', 'browserify']
+
+gulp.task 'clean-browser-tests', ->
+	gulp.src 'tmp', {read: false}
+	.pipe clean()
+
 gulp.task 'make', ['build', 'browserify', 'uglify']
 
 
@@ -38,7 +67,8 @@ gulp.task 'build', ->
 
 gulp.task 'browserify', ['build'], ->
 	gulp.src 'lib/lacona.js', {read: false}
-	.pipe browserify {standalone: 'lacona'}
+	.pipe browserify
+		standalone: 'lacona'
 	.pipe rename('lacona.js')
 	.pipe gulp.dest 'dist'
 
