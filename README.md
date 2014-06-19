@@ -7,7 +7,7 @@ In other words, you tell Lacona how some language works, and it will help people
 
 Of course, language is complicated, so Lacona provides some powerful tools to simplify it. You can create sentences with well-defined "phrases" that make the process much simpler.
 
-#Develoment Notice!
+#Development Notice!
 
 Lacona is under _very active development_ right now. Absolutely nothing is set in stone, and absolutely nothing outside the `test` directory is expected to work properly. I'm _really_ excited about this project, and I'm hoping to have some cool demos out in the near future. Of course, if you would like to contribute, start opening up issues on [Github](https://github.com/brandonhorst/lacona) or find me on Twitter at [@brandonhorst](https://twitter.com/brandonhorst).
 
