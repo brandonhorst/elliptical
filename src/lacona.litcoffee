@@ -78,23 +78,6 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 			inputOption.sentence.scope[inputOption.sentence.run](inputOption.result, done)
 
 
-	convertToHTML = (inputOption, done) ->
-		html = '<div class="option">'
-		html += '<span class="match">'
-		for match in inputOption.match
-			html += "<span class='word #{match.partOfSpeech}'>#{match.string}</span>"
-		html += '</span><span class="suggestion">'
-		for suggestion in inputOption.suggestion.words
-			html += "<span class='word #{suggestion.partOfSpeech}'>#{suggestion.string}</span>"
-		html += '</span><span class="completion">'
-		for completion in inputOption.completion
-			html += "<span class='word #{completion.partOfSpeech}'>#{completion.string}</span>"
-		html += '</span></div>'
-
-		inputOption.html = html
-		done()
 
 	module.exports =
 		Parser: Parser
-		convertToHTML: convertToHTML
-
