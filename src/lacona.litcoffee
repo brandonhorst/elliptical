@@ -1,9 +1,9 @@
 #Includes
 
-	{EventEmitter} = require 'events'
-	async = require 'async'
-	util = require 'util'
 	_ = require 'lodash'
+	async = require 'async'
+	{EventEmitter} = require 'events'
+	util = require 'util'
 
 	ElementFactory = require './element-factory'
 	Phrase = require './phrase'
@@ -53,6 +53,8 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 			@middleware.push next
 			return @
 
+###`parse`
+
 		parse: (inputText, lang) ->
 			lang = lang ? window?.navigator?.language?.replace?('-', '_') ? process?.env?.LANG?.split?('.')?[0] ? 'default' #ALL THE QUESTION MARKS
 
@@ -74,10 +76,23 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 					@emit 'end'
 			return @
 
-		run: (inputOption, done) ->
-			inputOption.sentence.scope[inputOption.sentence.run](inputOption.result, done)
+	run = (inputOption, done) ->
+		inputOption.sentence.scope[inputOption.sentence.run](inputOption.result, done)
+		return @
 
+	nextText = (inputOption) ->
+		match = _.reduce inputOption.match, (string, match) ->
+			return string + match.string
+		, ''
+
+		matchAndSuggestion = _.reduce inputOption.suggestion.words, (string, suggestion) ->
+			return string + suggestion.string
+		, match
+
+		return matchAndSuggestion
 
 
 	module.exports =
 		Parser: Parser
+		run: run
+		nextText: nextText

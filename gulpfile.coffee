@@ -33,10 +33,12 @@ gulp.task 'watch', ->
 gulp.task '_compile-tests', ->
 	gulp.src 'test/**/*coffee'
 	.pipe coffee()
+	.pipe rename
+		dirname: 'raw'
 	.pipe gulp.dest 'tmp'
 
 gulp.task '_browserify-tests', ['_compile-tests'], ->
-	gulp.src 'tmp/parse.js', {read: false}
+	gulp.src 'tmp/raw/**/*.js', {read: false}
 	.pipe browserify
 		ignore: ['../src/lacona']
 	.pipe rename

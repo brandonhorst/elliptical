@@ -9,11 +9,12 @@
   </head>
   <body>
     <div id="mocha"></div>
+    <script src="../dist/lacona.js"></script>
     <script src="../node_modules/mocha/mocha.js"></script>
     <script src="../node_modules/chai/chai.js"></script>
     <script>mocha.setup('bdd')</script>
-    <script src="../dist/lacona.js"></script>
     <script src="../tmp/parse.browserify.js"></script>
+    <script src="../tmp/run.browserify.js"></script>
     <script>
       if (window.mochaPhantomJS) {
         mochaPhantomJS.run();
