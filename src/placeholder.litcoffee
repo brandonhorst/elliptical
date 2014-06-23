@@ -22,13 +22,26 @@
 			phrases = @phraseAccessor(@type)
 
 			async.each phrases, (phrase, done) =>
+				currentlyInData = 0
+				doneCalled = false
 				phrase.parse input, lang, @options, (option) =>
+					currentlyInData++
 					phrase.getValue @options, option.result, (err, value) =>
 						newOption = option.replaceResult(oldResult)
 						newOption = newOption.handleValue(@id, value)
 
 						data(newOption)
-				, done
+						currentlyInData--
+						if currentlyInData is 0 and doneCalled
+							done()
+
+				, (err) ->
+					if err?
+						done(err)
+					else if currentlyInData is 0
+						done()
+					else
+						doneCalled = true
 			, done
 
 	module.exports = Placeholder
