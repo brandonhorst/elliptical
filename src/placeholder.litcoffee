@@ -23,12 +23,11 @@
 
 			async.each phrases, (phrase, done) =>
 				phrase.parse input, lang, @options, (option) =>
-					value = phrase.getValue(@options, option.result)
+					phrase.getValue @options, option.result, (err, value) =>
+						newOption = option.replaceResult(oldResult)
+						newOption = newOption.handleValue(@id, value)
 
-					newOption = option.replaceResult(oldResult)
-					newOption = newOption.handleValue(@id, value)
-
-					data(newOption)
+						data(newOption)
 				, done
 			, done
 

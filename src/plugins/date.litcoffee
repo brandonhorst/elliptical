@@ -4,14 +4,15 @@
 
 	module.exports =
 		scope:
-			getDate: (result) ->
+			getDate: (result, done) ->
 				if result.relativeDay?
 					date = new Date()
 					date.setHours(0, 0, 0, 0)
 					date.setDate(date.getDate() + result.relativeDay)
-					return date
+					done(null, date)
 				else
-					return new Date()
+					done(null, new Date())
+					
 		schema: [
 			name: 'dayOfTheWeek'
 			root:

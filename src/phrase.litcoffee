@@ -28,11 +28,11 @@
 				data(result)
 			, done
 
-		getValue: (options, result) ->
+		getValue: (options, result, done) ->
 			if @evaluate?
-				return @scope[@evaluate].call(options, result)
+				@scope[@evaluate].call(options, result, done)
 			else
-				return result['@value']
+				done(null, result['@value'])
 
 			
 
