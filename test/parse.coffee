@@ -243,7 +243,8 @@ describe 'Parser', ->
 			expect(dataCalled, testCase.desc).to.have.been.called.above(0)
 			if dataCalled.__spy.calls.length is 2
 				done()
-		.parse(testCase.input)
+			else
+				@parse(testCase.input)
 
 
 	it 'handles a schema with a choice', (done) ->
@@ -885,4 +886,34 @@ describe 'Parser', ->
 				done()
 			.parse(testCase.input, testCase.language)
 		, done
+
+
+	it 'will not throw data for an old parse', (done) ->
+		testCase =
+			input: 'test'
+			delay:
+				scope:
+					delay: (result, done) ->
+						process.nextTick done
+				schema:
+					name: 'delay'
+					root: 'test'
+					evaluate: 'delay'
+			schema:
+				root:
+					type: 'delay'
+				run: ''
+			called: 1
+
+		dataCalled = chai.spy()
+		new Parser()
+		.understand testCase.delay
+		.understand testCase.schema
+		.on 'data', (data) ->
+			dataCalled()
+		.on 'end', ->
+			expect(dataCalled).to.have.been.called.once
+			done()
+		.parse(testCase.input)
+		.parse(testCase.input)
 

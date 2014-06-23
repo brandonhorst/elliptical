@@ -25,6 +25,8 @@
 			@understand require('./plugins/suggester')
 			@understand require('./plugins/list')
 
+			@currentParseNumber = 0
+
 		_phraseAccessor: (name) =>
 			_.filter @phrases, (phrase) ->
 				phrase.name is name or name in phrase.extends
@@ -57,11 +59,16 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 
 		parse: (inputText, lang) ->
 			lang = lang ? window?.navigator?.language?.replace?('-', '_') ? process?.env?.LANG?.split?('.')?[0] ? 'default' #ALL THE QUESTION MARKS
+			@currentParseNumber++
+			thisParseNumber = @currentParseNumber
 
-			async.each _.filter(@phrases, (item) -> item.run?), (phrase, done) =>
+			phraseIsSentence = (item) ->
+				item.run?
+
+			gotData = (phrase, done) =>
 				input = new InputOption(phrase, inputText)
 				phrase.parse input, lang, null, (option) =>
-					if option.text is ''
+					if option.text is '' and thisParseNumber is @currentParseNumber
 						async.eachSeries @middleware, (call, done) =>
 							call option, done
 						, (err) =>
@@ -69,11 +76,14 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 							@emit 'data', option
 				, done
 
-			, (err) =>
+			allPhrasesDone = (err) =>
 				if err?
 					@emit 'error', err
-				else
+				else if thisParseNumber is @currentParseNumber
 					@emit 'end'
+
+			async.each _.filter(@phrases, phraseIsSentence), gotData, allPhrasesDone
+
 			return @
 
 	run = (inputOption, done) ->
