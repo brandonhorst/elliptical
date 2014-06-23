@@ -78,9 +78,8 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 
 	run = (inputOption, done) ->
 		inputOption.sentence.scope[inputOption.sentence.run](inputOption.result, done)
-		return @
 
-	nextText = (inputOption) ->
+	nextText = (inputOption, done) ->
 		match = _.reduce inputOption.match, (string, match) ->
 			return string + match.string
 		, ''
@@ -89,7 +88,7 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 			return string + suggestion.string
 		, match
 
-		return matchAndSuggestion
+		done(null, matchAndSuggestion)
 
 
 	module.exports =

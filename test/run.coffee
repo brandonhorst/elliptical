@@ -13,7 +13,7 @@ else
 chai.config.includeStack = true
 expect = chai.expect
 
-describe 'Parser', ->
+describe 'run', ->
 	it 'can run an inputOption', (done) ->
 		testCase =
 			input: 'test'
@@ -29,11 +29,7 @@ describe 'Parser', ->
 		inputOption = null
 		new Parser()
 		.understand {schema: testCase.schema, scope: testCase.scope}
-		.on 'data', (data) ->
-			inputOption = data
-			dataCalled()
-		.on 'end', ->
-			expect(dataCalled, testCase.desc).to.have.been.called.once
+		.on 'data', (inputOption) ->
 			lacona.run inputOption, (err) ->
 				expect(err).to.not.exist
 				expect(testCase.scope.run).to.have.been.called.once
