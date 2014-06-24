@@ -59,7 +59,7 @@ gulp.task 'clean-browser-tests', ->
 	gulp.src 'tmp', {read: false}
 	.pipe clean()
 
-gulp.task 'make', ['build', 'browserify', 'uglify']
+gulp.task 'make', ['uglify']
 
 
 gulp.task 'build', ->
