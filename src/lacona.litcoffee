@@ -66,7 +66,7 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 				item.run?
 
 			gotData = (phrase, done) =>
-				input = new InputOption(phrase, inputText)
+				input = new InputOption(@options, phrase, inputText)
 				phrase.parse input, lang, null, (option) =>
 					if option.text is '' and thisParseNumber is @currentParseNumber
 						async.eachSeries @middleware, (call, done) =>

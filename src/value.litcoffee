@@ -21,7 +21,4 @@
 					data(output)
 			, done
 
-		suggestions: (inputString, done) ->
-			throw Error("not yet implemented")
-
 	module.exports = Value

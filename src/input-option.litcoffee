@@ -7,7 +7,7 @@
 #InputOption
 
 	class InputOption
-		constructor: (@sentence = null, @text = "", @match = [], @suggestion = {words: []}, @completion = [], @result = {}) ->
+		constructor: (@options, @sentence = null, @text = "", @match = [], @suggestion = {words: []}, @completion = [], @result = {}) ->
 
 		handleValue: (id, value) ->
 			newResult = _.cloneDeep(@result)
@@ -15,10 +15,33 @@
 				delete newResult[id]
 			else
 				newResult[id] = value
-			return new InputOption(@sentence, @text, @match, @suggestion, @completion, newResult)
+			return new InputOption(@options, @sentence, @text, @match, @suggestion, @completion, newResult)
 
 		replaceResult: (newResult) ->
-			return new InputOption(@sentence, @text, @match, @suggestion, @completion, newResult)
+			return new InputOption(@options, @sentence, @text, @match, @suggestion, @completion, newResult)
+
+Returns an integer representing how many characters to consume, or null for no match
+
+		doesStringContainThisText: (string) ->
+			if @options?.fuzzy
+				fuzzyRegexString = _.reduce @text, (whole, character) ->
+					return "#{whole}#{character}.*?"
+				, '^.*?'
+				fuzzyRegex = new RegExp(fuzzyRegexString, 'i')
+				return string.match(fuzzyRegex)?[0]?.length
+			else
+				return if string.toLowerCase().startsWith(@text.toLowerCase()) then @text.length else null
+
+		doesThisTextContainString: (string) ->
+			# if @options?.fuzzy
+			# 	fuzzyRegexString = _.reduce string, (whole, character) ->
+			# 		return "#{whole}#{character}.*?"
+			# 	, '^.*?'
+			# 	fuzzyRegex = new RegExp(fuzzyRegexString, 'i')
+			# 	console.log fuzzyRegex
+			# 	return @text.match(fuzzyRegex)?[0]?.length
+			# else
+			return if @text.toLowerCase().startsWith(string.toLowerCase()) then string.length else null
 
 		handleString: (string, partOfSpeech) ->
 			newText = @text
@@ -53,20 +76,20 @@ This is a completion
 This is a part of the text
 
 			else
-				thisTextContainsString = @text.toLowerCase().startsWith(string.toLowerCase())
-				stringContainsThisText = string.toLowerCase().startsWith(@text.toLowerCase())
+				thisTextContainsString = @doesThisTextContainString(string)
+				stringContainsThisText = @doesStringContainThisText(string)
 
 This is a match, and fully consumed
 
-				if thisTextContainsString
+				if thisTextContainsString?
 					newMatch.push(newWord)
-					newText = @text.substring(string.length)
+					newText = @text.substring(thisTextContainsString)
 
 This is a match, and partially consumed
 
-				else if stringContainsThisText
+				else if stringContainsThisText?
 					newSuggestion =
-						charactersComplete: @text.length
+						charactersComplete: stringContainsThisText
 						words: [ newWord ]
 					newText = ""
 
@@ -77,7 +100,7 @@ This is not a match at all
 
 And send it on (if there is a match)
 			
-			return new InputOption(@sentence, newText, newMatch, newSuggestion, newCompletion, newResult)
+			return new InputOption(@options, @sentence, newText, newMatch, newSuggestion, newCompletion, newResult)
 
 	module.exports = InputOption
 

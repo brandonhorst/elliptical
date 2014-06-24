@@ -27,7 +27,7 @@ describe 'Parser', ->
 			done()
 		.parse()
 
-	it 'handles a schema with a single literal properly', (done) ->
+	it 'handles a schema with a single literal', (done) ->
 		testCases = [
 			input: 'l'
 			schema:
@@ -917,3 +917,74 @@ describe 'Parser', ->
 		.parse(testCase.input)
 		.parse(testCase.input)
 
+
+	it 'handles a schema with a single literal (fuzzy)', (done) ->
+		testCases = [
+			desc: 'basic'
+			input: 'ral'
+			schema:
+				root: 'literal test'
+				run: ''
+			options:
+				fuzzy: true
+			matches: 1
+			charactersComplete: 7
+			suggestion: 'literal test'
+			result: {}
+		,
+			desc: 'with value'
+			input: 'ttt'
+			schema:
+				root:
+					type: 'literal'
+					display: 'literal test'
+					value: 'test'
+					id: 'theLiteral'
+				run: ''
+			options:
+				fuzzy: true
+			matches: 1
+			charactersComplete: 12
+			suggestion: 'literal test'
+			result:
+				theLiteral: 'test'
+		# ,
+		# 	desc: 'with freetext and choice'
+		# 	input: 'primary ultimate'
+		# 	schema:
+		# 		root:
+		# 			type: 'sequence'
+		# 			children: [
+		# 				'primary'
+		# 			,
+		# 				type: 'freetext'
+		# 			,
+		# 				'ultimate'
+		# 			]
+		# 		run: ''
+		# 	options:
+		# 		fuzzy: true
+		# 	matches: 1
+		# 	charactersComplete: 12
+		# 	suggestion: 'literal test'
+		# 	result:
+		# 		theLiteral: 'test'
+		]
+		async.each testCases, (testCase, done) ->
+			dataCalled = chai.spy()
+
+			new Parser(testCase.options)
+			.understand testCase.schema
+			.on 'data', (data) ->
+				expect(data, testCase.desc).to.exist
+				expect(data.suggestion, testCase.desc).to.exist
+				expect(data.suggestion.words, testCase.desc).to.have.length 1
+				expect(data.suggestion.charactersComplete, testCase.desc).to.equal testCase.charactersComplete
+				expect(data.suggestion.words[0].string, testCase.desc).to.equal testCase.suggestion
+				expect(data.result, testCase.desc).to.deep.equal testCase.result
+				dataCalled()
+			.on 'end', ->
+				expect(dataCalled, testCase.desc).to.have.been.called.exactly(testCase.matches)
+				done()
+			.parse(testCase.input)
+		, done
