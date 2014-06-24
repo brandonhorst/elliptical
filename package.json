@@ -17,7 +17,11 @@
     "language",
     "parsing"
   ],
-  "author": "Brandon Horst",
+  "author": {
+    "name": "Brandon Horst",
+    "email": "brandonhorst@gmail.com",
+    "url": "http://github.com/brandonhorst"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/brandonhorst/lacona/issues"
