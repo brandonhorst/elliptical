@@ -12,7 +12,11 @@
 #Lacona
 
 	class Parser extends EventEmitter
-		constructor: (@options) ->
+		constructor: (options) ->
+
+			@optionsForInput = _.pick(options, 'fuzzy')
+			@options = _.omit(options, 'fuzzy')
+
 			@phrases = []
 
 			@middleware = []
@@ -66,7 +70,7 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 				item.run?
 
 			gotData = (phrase, done) =>
-				input = new InputOption(@options, phrase, inputText)
+				input = new InputOption(@optionsForInput, phrase, inputText)
 				phrase.parse input, lang, null, (option) =>
 					if option.text is '' and thisParseNumber is @currentParseNumber
 						async.eachSeries @middleware, (call, done) =>
@@ -99,6 +103,7 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 		, match
 
 		done(null, matchAndSuggestion)
+
 
 
 	module.exports =

@@ -140,6 +140,31 @@ By means of example, let's support Spanish in our Schema, shall we?
 		run: 'createReminder'
 	}
 
+#Parsing
+
+You can create a new Parser instance with
+
+	var parser = new lacona.Parser(options);
+
+The `Parser` object follows patterns that should be familiar to node.js users, and should be very simple to learn for everyone else.
+
+To teach a `Parser` some phrases, you call
+
+	parser.understand(grammar);
+
+To start parsing phrase, you call
+
+	parser.parse(stringToParse);
+
+To get the results of a parse, `Parser` will emit events. These can be captured with
+
+	parser.on(event, handler);
+
+where `event` is a string and `handler` is a function. Whenever an event named `event` is emitted, the `handler` will be called. 
+
+When `parse` is called, `data` events will be emitted with a single `OutputOption` argument for every valid result in the order that they are recieved. Then, `end` will be emitted. If something goes wrong, `error` will be emitted with a single `Error` argument.
+
+If you are implementing a UI that will be maintaining state between requests, look into `laconic-stateful` ([GitHub](https://github.com/brandonhorst/laconic-stateful), [npm]()).
 
 #Reference
 
@@ -147,7 +172,7 @@ By means of example, let's support Spanish in our Schema, shall we?
 
 You can access everything you need to throught the `lacona` module. From node:
 
-	var lacona = require('lacona')
+	var lacona = require('lacona');
 
 From the browser (exposes a global object called `lacona`):
 
@@ -161,7 +186,6 @@ From the browser (exposes a global object called `lacona`):
 
 	var parser = new lacona.Parser()
 
-The `Parser` object follows patterns that should be familiar to node.js users, and should be very simple to learn for everyone else.
 
 ####`understand(grammar)`
 
