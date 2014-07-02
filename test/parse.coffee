@@ -755,68 +755,6 @@ describe 'Parser', ->
 			.parse(testCase.input)
 		, done
 
-	it 'handles an date (complete)', (done) ->
-		testCases = [
-			input: 'today'
-			desc: 'today'
-			schema:
-				root:
-					type: 'date'
-					id: 'test'
-				run: ''
-			result:
-				test: moment({hour: 0}).toDate()
-			matches: 1
-		,
-			input: 'tomorrow'
-			desc: 'tomorrow'
-			schema:
-				root:
-					type: 'date'
-					id: 'test'
-				run: ''
-			result:
-				test: moment({hour: 0}).add(1, 'd').toDate()
-			matches: 1
-		,
-			input: 'the day after tomorrow'
-			desc: 'the day after tomorrow'
-			schema:
-				root:
-					type: 'date'
-					id: 'test'
-				run: ''
-			result:
-				test: moment({hour: 0}).add(2, 'd').toDate()
-			matches: 1
-		,
-			input: 'in 3 days'
-			desc: 'in n days'
-			schema:
-				root:
-					type: 'date'
-					id: 'test'
-				run: ''
-			result:
-				test: moment({hour: 0}).add(3, 'd').toDate()
-			matches: 1
-		]
-
-		async.each testCases, (testCase, done) ->
-			dataCalled = chai.spy()
-			new Parser()
-			.understand testCase.schema
-			.on 'data', (data) ->
-				dataCalled()
-				expect(data, testCase.desc).to.exist
-				expect(data.result, testCase.desc).to.exist
-				expect(data.result.test, testCase.desc).to.equalDate testCase.result.test
-			.on 'end', ->
-				expect(dataCalled, testCase.desc).to.have.been.called.exactly(testCase.matches)
-				done()
-			.parse(testCase.input)
-		, done
-
 
 	it 'handles schemata in different languages', (done) ->
 		testCases = [
