@@ -8,9 +8,10 @@
 		scope:
 			integer: (inputString, data, done) ->
 
-#integerRegex
+####integerRegex
 
-```
+*
+<pre>
 ^					- the start of the string followed by
 	(?:				- a non-capturing group of
 		0			- zero followed by
@@ -30,7 +31,8 @@
 		\d*			- zero or more digits
 	)?				- followed by
 $					- the end of the string
-```
+</pre>
+*
 
 				integerRegex = /^(?:0$)|(?:[1-9]\d{0,2})(?:(?:,\d{3})*|\d*)?$/
 
