@@ -1,11 +1,15 @@
 Lacona
 ======
 
-Lacona is a Javascript library for parsing and predicting natural language according to an arbitrary well-defined schema.
+Lacona is a Javascript library for parsing and predicting natural language according to an arbitrary but well-defined schema.
 
 In other words, you tell Lacona how some language works, and it will help people write it, and tell you what they are saying.
 
 Of course, language is complicated, so Lacona provides some powerful tools to simplify it. You can create sentences with well-defined "phrases" that make the process much simpler.
+
+Lacaoa may seem similar to tookits like `nltk`, but it is conceptually very different. They both take a natural language string, parse it, and tokenize it. The difference is that `nltk` has some concept of English grammar which it uses to parse arbitrary sentences and give you the component words and phrases and how they fit together. Lacona cannot do that. Lacona does not know anything about English grammar. It does, however, know exactly what a time looks like in an English sentence (1pm, 0423, quarter til 9, 14 minutes ago), and it can parse that and return a Javascript `Date` object for use in an arbitrary program.
+
+So in short, `nltk` is a low-level parser that breaks any string according to its real-world grammar. Lacona understands a finite, well-defined number of phrases, but extracts the data in a way that doesn't require any knowledge of the real-world grammar. And of course, you can give it new schemas to help it understand new things.
 
 #Development Notice!
 
