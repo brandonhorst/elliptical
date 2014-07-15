@@ -686,8 +686,20 @@ describe 'Parser', ->
 
 	it 'handles an integer', (done) ->
 		testCases = [
+			input: '3'
+			desc: 'valid with small inputs'
+			schema:
+				root:
+					type: 'integer'
+					id: 'test'
+				run: ''
+			match: '3'
+			result:
+				test: 3
+			matches: 1
+		,
 			input: '1234'
-			desc: 'valid'
+			desc: 'valid with medium inputs'
 			schema:
 				root:
 					type: 'integer'
@@ -696,6 +708,18 @@ describe 'Parser', ->
 			match: '1234'
 			result:
 				test: 1234
+			matches: 1
+		,
+			input: '1198234812934'
+			desc: 'valid with large inputs'
+			schema:
+				root:
+					type: 'integer'
+					id: 'test'
+				run: ''
+			match: '1198234812934'
+			result:
+				test: 1198234812934
 			matches: 1
 		,
 			input: '12b4'
@@ -737,6 +761,42 @@ describe 'Parser', ->
 			result: 
 				test: 12
 			matches: 1
+		,
+			input: '1,000,000'
+			desc: 'integer correctly formatted with commas'
+			schema:
+				root:
+					type: 'integer'
+					id: 'test'
+				run: ''
+			match: '1,000,000'
+			result:
+				test: 1000000
+			matches: 1
+		,
+			input: '10,00,000,000'
+			desc: 'integer incorrectly formatted with commas'
+			schema:
+				root:
+					type: 'integer'
+				run: ''
+			matches: 0
+		,
+			input: '100,000,b,000'
+			desc: 'integer incorrectly formatted with invalid characters and commas'
+			schema:
+				root:
+					type: 'integer'
+				run: ''
+			matches: 0
+		,
+			input: '1,00'
+			desc: 'integer formatted with incorrect number of trailing zeroes'
+			schema:
+				root:
+					type: 'integer'
+				run: ''
+			matches: 0
 		]
 
 		async.each testCases, (testCase, done) ->
