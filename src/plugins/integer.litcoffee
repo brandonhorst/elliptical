@@ -7,7 +7,32 @@
 	module.exports =
 		scope:
 			integer: (inputString, data, done) ->
-				integerRegex = /^(?:\d{1,3})(?:,?(?:(?:\d{3}),?)*?(?:\d{3}))?$/
+
+#integerRegex
+
+```
+^					- the start of the string followed by
+	(?:				- a non-capturing group of
+		0			- zero followed by
+		$			- the end of the string
+	)
+	|				- or
+	(?:				- a non-capturing group of
+		[1-9]		- the set of numbers 1-9 followed by
+		\d{0,2}		- between zero and 2 digits
+	)				- followed by
+	(?:				- an optional non-capturing group of
+		(?:			- zero or more non-capturing groups of
+			,		- a comma followed by
+			\d{3}	- 3 digits
+		)*
+		|			- or
+		\d*			- zero or more digits
+	)?				- followed by
+$					- the end of the string
+```
+
+				integerRegex = /^(?:0$)|(?:[1-9]\d{0,2})(?:(?:,\d{3})*|\d*)?$/
 
 				for stringPart in lutil.splitString(inputString)
 					if stringPart.match(integerRegex)
