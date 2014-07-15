@@ -8,7 +8,7 @@
 		scope:
 			integer: (inputString, data, done) ->
 
-#integerRegex
+####integerRegex
 
 ```
 ^					- the start of the string followed by
