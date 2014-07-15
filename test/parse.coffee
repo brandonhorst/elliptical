@@ -686,6 +686,18 @@ describe 'Parser', ->
 
 	it 'handles an integer', (done) ->
 		testCases = [
+			input: '0'
+			desc: 'valid with zero'
+			schema:
+				root:
+					type: 'integer'
+					id: 'test'
+				run: ''
+			match: '0'
+			result:
+				test: 0
+			matches: 1
+		,
 			input: '3'
 			desc: 'valid with small inputs'
 			schema:
@@ -792,6 +804,38 @@ describe 'Parser', ->
 		,
 			input: '1,00'
 			desc: 'integer formatted with incorrect number of trailing zeroes'
+			schema:
+				root:
+					type: 'integer'
+				run: ''
+			matches: 0
+		,
+			input: '1,000,000,000000000000000'
+			desc: 'integer formatted with commas and trailing zeroes'
+			schema:
+				root:
+					type: 'integer'
+				run: ''
+			matches: 0
+		,
+			input: '1,000,000,000000000,000,000'
+			desc: 'integer formatted in a tricky way'
+			schema:
+				root:
+					type: 'integer'
+				run: ''
+			matches: 0
+		,
+			input: '00000000'
+			desc: 'integer with all zeroes'
+			schema:
+				root:
+					type: 'integer'
+				run: ''
+			matches: 0
+		,
+			input: '01,000,000'
+			desc: 'integer formatted with commas and leading zero'
 			schema:
 				root:
 					type: 'integer'
