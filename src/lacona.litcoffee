@@ -21,12 +21,7 @@
 
 			@middleware = []
 
-			@understand require('./plugins/literal')
-			@understand require('./plugins/freetext')
-			@understand require('./plugins/integer')
-			@understand require('./plugins/validator')
-			@understand require('./plugins/suggester')
-			@understand require('./plugins/list')
+			@understand require('./literal')
 
 			@currentParseNumber = 0
 
@@ -102,7 +97,6 @@ to the `data` event (or the next middleware) rather than the inputOption itself.
 		, match
 
 		done(null, matchAndSuggestion)
-
 
 
 	module.exports =

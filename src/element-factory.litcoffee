@@ -1,6 +1,7 @@
 #Includes
 
-	# Literal = require './literal'
+	_ = require 'lodash'
+
 	Choice = require './choice'
 	Sequence = require './sequence'
 	Repeat = require './repeat'
@@ -19,10 +20,14 @@ Create an object from a JSON representation.
 If it is just a string, it is interpreted as a literal with just a display property
 
 		create: (object) ->
-			if typeof object is 'string' or object instanceof String
+			if _.isString(object)
 				trueObject =
 					type: 'literal'
 					display: object
+			else if _.isArray(object)
+				trueObject =
+					type: 'sequence'
+					children: object
 			else
 				trueObject = object
 
