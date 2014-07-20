@@ -2,8 +2,8 @@ _ = require 'lodash'
 async = require 'async'
 moment = require 'moment'
 chai = require 'chai'
-chai.use require 'chai-spies'
-chai.use require 'chai-datetime'
+sinon = require 'sinon'
+chai.use require 'sinon-chai'
 
 if window?.lacona?
 	lacona = window.lacona
@@ -18,66 +18,15 @@ expect = chai.expect
 describe 'Parser', ->
 
 	it 'handles without a schema (data is never called)', (done) ->
-		dataCalled = chai.spy()
+		dataCalled = sinon.spy()
 		new Parser()
 		.on 'data', ->
 			dataCalled()
 		.on 'end', ->
-			expect(dataCalled).to.not.have.been.called()
+			expect(dataCalled).to.not.have.been.called
 			done()
 		.parse()
 
-	it 'handles a schema with a single literal', (done) ->
-		testCases = [
-			input: 'l'
-			schema:
-				root: 'literal test'
-				run: ''
-			matches: 1
-			suggestion: 'literal test'
-			result: {}
-		,
-			input: 'l'
-			schema:
-				root:
-					type: 'literal'
-					display: 'literal test'
-				run: ''
-			matches: 1
-			suggestion: 'literal test'
-			result: {}
-		,
-			input: 'l'
-			schema:
-				root:
-					type: 'literal'
-					display: 'literal test'
-					value: 'test'
-					id: 'theLiteral'
-				run: ''
-			matches: 1
-			suggestion: 'literal test'
-			result:
-				theLiteral: 'test'
-		]
-		async.each testCases, (testCase, done) ->
-			dataCalled = chai.spy()
-
-			new Parser()
-			.understand testCase.schema
-			.on 'data', (data) ->
-				expect(data).to.exist
-				expect(data.suggestion).to.exist
-				expect(data.suggestion.words).to.have.length 1
-				expect(data.suggestion.charactersComplete).to.equal 1
-				expect(data.suggestion.words[0].string).to.equal testCase.suggestion
-				expect(data.result).to.deep.equal testCase.result
-				dataCalled()
-			.on 'end', ->
-				expect(dataCalled).to.have.been.called.exactly(testCase.matches)
-				done()
-			.parse(testCase.input)
-		, done
 
 	it 'handles phrases with extension', (done) ->
 		testCase =
@@ -98,7 +47,7 @@ describe 'Parser', ->
 			matches: 2
 			suggestions: ['test', 'totally']
 
-		dataCalled = chai.spy()
+		dataCalled = sinon.spy()
 		new Parser()
 		.understand testCase.schemata[0]
 		.understand testCase.schemata[1]
@@ -108,7 +57,7 @@ describe 'Parser', ->
 			expect(testCase.suggestions, testCase.desc).to.contain data.suggestion.words[0].string
 			dataCalled()
 		.on 'end', ->
-			expect(dataCalled, testCase.desc).to.have.been.called.exactly(testCase.matches)
+			expect(dataCalled, testCase.desc).to.have.callCount(testCase.matches)
 			done()
 		.parse testCase.input
 
@@ -178,7 +127,7 @@ describe 'Parser', ->
 				theChoice: 'should be'
 		]
 		async.each testCases, (testCase, done) ->
-			dataCalled = chai.spy()
+			dataCalled = sinon.spy()
 			new Parser()
 			.understand testCase.schema
 			.on 'data', (data) ->
@@ -190,7 +139,7 @@ describe 'Parser', ->
 				expect(data.result, testCase.desc).to.deep.equal testCase.result
 				dataCalled()	
 			.on 'end', ->
-				expect(dataCalled).to.have.been.called.exactly(testCase.matches)
+				expect(dataCalled).to.have.callCount(testCase.matches)
 				done()
 			.parse(testCase.input)
 		, done
@@ -277,7 +226,7 @@ describe 'Parser', ->
 		]
 
 		async.each testCases, (testCase, done) ->
-			dataCalled = chai.spy()
+			dataCalled = sinon.spy()
 			new Parser()
 			.understand testCase.schema
 			.on 'data', (data) ->
@@ -289,7 +238,7 @@ describe 'Parser', ->
 				expect(data.result, testCase.desc).to.deep.equal testCase.result
 				dataCalled()
 			.on 'end', ->
-				expect(dataCalled, testCase.desc).to.have.been.called.exactly(testCase.matches)
+				expect(dataCalled, testCase.desc).to.have.callCount(testCase.matches)
 				done()
 			.parse(testCase.input)
 		, done
@@ -360,7 +309,7 @@ describe 'Parser', ->
 
 
 		async.each testCases, (testCase, done) ->
-			dataCalled = chai.spy()
+			dataCalled = sinon.spy()
 			new Parser()
 			.understand testCase.schema
 			.on 'data', (data) ->
@@ -372,7 +321,7 @@ describe 'Parser', ->
 				expect(data.result, testCase.desc).to.deep.equal testCase.result
 				dataCalled()
 			.on 'end', ->
-				expect(dataCalled, testCase.desc).to.have.been.called.exactly(testCase.matches)
+				expect(dataCalled, testCase.desc).to.have.callCount(testCase.matches)
 				done()
 			.parse(testCase.input)
 		, done
@@ -433,7 +382,7 @@ describe 'Parser', ->
 
 
 		async.each testCases, (testCase, done) ->
-			dataCalled = chai.spy()
+			dataCalled = sinon.spy()
 			new Parser()
 			.understand testCase.schema
 			.on 'data', (data) ->
@@ -445,7 +394,7 @@ describe 'Parser', ->
 				expect(data.suggestion.words[0].string, testCase.desc).to.equal testCase.suggestion
 				expect(data.result, testCase.desc).to.deep.equal testCase.result
 			.on 'end', ->
-				expect(dataCalled, testCase.desc).to.have.been.called.exactly(testCase.matches)
+				expect(dataCalled, testCase.desc).to.have.callCount(testCase.matches)
 				done()
 			.parse(testCase.input)
 		, done
@@ -505,7 +454,7 @@ describe 'Parser', ->
 		]
 
 		async.each testCases, (testCase, done) ->
-			dataCalled = chai.spy()
+			dataCalled = sinon.spy()
 			if testCase.setDefault?
 				testCase.setDefault()
 
@@ -515,7 +464,7 @@ describe 'Parser', ->
 				expect(data.suggestion.words[0].string, testCase.desc).to.equal testCase.suggestion
 				dataCalled()
 			.on 'end', ->
-				expect(dataCalled, testCase.desc).to.have.been.called.exactly(testCase.matches)
+				expect(dataCalled, testCase.desc).to.have.callCount(testCase.matches)
 				done()
 			.parse(testCase.input, testCase.language)
 		, done
@@ -538,7 +487,7 @@ describe 'Parser', ->
 				run: ''
 			called: 1
 
-		dataCalled = chai.spy()
+		dataCalled = sinon.spy()
 		new Parser()
 		.understand testCase.delay
 		.understand testCase.schema
@@ -583,7 +532,7 @@ describe 'Parser', ->
 				theLiteral: 'test'
 		]
 		async.each testCases, (testCase, done) ->
-			dataCalled = chai.spy()
+			dataCalled = sinon.spy()
 
 			new Parser(testCase.options)
 			.understand testCase.schema
@@ -596,7 +545,7 @@ describe 'Parser', ->
 				expect(data.result, testCase.desc).to.deep.equal testCase.result
 				dataCalled()
 			.on 'end', ->
-				expect(dataCalled, testCase.desc).to.have.been.called.exactly(testCase.matches)
+				expect(dataCalled, testCase.desc).to.have.callCount(testCase.matches)
 				done()
 			.parse(testCase.input)
 		, done

@@ -1,7 +1,8 @@
 _ = require 'lodash'
 async = require 'async'
 chai = require 'chai'
-chai.use require 'chai-spies'
+sinon = require 'sinon'
+chai.use require 'sinon-chai'
 
 if window?.lacona?
 	lacona = window.lacona
@@ -21,10 +22,10 @@ describe 'run', ->
 				root: 'test'
 				run: 'run'
 			scope:
-				run: chai.spy (result, done) ->
+				run: sinon.spy (result, done) ->
 					done()
 
-		dataCalled = chai.spy()
+		dataCalled = sinon.spy()
 
 		inputOption = null
 		new Parser()

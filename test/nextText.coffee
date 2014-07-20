@@ -1,7 +1,6 @@
 _ = require 'lodash'
 async = require 'async'
 chai = require 'chai'
-chai.use require 'chai-spies'
 
 if window?.lacona?
 	lacona = window.lacona
