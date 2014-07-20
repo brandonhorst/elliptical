@@ -13,13 +13,13 @@ var util = require('gulp-util');
 
 
 var paths = {
-	test: 'test/**/*.coffee',
+	test: ['test/**/*.coffee', 'test/**/*.js'],
 	src: 'src/**/*.litcoffee'
 };
 
 gulp.task('test', function() {
 	return gulp
-		.src([paths.test])
+		.src(paths.test)
 		.pipe(mocha());
 });
 
