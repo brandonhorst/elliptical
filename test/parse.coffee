@@ -27,41 +27,6 @@ describe 'Parser', ->
 			done()
 		.parse()
 
-
-	it 'handles phrases with extension', (done) ->
-		testCase =
-			input: 't'
-			desc: 'extension'
-			schemata: [
-				name: 'extended'
-				root: 'test'
-			,
-				name: 'extender'
-				extends: ['extended']
-				root: 'totally'
-			,
-				root:
-					type: 'extended'
-				run: ''
-			]
-			matches: 2
-			suggestions: ['test', 'totally']
-
-		dataCalled = sinon.spy()
-		new Parser()
-		.understand testCase.schemata[0]
-		.understand testCase.schemata[1]
-		.understand testCase.schemata[2]
-		.on 'data', (data) ->
-			expect(data, testCase.desc).to.exist
-			expect(testCase.suggestions, testCase.desc).to.contain data.suggestion.words[0].string
-			dataCalled()
-		.on 'end', ->
-			expect(dataCalled, testCase.desc).to.have.callCount(testCase.matches)
-			done()
-		.parse testCase.input
-
-
 	it 'handles schemata in different languages', (done) ->
 		testCases = [
 			input: 'pr'
