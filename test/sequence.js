@@ -16,14 +16,14 @@ if (typeof window !== 'undefined' && window.lacona) {
 
 chai.config.includeStack = true;
 
-describe('choice', function() {
+describe('sequence', function() {
 	var parser;
 
 	beforeEach(function() {
 		parser = new lacona.Parser();
 	});
 
-	it('default separator: " "', function (done) {
+	it('', function (done) {
 		var schema = {
 			root: {
 				type: 'sequence',
