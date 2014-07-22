@@ -23,7 +23,7 @@ describe('sequence', function() {
 		parser = new lacona.Parser();
 	});
 
-	it('', function (done) {
+	it('puts two elements in order', function (done) {
 		var schema = {
 			root: {
 				type: 'sequence',
