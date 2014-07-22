@@ -23,17 +23,9 @@ gulp.task('test', function() {
 		.pipe(mocha());
 });
 
-gulp.task('_compile-tests', function() {
+gulp.task('_browserify-tests', function() {
 	return gulp
-		.src('test/**/*coffee')
-		.pipe(coffee())
-		.pipe(rename({ dirname: 'raw' }))
-		.pipe(gulp.dest('tmp'));
-});
-
-gulp.task('_browserify-tests', ['_compile-tests'], function() {
-	return gulp
-		.src('tmp/raw/**/*.js', {read: false})
+		.src('test/**/*.js', {read: false})
 		.pipe(browserify({ignore: ['../src/lacona']}))
 		.pipe(rename({extname: '.browserify.js'}))
 		.pipe(gulp.dest('tmp'));
