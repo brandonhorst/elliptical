@@ -5,7 +5,6 @@
 	Choice = require './choice'
 	Sequence = require './sequence'
 	Repeat = require './repeat'
-	Queue = require './queue'
 
 	Phrase = require './phrase'
 	Value = require './value'

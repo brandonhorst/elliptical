@@ -170,4 +170,96 @@ describe('choice', function() {
 		.on('end', onEnd)
 		.parse('r');
 	});
+
+	it('can be restricted by a limit of 1', function (done) {
+		var schema = {
+			root: {
+				type: 'choice',
+				children: [
+					'right',
+					'really wrong'
+				],
+				limit: 1
+			},
+			run: ''
+		}
+
+		var onData = sinon.spy(function(data) {
+			expect(data.suggestion.words[0].string).to.equal('right');
+		});
+
+		var onEnd = function() {
+			expect(onData).to.have.been.called.once;
+			done();
+		};
+
+		parser
+		.understand(schema)
+		.on('data', onData)
+		.on('end', onEnd)
+		.parse('r');
+	});
+
+	it('can be restricted by a limit of more than 1', function (done) {
+		var schema = {
+			root: {
+				type: 'choice',
+				children: [{
+						type: 'literal',
+						value: 'testValue',
+						display: 'right'
+					},
+					'really wrong'
+				],
+				limit: 1,
+				id: 'testId'
+			},
+			run: ''
+		}
+
+		var onData = sinon.spy(function(data) {
+			expect(data.result.testId).to.equal('testValue');
+		});
+
+		var onEnd = function() {
+			expect(onData).to.have.been.called.once;
+			done();
+		};
+
+		parser
+		.understand(schema)
+		.on('data', onData)
+		.on('end', onEnd)
+		.parse('r');
+	});
+
+	it('has a value when limited', function (done) {
+		var schema = {
+			root: {
+				type: 'choice',
+				children: [
+					'right',
+					'right too',
+					'really wrong'
+				],
+				limit: 2
+			},
+			run: ''
+		}
+
+		var onData = sinon.spy(function(data) {
+			expect(data.suggestion.words[0].string).to.contain('right');
+		});
+
+		var onEnd = function() {
+			expect(onData).to.have.been.called.twice;
+			done();
+		};
+
+		parser
+		.understand(schema)
+		.on('data', onData)
+		.on('end', onEnd)
+		.parse('r');
+	});
 });
