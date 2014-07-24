@@ -19,9 +19,9 @@ coverage
 node_modules
 
 # Generated files
-lib
 dist
 tmp
 
 # Sublime Workspace
 *.sublime-workspace
+*.sublime-project
