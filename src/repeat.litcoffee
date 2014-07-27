@@ -1,7 +1,6 @@
 #Includes
 
 	_ = require 'lodash'
-	util = require 'util'
 
 	Group = require './group'
 
@@ -12,30 +11,30 @@
 			super options
 			@child = factory.create(options.child)
 			@separator = factory.create(options.separator ? ' ')
-			@max = options.max ? Number.MAX_VALUE ####MAX/MIN ARE NOT YET IMPLEMENTED
+			@max = options.max ? Number.MAX_VALUE
 			@min = options.min ? Number.MIN_VALUE
-
-		handleParse: (input, lang, context, data, done) ->
 
 Parse the child. If it gets data, pass the data on, then try the separator.
 If the separator gets data too, loop around. If either doesn't get data, we're done.
 If it already has a suggestion, we're also done - we will never suggest more than one repeat
 
+		handleParse: (input, lang, context, data, done) ->
 			parsesActive = 0
 
-			parseChild = (input) =>
+			parseChild = (input, wasSuggested, level) =>
 				parsesActive++
 				@child.parse input, lang, context, (option) =>
-					newResult = if util.isArray(option.result[@id]) then option.result[@id] else []
+					newResult = if _.isArray(option.result[@id]) then option.result[@id] else []
 					if typeof option.result[@child.id] isnt 'undefined'
 						newResult.push option.result[@child.id]
 					newOption = option.handleValue(@id, newResult)
 					newOption = newOption.handleValue(@child.id, undefined)
 
 					continueToSeparator = newOption.suggestion.words.length is 0 #store it, in case data changes it
-					data(newOption)
-					if continueToSeparator
-						parseSeparator(newOption)
+					if level >= @min and level <= @max
+						data(newOption)
+					if level < @max and continueToSeparator
+						parseSeparator(newOption, wasSuggested, level)
 				, (err) =>
 					if err?
 						done(err)
@@ -44,10 +43,10 @@ If it already has a suggestion, we're also done - we will never suggest more tha
 						if parsesActive is 0
 							done()
 
-			parseSeparator = (input) =>
+			parseSeparator = (input, wasSuggested, level) =>
 				parsesActive++
 				@separator.parse input, lang, context, (option) =>
-					parseChild(option)
+					parseChild(option, wasSuggested, level + 1)
 				, (err) =>
 					if err?
 						done(err)
@@ -56,7 +55,7 @@ If it already has a suggestion, we're also done - we will never suggest more tha
 						if parsesActive is 0
 							done()
 
-			parseChild(input)
+			parseChild(input, false, 1)
 
 
 	module.exports = Repeat

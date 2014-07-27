@@ -161,4 +161,63 @@ describe('repeat', function() {
 		.on('end', onEnd)
 		.parse('super m');
 	});
+
+
+	it('does not accept fewer than min iterations', function (done) {
+		var schema = {
+			root: {
+				type: 'repeat',
+				child: 'a',
+				separator: 'b',
+				min: 2
+			},
+			run: ''
+		}
+
+		var onData = sinon.spy(function(data) {
+			expect(data.match[0].string).to.equal('a');
+			expect(data.suggestion.words[0].string).to.equal('b');
+			expect(data.completion[0].string).to.equal('a');
+		});
+
+		var onEnd = function() {
+			expect(onData).to.have.been.called.once;
+			done();
+		};
+
+		parser
+		.understand(schema)
+		.on('data', onData)
+		.on('end', onEnd)
+		.parse('a');
+	});
+
+
+	it('does not accept more than max iterations', function (done) {
+		var schema = {
+			root: {
+				type: 'repeat',
+				child: 'a',
+				separator: 'b',
+				max: 1
+			},
+			run: ''
+		}
+
+		var onData = sinon.spy(function(data) {
+			expect(data.suggestion.words).to.be.empty;
+			expect(data.match[0].string).to.equal('a');
+		});
+
+		var onEnd = function() {
+			expect(onData).to.have.been.called.once;
+			done();
+		};
+
+		parser
+		.understand(schema)
+		.on('data', onData)
+		.on('end', onEnd)
+		.parse('a');
+	});
 });
