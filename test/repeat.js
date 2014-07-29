@@ -220,4 +220,70 @@ describe('repeat', function() {
 		.on('end', onEnd)
 		.parse('a');
 	});
+
+
+	it('rejects non-unique repeated elements', function (done) {
+		var schema = {
+			root: {
+				type: 'repeat',
+				child: {
+					type: 'choice',
+					children: [
+						'a',
+						'b'
+					]
+				},
+				id: 'rep',
+				unique: true
+			},
+			run: ''
+		}
+
+		var onData = sinon.spy();
+
+		var onEnd = function() {
+			expect(onData).to.not.have.been.called;
+			done();
+		};
+
+		parser
+		.understand(schema)
+		.on('data', onData)
+		.on('end', onEnd)
+		.parse('a a');
+	});
+
+
+	it('accepts unique repeated elements', function (done) {
+		var schema = {
+			root: {
+				type: 'repeat',
+				child: {
+					type: 'choice',
+					children: [
+						'a',
+						'b'
+					]
+				},
+				unique: true
+			},
+			run: ''
+		}
+
+		var onData = sinon.spy(function(data) {
+			expect(data.match[0].string).to.equal('a');
+			expect(data.match[2].string).to.equal('b');
+		});
+
+		var onEnd = function() {
+			expect(onData).to.have.been.called.once;
+			done();
+		};
+
+		parser
+		.understand(schema)
+		.on('data', onData)
+		.on('end', onEnd)
+		.parse('a b');
+	});
 });

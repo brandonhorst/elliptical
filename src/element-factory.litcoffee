@@ -23,6 +23,7 @@ If it is just a string, it is interpreted as a literal with just a display prope
 				trueObject =
 					type: 'literal'
 					display: object
+					value: object
 			else if _.isArray(object)
 				trueObject =
 					type: 'sequence'

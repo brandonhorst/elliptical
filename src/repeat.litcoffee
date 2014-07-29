@@ -13,6 +13,7 @@
 			@separator = factory.create(options.separator ? ' ')
 			@max = options.max ? Number.MAX_VALUE
 			@min = options.min ? Number.MIN_VALUE
+			@unique = options.unique ? false
 
 Parse the child. If it gets data, pass the data on, then try the separator.
 If the separator gets data too, loop around. If either doesn't get data, we're done.
@@ -24,10 +25,23 @@ If it already has a suggestion, we're also done - we will never suggest more tha
 			parseChild = (input, wasSuggested, level) =>
 				parsesActive++
 				@child.parse input, lang, context, (option) =>
-					newResult = if _.isArray(option.result[@id]) then option.result[@id] else []
-					if typeof option.result[@child.id] isnt 'undefined'
-						newResult.push option.result[@child.id]
-					newOption = option.handleValue(@id, newResult)
+
+					# Get the value of this repeat (or create an empty array)
+					ownResult = if _.isArray(option.result[@id]) then option.result[@id] else []
+
+					#If the child added a value, add it to the repeat's value
+					childResult = option.result[@child.id]
+
+					if @unique and childResult in ownResult
+						return
+
+					if typeof childResult isnt 'undefined'
+						ownResult.push(childResult)
+
+					#Put the modified value into the option
+					newOption = option.handleValue(@id, ownResult)
+
+					#Remove the child's value - it is covered by the repeat
 					newOption = newOption.handleValue(@child.id, undefined)
 
 					continueToSeparator = newOption.suggestion.words.length is 0 #store it, in case data changes it

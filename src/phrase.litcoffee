@@ -2,7 +2,6 @@
 
 	{EventEmitter} = require 'events'
 	_ = require 'lodash'
-	require './stringshims'
 
 #Phrase
 
@@ -24,8 +23,8 @@
 		parse: (input, lang, context, data, done) ->
 			node = @grammars[lang] ? @grammars[lang.split('_')[0]] ? @grammars.default
 			node.parse input, lang, context, (result) ->
-				delete result.result[id] for id of result.result when id.startsWith '@temp'
-				data(result)
+				newResult = result.clearTemps()
+				data(newResult)
 			, done
 
 		getValue: (options, result, done) ->

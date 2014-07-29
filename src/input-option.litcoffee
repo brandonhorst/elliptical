@@ -17,6 +17,12 @@
 				newResult[id] = value
 			return new InputOption(@options, @sentence, @text, @match, @suggestion, @completion, newResult)
 
+		clearTemps: ->
+			newResult = _.cloneDeep(@result)
+			delete newResult[id] for id of newResult when id.startsWith('@temp')
+			return new InputOption(@options, @sentence, @text, @match, @suggestion, @completion, newResult)
+
+
 		replaceResult: (newResult) ->
 			return new InputOption(@options, @sentence, @text, @match, @suggestion, @completion, newResult)
 
