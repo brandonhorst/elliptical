@@ -13,7 +13,7 @@ var util = require('gulp-util');
 
 
 var paths = {
-	test: ['test/**/*.coffee', 'test/**/*.js'],
+	test: ['test/**/*.js'],
 	src: 'src/**/*.litcoffee'
 };
 
@@ -23,13 +23,6 @@ gulp.task('test', function() {
 		.pipe(mocha());
 });
 
-gulp.task('_browserify-tests', function() {
-	return gulp
-		.src('test/**/*.js', {read: false})
-		.pipe(browserify({ignore: ['../src/lacona']}))
-		.pipe(rename({extname: '.browserify.js'}))
-		.pipe(gulp.dest('tmp'));
-});
 gulp.task('phantom', ['build-browser-tests'], function() {
 	return gulp
 		.src('test/**/*.html')
@@ -40,15 +33,14 @@ gulp.task('clean', function() {
 		.src(['dist', 'lib', 'tmp', 'coverage'], { read: false })
 		.pipe(clean());
 });
-gulp.task('build-browser-tests', ['_browserify-tests', 'browserify']);
 
-gulp.task('clean-browser-tests', function() {
+gulp.task('build-browser-tests', ['browserify'], function() {
 	return gulp
-		.src('tmp', {read: false})
-		.pipe(clean());
+		.src('test/**/*.js', {read: false})
+		.pipe(browserify({ignore: ['../src/lacona']}))
+		.pipe(rename({extname: '.browserify.js'}))
+		.pipe(gulp.dest('tmp'));
 });
-
-gulp.task('make', ['uglify']);
 
 gulp.task('build', function() {
 	return gulp
@@ -64,7 +56,7 @@ gulp.task('browserify', ['build'], function() {
 		.pipe(rename('lacona.js'))
 		.pipe(gulp.dest('dist'));
 });
-gulp.task('uglify', ['browserify'], function() {
+gulp.task('make', ['browserify'], function() {
 	return gulp
 		.src('dist/lacona.js')
 		.pipe(uglify())

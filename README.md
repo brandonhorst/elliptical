@@ -23,35 +23,33 @@ Lacona is under _very active development_ right now. Absolutely nothing is set i
 
 Lacona contains a full set of BDD unit tests. They are designed to run both in node.js and in the browser (including PhantomJS).
 
-	gulp test    #run node.js tests
-	gulp phantom #run tests in PhantomJS
-	npm test     #run both node.js tests and PhantomJS tests
+- `gulp test`: run tests in node.js
+- `gulp phantom`: run tests in PhantomJS
+- `npm test`: run tests in both node.js and PhantomJS
 
-You can also run the tests in a browser of your choice by opening `test/mocha.html`.
+You can also run the tests in a browser of your choice by running `gulp build-browser-tests` and then opening `test/mocha.html`.
 
 #Usage
 
-Lacona is written entirely in CoffeeScript. It ships with the CoffeeScript source (in `src`) as well as the compiled Javascript (in `lib`), which is used by default. It also ships with with a version that is perfectly functional in the browser, courtesy of Browserify, in the `dist` directory. The browser version exposes a single global variable, `lacona`.
-
-Note that these two built versions are not included in the git repo, as they can be built with `gulp build`, which is done automatically before uploading to npm. They can be removed with `gulp clean`.
-
 ##Node
 
-	var lacona = require('lacona');
-	var parser = new lacona.Parser();
+```bash
+npm install lacona
+```
+
+```javascript
+var lacona = require('lacona');
+var parser = new lacona.Parser();
+```
 
 ##Browser
 
-	<script src="node_modules/dist/lacona.min.js"></script>
-	<script>
-		var parser = new lacona.Parser();
-	</script>
-
-#Testing
-
-BDD tests use Mocha and Chai. They can be run with `gulp test`. `gulp watch` will run the tests every time a source file is saved, which can be useful for development.
-
-Testing in the browser can be done automatically with `gulp phantom` (using PhantomJS). Alternatively, you can load up the tests in any browser by running `gulp build-browser-tests` and then opening `test/mocha.html`. The built files can be removed with `gulp clean-browser-tests` or just `gulp clean`.
+```html
+<script src="node_modules/dist/lacona.min.js"></script>
+<script>
+	var parser = new lacona.Parser();
+</script>
+```
 
 ##Let's Have an Example
 
@@ -74,32 +72,34 @@ As long as Lacona knows what a `<task name>` and a `<date and time>` look like, 
 
 Making a Lacona grammar to understand those options is easy:
 
-	{
-		root: {
-			type: 'choice',
-			children: [
-				{
-					type: 'sequence'
-					children: [
-						'remind me to',
-						{ type: 'freetext', id: 'taskName' },
-						{ type: 'datetime', id: 'dateAndTime' }
-					]
-				},
-				{
-					type: 'sequence'
-					children: [
-						{ type: 'datetime', id: 'dateAndTime' },
-						', remind me to',
-						{ type: 'freetext', id: 'taskName' }
-					]
-				}
-			]
-		},
-		run: 'createReminder'
-	}
+```json
+{
+	root: {
+		type: 'choice',
+		children: [
+			{
+				type: 'sequence'
+				children: [
+					'remind me to',
+					{ type: 'freetext', id: 'taskName' },
+					{ type: 'datetime', id: 'dateAndTime' }
+				]
+			},
+			{
+				type: 'sequence'
+				children: [
+					{ type: 'datetime', id: 'dateAndTime' },
+					', remind me to',
+					{ type: 'freetext', id: 'taskName' }
+				]
+			}
+		]
+	},
+	run: 'createReminder'
+}
+```
 
-That may look a bit complicated, but it's not. It's a JSON Object saying with a single `root` element, which is a `choice` between two `sequence`s. It can be thought of as a tree, and here's a diagram: #Diagram on draw.io#
+That may look a bit complicated, but it's not. It's a JSON Object saying with a single `root` element, which is a `choice` between two `sequence`s.
 
 One important thing to notice is the `id` properties. These are a logical name for the data that any given `phrase` contains, and they govern how the data is provided back. In this case, let's say the user inputs
 
@@ -107,10 +107,12 @@ One important thing to notice is the `id` properties. These are a logical name f
 
 The return value would be a single JSON object that looks like this (presuming that "today" is June 13, 2014):
 
-	{
-		taskName: "wash the car",
-		dateAndTime: Date(Sat Jun 14 2014 8:00:00 GMT-0400 (EDT))
-	}
+```json
+{
+	taskName: "wash the car",
+	dateAndTime: Date(Sat Jun 14 2014 8:00:00 GMT-0400 (EDT))
+}
+```
 
 Notice that the important bits are extracted, and provided in an easily-usable way. It would be simple to take this object and send it to the interface or server.
 
@@ -120,39 +122,54 @@ Now the beauty is this: Let's I also want to support Spanish speakers. I could m
 
 But the data returned would be in exactly the same format.
 
-	{
-		taskName: "lavar la coche",
-		dateAndTime: Date(Sat Jun 14 2014 8:00:00 GMT-0400 (EDT))
-	}
+```json
+{
+	taskName: "lavar la coche",
+	dateAndTime: Date(Sat Jun 14 2014 8:00:00 GMT-0400 (EDT))
+}
+```
 
 Because the format is so general, you can accept sentences in any language at all, even languages with distinctly different grammatical structures. In Japanese, the verbs generally come last. In Arabic, text is written right-to-left. In Chinese languages, spaces are not used. Even so, Lacona can make sense out of the texts and allow effective parsing.
 
-By means of example, let's support Spanish in our Schema, shall we?
+By means of example, let's support Spanish in our Schema, shall we? Please note that an array as a schema element is shorthand for `{type: 'sequence', separator: ' ', children: [array contents]}`.
 
-	{
+```json
+{
+	grammars: [ {
+		lang: ['en', 'default'],
 		root: {
 			type: 'choice',
-			children: [
-				{
-					type: 'sequence'
-					children: [
-						'remind me to',
-						{ type: 'freetext', id: 'taskName' },
-						{ type: 'datetime', id: 'dateAndTime' }
-					]
-				},
-				{
-					type: 'sequence'
-					children: [
-						{ type: 'datetime', id: 'dateAndTime' },
-						', remind me to',
-						{ type: 'freetext', id: 'taskName' }
-					]
-				}
+			children: [ [
+					'remind me to',
+					{ type: 'freetext', id: 'taskName' },
+					{ type: 'datetime', id: 'dateAndTime' }
+				], [
+					{ type: 'datetime', id: 'dateAndTime' },
+					', remind me to',
+					{ type: 'freetext', id: 'taskName' }
+				]
 			]
-		},
-		run: 'createReminder'
-	}
+		}
+	}, {
+		lang: ['es'],
+		root: {
+			type: 'choice',
+			children: [ [
+					'recuérdame ',
+					{ type: 'freetext', id: 'taskName' },
+					{ type: 'datetime', id: 'dateAndTime' }
+				], [
+					{ type: 'datetime', id: 'dateAndTime' },
+					', recuérdame',
+					{ type: 'freetext', id: 'taskName' }
+				]
+			]
+		}
+
+	} ],
+	run: 'createReminder'
+}
+```
 
 #Parsing
 
@@ -178,19 +195,39 @@ where `event` is a string and `handler` is a function. Whenever an event named `
 
 When `parse` is called, `data` events will be emitted with a single `OutputOption` argument for every valid result in the order that they are recieved. Then, `end` will be emitted. If something goes wrong, `error` will be emitted with a single `Error` argument.
 
-If you are implementing a UI that will be maintaining state between requests, look into `laconic-stateful` ([GitHub](https://github.com/brandonhorst/laconic-stateful), [npm]()).
+If you are implementing a UI that will be maintaining state between requests, look into `laconic-stateful` ([GitHub](https://github.com/brandonhorst/laconic-stateful), [npm](https://www.npmjs.org/package/lacona-stateful)).
+
+#Directories
+
+- `src`: CoffeeScript source
+- `lib`: Generated Javascript source
+- `test`: Unit tests
+- `test/mocha.html`: Page for running tests in browser
+- `dist`: Browserify'd classes, for running in browser
+
+#Building
+
+`gulp make`: Compile CoffeeScript (`lib`), browserify the generated source (`dist/lacona.js`), and uglify it (`dist/lacona.min.js`). This is done automatically with `npm install`.
 
 #Reference
+
+##Development Notice
+
+Not all of this functionality has been implemented yet. If functionality currently exists, you will find it in the tests.
 
 ##lacona
 
 You can access everything you need to throught the `lacona` module. From node:
 
-	var lacona = require('lacona');
+```javascript
+var lacona = require('lacona');
+```
 
 From the browser (exposes a global object called `lacona`):
 
-	<script type="text/javascript" src="build/lacona.min.js" />
+```html
+<script type="text/javascript" src="build/lacona.min.js"></script>
+```
 
 `lacona` contains `Parser`, which handles most of the necessary tools that you will need, as well as `utils` which contains some useful functions.
 
@@ -198,16 +235,19 @@ From the browser (exposes a global object called `lacona`):
 
 `Parser` is a constructor that takes no arguments. Instantiate a new `Parser` with
 
-	var parser = new lacona.Parser()
+```javascript
+var parser = new lacona.Parser()
+```
 
+####`parser.understand(grammar || schema)`
 
-####`understand(grammar)`
+Take a single `grammar`, containing a `scope` and a `schema`, which may contain any number of `phrase`s. Any phrases passed in will be available to all other `phrase`s, both for extension and precidence, and for inclusion.
 
-Take a single `grammar`, containing a `scope` and any number of `phrase`s. Any phrases passed in will be available to all other `phrase`s, both for extension and precidence, and for inclusion.
+Note that if the object that is passed to `understand` does not contain a property called `schema`, it will assume that it is a `schema` with no associated `scope`, rather than a `grammar`.
 
 Returns the `Parser` instance for chaining.
 
-####`use(middleware)`
+####`parser.use(middleware)`
 
 Takes a middleware function that will be used to modulate the data coming from Lacona. All middleware `use`d will be executed in order. The most common use for this is to take the data and transform it into something that can be displayed. While this would not be useful on the server or in a framework like AngularJS, it could come in handy for simple sites that want to make use of Lacona's functionality.
 
@@ -219,25 +259,35 @@ Returns the `Parser` instance for chaining.
 
 This allows you to set handlers that respond to the parser's events. Just like node.js streams, `Parser` will trigger 3 events: `data`, `end`, and `error`. To handle one of these events, just pass the name of the event as the first argument, and a `Function` to handle it as the second.
 
-#####`data`
+#####`data` event
 
 This event is triggered as soon as the `Parser` gets a successful parsing structure. It is passed a single argument, `option`, which is a representation of the parse (after being passed through all middleware). These may be called in any order. If order matters, ... #Figure this out#
 
-#####`end`
+#####`end` event
 
 Called with no arguments when all possible options have been delivered. `data` will never be called after `end` is, for a single parse.
 
-#####`error`
+#####`error` event
 
 Something went wrong. `end` will not be called.
 
 ##High-level Constructs
+
+###`grammar`
+
+```
+{
+	scope: `scope`,
+	schema: `schema`
+}
+```
 
 ####`schema`
 
 	phrase || [ phrase ]
 
 ####`phrase`
+
 	{
 		name: String [required]
 		root: element [required]
