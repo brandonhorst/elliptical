@@ -1,6 +1,5 @@
 var _ = require('lodash');
 var async = require('async');
-var moment = require('moment');
 var chai = require('chai');
 var expect = chai.expect;
 var lacona;
@@ -11,7 +10,7 @@ chai.use(require('sinon-chai'));
 if (typeof window !== 'undefined' && window.lacona) {
 	lacona = window.lacona;
 } else {
-	lacona = require('../src/lacona');
+	lacona = require('../lib/lacona');
 }
 
 describe('run', function () {

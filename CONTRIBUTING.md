@@ -1,6 +1,6 @@
 #Contributing to Lacona
 
-Lacona is a brand-new project with some unique ideas about linguistic parsing. The project lead is [@brandonhorst](http://twitter.com/brandonhorst). This document is also maintained by Brandon. If you would like to contribute, there are a number of components that need work.
+Lacona is a brand-new project with some unique ideas about linguistic parsing. The project lead is [@brandonhorst](https://github.com/brandonhorst). This document is also maintained by Brandon. If you would like to contribute, there are a number of components that need work.
 
 - Lacona Core Development
 - Lacona Phrase Development
@@ -15,14 +15,13 @@ Lacona is a brand-new project with some unique ideas about linguistic parsing. T
 
 The Lacona Core is contained in this repositiory, [brandonhorst/lacona](http://github.com/brandonhorst/github). It contains the logic for Lacona's core functionality - understanding phrases, parsing an input string, and giving output. It also conatains 5 built-in phrases: `choice`, `sequence`, `repeat`, `value,` and `literal`.
 
-The Lacona core is currently written entirely in CoffeeScript, though this should change to Javascript in the near future. Building is done using GulpJS. Tests are written using Mocha, Chai, and Sinon, and use PhantomJS for automated browser testing.
+The Lacona core is currently written entirely in JavaScript. Building is done using GulpJS. Tests are written using Mocha, Chai, and Sinon, and use PhantomJS for automated browser testing.
 
 The core depends upon `lodash` and `async`. I would love to see those both removed at some point for the sake of file size, but for now these two dependencies are fine.
 
 What needs to be done:
 
 - Clear plan for features required for initial release
-- Transition from all CoffeeScript into Javascript
 - 100% test coverage
 - Utility to browserify Lacona bundled with a number of phrases, for web developers
 
@@ -69,15 +68,13 @@ The project lead can only claim fluency in English, so this will need to be a te
 
 To truly claim that Lacona is internationalized, I would like to see the core components translated into the following languages. Of course, more languages will always be better, but I would consider this the core requirement.
 
-- English [@brandonhorst]
-- Spanish []
-- Portugese []
-- French []
-- German []
-- Russian []
-- Japanese []
 - Arabic []
-- Mandarian Chinese []
+- English [@brandonhorst]
+- French []
+- Portuguese []
+- Russian []
+- Spanish []
+- Standard Chinese []
 
 Within these languages there are many dialects that mean quite a bit. For example, American and British English-speakers choose to represent things like decimals and dates very differently. Those differences may, at some point, need to split up under the responibility of different leads.
 

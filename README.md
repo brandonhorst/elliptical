@@ -75,27 +75,27 @@ Making a Lacona grammar to understand those options is easy:
 ```json
 {
 	root: {
-		type: 'choice',
-		children: [
+		"type": "choice",
+		"children": [
 			{
-				type: 'sequence'
-				children: [
-					'remind me to',
-					{ type: 'freetext', id: 'taskName' },
-					{ type: 'datetime', id: 'dateAndTime' }
+				"type": "sequence",
+				"children": [
+					"remind me to",
+					{ "type": "freetext", "id": "taskName" },
+					{ "type": "datetime", "id": "dateAndTime" }
 				]
 			},
 			{
-				type: 'sequence'
-				children: [
-					{ type: 'datetime', id: 'dateAndTime' },
-					', remind me to',
-					{ type: 'freetext', id: 'taskName' }
+				"type": "sequence",
+				"children": [
+					{ "type": "datetime", "id": "dateAndTime" },
+					", remind me to",
+					{ "type": "freetext", "id": "taskName" }
 				]
 			}
 		]
 	},
-	run: 'createReminder'
+	"run": "createReminder"
 }
 ```
 
@@ -107,10 +107,10 @@ One important thing to notice is the `id` properties. These are a logical name f
 
 The return value would be a single JSON object that looks like this (presuming that "today" is June 13, 2014):
 
-```json
+```javascript
 {
-	taskName: "wash the car",
-	dateAndTime: Date(Sat Jun 14 2014 8:00:00 GMT-0400 (EDT))
+	"taskName": "wash the car",
+	"dateAndTime": Date("Sat Jun 14 2014 8:00:00 GMT-0400 (EDT)")
 }
 ```
 
@@ -122,10 +122,10 @@ Now the beauty is this: Let's I also want to support Spanish speakers. I could m
 
 But the data returned would be in exactly the same format.
 
-```json
+```javascript
 {
-	taskName: "lavar la coche",
-	dateAndTime: Date(Sat Jun 14 2014 8:00:00 GMT-0400 (EDT))
+	"taskName": "lavar la coche",
+	"dateAndTime": Date("Sat Jun 14 2014 8:00:00 GMT-0400 (EDT)")
 }
 ```
 
@@ -135,39 +135,39 @@ By means of example, let's support Spanish in our Schema, shall we? Please note 
 
 ```json
 {
-	grammars: [ {
-		lang: ['en', 'default'],
-		root: {
-			type: 'choice',
-			children: [ [
-					'remind me to',
-					{ type: 'freetext', id: 'taskName' },
-					{ type: 'datetime', id: 'dateAndTime' }
+	"grammars": [ {
+		"lang": ["en", "default"],
+		"root": {
+			"type": "choice",
+			"children": [ [
+					"remind me to",
+					{ "type": "freetext", "id": "taskName" },
+					{ "type": "datetime", "id": "dateAndTime" }
 				], [
-					{ type: 'datetime', id: 'dateAndTime' },
-					', remind me to',
-					{ type: 'freetext', id: 'taskName' }
+					{ "type": "datetime", "id": "dateAndTime" },
+					", remind me to",
+					{ "type": "freetext", "id": "taskName" }
 				]
 			]
 		}
 	}, {
-		lang: ['es'],
-		root: {
-			type: 'choice',
-			children: [ [
-					'recuérdame ',
-					{ type: 'freetext', id: 'taskName' },
-					{ type: 'datetime', id: 'dateAndTime' }
+		"lang": ["es"],
+		"root": {
+			"type": "choice",
+			"children": [ [
+					"recuérdame ",
+					{ "type": "freetext", "id": "taskName" },
+					{ "type": "datetime", "id": "dateAndTime" }
 				], [
-					{ type: 'datetime', id: 'dateAndTime' },
-					', recuérdame',
-					{ type: 'freetext', id: 'taskName' }
+					{ "type": "datetime", "id": "dateAndTime" },
+					", recuérdame",
+					{ "type": "freetext", "id": "taskName" }
 				]
 			]
 		}
 
 	} ],
-	run: 'createReminder'
+	"run": "createReminder"
 }
 ```
 
@@ -175,21 +175,29 @@ By means of example, let's support Spanish in our Schema, shall we? Please note 
 
 You can create a new Parser instance with
 
-	var parser = new lacona.Parser(options);
+```javascript
+var parser = new lacona.Parser(options);
+```
 
 The `Parser` object follows patterns that should be familiar to node.js users, and should be very simple to learn for everyone else.
 
 To teach a `Parser` some phrases, you call
 
-	parser.understand(grammar);
+```javascript
+parser.understand(grammar);
+```
 
 To start parsing phrase, you call
 
-	parser.parse(stringToParse);
+```javascript
+parser.parse(stringToParse);
+```
 
 To get the results of a parse, `Parser` will emit events. These can be captured with
 
-	parser.on(event, handler);
+```javascript
+parser.on(event, handler);
+```
 
 where `event` is a string and `handler` is a function. Whenever an event named `event` is emitted, the `handler` will be called. 
 
@@ -199,15 +207,14 @@ If you are implementing a UI that will be maintaining state between requests, lo
 
 #Directories
 
-- `src`: CoffeeScript source
-- `lib`: Generated Javascript source
+- `lib`: Javascript source
 - `test`: Unit tests
 - `test/mocha.html`: Page for running tests in browser
 - `dist`: Browserify'd classes, for running in browser
 
-#Building
+#Building for the Browser
 
-`gulp make`: Compile CoffeeScript (`lib`), browserify the generated source (`dist/lacona.js`), and uglify it (`dist/lacona.min.js`). This is done automatically with `npm install`.
+`npm install`: Browserify the source (`dist/lacona.js`), and uglify it (`dist/lacona.min.js`).
 
 #Reference
 
@@ -275,10 +282,10 @@ Something went wrong. `end` will not be called.
 
 ###`grammar`
 
-```
+```json
 {
-	scope: `scope`,
-	schema: `schema`
+	"scope": `scope`,
+	"schema": `schema`
 }
 ```
 
