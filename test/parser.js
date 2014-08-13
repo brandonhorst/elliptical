@@ -51,7 +51,7 @@ describe('Parser', function () {
 		});
 
 		var onEnd = function () {
-			expect(onData).to.have.been.called.once;
+			expect(onData).to.have.been.calledOnce;
 			done();
 		};
 
@@ -79,7 +79,7 @@ describe('Parser', function () {
 		});
 
 		var onEnd = function () {
-			expect(onData).to.have.been.called.once;
+			expect(onData).to.have.been.calledOnce;
 			done();
 		};
 
@@ -107,7 +107,7 @@ describe('Parser', function () {
 		});
 
 		var onEnd = function () {
-			expect(onData).to.have.been.called.once;
+			expect(onData).to.have.been.calledOnce;
 			done();
 		};
 
@@ -151,7 +151,7 @@ describe('Parser', function () {
 		var onData = sinon.spy();
 
 		var onEnd = function() {
-			expect(onData).to.have.been.called.once;
+			expect(onData).to.have.been.calledOnce;
 			done();
 		}
 

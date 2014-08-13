@@ -32,7 +32,7 @@ describe('Parser with fuzzy matching', function () {
 		});
 
 		var onEnd = function () {
-			expect(onData).to.have.been.called.once;
+			expect(onData).to.have.been.calledOnce;
 			done();
 		};
 

@@ -43,7 +43,7 @@ describe('Parser', function () {
 		});
 
 		var onEnd = function() {
-			expect(onData).to.have.been.called.twice;
+			expect(onData).to.have.been.calledTwice;
 			done();
 		}
 

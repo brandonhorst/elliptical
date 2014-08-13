@@ -35,7 +35,7 @@ describe('run', function () {
 
 		var afterRun = function (err) {
 			expect(err).to.not.exist;
-			expect(grammar.scope.run).to.have.been.called.once;
+			expect(grammar.scope.run).to.have.been.calledOnce;
 			done();
 		}
 

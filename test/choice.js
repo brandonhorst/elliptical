@@ -40,7 +40,7 @@ describe('choice', function() {
 		});
 
 		var onEnd = function() {
-			expect(onData).to.have.been.called.once;
+			expect(onData).to.have.been.calledOnce;
 			done();
 		};
 
@@ -69,7 +69,7 @@ describe('choice', function() {
 		});
 
 		var onEnd = function() {
-			expect(onData).to.have.been.called.twice;
+			expect(onData).to.have.been.calledTwice;
 			done();
 		};
 
@@ -98,7 +98,7 @@ describe('choice', function() {
 		});
 
 		var onEnd = function() {
-			expect(onData).to.have.been.called.twice;
+			expect(onData).to.have.been.calledTwice;
 			done();
 		};
 
@@ -159,7 +159,7 @@ describe('choice', function() {
 		});
 
 		var onEnd = function() {
-			expect(onData).to.have.been.called.once;
+			expect(onData).to.have.been.calledOnce;
 			done();
 		};
 
@@ -188,7 +188,7 @@ describe('choice', function() {
 		});
 
 		var onEnd = function() {
-			expect(onData).to.have.been.called.once;
+			expect(onData).to.have.been.calledOnce;
 			done();
 		};
 
@@ -221,7 +221,7 @@ describe('choice', function() {
 		});
 
 		var onEnd = function() {
-			expect(onData).to.have.been.called.once;
+			expect(onData).to.have.been.calledOnce;
 			done();
 		};
 
@@ -251,7 +251,43 @@ describe('choice', function() {
 		});
 
 		var onEnd = function() {
-			expect(onData).to.have.been.called.twice;
+			expect(onData).to.have.been.calledTwice;
+			done();
+		};
+
+		parser
+		.understand(schema)
+		.on('data', onData)
+		.on('end', onEnd)
+		.parse('r');
+	});
+
+	it('still works when a limited child has multiple options', function (done) {
+		var schema = {
+			root: {
+				type: 'choice',
+				children: [
+					{
+						type: 'choice',
+						children: [
+							'right',
+							'right too'
+						]
+					},
+					'wrong',
+					'right as well'
+				],
+				limit: 2
+			},
+			run: ''
+		}
+
+		var onData = sinon.spy(function(data) {
+			expect(data.suggestion.words[0].string).to.contain('right');
+		});
+
+		var onEnd = function() {
+			expect(onData).to.have.been.calledThrice;
 			done();
 		};
 

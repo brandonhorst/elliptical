@@ -36,7 +36,7 @@ describe('literal', function() {
 		});
 
 		var onEnd = function() {
-			expect(onData).to.have.been.called.once;
+			expect(onData).to.have.been.calledOnce;
 			done();
 		};
 
@@ -64,7 +64,7 @@ describe('literal', function() {
 		});
 
 		var onEnd = function() {
-			expect(onData).to.have.been.called.once;
+			expect(onData).to.have.been.calledOnce;
 			done();
 		};
 
@@ -96,7 +96,7 @@ describe('literal', function() {
 		});
 
 		var onEnd = function() {
-			expect(onData).to.have.been.called.once;
+			expect(onData).to.have.been.calledOnce;
 			done();
 		};
 
