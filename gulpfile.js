@@ -1,11 +1,13 @@
-require('coffee-script/register');
-
 var gulp = require('gulp');
+
 var browserify = require('gulp-browserify');
 var clean = require('gulp-clean');
+var jshint = require('gulp-jshint');
 var mocha = require('gulp-mocha');
+var package = require('./package');
 var phantom = require('gulp-mocha-phantomjs');
 var rename = require('gulp-rename');
+var stylish = require('jshint-stylish');
 var watch = require('gulp-watch');
 var uglify = require('gulp-uglify');
 var util = require('gulp-util');
@@ -13,18 +15,27 @@ var util = require('gulp-util');
 gulp.task('test', function() {
 	return gulp
 		.src('test/**/*.js')
-		.pipe(mocha());
+		.pipe(mocha({reporter: 'dot'}));
 });
 
 gulp.task('phantom', ['build-browser-tests'], function() {
 	return gulp
 		.src('test/**/*.html')
-		.pipe(phantom());
+		.pipe(phantom({reporter: 'dot'}));
 });
+
 gulp.task('clean', function() {
 	return gulp
 		.src(['dist', 'tmp', 'coverage'], { read: false })
 		.pipe(clean());
+});
+
+gulp.task('lint', function() {
+	return gulp
+		.src('lib/**/*.js')
+		.pipe(jshint(package.jshintConfig))
+		.pipe(jshint.reporter(stylish))
+		.pipe(jshint.reporter('fail'));
 });
 
 gulp.task('build-browser-tests', ['browserify'], function() {
