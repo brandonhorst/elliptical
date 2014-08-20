@@ -53,7 +53,7 @@ gulp.task('lint', function() {
 		.pipe(jshint.reporter('fail'));
 });
 
-gulp.task('build-browser-tests', ['browserify'], function() {
+gulp.task('build-browser-tests', ['make'], function() {
 	glob('./test/**/*.js', function(err, files) {
 		if (err) {
 			throw err;
