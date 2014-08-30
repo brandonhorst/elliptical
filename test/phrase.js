@@ -16,7 +16,7 @@ if (typeof window !== 'undefined' && window.lacona) {
 describe('Parser', function () {
 	var parser;
 	beforeEach(function() {
-		parser = new lacona.Parser();
+		parser = new lacona.Parser({sentences: ['test']});
 	});
 
 	it('handles phrases with extension', function (done) {
@@ -32,10 +32,10 @@ describe('Parser', function () {
 		};
 
 		var sentence = {
+			name: 'test',
 			root: {
 				type: 'extended'
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function (data) {

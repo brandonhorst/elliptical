@@ -19,19 +19,19 @@ describe('choice', function() {
 	var parser;
 
 	beforeEach(function() {
-		parser = new lacona.Parser();
+		parser = new lacona.Parser({sentences: ['test']});
 	});
 
 	it('suggests one valid choice', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'choice',
 				children: [
 					'right',
 					'wrong'
 				]
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {
@@ -53,14 +53,14 @@ describe('choice', function() {
 
 	it('suggests multiple valid choices', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'choice',
 				children: [
 					'right',
 					'right also'
 				]
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {
@@ -82,14 +82,14 @@ describe('choice', function() {
 
 	it('suggests multiple valid choices', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'choice',
 				children: [
 					'right',
 					'right also'
 				]
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {
@@ -111,14 +111,14 @@ describe('choice', function() {
 
 	it('suggests no valid choices', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'choice',
 				children: [
 					'wrong',
 					'wrong also'
 				]
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy();
@@ -137,6 +137,7 @@ describe('choice', function() {
 
 	it('adopts the value of the child', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'choice',
 				id: 'testId',
@@ -148,8 +149,7 @@ describe('choice', function() {
 				},
 					'wrong'
 				]
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {
@@ -172,6 +172,7 @@ describe('choice', function() {
 
 	it('can be restricted by a limit of 1', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'choice',
 				children: [
@@ -179,8 +180,7 @@ describe('choice', function() {
 					'really wrong'
 				],
 				limit: 1
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {
@@ -201,6 +201,7 @@ describe('choice', function() {
 
 	it('can be restricted by a limit of more than 1', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'choice',
 				children: [{
@@ -212,8 +213,7 @@ describe('choice', function() {
 				],
 				limit: 1,
 				id: 'testId'
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {
@@ -234,6 +234,7 @@ describe('choice', function() {
 
 	it('has a value when limited', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'choice',
 				children: [
@@ -242,8 +243,7 @@ describe('choice', function() {
 					'really wrong'
 				],
 				limit: 2
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {
@@ -264,6 +264,7 @@ describe('choice', function() {
 
 	it('still works when a limited child has multiple options', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'choice',
 				children: [
@@ -278,8 +279,7 @@ describe('choice', function() {
 					'right as well'
 				],
 				limit: 2
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {

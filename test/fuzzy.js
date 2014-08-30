@@ -17,13 +17,13 @@ if (typeof window !== 'undefined' && window.lacona) {
 describe('Parser with fuzzy matching', function () {
 	var parser;
 	beforeEach(function() {
-		parser = new lacona.Parser({fuzzy: true});
+		parser = new lacona.Parser({fuzzy: true, sentences: ['test']});
 	});
 
 	it('supports fuzzy matching', function (done) {
 		var schema = {
-			root: 'a simple test',
-			run: ''
+			name: 'test',
+			root: 'a simple test'
 		}
 
 		var onData = sinon.spy(function (data) {

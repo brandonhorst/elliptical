@@ -72,7 +72,6 @@
     "quotmark": "single",
     "undef": true,
     "unused": true,
-    "strict": true,
     "node": true
   }
 }

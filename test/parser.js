@@ -16,7 +16,7 @@ if (typeof window !== 'undefined' && window.lacona) {
 describe('Parser', function () {
 	var parser;
 	beforeEach(function() {
-		parser = new lacona.Parser();
+		parser = new lacona.Parser({sentences: ['test']});
 	});
 
 	it('never calls data without a schema', function (done) {
@@ -36,14 +36,14 @@ describe('Parser', function () {
 
 	it('can parse in a specified language', function (done) {
 		var schema = {
+			name: 'test',
 			grammars: [{
 				lang: ['en', 'default'],
 				root: 'test'
 			}, {
 				lang: ['es'],
 				root: 'prueba'
-			}],
-			run: ''
+			}]
 		};
 
 		var onData = sinon.spy(function (data) {
@@ -64,14 +64,14 @@ describe('Parser', function () {
 
 	it('falls back on a less specific language if a more specific one is not provided', function (done) {
 		var schema = {
+			name: 'test',
 			grammars: [{
 				lang: ['en_GB', 'default'],
 				root: 'trolley'
 			}, {
 				lang: ['en'],
 				root: 'train'
-			}],
-			run: ''
+			}]
 		};
 
 		var onData = sinon.spy(function (data) {
@@ -92,14 +92,14 @@ describe('Parser', function () {
 
 	it('if no language is provded, takes the default specified by the system (window.nagivator.language or process.env.LANG)', function (done) {
 		var schema = {
+			name: 'test',
 			grammars: [{
 				lang: ['es'],
 				root: 'prueba'
 			}, {
 				lang: ['en', 'default'],
 				root: 'test'
-			}],
-			run: ''
+			}]
 		};
 
 		var onData = sinon.spy(function (data) {
@@ -142,10 +142,10 @@ describe('Parser', function () {
 		}
 
 		var sentence = {
+			name: 'test',
 			root: {
 				type: 'delay'
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy();

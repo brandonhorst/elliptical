@@ -19,13 +19,13 @@ describe('literal', function() {
 	var parser;
 
 	beforeEach(function() {
-		parser = new lacona.Parser();
+		parser = new lacona.Parser({sentences: ['test']});
 	});
 
 	it('handles an implicit literal (string in schema)', function (done) {
 		var schema = {
-			root: 'literal test',
-			run: ''
+			name: 'test',
+			root: 'literal test'
 		}
 
 		var onData = sinon.spy(function(data) {
@@ -49,11 +49,11 @@ describe('literal', function() {
 
 	it('handles a fully-qualified literal (no id)', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'literal',
 				display: 'literal test'
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {
@@ -77,13 +77,13 @@ describe('literal', function() {
 
 	it('handles a fully-qualified literal with an id', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'literal',
 				display: 'literal test',
 				value: 'test',
 				id: 'testId'
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {

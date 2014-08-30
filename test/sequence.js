@@ -19,19 +19,19 @@ describe('sequence', function() {
 	var parser;
 
 	beforeEach(function() {
-		parser = new lacona.Parser();
+		parser = new lacona.Parser({sentences: ['test']});
 	});
 
 	it('puts two elements in order', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'sequence',
 				children: [
 					'super',
 					'man'
 				]
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {
@@ -53,6 +53,7 @@ describe('sequence', function() {
 
 	it('empty separator', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'sequence',
 				children: [
@@ -60,8 +61,7 @@ describe('sequence', function() {
 					'man'
 				],
 				separator: ''
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {
@@ -83,6 +83,7 @@ describe('sequence', function() {
 
 	it('custom separator', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'sequence',
 				children: [
@@ -90,8 +91,7 @@ describe('sequence', function() {
 					'man'
 				],
 				separator: ' test '
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {
@@ -112,6 +112,7 @@ describe('sequence', function() {
 
 	it('optional child', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'sequence',
 				children: [
@@ -124,8 +125,7 @@ describe('sequence', function() {
 					},
 					'man'
 				]
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {
@@ -151,6 +151,7 @@ describe('sequence', function() {
 
 	it('can set a value to the result', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'sequence',
 				id: 'testId',
@@ -159,8 +160,7 @@ describe('sequence', function() {
 					'super',
 					'man'
 				]
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {

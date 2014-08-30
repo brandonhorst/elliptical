@@ -3,16 +3,36 @@
 `Parser` is a constructor that takes no arguments. Instantiate a new `Parser` with
 
 ```javascript
-var parser = new lacona.Parser();
+var parser = new lacona.Parser(options);
 ```
 
-##`parser.understand(grammar)`
+##constructor `lacona.Parser(options)`
+
+`options` can contain the following properties, which can be set afterward construction as well:
+
+- `sentences`
+- `langs`
+- `fuzzy`
+
+##method `parser.understand(grammar)`
 
 See [grammar](doc/grammar.md) docs.
 
 Returns the `Parser` instance for chaining.
 
-##`parser.use(middleware)`
+##property `parser.sentences`
+
+`Array` of `String`s representing which of the given `phrase`s should be treated as top-level. That is, which ones should be used to start the parse.
+
+##property `parser.langs`
+
+`Array` of `String`s representing which languages. These will be attempted in-order before falling back on `default`.
+
+##property `parser.fuzzy`
+
+`Boolean` value representing whether or not to use a fuzzy search
+
+##method `parser.use(middleware)`
 
 Takes a middleware function that will be used to modulate the data coming from Lacona. All middleware `use`d will be executed in order. The most common use for this is to take the data and transform it into something that can be displayed. While this may not be useful on the server or in a framework like AngularJS, it could come in handy for simple sites that want to make use of Lacona's functionality.
 
@@ -20,7 +40,7 @@ Takes a middleware function that will be used to modulate the data coming from L
 
 Returns the `Parser` instance for chaining.
 
-###`on(event, handler)`
+###method `on(event, handler)`
 
 This allows you to set handlers that respond to the parser's events. Just like node.js streams, `Parser` will trigger 3 events: `data`, `end`, and `error`. To handle one of these events, just pass the name of the event as the first argument, and a `Function` to handle it as the second.
 

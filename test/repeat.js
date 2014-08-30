@@ -19,17 +19,17 @@ describe('repeat', function() {
 	var parser;
 
 	beforeEach(function() {
-		parser = new lacona.Parser();
+		parser = new lacona.Parser({sentences: ['test']});
 	});
 
 	it('does not accept input that does not match the child', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'repeat',
 				child: 'super',
 				separator: 'man'
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy();
@@ -48,12 +48,12 @@ describe('repeat', function() {
 
 	it('accepts the child on its own', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'repeat',
 				child: 'super',
 				separator: 'man'
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {
@@ -74,12 +74,12 @@ describe('repeat', function() {
 
 	it('accepts the child twice, with the separator in the middle', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'repeat',
 				child: 'super',
 				separator: 'man'
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {
@@ -100,6 +100,7 @@ describe('repeat', function() {
 
 	it('creates an array from the values of the children', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'repeat',
 				child: {
@@ -110,8 +111,7 @@ describe('repeat', function() {
 				},
 				separator: 'man',
 				id: 'testId'
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {
@@ -133,6 +133,7 @@ describe('repeat', function() {
 
 	it('can set a value to the result', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'sequence',
 				id: 'testId',
@@ -141,8 +142,7 @@ describe('repeat', function() {
 					'super',
 					'man'
 				]
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {
@@ -164,13 +164,13 @@ describe('repeat', function() {
 
 	it('does not accept fewer than min iterations', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'repeat',
 				child: 'a',
 				separator: 'b',
 				min: 2
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {
@@ -194,13 +194,13 @@ describe('repeat', function() {
 
 	it('does not accept more than max iterations', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'repeat',
 				child: 'a',
 				separator: 'b',
 				max: 1
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {
@@ -223,6 +223,7 @@ describe('repeat', function() {
 
 	it('rejects non-unique repeated elements', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'repeat',
 				child: {
@@ -234,8 +235,7 @@ describe('repeat', function() {
 				},
 				id: 'rep',
 				unique: true
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy();
@@ -255,6 +255,7 @@ describe('repeat', function() {
 
 	it('accepts unique repeated elements', function (done) {
 		var schema = {
+			name: 'test',
 			root: {
 				type: 'repeat',
 				child: {
@@ -265,8 +266,7 @@ describe('repeat', function() {
 					]
 				},
 				unique: true
-			},
-			run: ''
+			}
 		}
 
 		var onData = sinon.spy(function(data) {
