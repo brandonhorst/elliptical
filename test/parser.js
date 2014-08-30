@@ -38,7 +38,7 @@ describe('Parser', function () {
     var grammar = {
       phrases: [{
         name: 'test',
-        grammars: [{
+        schemas: [{
           lang: ['en', 'default'],
           root: 'test'
         }, {
@@ -68,7 +68,7 @@ describe('Parser', function () {
     var grammar = {
       phrases: [{
         name: 'test',
-        grammars: [{
+        schemas: [{
           lang: ['en_GB', 'default'],
           root: 'trolley'
         }, {
@@ -98,7 +98,7 @@ describe('Parser', function () {
     var grammar = {
       phrases: [{
         name: 'test',
-        grammars: [{
+        schemas: [{
           lang: ['es'],
           root: 'prueba'
         }, {
