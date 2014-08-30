@@ -8,281 +8,299 @@ var sinon = require('sinon');
 chai.use(require('sinon-chai'));
 
 if (typeof window !== 'undefined' && window.lacona) {
-	lacona = window.lacona;
+  lacona = window.lacona;
 } else {
-	lacona = require('../lib/lacona');
+  lacona = require('../lib/lacona');
 }
 
 chai.config.includeStack = true;
 
 describe('repeat', function() {
-	var parser;
+  var parser;
 
-	beforeEach(function() {
-		parser = new lacona.Parser({sentences: ['test']});
-	});
+  beforeEach(function() {
+    parser = new lacona.Parser({sentences: ['test']});
+  });
 
-	it('does not accept input that does not match the child', function (done) {
-		var schema = {
-			name: 'test',
-			root: {
-				type: 'repeat',
-				child: 'super',
-				separator: 'man'
-			}
-		}
+  it('does not accept input that does not match the child', function (done) {
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        root: {
+          type: 'repeat',
+          child: 'super',
+          separator: 'man'
+        }
+      }]
+    }
 
-		var onData = sinon.spy();
+    var onData = sinon.spy();
 
-		var onEnd = function() {
-			expect(onData).to.not.have.been.called;
-			done();
-		};
+    var onEnd = function() {
+      expect(onData).to.not.have.been.called;
+      done();
+    };
 
-		parser
-		.understand(schema)
-		.on('data', onData)
-		.on('end', onEnd)
-		.parse('wrong');
-	});
+    parser
+    .understand(grammar)
+    .on('data', onData)
+    .on('end', onEnd)
+    .parse('wrong');
+  });
 
-	it('accepts the child on its own', function (done) {
-		var schema = {
-			name: 'test',
-			root: {
-				type: 'repeat',
-				child: 'super',
-				separator: 'man'
-			}
-		}
+  it('accepts the child on its own', function (done) {
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        root: {
+          type: 'repeat',
+          child: 'super',
+          separator: 'man'
+        }
+      }]
+    }
 
-		var onData = sinon.spy(function(data) {
-			expect(data.suggestion.words[0].string).to.equal('man');
-		});
+    var onData = sinon.spy(function(data) {
+      expect(data.suggestion.words[0].string).to.equal('man');
+    });
 
-		var onEnd = function() {
-			expect(onData).to.have.been.calledOnce;
-			done();
-		};
+    var onEnd = function() {
+      expect(onData).to.have.been.calledOnce;
+      done();
+    };
 
-		parser
-		.understand(schema)
-		.on('data', onData)
-		.on('end', onEnd)
-		.parse('superm');
-	});
+    parser
+    .understand(grammar)
+    .on('data', onData)
+    .on('end', onEnd)
+    .parse('superm');
+  });
 
-	it('accepts the child twice, with the separator in the middle', function (done) {
-		var schema = {
-			name: 'test',
-			root: {
-				type: 'repeat',
-				child: 'super',
-				separator: 'man'
-			}
-		}
+  it('accepts the child twice, with the separator in the middle', function (done) {
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        root: {
+          type: 'repeat',
+          child: 'super',
+          separator: 'man'
+        }
+      }]
+    }
 
-		var onData = sinon.spy(function(data) {
-			expect(data.suggestion.words[0].string).to.equal('super');
-		});
+    var onData = sinon.spy(function(data) {
+      expect(data.suggestion.words[0].string).to.equal('super');
+    });
 
-		var onEnd = function() {
-			expect(onData).to.have.been.calledOnce;
-			done();
-		};
+    var onEnd = function() {
+      expect(onData).to.have.been.calledOnce;
+      done();
+    };
 
-		parser
-		.understand(schema)
-		.on('data', onData)
-		.on('end', onEnd)
-		.parse('supermans');
-	});
+    parser
+    .understand(grammar)
+    .on('data', onData)
+    .on('end', onEnd)
+    .parse('supermans');
+  });
 
-	it('creates an array from the values of the children', function (done) {
-		var schema = {
-			name: 'test',
-			root: {
-				type: 'repeat',
-				child: {
-					type: 'literal',
-					display: 'super',
-					value: 'testValue',
-					id: 'subElementId'
-				},
-				separator: 'man',
-				id: 'testId'
-			}
-		}
+  it('creates an array from the values of the children', function (done) {
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        root: {
+          type: 'repeat',
+          child: {
+            type: 'literal',
+            display: 'super',
+            value: 'testValue',
+            id: 'subElementId'
+          },
+          separator: 'man',
+          id: 'testId'
+        }
+      }]
+    }
 
-		var onData = sinon.spy(function(data) {
-			expect(data.result.testId).to.deep.equal(['testValue', 'testValue']);
-			expect(data.result.subElementId).to.be.undefined;
-		});
+    var onData = sinon.spy(function(data) {
+      expect(data.result.testId).to.deep.equal(['testValue', 'testValue']);
+      expect(data.result.subElementId).to.be.undefined;
+    });
 
-		var onEnd = function() {
-			expect(onData).to.have.been.calledOnce;
-			done();
-		};
+    var onEnd = function() {
+      expect(onData).to.have.been.calledOnce;
+      done();
+    };
 
-		parser
-		.understand(schema)
-		.on('data', onData)
-		.on('end', onEnd)
-		.parse('supermans');
-	});
+    parser
+    .understand(grammar)
+    .on('data', onData)
+    .on('end', onEnd)
+    .parse('supermans');
+  });
 
-	it('can set a value to the result', function (done) {
-		var schema = {
-			name: 'test',
-			root: {
-				type: 'sequence',
-				id: 'testId',
-				value: 'testValue',
-				children: [
-					'super',
-					'man'
-				]
-			}
-		}
+  it('can set a value to the result', function (done) {
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        root: {
+          type: 'sequence',
+          id: 'testId',
+          value: 'testValue',
+          children: [
+            'super',
+            'man'
+          ]
+        }
+      }]
+    }
 
-		var onData = sinon.spy(function(data) {
-			expect(data.result.testId).to.equal('testValue');
-		});
+    var onData = sinon.spy(function(data) {
+      expect(data.result.testId).to.equal('testValue');
+    });
 
-		var onEnd = function() {
-			expect(onData).to.have.been.calledOnce;
-			done();
-		};
+    var onEnd = function() {
+      expect(onData).to.have.been.calledOnce;
+      done();
+    };
 
-		parser
-		.understand(schema)
-		.on('data', onData)
-		.on('end', onEnd)
-		.parse('super m');
-	});
-
-
-	it('does not accept fewer than min iterations', function (done) {
-		var schema = {
-			name: 'test',
-			root: {
-				type: 'repeat',
-				child: 'a',
-				separator: 'b',
-				min: 2
-			}
-		}
-
-		var onData = sinon.spy(function(data) {
-			expect(data.match[0].string).to.equal('a');
-			expect(data.suggestion.words[0].string).to.equal('b');
-			expect(data.completion[0].string).to.equal('a');
-		});
-
-		var onEnd = function() {
-			expect(onData).to.have.been.calledOnce;
-			done();
-		};
-
-		parser
-		.understand(schema)
-		.on('data', onData)
-		.on('end', onEnd)
-		.parse('a');
-	});
+    parser
+    .understand(grammar)
+    .on('data', onData)
+    .on('end', onEnd)
+    .parse('super m');
+  });
 
 
-	it('does not accept more than max iterations', function (done) {
-		var schema = {
-			name: 'test',
-			root: {
-				type: 'repeat',
-				child: 'a',
-				separator: 'b',
-				max: 1
-			}
-		}
+  it('does not accept fewer than min iterations', function (done) {
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        root: {
+          type: 'repeat',
+          child: 'a',
+          separator: 'b',
+          min: 2
+        }
+      }]
+    }
 
-		var onData = sinon.spy(function(data) {
-			expect(data.suggestion.words).to.be.empty;
-			expect(data.match[0].string).to.equal('a');
-		});
+    var onData = sinon.spy(function(data) {
+      expect(data.match[0].string).to.equal('a');
+      expect(data.suggestion.words[0].string).to.equal('b');
+      expect(data.completion[0].string).to.equal('a');
+    });
 
-		var onEnd = function() {
-			expect(onData).to.have.been.calledOnce;
-			done();
-		};
+    var onEnd = function() {
+      expect(onData).to.have.been.calledOnce;
+      done();
+    };
 
-		parser
-		.understand(schema)
-		.on('data', onData)
-		.on('end', onEnd)
-		.parse('a');
-	});
-
-
-	it('rejects non-unique repeated elements', function (done) {
-		var schema = {
-			name: 'test',
-			root: {
-				type: 'repeat',
-				child: {
-					type: 'choice',
-					children: [
-						'a',
-						'b'
-					]
-				},
-				id: 'rep',
-				unique: true
-			}
-		}
-
-		var onData = sinon.spy();
-
-		var onEnd = function() {
-			expect(onData).to.not.have.been.called;
-			done();
-		};
-
-		parser
-		.understand(schema)
-		.on('data', onData)
-		.on('end', onEnd)
-		.parse('a a');
-	});
+    parser
+    .understand(grammar)
+    .on('data', onData)
+    .on('end', onEnd)
+    .parse('a');
+  });
 
 
-	it('accepts unique repeated elements', function (done) {
-		var schema = {
-			name: 'test',
-			root: {
-				type: 'repeat',
-				child: {
-					type: 'choice',
-					children: [
-						'a',
-						'b'
-					]
-				},
-				unique: true
-			}
-		}
+  it('does not accept more than max iterations', function (done) {
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        root: {
+          type: 'repeat',
+          child: 'a',
+          separator: 'b',
+          max: 1
+        }
+      }]
+    }
 
-		var onData = sinon.spy(function(data) {
-			expect(data.match[0].string).to.equal('a');
-			expect(data.match[2].string).to.equal('b');
-		});
+    var onData = sinon.spy(function(data) {
+      expect(data.suggestion.words).to.be.empty;
+      expect(data.match[0].string).to.equal('a');
+    });
 
-		var onEnd = function() {
-			expect(onData).to.have.been.calledOnce;
-			done();
-		};
+    var onEnd = function() {
+      expect(onData).to.have.been.calledOnce;
+      done();
+    };
 
-		parser
-		.understand(schema)
-		.on('data', onData)
-		.on('end', onEnd)
-		.parse('a b');
-	});
+    parser
+    .understand(grammar)
+    .on('data', onData)
+    .on('end', onEnd)
+    .parse('a');
+  });
+
+
+  it('rejects non-unique repeated elements', function (done) {
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        root: {
+          type: 'repeat',
+          child: {
+            type: 'choice',
+            children: [
+              'a',
+              'b'
+            ]
+          },
+          id: 'rep',
+          unique: true
+        }
+      }]
+    }
+
+    var onData = sinon.spy();
+
+    var onEnd = function() {
+      expect(onData).to.not.have.been.called;
+      done();
+    };
+
+    parser
+    .understand(grammar)
+    .on('data', onData)
+    .on('end', onEnd)
+    .parse('a a');
+  });
+
+
+  it('accepts unique repeated elements', function (done) {
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        root: {
+          type: 'repeat',
+          child: {
+            type: 'choice',
+            children: [
+              'a',
+              'b'
+            ]
+          },
+          unique: true
+        }
+      }]
+    }
+
+    var onData = sinon.spy(function(data) {
+      expect(data.match[0].string).to.equal('a');
+      expect(data.match[2].string).to.equal('b');
+    });
+
+    var onEnd = function() {
+      expect(onData).to.have.been.calledOnce;
+      done();
+    };
+
+    parser
+    .understand(grammar)
+    .on('data', onData)
+    .on('end', onEnd)
+    .parse('a b');
+  });
 });

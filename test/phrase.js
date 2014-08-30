@@ -20,22 +20,18 @@ describe('Parser', function () {
 	});
 
 	it('handles phrases with extension', function (done) {
-		var extendedPhrase = {
-			name: 'extended',
-			root: 'test'
-		};
-
-		var extenderPhrase = {
-			name: 'extender',
-			extends: ['extended'],
-			root: 'totally'
-		};
-
-		var sentence = {
-			name: 'test',
-			root: {
-				type: 'extended'
-			}
+		var grammar = {
+			phrases: [{
+				name: 'extended',
+				root: 'test'
+			}, {
+				name: 'extender',
+				extends: ['extended'],
+				root: 'totally'
+			}, {
+				name: 'test',
+				root: {type: 'extended'}
+			}]
 		}
 
 		var onData = sinon.spy(function (data) {
@@ -48,9 +44,7 @@ describe('Parser', function () {
 		}
 
 		parser
-		.understand(extenderPhrase)
-		.understand(extendedPhrase)
-		.understand(sentence)
+		.understand(grammar)
 		.on('data', onData)
 		.on('end', onEnd)
 		.parse('t');
