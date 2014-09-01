@@ -39,10 +39,10 @@ describe('Parser', function () {
       phrases: [{
         name: 'test',
         schemas: [{
-          lang: ['en', 'default'],
+          langs: ['en', 'default'],
           root: 'test'
         }, {
-          lang: ['es'],
+          langs: ['es'],
           root: 'prueba'
         }]
       }]
@@ -69,10 +69,10 @@ describe('Parser', function () {
       phrases: [{
         name: 'test',
         schemas: [{
-          lang: ['en_GB', 'default'],
+          langs: ['en_GB', 'default'],
           root: 'trolley'
         }, {
-          lang: ['en'],
+          langs: ['en'],
           root: 'train'
         }]
       }]
@@ -99,10 +99,10 @@ describe('Parser', function () {
       phrases: [{
         name: 'test',
         schemas: [{
-          lang: ['es'],
+          langs: ['es'],
           root: 'prueba'
         }, {
-          lang: ['en', 'default'],
+          langs: ['en', 'default'],
           root: 'test'
         }]
       }]
