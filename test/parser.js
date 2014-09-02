@@ -57,11 +57,13 @@ describe('Parser', function () {
       done();
     };
 
+    parser.langs = ['es'];
+
     parser
     .understand(grammar)
     .on('data', onData)
     .on('end', onEnd)
-    .parse('p', 'es');
+    .parse('p');
   });
 
   it('falls back on a less specific language if a more specific one is not provided', function (done) {
@@ -94,22 +96,26 @@ describe('Parser', function () {
     .parse('tr', 'en_US');
   });
 
-  it('if no language is provded, takes the default specified by the system (window.nagivator.language or process.env.LANG)', function (done) {
+  it('if no language is provded, takes the default specified by the system (window.navigator.language or process.env.LANG)', function (done) {
+    var lang = typeof window === 'undefined'
+      ? process.env.LANG.split('.')[0]
+      : window.navigator.language.replace('-', '_');
+
     var grammar = {
       phrases: [{
         name: 'test',
         schemas: [{
-          langs: ['es'],
-          root: 'prueba'
+          langs: [lang],
+          root: 'inanotherlanguage'
         }, {
-          langs: ['en', 'default'],
+          langs: ['default'],
           root: 'test'
         }]
       }]
     };
 
     var onData = sinon.spy(function (data) {
-      expect(data.suggestion.words[0].string).to.equal('prueba');
+      expect(data.suggestion.words[0].string).to.equal('inanotherlanguage');
     });
 
     var onEnd = function () {
@@ -117,19 +123,13 @@ describe('Parser', function () {
       done();
     };
 
-    if (typeof window !== 'undefined') {
-      window.navigator = {
-        language: 'es_ES'
-      };
-    } else {
-      process.env.LANG = 'es_ES.UTF-8';
-    }
+
 
     parser
     .understand(grammar)
     .on('data', onData)
     .on('end', onEnd)
-    .parse('pr');
+    .parse('inanothe');
   });
 
 
