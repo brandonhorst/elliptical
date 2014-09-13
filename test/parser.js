@@ -71,17 +71,17 @@ describe('Parser', function () {
       phrases: [{
         name: 'test',
         schemas: [{
-          langs: ['en_GB', 'default'],
-          root: 'trolley'
-        }, {
-          langs: ['en'],
+          langs: ['en', 'default'],
           root: 'train'
+        }, {
+          langs: ['es'],
+          root: 'tren'
         }]
       }]
     };
 
     var onData = sinon.spy(function (data) {
-      expect(data.suggestion.words[0].string).to.equal('train');
+      expect(data.suggestion.words[0].string).to.equal('tren');
     });
 
     var onEnd = function () {
@@ -89,14 +89,16 @@ describe('Parser', function () {
       done();
     };
 
+    parser.langs = ['es_ES'];
+
     parser
     .understand(grammar)
     .on('data', onData)
     .on('end', onEnd)
-    .parse('tr', 'en_US');
+    .parse('tr');
   });
 
-  it('if no language is provded, takes the default specified by the system (window.navigator.language or process.env.LANG)', function (done) {
+  it('if no language is provided, takes the default specified by the system (window.navigator.language or process.env.LANG)', function (done) {
     var lang = typeof window === 'undefined'
       ? process.env.LANG.split('.')[0]
       : window.navigator.language.replace('-', '_');
