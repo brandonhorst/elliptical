@@ -4,7 +4,6 @@ var async = require('async');
 var browserify = require('browserify');
 var exec = require('child_process').exec;
 var glob = require('glob');
-var merge = require('merge-stream');
 var package = require('./package');
 var path = require('path');
 var rimraf = require('rimraf');
@@ -17,7 +16,6 @@ var rename = require('gulp-rename');
 var source = require('vinyl-source-stream');
 var streamify = require('gulp-streamify');
 var stylish = require('jshint-stylish');
-var watch = require('gulp-watch');
 var uglify = require('gulp-uglify');
 var util = require('gulp-util');
 
