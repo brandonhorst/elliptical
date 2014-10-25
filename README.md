@@ -115,7 +115,7 @@ One important thing to notice is the `id` properties. These are a logical name f
 
 	remind me to wash the car tomorrow at 8am
 
-The return value would be a single JSON object that looks like this (presuming that "today" is June 13, 2014):
+The parse output would be a single JSON object contains a `result` property that looks like this (presuming that "today" is June 13, 2014):
 
 ```javascript
 {
@@ -130,7 +130,7 @@ Now the beauty is this: Let's I also want to support Spanish speakers. I could m
 
 	recuérdame lavar la coche mañana a las 8
 
-But the data returned would be in exactly the same format.
+But the `result` property returned would be in exactly the same format.
 
 ```javascript
 {
@@ -183,6 +183,36 @@ By means of example, let's support Spanish in our Schema, shall we? Please note 
 }
 ```
 
+When a string is parsed, information about the string is also provided. The full output for the input:
+
+	remind me to feed the dog tom
+
+will look like this:
+
+```javascript
+{
+	"match": [
+		{"string": "remind me to"},
+		{"string": " "},
+		{"string": "feed the dog"},
+		{"string": " "}
+	],
+	"suggestion": {
+		"words": [
+			{"string": "tomorrow"}
+		],
+		"charactersComplete": 3
+	},
+	"completion": [],
+	"result": {
+		"taskName": "feed the dog",
+		"dateAndTime": Date("Sat Jun 14 2014 8:00:00 GMT-0400 (EDT)")
+	}
+}
+```
+
+Note that `partOfSpeech` will be implemented shortly, and `charactersComplete` will be changing slightly to allow for fuzzy matching.
+
 #Parsing
 
 You can create a new Parser instance with
@@ -211,7 +241,7 @@ To get the results of a parse, `Parser` will emit events. These can be captured 
 parser.on(event, handler);
 ```
 
-where `event` is a string and `handler` is a function. Whenever an event named `event` is emitted, the `handler` will be called. 
+where `event` is a string and `handler` is a function. Whenever an event named `event` is emitted, the `handler` will be called.
 
 When `parse` is called, `data` events will be emitted with a single `OutputOption` argument for every valid result in the order that they are recieved. Then, `end` will be emitted. If something goes wrong, `error` will be emitted with a single `Error` argument.
 
