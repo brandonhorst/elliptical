@@ -104,8 +104,7 @@ Making a Lacona grammar to understand those options is easy:
 				{ "type": "freetext", "id": "taskName" }
 			]
 		]
-	},
-	"run": "createReminder"
+	}
 }
 ```
 
@@ -178,8 +177,7 @@ By means of example, let's support Spanish in our Schema, shall we? Please note 
 			]
 		}
 
-	} ],
-	"run": "createReminder"
+	} ]
 }
 ```
 
