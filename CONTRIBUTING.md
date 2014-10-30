@@ -13,17 +13,16 @@ Lacona is a brand-new project with some unique ideas about linguistic parsing. T
 
 ##Lacona Core Development
 
-The Lacona Core is contained in this repositiory, [brandonhorst/lacona](http://github.com/brandonhorst/github). It contains the logic for Lacona's core functionality - understanding phrases, parsing an input string, and giving output. It also conatains 5 built-in phrases: `choice`, `sequence`, `repeat`, `value,` and `literal`.
+The Lacona Core is contained in this repositiory, [brandonhorst/lacona](http://github.com/brandonhorst/github). It contains the logic for Lacona's core functionality - understanding phrases, parsing an input string, and giving output. It also contains 5 built-in phrases: `choice`, `sequence`, `repeat`, `value,` and `literal`.
 
 The Lacona core is currently written entirely in JavaScript. Building is done using GulpJS. Tests are written using Mocha, Chai, and Sinon, and use PhantomJS for automated browser testing.
 
-The core depends upon `lodash` and `async`. I would love to see those both removed at some point for the sake of file size, but for now these two dependencies are fine.
+The core depends upon `lodash`, `async`, and `semver`. I would love to see these removed at some point for the sake of file size, but for now these dependencies are fine.
 
 What needs to be done:
 
 - Clear plan for features required for initial release
 - 100% test coverage
-- Utility to browserify Lacona bundled with a number of phrases, for web developers
 
 ##Lacona Phrase Development
 
@@ -74,7 +73,7 @@ To truly claim that Lacona is internationalized, I would like to see the core co
 - Portuguese []
 - Russian []
 - Spanish []
-- Standard Chinese []
+- Standard Chinese (Simplified) []
 
 Within these languages there are many dialects that mean quite a bit. For example, American and British English-speakers choose to represent things like decimals and dates very differently. Those differences may, at some point, need to split up under the responibility of different leads.
 
@@ -90,9 +89,9 @@ A full technical description of all phrase properties, method calls, and events.
 
 Lacona is, at its core, just a library that takes input and emits events. Its functionality can be extended to provide tools more useful to the programmer.
 
-One such extension is [`lacona-stateful`](https://github.com/brandonhorst/lacona-stateful), which intercepts the standard Lacona events and emits events that may be useful for making a stateful interface.
+One such extension is [`lacona-addon-stateful`](https://github.com/lacona/lacona-addon-stateful), which intercepts the standard Lacona events and emits events that may be useful for making a stateful interface.
 
-At this moment, `lacona-stateful` is the only extension that I would consider part of the Lacona core, but as others are developed, they may be included if found useful.
+At this moment, `lacona-addon-stateful` is the only extension that I would consider part of the Lacona core, but as others are developed, they may be included if found useful.
 
 ##Demos
 
