@@ -1,6 +1,6 @@
 #`lacona` `grammar`
 
-In `lacona`, language is specified using JavaScript objects. Ultimately, these objects are known as `phrase`s - individual linguistic components. Note that a lacona `phrase` does not necessarily need to be a linguistic phrase - it could be a punctuation mark, a word, a sentence, or a whole paragraph.
+In `lacona`, language is described using JavaScript objects. Ultimately, these objects are known as `phrase`s - individual linguistic components. Note that a lacona `phrase` does not necessarily need to be a linguistic phrase - it could be a punctuation mark, a word, a sentence, or a whole paragraph. A `phrase` is any linguistic structure
 
 `phrase`s are composed of other `phrase`s. Ultimately, all phrases reduce down to the four built-in `phrase`s - `value`, `sequence`, `choice`, and `repeat`. These are the only `phrase`s that Lacona understands by default.
 
@@ -18,14 +18,16 @@ Note that the words like 'grammar,' 'schema,' and 'phrase' have real English mea
 }
 ```
 
+A `grammar` is a collection of phrases. These phrases can freely reference each other, allowing composition of complex phrases. Additionally, these phrases share dependencies, and the `scope` object.
+
 The object passed to `Parser#understand`.
 
 ##`scope`
 
 ```
 {
-	name: Function(),
-	name2: Function(),
+	name: Function,
+	name2: Function,
 	...
 }
 ```
@@ -42,6 +44,7 @@ A `scope` object contains arbitrarily-named functions that will be referenced by
 		langs: [ String ], //required
 		root: phraseReference //required
 	} || root: phraseReference, //required
+	evaluate: String,
 	extends: [ String ] || {phraseName: version},
 	precedes: [ String ] || {phraseName: version}
 }
@@ -75,9 +78,9 @@ If a `String` is provided, it will be used as the `value` and `display` of a `li
 ```
 'test' == {type: 'literal', display: 'test', value: 'test'}
 
-[phraseRef1, phraseRef2] = {type: sequence, children: [phraseRef1, phraseRef2]}
+[phraseRef1, phraseRef2] == {type: sequence, children: [phraseRef1, phraseRef2]}
 ```
 
-The `type` property must be the same as some `name` property of a phrase listed in the `grammar`'s `dependencies`, otherwise it throws a runtime error.
+The `type` property must be the same as some `name` property of a phrase provided in this `grammar`, or in the `grammar`'s `dependencies`, otherwise it throws a runtime error.
 
-Any properties beyond these 3 will be passed to the `phrase`.
+Any additional properties beyond these 3 will be passed to the `phrase`.

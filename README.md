@@ -91,18 +91,25 @@ Making a Lacona grammar to understand those options is easy:
 
 ```json
 {
+	"name": "reminder",
 	"root": {
 		"type": "choice",
 		"children": [
-			[
-				"remind me to",
-				{ "type": "freetext", "id": "taskName" },
-				{ "type": "datetime", "id": "dateAndTime" }
-			], [
-				{ "type": "datetime", "id": "dateAndTime" },
-				", remind me to",
-				{ "type": "freetext", "id": "taskName" }
-			]
+			{
+				"type": "sequence",
+				"children": [
+					"remind me to",
+					{ "type": "freetext", "id": "taskName" },
+					{ "type": "datetime", "id": "dateAndTime" }
+				]
+			}, {
+				"type": "sequence",
+				"children": [
+					{ "type": "datetime", "id": "dateAndTime" },
+					", remind me to",
+					{ "type": "freetext", "id": "taskName" }
+				]
+			}
 		]
 	}
 }
