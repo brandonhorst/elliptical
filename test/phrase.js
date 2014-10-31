@@ -149,7 +149,33 @@ describe('Parser', function () {
 
     expect(function() {
       parser.understand(grammar);
-      done();
+    }).to.throw(lacona.Error);
+  });
+
+  it('throws for phrases without a lang', function () {
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        schemas: [{
+          root: 'whatever'
+        }]
+      }]
+    }
+
+    expect(function() {
+      parser.understand(grammar);
+    }).to.throw(lacona.Error);
+  });
+
+  it('throws for phrases without a root', function () {
+    var grammar = {
+      phrases: [{
+        name: 'test'
+      }]
+    }
+
+    expect(function() {
+      parser.understand(grammar);
     }).to.throw(lacona.Error);
   });
 });
