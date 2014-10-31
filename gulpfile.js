@@ -1,4 +1,5 @@
 var gulp = require('gulp');
+var _ = require('lodash');
 
 var async = require('async');
 var browserify = require('browserify');
@@ -51,7 +52,7 @@ gulp.task('lint', function() {
 gulp.task('lint-misc', function () {
 	return gulp
 		.src(['test/**/*.js', 'gulpfile.js'])
-		.pipe(jshint(package.jshintConfig))
+		.pipe(jshint(_.merge(package.jshintConfig, package.jshintConfigMisc)))
 		.pipe(jshint.reporter(stylish))
 		.pipe(jshint.reporter('fail'));
 });
