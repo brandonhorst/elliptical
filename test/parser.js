@@ -1,5 +1,3 @@
-var _ = require('lodash');
-var async = require('async');
 var chai = require('chai');
 var expect = chai.expect;
 var lacona;
@@ -25,7 +23,7 @@ describe('Parser', function () {
     var onEnd = function () {
       expect(onData).to.not.have.been.called;
       done();
-    }
+    };
 
     parser
     .on('data', onData)
@@ -99,9 +97,9 @@ describe('Parser', function () {
   });
 
   it('if no language is provided, takes the default specified by the system (window.navigator.language or process.env.LANG)', function (done) {
-    var lang = typeof window === 'undefined'
-      ? process.env.LANG.split('.')[0]
-      : window.navigator.language.replace('-', '_');
+    var lang = typeof window === 'undefined' ?
+      process.env.LANG.split('.')[0] :
+      window.navigator.language.replace('-', '_');
 
     var grammar = {
       phrases: [{
@@ -152,21 +150,15 @@ describe('Parser', function () {
           type: 'delay'
         }
       }]
-    }
+    };
 
-    var sentence = {
-      name: 'test',
-      root: {
-        type: 'delay'
-      }
-    }
 
     var onData = sinon.spy();
 
     var onEnd = function() {
       expect(onData).to.have.been.calledOnce;
       done();
-    }
+    };
 
     parser
     .understand(grammar)
@@ -182,7 +174,7 @@ describe('Parser', function () {
     var grammar = {};
 
     expect(function () {
-      parser.understand(grammar)
+      parser.understand(grammar);
     }).to.throw(lacona.Error);
   });
 
@@ -194,7 +186,7 @@ describe('Parser', function () {
     };
 
     expect(function () {
-      parser.understand(grammar)
+      parser.understand(grammar);
     }).to.throw(lacona.Error);
   });
 
