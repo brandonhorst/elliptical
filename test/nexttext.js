@@ -1,9 +1,6 @@
-var _ = require('lodash');
-var async = require('async');
 var chai = require('chai');
 var expect = chai.expect;
 var lacona;
-var sinon = require('sinon');
 
 chai.use(require('sinon-chai'));
 
@@ -29,7 +26,7 @@ describe('nextText', function () {
         ]
       },
       completion: {}
-    }
+    };
 
     lacona.nextText(inputOption, function (err, nextText) {
       expect(err).to.not.exist;
@@ -38,4 +35,3 @@ describe('nextText', function () {
     });
   });
 });
-
