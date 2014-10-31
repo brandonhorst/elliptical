@@ -1,5 +1,3 @@
-var _ = require('lodash');
-var async = require('async');
 var chai = require('chai');
 var expect = chai.expect;
 var lacona;
@@ -28,7 +26,7 @@ describe('literal', function() {
         name: 'test',
         root: 'literal test'
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.suggestion.words).to.have.length(1);
@@ -58,7 +56,7 @@ describe('literal', function() {
           display: 'literal test'
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.suggestion.words).to.have.length(1);
@@ -90,7 +88,7 @@ describe('literal', function() {
           id: 'testId'
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.suggestion.words).to.have.length(1);
