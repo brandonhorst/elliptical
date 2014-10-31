@@ -113,4 +113,27 @@ describe('Parser', function () {
     .on('end', onEnd)
     .parse('t');
   });
+
+  it('simply ignores phrases that do not exist', function (done) {
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        root: {type: 'nonexistant'}
+      }]
+    }
+
+    var onData = sinon.spy();
+
+    var onEnd = function() {
+      expect(onData).to.not.have.been.called;
+      done();
+    }
+
+    parser
+    .understand(grammar)
+    .on('data', onData)
+    .on('end', onEnd)
+    .parse('t');
+
+  });
 });
