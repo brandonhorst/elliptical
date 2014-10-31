@@ -41,7 +41,6 @@ While developers are free to create and distribute phrases in any way they want,
 - lacona-phrase-number
 	- `integer`
 	- `float`
-	- `complex`
 - lacona-phrase-freetext
 	- `freetext`
 - lacona-phrase-datetime
