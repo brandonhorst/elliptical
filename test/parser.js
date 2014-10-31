@@ -176,4 +176,14 @@ describe('Parser', function () {
     .parse('test');
   });
 
+
+  it('will not throw data for an old parse', function () {
+
+    var grammar = {};
+
+    expect(function () {
+      parser.understand(grammar)
+    }).to.throw(lacona.Error);
+  });
+
 });
