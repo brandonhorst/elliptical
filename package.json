@@ -1,6 +1,6 @@
 {
   "name": "lacona",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Natural Language Parsing Framework",
   "main": "lib/lacona.js",
   "scripts": {
