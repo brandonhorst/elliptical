@@ -1,5 +1,3 @@
-var _ = require('lodash');
-var async = require('async');
 var chai = require('chai');
 var expect = chai.expect;
 var lacona;
@@ -34,7 +32,7 @@ describe('sequence', function() {
           ]
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.suggestion.words[0].string).to.equal('man');
@@ -66,7 +64,7 @@ describe('sequence', function() {
           separator: ''
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.suggestion.words[0].string).to.equal('man');
@@ -98,7 +96,7 @@ describe('sequence', function() {
           separator: ' test '
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.suggestion.words[0].string).to.equal('man');
@@ -134,7 +132,7 @@ describe('sequence', function() {
           ]
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(['maximum', 'man']).to.contain(data.suggestion.words[0].string);
@@ -171,7 +169,7 @@ describe('sequence', function() {
           ]
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.result.testId).to.equal('testValue');
