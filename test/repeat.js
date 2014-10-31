@@ -1,5 +1,3 @@
-var _ = require('lodash');
-var async = require('async');
 var chai = require('chai');
 var expect = chai.expect;
 var lacona;
@@ -32,7 +30,7 @@ describe('repeat', function() {
           separator: 'man'
         }
       }]
-    }
+    };
 
     var onData = sinon.spy();
 
@@ -58,7 +56,7 @@ describe('repeat', function() {
           separator: 'man'
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.suggestion.words[0].string).to.equal('man');
@@ -86,7 +84,7 @@ describe('repeat', function() {
           separator: 'man'
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.suggestion.words[0].string).to.equal('super');
@@ -120,7 +118,7 @@ describe('repeat', function() {
           id: 'testId'
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.result.testId).to.deep.equal(['testValue', 'testValue']);
@@ -153,7 +151,7 @@ describe('repeat', function() {
           ]
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.result.testId).to.equal('testValue');
@@ -183,7 +181,7 @@ describe('repeat', function() {
           min: 2
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.match[0].string).to.equal('a');
@@ -215,7 +213,7 @@ describe('repeat', function() {
           max: 1
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.suggestion.words).to.be.empty;
@@ -252,7 +250,7 @@ describe('repeat', function() {
           unique: true
         }
       }]
-    }
+    };
 
     var onData = sinon.spy();
 
@@ -285,7 +283,7 @@ describe('repeat', function() {
           unique: true
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.match[0].string).to.equal('a');
