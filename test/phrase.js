@@ -1,5 +1,3 @@
-var _ = require('lodash');
-var async = require('async');
 var chai = require('chai');
 var expect = chai.expect;
 var lacona;
@@ -32,7 +30,7 @@ describe('Parser', function () {
         name: 'test',
         root: {type: 'extended'}
       }]
-    }
+    };
 
     var onData = sinon.spy(function (data) {
       expect(['test', 'totally']).to.contain(data.suggestion.words[0].string);
@@ -41,7 +39,7 @@ describe('Parser', function () {
     var onEnd = function() {
       expect(onData).to.have.been.calledTwice;
       done();
-    }
+    };
 
     parser
     .understand(grammar)
@@ -64,7 +62,7 @@ describe('Parser', function () {
         name: 'test',
         root: {type: 'extended'}
       }]
-    }
+    };
 
     var onData = sinon.spy(function (data) {
       expect(['test', 'totally']).to.contain(data.suggestion.words[0].string);
@@ -73,7 +71,7 @@ describe('Parser', function () {
     var onEnd = function() {
       expect(onData).to.have.been.calledTwice;
       done();
-    }
+    };
 
     parser
     .understand(grammar)
@@ -96,7 +94,7 @@ describe('Parser', function () {
         name: 'test',
         root: {type: 'extended'}
       }]
-    }
+    };
 
     var onData = sinon.spy(function (data) {
       expect(data.suggestion.words[0].string).to.equal('test');
@@ -105,7 +103,7 @@ describe('Parser', function () {
     var onEnd = function() {
       expect(onData).to.have.been.calledOnce;
       done();
-    }
+    };
 
     parser
     .understand(grammar)
@@ -120,14 +118,14 @@ describe('Parser', function () {
         name: 'test',
         root: {type: 'nonexistant'}
       }]
-    }
+    };
 
     var onData = sinon.spy();
 
     var onEnd = function() {
       expect(onData).to.not.have.been.called;
       done();
-    }
+    };
 
     parser
     .understand(grammar)
@@ -145,7 +143,7 @@ describe('Parser', function () {
           root: 'whatever'
         }]
       }]
-    }
+    };
 
     expect(function() {
       parser.understand(grammar);
@@ -160,7 +158,7 @@ describe('Parser', function () {
           root: 'whatever'
         }]
       }]
-    }
+    };
 
     expect(function() {
       parser.understand(grammar);
@@ -172,7 +170,7 @@ describe('Parser', function () {
       phrases: [{
         name: 'test'
       }]
-    }
+    };
 
     expect(function() {
       parser.understand(grammar);
