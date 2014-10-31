@@ -13,7 +13,7 @@ So in short, `nltk` is a low-level parser that breaks any string according to it
 
 #Development Notice!
 
-Lacona is under _very active development_ right now. Absolutely nothing is set in stone, and absolutely nothing outside the `test` directory is expected to work properly. I'm _really_ excited about this project, and I'm hoping to have some cool demos out in the near future. Of course, if you would like to contribute, start opening up issues on [Github](https://github.com/brandonhorst/lacona) or find me on Twitter at [@brandonhorst](https://twitter.com/brandonhorst).
+Lacona is under _very active development_ right now. Absolutely nothing is set in stone, and absolutely nothing outside the `test` directory is expected to work properly. I'm _really_ excited about this project, and I'm hoping to have some cool demos out in the near future. Of course, if you would like to contribute, start opening up issues on [Github](https://github.com/lacona/lacona) or find me on Twitter at [@brandonhorst](https://twitter.com/brandonhorst).
 
 #Installation
 
@@ -89,44 +89,51 @@ As long as Lacona knows what a `<task name>` and a `<date and time>` look like, 
 
 Making a Lacona grammar to understand those options is easy:
 
-```json
+```javascript
 {
-	"name": "reminder",
-	"root": {
-		"type": "choice",
-		"children": [
-			{
-				"type": "sequence",
-				"children": [
-					"remind me to",
-					{ "type": "freetext", "id": "taskName" },
-					{ "type": "datetime", "id": "dateAndTime" }
-				]
-			}, {
-				"type": "sequence",
-				"children": [
-					{ "type": "datetime", "id": "dateAndTime" },
-					", remind me to",
-					{ "type": "freetext", "id": "taskName" }
-				]
-			}
-		]
-	}
+	phrases: [{
+		name: "reminder",
+		root: {
+			type: "choice",
+			children: [
+				{
+					type: "sequence",
+					children: [
+						"remind me to",
+						{ type: "freetext", id: "taskName" },
+						{ type: "datetime", id: "dateAndTime" }
+					]
+				}, {
+					type: "sequence",
+					separator: null,
+					children: [
+						{ type: "datetime", id: "dateAndTime" },
+						", remind me to ",
+						{ type: "freetext", id: "taskName" }
+					]
+				}
+			]
+		}
+	}],
+	dependencies: [
+		require('lacona-phrase-datetime'),
+		require('lacona-phrase-freetext')
+	]
 }
 ```
 
-That may look a bit complicated, but it's not. It's a JSON Object saying with a single `root` element, which is a `choice` between two `sequence`s.
+That may look a bit complicated, but it's not. It's a JSON Object called a `grammar` with two properties: `phrases` and `dependencies`. `dependencies` references some external phrases that can be installed with npm. `phrases` is an array with a single element, and object with a single `root` element, which is a `choice` between two `sequence`s.
 
 One important thing to notice is the `id` properties. These are a logical name for the data that any given `phrase` contains, and they govern how the data is provided back. In this case, let's say the user inputs
 
 	remind me to wash the car tomorrow at 8am
 
-The parse output would be a single JSON object contains a `result` property that looks like this (presuming that "today" is June 13, 2014):
+The parse output would be a single JSON object containing a `result` property that looks like this (presuming that "today" is June 13, 2014):
 
 ```javascript
 {
-	"taskName": "wash the car",
-	"dateAndTime": Date("Sat Jun 14 2014 8:00:00 GMT-0400 (EDT)")
+	taskName: "wash the car",
+	dateAndTime: Date("Sat Jun 14 2014 8:00:00 GMT-0400 (EDT)")
 }
 ```
 
@@ -140,8 +147,8 @@ But the `result` property returned would be in exactly the same format.
 
 ```javascript
 {
-	"taskName": "lavar la coche",
-	"dateAndTime": Date("Sat Jun 14 2014 8:00:00 GMT-0400 (EDT)")
+	taskName: "lavar la coche",
+	dateAndTime: Date("Sat Jun 14 2014 8:00:00 GMT-0400 (EDT)")
 }
 ```
 
@@ -149,69 +156,85 @@ Because the format is so general, you can accept sentences in any language at al
 
 By means of example, let's support Spanish in our Schema, shall we? Please note that an array as a schema element is shorthand for `{type: 'sequence', separator: ' ', children: [array contents]}`.
 
-```json
+```javascript
 {
-	"schemas": [ {
-		"langs": ["en", "default"],
-		"root": {
-			"type": "choice",
-			"children": [
-				[
-					"remind me to",
-					{ "type": "freetext", "id": "taskName" },
-					{ "type": "datetime", "id": "dateAndTime" }
-				], [
-					{ "type": "datetime", "id": "dateAndTime" },
-					", remind me to",
-					{ "type": "freetext", "id": "taskName" }
-				]
-			]
-		}
-	}, {
-		"langs": ["es"],
-		"root": {
-			"type": "choice",
-			"children": [
-				[
-					"recuérdame ",
-					{ "type": "freetext", "id": "taskName" },
-					{ "type": "datetime", "id": "dateAndTime" }
-				], [
-					{ "type": "datetime", "id": "dateAndTime" },
-					", recuérdame",
-					{ "type": "freetext", "id": "taskName" }
-				]
-			]
-		}
-
-	} ]
+	phrases: [{
+		name: "reminder",
+		schemas: [{
+			langs: ["en", "default"],
+			root: {
+				type: "choice",
+				children: [{
+					type: "sequence",
+					children: [
+						"remind me to",
+						{ type: "freetext", id: "taskName" },
+						{ type: "datetime", id: "dateAndTime" }
+					]
+				}, {
+					type: "sequence",
+					separator: null,
+					children: [
+						{ type: "datetime", id: "dateAndTime" },
+						", remind me to ",
+						{ type: "freetext", id: "taskName" }
+					]
+				}]
+			}
+		}, {
+			langs: ["es"],
+			root: {
+				type: "choice",
+				children: [{
+					type: "sequence",
+					children: [
+						"recuérdame",
+						{ type: "freetext", id: "taskName" },
+						{ type: "datetime", id: "dateAndTime" }
+					]
+				}, {
+					type: "sequence",
+					separator: null,
+					children: [
+						{ type: "datetime", id: "dateAndTime" },
+						", recuérdame ",
+						{ type: "freetext", id: "taskName" }
+					]
+				}]
+			}
+		}]
+	}],
+	dependencies: [
+		require('lacona-phrase-datetime'),
+		require('lacona-phrase-freetext')
+	]
 }
 ```
 
-When a string is parsed, information about the string is also provided. The full output for the input:
+When a string is parsed, information about the string parse status is also provided. This is useful for displaying the input in a meaningful way. If the grammar above is supplied with this input:
 
 	remind me to feed the dog tom
 
-will look like this:
+the full output object will look like this:
 
 ```javascript
 {
-	"match": [
-		{"string": "remind me to"},
-		{"string": " "},
-		{"string": "feed the dog"},
-		{"string": " "}
+	match: [
+		{string: "remind me to"},
+		{string: " "},
+		{string: "feed the dog"},
+		{string: " "}
 	],
-	"suggestion": {
-		"words": [
-			{"string": "tomorrow"}
+	suggestion: {
+		words: [
+			{string: "tomorrow"}
 		],
-		"charactersComplete": 3
+		charactersComplete: 3
 	},
-	"completion": [],
-	"result": {
-		"taskName": "feed the dog",
-		"dateAndTime": Date("Sat Jun 14 2014 8:00:00 GMT-0400 (EDT)")
+	completion: [],
+	result: {
+		taskName: "feed the dog",
+		dateAndTime: Date("Sat Jun 14 2014 8:00:00 GMT-0400 (EDT)")
 	}
 }
 ```
