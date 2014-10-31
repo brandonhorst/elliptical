@@ -51,6 +51,14 @@ gulp.task('lint', function() {
 		.pipe(jshint.reporter('fail'));
 });
 
+gulp.task('lint-misc', function () {
+	return gulp
+		.src(['test/**/*.js', 'gulpfile.js'])
+		.pipe(jshint(package.jshintConfig))
+		.pipe(jshint.reporter(stylish))
+		.pipe(jshint.reporter('fail'));
+});
+
 gulp.task('build-browser-tests', ['make'], function() {
 	glob('./test/**/*.js', function(err, files) {
 		if (err) {
