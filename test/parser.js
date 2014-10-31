@@ -177,7 +177,7 @@ describe('Parser', function () {
   });
 
 
-  it('will not throw data for an old parse', function () {
+  it('requires grammars to have phrases', function () {
 
     var grammar = {};
 
