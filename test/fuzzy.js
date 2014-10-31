@@ -1,5 +1,3 @@
-var _ = require('lodash');
-var async = require('async');
 var chai = require('chai');
 var expect = chai.expect;
 var lacona;
