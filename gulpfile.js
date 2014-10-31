@@ -79,39 +79,4 @@ gulp.task('make', function() {
 		.pipe(streamify(uglify()))
 		.pipe(gulp.dest('dist'));
 
-	//This could should work, but I'm not going to get into filesize opt yet
-
-	// var noLodash = browserify({standalone: 'lacona'})
-	// 	.add('./lib/lacona.js')
-	// 	.ignore('lodash')
-	// 	.bundle()
-	// 	.pipe(source('lacona.external-lodash.js'))
-	// 	.pipe(gulp.dest('dist'))
-	// 	.pipe(rename('lacona.external-lodash.min.js'))
-	// 	.pipe(streamify(uglify()))
-	// 	.pipe(gulp.dest('dist'));
-
-	// var noAsync = browserify({standalone: 'lacona'})
-	// 	.add('./lib/lacona.js')
-	// 	.ignore('async')
-	// 	.bundle()
-	// 	.pipe(source('lacona.external-async.js'))
-	// 	.pipe(gulp.dest('dist'))
-	// 	.pipe(rename('lacona.external-async.min.js'))
-	// 	.pipe(streamify(uglify()))
-	// 	.pipe(gulp.dest('dist'));
-
-	// var noLodashNoAsync = browserify({standalone: 'lacona'})
-	// 	.add('./lib/lacona.js')
-	// 	.ignore('lodash')
-	// 	.ignore('async')
-	// 	.bundle()
-	// 	.pipe(source('lacona.external-lodash-async.js'))
-	// 	.pipe(gulp.dest('dist'))
-	// 	.pipe(rename('lacona.external-lodash-async.min.js'))
-	// 	.pipe(streamify(uglify()))
-	// 	.pipe(gulp.dest('dist'));
-
-	// return merge(lacona, noLodash, noAsync, noLodashNoAsync);
-
 });
