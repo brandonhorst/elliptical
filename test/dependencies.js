@@ -1,5 +1,3 @@
-var _ = require('lodash');
-var async = require('async');
 var chai = require('chai');
 var expect = chai.expect;
 var lacona;
@@ -31,16 +29,16 @@ describe('dependencies', function () {
           root: 'something'
         }]
       }]
-    }
+    };
 
     var onData = sinon.spy(function (data) {
-      expect(data.suggestion.words[0].string).to.equal("something");
+      expect(data.suggestion.words[0].string).to.equal('something');
     });
 
     var onEnd = function() {
       expect(onData).to.have.been.calledOnce;
       done();
-    }
+    };
 
     parser
     .understand(grammar)
