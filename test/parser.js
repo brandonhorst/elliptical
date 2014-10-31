@@ -186,4 +186,16 @@ describe('Parser', function () {
     }).to.throw(lacona.Error);
   });
 
+
+  it('requires placeholders to have type', function () {
+
+    var grammar = {
+      phrases: [{}]
+    };
+
+    expect(function () {
+      parser.understand(grammar)
+    }).to.throw(lacona.Error);
+  });
+
 });
