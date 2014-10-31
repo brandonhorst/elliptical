@@ -2,10 +2,8 @@ var gulp = require('gulp');
 
 var async = require('async');
 var browserify = require('browserify');
-var exec = require('child_process').exec;
 var glob = require('glob');
 var package = require('./package');
-var path = require('path');
 var rimraf = require('rimraf');
 
 var filesize = require('gulp-filesize');
@@ -17,7 +15,6 @@ var source = require('vinyl-source-stream');
 var streamify = require('gulp-streamify');
 var stylish = require('jshint-stylish');
 var uglify = require('gulp-uglify');
-var util = require('gulp-util');
 
 gulp.task('test', function() {
 	return gulp
@@ -34,7 +31,7 @@ gulp.task('phantom', ['build-browser-tests'], function() {
 gulp.task('clean', function(done) {
 	async.each(['dist', 'tmp'], function (dir, done) {
 		rimraf(dir, done);
-	}, done)
+	}, done);
 });
 
 gulp.task('size', ['make'], function() {
@@ -64,7 +61,7 @@ gulp.task('build-browser-tests', ['make'], function() {
 		if (err) {
 			throw err;
 		} else {
-			var ify = browserify()
+			var ify = browserify();
 			for (var i = 0; i < files.length; i++) {
 				ify.add(files[i]);
 			}

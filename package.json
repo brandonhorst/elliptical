@@ -4,7 +4,8 @@
   "description": "Natural Language Parsing Framework",
   "main": "lib/lacona.js",
   "scripts": {
-    "test": "gulp lint && gulp lint-tests && gulp test && gulp phantom",
+    "test": "npm run lint && gulp test && gulp phantom",
+    "lint": "gulp lint && gulp lint-misc",
     "prepublish": "gulp make"
   },
   "repository": {
@@ -40,7 +41,6 @@
     "gulp-rimraf": "^0.1.0",
     "gulp-streamify": "0.0.5",
     "gulp-uglify": "^0.3.0",
-    "gulp-util": "^2.2.14",
     "jshint-stylish": "^0.4.0",
     "mocha": "^1.20.1",
     "rimraf": "^2.2.8",
