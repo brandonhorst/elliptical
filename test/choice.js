@@ -1,5 +1,3 @@
-var _ = require('lodash');
-var async = require('async');
 var chai = require('chai');
 var expect = chai.expect;
 var lacona;
@@ -34,7 +32,7 @@ describe('choice', function() {
           ]
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.suggestion.words[0].string).to.equal('right');
@@ -65,7 +63,7 @@ describe('choice', function() {
           ]
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.suggestion.words[0].string).to.contain('right');
@@ -96,7 +94,7 @@ describe('choice', function() {
           ]
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.suggestion.words[0].string).to.contain('right');
@@ -127,7 +125,7 @@ describe('choice', function() {
           ]
         }
       }]
-    }
+    };
 
     var onData = sinon.spy();
 
@@ -160,7 +158,7 @@ describe('choice', function() {
           ]
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.suggestion.words[0].string).to.equal('right');
@@ -193,7 +191,7 @@ describe('choice', function() {
           limit: 1
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.suggestion.words[0].string).to.equal('right');
@@ -228,7 +226,7 @@ describe('choice', function() {
           id: 'testId'
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.result.testId).to.equal('testValue');
@@ -260,7 +258,7 @@ describe('choice', function() {
           limit: 2
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.suggestion.words[0].string).to.contain('right');
@@ -298,7 +296,7 @@ describe('choice', function() {
           limit: 2
         }
       }]
-    }
+    };
 
     var onData = sinon.spy(function(data) {
       expect(data.suggestion.words[0].string).to.contain('right');
