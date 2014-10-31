@@ -134,6 +134,22 @@ describe('Parser', function () {
     .on('data', onData)
     .on('end', onEnd)
     .parse('t');
+  });
 
+  it('throws for phrases without a default-lang schema', function () {
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        schemas: [{
+          langs: ['en-US'],
+          root: 'whatever'
+        }]
+      }]
+    }
+
+    expect(function() {
+      parser.understand(grammar);
+      done();
+    }).to.throw(lacona.Error);
   });
 });
