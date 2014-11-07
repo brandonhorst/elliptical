@@ -50,7 +50,8 @@
     "vinyl-source-stream": "^0.1.1"
   },
   "dependencies": {
-    "async": "^0.9.0",
+    "async-each": "^0.1.6",
+    "async-each-series": "^0.1.1",
     "semver": "^3.0.1"
   },
   "jshintConfig": {

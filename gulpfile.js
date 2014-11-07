@@ -1,7 +1,7 @@
 var gulp = require('gulp');
 var _ = require('lodash');
 
-var async = require('async');
+var asyncEach = require('async-each');
 var browserify = require('browserify');
 var glob = require('glob');
 var package = require('./package');
@@ -30,7 +30,7 @@ gulp.task('phantom', ['build-browser-tests'], function() {
 });
 
 gulp.task('clean', function(done) {
-	async.each(['dist', 'tmp'], function (dir, done) {
+	asyncEach(['dist', 'tmp'], function (dir, done) {
 		rimraf(dir, done);
 	}, done);
 });

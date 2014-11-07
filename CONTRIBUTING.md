@@ -17,7 +17,7 @@ The Lacona Core is contained in this repositiory, [brandonhorst/lacona](http://g
 
 The Lacona core is currently written entirely in JavaScript. Building is done using GulpJS. Tests are written using Mocha, Chai, and Sinon, and use PhantomJS for automated browser testing.
 
-The core depends upon `async` and `semver`. I would love to see these removed at some point for the sake of file size, but for now these dependencies are fine.
+The core depends upon `semver`, for the current versioning strategy, which I would like to rethink.
 
 What needs to be done:
 
