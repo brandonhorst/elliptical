@@ -5,7 +5,7 @@ var asyncEach = require('async-each');
 var browserify = require('browserify');
 var glob = require('glob');
 var package = require('./package');
-var rimraf = require('rimraf');
+var del = require('del');
 
 var filesize = require('gulp-filesize');
 var jshint = require('gulp-jshint');
@@ -31,7 +31,7 @@ gulp.task('phantom', ['build-browser-tests'], function() {
 
 gulp.task('clean', function(done) {
 	asyncEach(['dist', 'tmp'], function (dir, done) {
-		rimraf(dir, done);
+		del(dir, done);
 	}, done);
 });
 
