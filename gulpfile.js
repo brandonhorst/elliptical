@@ -1,7 +1,6 @@
 var gulp = require('gulp');
 var _ = require('lodash');
 
-var asyncEach = require('async-each');
 var browserify = require('browserify');
 var glob = require('glob');
 var package = require('./package');
@@ -30,9 +29,7 @@ gulp.task('phantom', ['build-browser-tests'], function() {
 });
 
 gulp.task('clean', function(done) {
-	asyncEach(['dist', 'tmp'], function (dir, done) {
-		del(dir, done);
-	}, done);
+	del(['dist', 'tmp'], done);
 });
 
 gulp.task('size', ['make'], function() {
