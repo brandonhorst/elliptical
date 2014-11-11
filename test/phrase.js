@@ -112,6 +112,71 @@ describe('Parser', function () {
     .parse('t');
   });
 
+  it('allows for recursive phrases (no infinite loop)', function (done) {
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        root: [
+          'the', {
+            type: 'choice',
+            children: [
+              'test',
+              {type: 'test'}
+            ]
+          }
+        ]
+      }]
+    };
+
+    var onData = sinon.spy(function (data) {
+      expect(['the', 'test']).to.contain(data.suggestion.words[0].string);
+    });
+
+    var onEnd = function() {
+      expect(onData).to.have.been.calledTwice;
+      done();
+    };
+
+    parser
+    .understand(grammar)
+    .on('data', onData)
+    .on('end', onEnd)
+    .parse('the t');
+  });
+
+
+
+  it('allows for nested phrases with the same id', function (done) {
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        root: { type: 'include1', id: 'test' }
+      }, {
+        name: 'include1',
+        root: { type: 'include2', id: '@value' }
+      }, {
+        name: 'include2',
+        root: { type: 'literal', value: 'test', display: 'test', id: '@value' }
+      }]
+    };
+
+    var onData = sinon.spy(function (data) {
+      expect(data.suggestion.words[0].string).to.equal('test');
+      expect(data.result.test).to.equal('test');
+    });
+
+    var onEnd = function() {
+      expect(onData).to.have.been.calledOnce;
+      done();
+    };
+
+    parser
+    .understand(grammar)
+    .on('data', onData)
+    .on('end', onEnd)
+    .parse('tes');
+  });
+
   it('simply ignores phrases that do not exist', function (done) {
     var grammar = {
       phrases: [{
