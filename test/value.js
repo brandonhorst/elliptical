@@ -69,17 +69,40 @@ describe('Parser', function () {
       }]
     };
 
-    var onData = sinon.spy();
-
     var onEnd = function () {
-      expect(onData).to.have.been.calledOnce;
       expect(fun).to.have.been.calledOnce;
       done();
     };
 
     parser
     .understand(grammar)
-    .on('data', onData)
+    .on('end', onEnd)
+    .parse('di');
+  });
+
+
+  it('has no variables when called in a sentence', function (done) {
+    var fun = sinon.spy(function (input, data, done) {
+      expect(this.myVar).to.not.exist;
+      done();
+    });
+
+    var grammar = {
+      scope: {fun: fun},
+      phrases: [{
+        name: 'test',
+        myVar: 'myVal', //this is never used
+        root: {type: 'value', compute: 'fun'}
+      }]
+    };
+
+    var onEnd = function () {
+      expect(fun).to.have.been.calledOnce;
+      done();
+    };
+
+    parser
+    .understand(grammar)
     .on('end', onEnd)
     .parse('di');
   });
