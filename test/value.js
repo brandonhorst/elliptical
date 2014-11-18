@@ -48,4 +48,40 @@ describe('Parser', function () {
     .parse('di');
   });
 
+  it('can access variables in parent in its function', function (done) {
+    var fun = sinon.spy(function (input, data, done) {
+      expect(this.myVar).to.equal('myVal');
+      data({display: 'disp', value: 'val'});
+      done();
+    });
+
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        root: {type: 'depPhrase', myVar: 'myVal'}
+      }],
+      dependencies: [{
+        scope: {depFun: fun},
+        phrases: [{
+          name: 'depPhrase',
+          root: {type: 'value', compute: 'depFun'}
+        }]
+      }]
+    };
+
+    var onData = sinon.spy();
+
+    var onEnd = function () {
+      expect(onData).to.have.been.calledOnce;
+      expect(fun).to.have.been.calledOnce;
+      done();
+    };
+
+    parser
+    .understand(grammar)
+    .on('data', onData)
+    .on('end', onEnd)
+    .parse('di');
+  });
+
 });
