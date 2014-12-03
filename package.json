@@ -29,28 +29,28 @@
   },
   "homepage": "https://github.com/brandonhorst/lacona",
   "devDependencies": {
-    "browserify": "^5.13.1",
-    "chai": "^1.9.1",
-    "glob": "^4.0.5",
-    "gulp": "^3.8.7",
+    "browserify": "^6.3.3",
+    "chai": "^1.10.0",
+    "glob": "^4.3.1",
+    "gulp": "^3.8.10",
     "gulp-filesize": "0.0.6",
-    "gulp-jshint": "^1.8.4",
-    "gulp-mocha": "^0.4.1",
-    "gulp-mocha-phantomjs": "^0.2.2",
+    "gulp-jshint": "^1.9.0",
+    "gulp-mocha": "^2.0.0",
+    "gulp-mocha-phantomjs": "^0.5.1",
     "gulp-rename": "^1.2.0",
     "gulp-streamify": "0.0.5",
-    "gulp-uglify": "^0.3.2",
-    "jshint-stylish": "^0.4.0",
+    "gulp-uglify": "^1.0.1",
+    "jshint-stylish": "^1.0.0",
     "lodash": "^2.4.1",
-    "mocha": "^1.21.5",
-    "sinon": "^1.10.3",
-    "sinon-chai": "^2.5.0",
-    "vinyl-source-stream": "^0.1.1"
+    "mocha": "^2.0.1",
+    "sinon": "^1.12.1",
+    "sinon-chai": "^2.6.0",
+    "vinyl-source-stream": "^1.0.0"
   },
   "dependencies": {
     "async-each": "^0.1.6",
     "async-each-series": "^0.1.1",
-    "semver": "^3.0.1"
+    "semver": "^4.1.0"
   },
   "jshintConfig": {
     "bitwise": true,
