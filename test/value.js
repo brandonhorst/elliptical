@@ -157,6 +157,65 @@ describe('Parser', function () {
     .parse('di');
   });
 
+  it('can $call functions defined (2 levels deep)', function (done) {
+    var fun = sinon.spy(function (done) {
+      expect(this.myVar).to.equal('val');
+      done();
+    });
+
+    function depFun(done) {
+      expect(this.myVar).to.equal('val');
+      this.$call('fun', function (err) {
+        expect(err).to.not.exist;
+        done();
+      });
+    }
+
+    function depDepFun(input, data, done) {
+      expect(this.myVar).to.equal('depVal');
+      this.$call('depFun', function (err) {
+        expect(err).to.not.exist;
+        done();
+      });
+    }
+
+    var grammar = {
+      scope: {fun: fun},
+      phrases: [{
+        name: 'test',
+        root: {type: 'depPhrase', myVar: 'val'}
+      }],
+      dependencies: [{
+        scope: {
+          depFun: depFun
+        },
+        phrases: [{
+          name: 'depPhrase',
+          root: {type: 'depDepPhrase', myVar: 'depVal'}
+        }],
+        dependencies: [{
+          scope: {
+            depDepFun: depDepFun
+          },
+          phrases: [{
+            name: 'depDepPhrase',
+            root: {type: 'value', compute: 'depDepFun'}
+          }],
+        }]
+      }]
+    };
+
+    var onEnd = function () {
+      expect(fun).to.have.been.calledOnce;
+      done();
+    };
+
+    parser
+    .understand(grammar)
+    .on('end', onEnd)
+    .parse('di');
+  });
+
   it('has no variables when called in a sentence', function (done) {
     var fun = sinon.spy(function (input, data, done) {
       expect(this.myVar).to.not.exist;
