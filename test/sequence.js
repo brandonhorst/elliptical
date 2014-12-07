@@ -83,6 +83,35 @@ describe('sequence', function() {
     .parse('superm');
   });
 
+
+  it('rejects input with a separator at the end', function (done) {
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        root: {
+          type: 'sequence',
+          children: [
+            'super',
+            'man'
+          ]
+        }
+      }]
+    };
+
+    var onData = sinon.spy();
+
+    var onEnd = function() {
+      expect(onData).to.not.have.been.called;
+      done();
+    };
+
+    parser
+    .understand(grammar)
+    .on('data', onData)
+    .on('end', onEnd)
+    .parse('super man ');
+  });
+
   it('custom separator', function (done) {
     var grammar = {
       phrases: [{
