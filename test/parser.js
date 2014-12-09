@@ -132,8 +132,7 @@ describe('Parser', function () {
     .parse('inanothe');
   });
 
-
-  it('will not throw data for an old parse', function (done) {
+  it('will not emit data but will emit end for an old parse', function (done) {
     var grammar = {
       scope: {
         delay: function (result, done) {
@@ -155,10 +154,14 @@ describe('Parser', function () {
 
     var onData = sinon.spy();
 
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
-      done();
-    };
+    var onEnd = sinon.spy(function() {
+      if (onEnd.calledOnce) {
+        expect(onData).to.not.have.been.called;
+      } else if (onEnd.calledTwice) {
+        expect(onData).to.have.been.calledOnce;
+        done();
+      }
+    });
 
     parser
     .understand(grammar)
