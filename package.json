@@ -4,10 +4,13 @@
   "description": "Natural Language Parsing Framework",
   "main": "lib/lacona.js",
   "scripts": {
-    "test": "npm run lint && mocha test --reporter dot && gulp phantom",
+    "test": "npm run test:node && npm run test:phantom",
     "lint": "npm run lint:lib && npm run lint:test",
     "lint:lib": "jshint --config node_modules/lacona-util-jshint/lib.json --reporter node_modules/jshint-stylish/stylish.js lib",
     "lint:test": "jshint --config node_modules/lacona-util-jshint/test.json --reporter node_modules/jshint-stylish/stylish.js test",
+    "test:phantom": "gulp phantom",
+    "test:node": "mocha test --reporter dot",
+    "validate": "npm run lint && npm run test",
     "prepublish": "gulp make"
   },
   "repository": {

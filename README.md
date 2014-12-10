@@ -21,14 +21,12 @@ Lacona is under _very active development_ right now. Absolutely nothing is set i
 npm install lacona
 ```
 
-#Testing
+#Testing and Linting
 
 Lacona contains a full set of BDD unit tests. They are designed to run both in node.js and in the browser (including PhantomJS).
 
-- `gulp lint`: run jshint
-- `gulp test`: run tests in node.js
-- `gulp phantom`: run tests in PhantomJS
-- `npm test`: run jshint, and then tests in both node.js and PhantomJS. If any fail, it will not proceed.
+- `npm test`: run unit tests on node and PhantomJS
+- `npm run lint`: run jshint on packages and tests
 
 You can also run the tests in a browser of your choice by running `gulp build-browser-tests` and then opening `test/mocha.html`.
 
