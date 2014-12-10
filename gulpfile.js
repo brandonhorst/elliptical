@@ -7,20 +7,12 @@ var package = require('./package');
 var del = require('del');
 
 var filesize = require('gulp-filesize');
-var jshint = require('gulp-jshint');
-var mocha = require('gulp-mocha');
 var phantom = require('gulp-mocha-phantomjs');
 var rename = require('gulp-rename');
 var source = require('vinyl-source-stream');
 var streamify = require('gulp-streamify');
 var stylish = require('jshint-stylish');
 var uglify = require('gulp-uglify');
-
-gulp.task('test', function() {
-	return gulp
-		.src('test/**/*.js')
-		.pipe(mocha({reporter: 'dot'}));
-});
 
 gulp.task('phantom', ['build-browser-tests'], function() {
 	return gulp
