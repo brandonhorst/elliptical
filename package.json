@@ -5,7 +5,9 @@
   "main": "lib/lacona.js",
   "scripts": {
     "test": "npm run lint && gulp test && gulp phantom",
-    "lint": "gulp lint && gulp lint-misc",
+    "lint": "npm run lint:lib && npm run lint:test",
+    "lint:lib": "jshint --config node_modules/lacona-util-jshint/lib.json --reporter node_modules/jshint-stylish/stylish.js lib",
+    "lint:test": "jshint --config node_modules/lacona-util-jshint/test.json --reporter node_modules/jshint-stylish/stylish.js test",
     "prepublish": "gulp make"
   },
   "repository": {
@@ -35,12 +37,12 @@
     "glob": "^4.3.1",
     "gulp": "^3.8.10",
     "gulp-filesize": "0.0.6",
-    "gulp-jshint": "^1.9.0",
     "gulp-mocha": "^2.0.0",
     "gulp-mocha-phantomjs": "^0.5.1",
     "gulp-rename": "^1.2.0",
     "gulp-streamify": "0.0.5",
     "gulp-uglify": "^1.0.1",
+    "jshint": "^2.5.10",
     "jshint-stylish": "^1.0.0",
     "lodash": "^2.4.1",
     "mocha": "^2.0.1",
@@ -53,37 +55,5 @@
     "async-each-series": "^0.1.1",
     "inherits": "^2.0.1",
     "semver": "^4.1.0"
-  },
-  "jshintConfig": {
-    "bitwise": true,
-    "camelcase": true,
-    "curly": true,
-    "eqeqeq": true,
-    "forin": true,
-    "freeze": true,
-    "immed": true,
-    "indent": 2,
-    "latedef": true,
-    "newcap": true,
-    "noarg": true,
-    "noempty": true,
-    "nonbsp": true,
-    "nonew": true,
-    "quotmark": "single",
-    "undef": true,
-    "unused": true,
-    "node": true
-  },
-  "jshintConfigMisc": {
-    "expr": true,
-    "globals": {
-      "describe": false,
-      "it": false,
-      "before": false,
-      "beforeEach": false,
-      "after": false,
-      "afterEach": false,
-      "window": false
-    }
   }
 }
