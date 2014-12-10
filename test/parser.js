@@ -31,6 +31,29 @@ describe('Parser', function () {
     .parse();
   });
 
+  it('calls end once per parse', function () {
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        root: 'test',
+      }]
+    };
+
+    var onData = sinon.spy();
+
+    var onEnd = sinon.spy();
+
+    parser
+      .understand(grammar)
+      .on('data', onData)
+      .on('end', onEnd)
+      .parse('t')
+      .parse('t');
+
+    expect(onData).to.have.been.calledTwice;
+    expect(onEnd).to.have.been.calledTwice;
+  });
+
 
   it('can parse in a specified language', function (done) {
     var grammar = {
