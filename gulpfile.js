@@ -1,5 +1,4 @@
 var gulp = require('gulp');
-var _ = require('lodash');
 
 var browserify = require('browserify');
 var glob = require('glob');
@@ -28,22 +27,6 @@ gulp.task('size', ['make'], function() {
 	return gulp
 		.src('dist/**/*.js')
 		.pipe(filesize());
-});
-
-gulp.task('lint', function() {
-	return gulp
-		.src('lib/**/*.js')
-		.pipe(jshint(package.jshintConfig))
-		.pipe(jshint.reporter(stylish))
-		.pipe(jshint.reporter('fail'));
-});
-
-gulp.task('lint-misc', function () {
-	return gulp
-		.src(['test/**/*.js', 'gulpfile.js'])
-		.pipe(jshint(_.merge(package.jshintConfig, package.jshintConfigMisc)))
-		.pipe(jshint.reporter(stylish))
-		.pipe(jshint.reporter('fail'));
 });
 
 gulp.task('build-browser-tests', ['make'], function() {
