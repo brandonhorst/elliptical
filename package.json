@@ -12,7 +12,7 @@
     "test:node": "mocha test --reporter dot",
     "validate": "npm run lint && npm run test",
     "cover": "istanbul cover _mocha test -- -R spec",
-    "coveralls": "npm run cover && cat coverage/lcov.info | coveralls && rimraf ./coverage",
+    "coveralls": "istanbul cover _mocha test --report lcovonly -- -R dot && cat coverage/lcov.info | coveralls && rimraf ./coverage",
     "make": "mkdirp dist && browserify lib/lacona.js --standalone lacona --outfile dist/lacona.js && npm run uglify",
     "make:test": "mkdirp tmp && browserify test/*.js --ignore lacona --outfile tmp/tests.js",
     "uglify": "uglifyjs --output dist/lacona.min.js dist/lacona.js ",
