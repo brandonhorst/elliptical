@@ -8,7 +8,7 @@ chai.use(require('sinon-chai'));
 if (typeof window !== 'undefined' && window.lacona) {
   lacona = window.lacona;
 } else {
-  lacona = require('../lib/lacona');
+  lacona = require('..');
 }
 
 describe('Parser', function () {
@@ -117,42 +117,6 @@ describe('Parser', function () {
     .on('data', onData)
     .on('end', onEnd)
     .parse('tr');
-  });
-
-  it('if no language is provided, takes the default specified by the system (window.navigator.language or process.env.LANG)', function (done) {
-    var lang = typeof window === 'undefined' ?
-      process.env.LANG.split('.')[0] :
-      window.navigator.language.replace('-', '_');
-
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        schemas: [{
-          langs: [lang],
-          root: 'inanotherlanguage'
-        }, {
-          langs: ['default'],
-          root: 'test'
-        }]
-      }]
-    };
-
-    var onData = sinon.spy(function (data) {
-      expect(data.suggestion.words[0].string).to.equal('inanotherlanguage');
-    });
-
-    var onEnd = function () {
-      expect(onData).to.have.been.calledOnce;
-      done();
-    };
-
-
-
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('inanothe');
   });
 
   it('will not emit data but will emit end for an old parse', function (done) {

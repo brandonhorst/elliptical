@@ -8,9 +8,8 @@ chai.use(require('sinon-chai'));
 if (typeof window !== 'undefined' && window.lacona) {
   lacona = window.lacona;
 } else {
-  lacona = require('../lib/lacona');
+  lacona = require('..');
 }
-
 
 describe('Parser with fuzzy matching', function () {
   var parser;
