@@ -1,6 +1,9 @@
 Lacona
 ======
 
+[![Build Status](https://travis-ci.org/lacona/lacona.svg?branch=master)](https://travis-ci.org/lacona/lacona)
+[![Coverage Status](https://img.shields.io/coveralls/lacona/lacona.svg)](https://coveralls.io/r/lacona/lacona)
+
 Lacona is a Javascript library for parsing and predicting natural language according to an arbitrary but well-defined schema.
 
 In other words, you tell Lacona how some language works, and it will help people write it, and tell you what they are saying.
