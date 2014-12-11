@@ -51,6 +51,39 @@ describe('sequence', function() {
     .parse('super m');
   });
 
+  // it('space is punctuation - tacked onto suggestion', function (done) {
+  //   var grammar = {
+  //     phrases: [{
+  //       name: 'test',
+  //       root: {
+  //         type: 'sequence',
+  //         children: [
+  //         'super',
+  //         'man'
+  //         ]
+  //       }
+  //     }]
+  //   };
+  //
+  //   var onData = sinon.spy(function(data) {
+  //     expect(data.suggestion.words).to.have.length(2);
+  //     expect(data.suggestion.words[0].string).to.equal('super');
+  //     expect(data.suggestion.words[1].string).to.equal(' ');
+  //     expect(data.result).to.be.empty;
+  //   });
+  //
+  //   var onEnd = function() {
+  //     expect(onData).to.have.been.calledOnce;
+  //     done();
+  //   };
+  //
+  //   parser
+  //   .understand(grammar)
+  //   .on('data', onData)
+  //   .on('end', onEnd)
+  //   .parse('sup');
+  // });
+
   it('empty separator', function (done) {
     var grammar = {
       phrases: [{
