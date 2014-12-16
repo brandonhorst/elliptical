@@ -14,14 +14,14 @@ describe('nextText', function () {
   it('can get the text from an inputOption', function (done) {
     var inputOption = {
       match: [
-        {string: 'test', partOfSpeech: 'action'},
-        {string: '1', partOfSpeech: 'action'}
+        {string: 'test', category: 'action'},
+        {string: '1', category: 'action'}
       ],
       suggestion: {
         charactersComplete: 0,
         words: [
-          {string: 'test', partOfSpeech: 'action'},
-          {string: '1', partOfSpeech: 'action'}
+          {string: 'test', category: 'action'},
+          {string: '1', category: 'action'}
         ]
       },
       completion: {}

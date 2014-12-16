@@ -28,7 +28,18 @@ describe('Parser', function () {
     parser
     .on('data', onData)
     .on('end', onEnd)
-    .parse();
+    .parse('test');
+  });
+
+  it('requires string input', function (done) {
+    var onError = sinon.spy(function(err) {
+      expect(err).to.be.an.instanceof(lacona.Error);
+      done();
+    });
+
+    parser
+    .on('error', onError)
+    .parse(123);
   });
 
   it('calls end once per parse', function () {
