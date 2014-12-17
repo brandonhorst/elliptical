@@ -169,6 +169,19 @@ describe('Parser', function () {
     .parse('test');
   });
 
+  it('emits a start event', function(done) {
+    var onStart = sinon.spy();
+
+    function onEnd() {
+      expect(onStart).to.have.been.called;
+      done();
+    }
+
+    parser
+      .on('start', onStart)
+      .on('end', onEnd)
+      .parse('test');
+  });
 
   it('requires grammars to have phrases', function () {
 
