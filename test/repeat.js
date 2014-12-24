@@ -1,23 +1,12 @@
 var chai = require('chai');
 var expect = chai.expect;
-var lacona;
-var sinon = require('sinon');
-
-chai.use(require('sinon-chai'));
-
-if (typeof window !== 'undefined' && window.lacona) {
-  lacona = window.lacona;
-} else {
-  lacona = require('..');
-}
-
-chai.config.includeStack = true;
+var testUtil = require('./util');
 
 describe('repeat', function() {
   var parser;
 
   beforeEach(function() {
-    parser = new lacona.Parser({sentences: ['test']});
+    parser = new testUtil.lacona.Parser({sentences: ['test']});
   });
 
   it('does not accept input that does not match the child', function (done) {
@@ -32,18 +21,15 @@ describe('repeat', function() {
       }]
     };
 
-    var onData = sinon.spy();
-
-    var onEnd = function() {
-      expect(onData).to.not.have.been.called;
+    function callback(data) {
+      expect(data).to.have.length(0);
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('wrong');
+    parser.understand(grammar);
+    testUtil.toStream(['wrong'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
   it('accepts the child on its own', function (done) {
@@ -58,20 +44,16 @@ describe('repeat', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.suggestion.words[0].string).to.equal('man');
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].suggestion.words[0].string).to.equal('man');
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('superm');
+    parser.understand(grammar);
+    testUtil.toStream(['superm'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
   it('accepts the child twice, with the separator in the middle', function (done) {
@@ -86,20 +68,16 @@ describe('repeat', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.suggestion.words[0].string).to.equal('super');
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].suggestion.words[0].string).to.equal('super');
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('supermans');
+    parser.understand(grammar);
+    testUtil.toStream(['supermans'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
   it('creates an array from the values of the children', function (done) {
@@ -120,21 +98,17 @@ describe('repeat', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.result.testId).to.deep.equal(['testValue', 'testValue']);
-      expect(data.result.subElementId).to.be.undefined;
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].result.testId).to.deep.equal(['testValue', 'testValue']);
+      expect(data[0].result.subElementId).to.be.undefined;
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('supermans');
+    parser.understand(grammar);
+    testUtil.toStream(['supermans'])
+    .pipe(parser)
+    .pipe(testUtil.toArray(callback));
   });
 
   it('can set a value to the result', function (done) {
@@ -153,20 +127,16 @@ describe('repeat', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.result.testId).to.equal('testValue');
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].result.testId).to.equal('testValue');
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('super m');
+    parser.understand(grammar);
+    testUtil.toStream(['superm'])
+    .pipe(parser)
+    .pipe(testUtil.toArray(callback));
   });
 
 
@@ -183,22 +153,18 @@ describe('repeat', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.match[0].string).to.equal('a');
-      expect(data.suggestion.words[0].string).to.equal('b');
-      expect(data.completion[0].string).to.equal('a');
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].match[0].string).to.equal('a');
+      expect(data[0].suggestion.words[0].string).to.equal('b');
+      expect(data[0].completion[0].string).to.equal('a');
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('a');
+    parser.understand(grammar);
+    testUtil.toStream(['a'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
 
@@ -215,21 +181,17 @@ describe('repeat', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.suggestion.words).to.be.empty;
-      expect(data.match[0].string).to.equal('a');
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].suggestion.words).to.be.empty;
+      expect(data[0].match[0].string).to.equal('a');
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('a');
+    parser.understand(grammar);
+    testUtil.toStream(['a'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
 
@@ -252,18 +214,15 @@ describe('repeat', function() {
       }]
     };
 
-    var onData = sinon.spy();
-
-    var onEnd = function() {
-      expect(onData).to.not.have.been.called;
+    function callback(data) {
+      expect(data).to.have.length(0);
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('a a');
+    parser.understand(grammar);
+    testUtil.toStream(['a a'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
 
@@ -285,20 +244,16 @@ describe('repeat', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.match[0].string).to.equal('a');
-      expect(data.match[2].string).to.equal('b');
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].match[0].string).to.equal('a');
+      expect(data[0].match[2].string).to.equal('b');
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('a b');
+    parser.understand(grammar);
+    testUtil.toStream(['a b'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 });

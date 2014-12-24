@@ -1,20 +1,11 @@
 var chai = require('chai');
 var expect = chai.expect;
-var lacona;
-var sinon = require('sinon');
+var testUtil = require('./util');
 
-chai.use(require('sinon-chai'));
-
-if (typeof window !== 'undefined' && window.lacona) {
-  lacona = window.lacona;
-} else {
-  lacona = require('..');
-}
-
-describe('Parser', function () {
+describe('Phrase', function () {
   var parser;
   beforeEach(function() {
-    parser = new lacona.Parser({sentences: ['test']});
+    parser = new testUtil.lacona.Parser({sentences: ['test']});
   });
 
   it('handles phrases with extension', function (done) {
@@ -32,20 +23,17 @@ describe('Parser', function () {
       }]
     };
 
-    var onData = sinon.spy(function (data) {
-      expect(['test', 'totally']).to.contain(data.suggestion.words[0].string);
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledTwice;
+    function callback(data) {
+      expect(data).to.have.length(2);
+      expect(['test', 'totally']).to.contain(data[0].suggestion.words[0].string);
+      expect(['test', 'totally']).to.contain(data[1].suggestion.words[0].string);
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('t');
+    parser.understand(grammar);
+    testUtil.toStream(['t'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
   it('handles phrases with extension and a specified version', function (done) {
@@ -64,20 +52,17 @@ describe('Parser', function () {
       }]
     };
 
-    var onData = sinon.spy(function (data) {
-      expect(['test', 'totally']).to.contain(data.suggestion.words[0].string);
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledTwice;
+    function callback(data) {
+      expect(data).to.have.length(2);
+      expect(['test', 'totally']).to.contain(data[0].suggestion.words[0].string);
+      expect(['test', 'totally']).to.contain(data[1].suggestion.words[0].string);
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('t');
+    parser.understand(grammar);
+    testUtil.toStream(['t'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
   it('rejects phrases with an incorrect version specified version', function (done) {
@@ -96,20 +81,16 @@ describe('Parser', function () {
       }]
     };
 
-    var onData = sinon.spy(function (data) {
-      expect(data.suggestion.words[0].string).to.equal('test');
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].suggestion.words[0].string).to.equal('test');
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('t');
+    parser.understand(grammar);
+    testUtil.toStream(['t'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
   it('allows for recursive phrases (no infinite loop)', function (done) {
@@ -117,7 +98,7 @@ describe('Parser', function () {
       phrases: [{
         name: 'test',
         root: [
-          'the', {
+          'the ', {
             type: 'choice',
             children: [
               'test',
@@ -128,20 +109,17 @@ describe('Parser', function () {
       }]
     };
 
-    var onData = sinon.spy(function (data) {
-      expect(['the', 'test']).to.contain(data.suggestion.words[0].string);
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledTwice;
+    function callback(data) {
+      expect(data).to.have.length(2);
+      expect(['the ', 'test']).to.contain(data[0].suggestion.words[0].string);
+      expect(['the ', 'test']).to.contain(data[1].suggestion.words[0].string);
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('the t');
+    parser.understand(grammar);
+    testUtil.toStream(['the t'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
 
@@ -160,21 +138,17 @@ describe('Parser', function () {
       }]
     };
 
-    var onData = sinon.spy(function (data) {
-      expect(data.suggestion.words[0].string).to.equal('test');
-      expect(data.result.test).to.equal('test');
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].suggestion.words[0].string).to.equal('test');
+      expect(data[0].result.test).to.equal('test');
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('tes');
+    parser.understand(grammar);
+    testUtil.toStream(['tes'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
   it('simply ignores phrases that do not exist', function (done) {
@@ -185,18 +159,15 @@ describe('Parser', function () {
       }]
     };
 
-    var onData = sinon.spy();
-
-    var onEnd = function() {
-      expect(onData).to.not.have.been.called;
+    function callback(data) {
+      expect(data).to.have.length(0);
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('t');
+    parser.understand(grammar);
+    testUtil.toStream(['t'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
   it('throws for phrases without a default-lang schema', function () {
@@ -212,7 +183,7 @@ describe('Parser', function () {
 
     expect(function() {
       parser.understand(grammar);
-    }).to.throw(lacona.Error);
+    }).to.throw(testUtil.lacona.Error);
   });
 
   it('throws for phrases without a lang', function () {
@@ -227,7 +198,7 @@ describe('Parser', function () {
 
     expect(function() {
       parser.understand(grammar);
-    }).to.throw(lacona.Error);
+    }).to.throw(testUtil.lacona.Error);
   });
 
   it('throws for phrases without a root', function () {
@@ -239,6 +210,6 @@ describe('Parser', function () {
 
     expect(function() {
       parser.understand(grammar);
-    }).to.throw(lacona.Error);
+    }).to.throw(testUtil.lacona.Error);
   });
 });

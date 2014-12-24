@@ -1,23 +1,12 @@
 var chai = require('chai');
 var expect = chai.expect;
-var lacona;
-var sinon = require('sinon');
-
-chai.use(require('sinon-chai'));
-
-if (typeof window !== 'undefined' && window.lacona) {
-  lacona = window.lacona;
-} else {
-  lacona = require('..');
-}
-
-chai.config.includeStack = true;
+var testUtil = require('./util.js');
 
 describe('choice', function() {
   var parser;
 
   beforeEach(function() {
-    parser = new lacona.Parser({sentences: ['test']});
+    parser = new testUtil.lacona.Parser({sentences: ['test']});
   });
 
   it('suggests one valid choice', function (done) {
@@ -34,21 +23,17 @@ describe('choice', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.suggestion.words[0].string).to.equal('right');
-      expect(data.result).to.be.empty;
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].suggestion.words[0].string).to.equal('right');
+      expect(data[0].result).to.be.empty;
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('r');
+    parser.understand(grammar);
+    testUtil.toStream(['r'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
   it('suggests multiple valid choices', function (done) {
@@ -65,52 +50,19 @@ describe('choice', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.suggestion.words[0].string).to.contain('right');
-      expect(data.result).to.be.empty;
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledTwice;
+    function callback(data) {
+      expect(data).to.have.length(2);
+      expect(data[0].suggestion.words[0].string).to.contain('right');
+      expect(data[0].result).to.be.empty;
+      expect(data[1].suggestion.words[0].string).to.contain('right');
+      expect(data[1].result).to.be.empty;
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('r');
-  });
-
-  it('suggests multiple valid choices', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'choice',
-          children: [
-            'right',
-            'right also'
-          ]
-        }
-      }]
-    };
-
-    var onData = sinon.spy(function(data) {
-      expect(data.suggestion.words[0].string).to.contain('right');
-      expect(data.result).to.be.empty;
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledTwice;
-      done();
-    };
-
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('r');
+    parser.understand(grammar);
+    testUtil.toStream(['r'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
   it('suggests no valid choices', function (done) {
@@ -127,18 +79,15 @@ describe('choice', function() {
       }]
     };
 
-    var onData = sinon.spy();
-
-    var onEnd = function() {
-      expect(onData).to.not.have.been.called;
+    function callback(data) {
+      expect(data).to.have.length(0);
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('r');
+    parser.understand(grammar);
+    testUtil.toStream(['r'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
   it('adopts the value of the child', function (done) {
@@ -160,22 +109,18 @@ describe('choice', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.suggestion.words[0].string).to.equal('right');
-      expect(data.result.testId).to.equal('testValue');
-      expect(data.result.subId).to.equal('testValue');
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].suggestion.words[0].string).to.equal('right');
+      expect(data[0].result.testId).to.equal('testValue');
+      expect(data[0].result.subId).to.equal('testValue');
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('r');
+    parser.understand(grammar);
+    testUtil.toStream(['r'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
   it('can be restricted by a limit of 1', function (done) {
@@ -193,23 +138,19 @@ describe('choice', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.suggestion.words[0].string).to.equal('right');
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].suggestion.words[0].string).to.equal('right');
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('r');
+    parser.understand(grammar);
+    testUtil.toStream(['r'])
+    .pipe(parser)
+    .pipe(testUtil.toArray(callback));
   });
 
-  it('can be restricted by a limit of more than 1', function (done) {
+  it('has a value when limited', function (done) {
     var grammar = {
       phrases: [{
         name: 'test',
@@ -228,23 +169,19 @@ describe('choice', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.result.testId).to.equal('testValue');
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].result.testId).to.equal('testValue');
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('r');
+    parser.understand(grammar);
+    testUtil.toStream(['r'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
-  it('has a value when limited', function (done) {
+  it('can be restricted by a limit of more than 1', function (done) {
     var grammar = {
       phrases: [{
         name: 'test',
@@ -260,20 +197,17 @@ describe('choice', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.suggestion.words[0].string).to.contain('right');
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledTwice;
+    function callback(data) {
+      expect(data).to.have.length(2);
+      expect(data[0].suggestion.words[0].string).to.contain('right');
+      expect(data[1].suggestion.words[0].string).to.contain('right');
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('r');
+    parser.understand(grammar);
+    testUtil.toStream(['r'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
   it('still works when a limited child has multiple options', function (done) {
@@ -298,19 +232,17 @@ describe('choice', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.suggestion.words[0].string).to.contain('right');
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledThrice;
+    function callback(data) {
+      expect(data).to.have.length(3);
+      expect(data[0].suggestion.words[0].string).to.contain('right');
+      expect(data[1].suggestion.words[0].string).to.contain('right');
+      expect(data[2].suggestion.words[0].string).to.contain('right');
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('r');
+    parser.understand(grammar);
+    testUtil.toStream(['r'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 });

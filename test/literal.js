@@ -1,54 +1,39 @@
 var chai = require('chai');
 var expect = chai.expect;
-var lacona;
-var sinon = require('sinon');
-
-chai.use(require('sinon-chai'));
-
-if (typeof window !== 'undefined' && window.lacona) {
-  lacona = window.lacona;
-} else {
-  lacona = require('..');
-}
-
-chai.config.includeStack = true;
+var testUtil = require('./util');
 
 describe('literal', function() {
   var parser;
 
   beforeEach(function() {
-    parser = new lacona.Parser({sentences: ['test']});
+    parser = new testUtil.lacona.Parser({sentences: ['test']});
   });
 
   it('handles an implicit literal (string in schema)', function (done) {
-    var schema = {
+    var grammar = {
       phrases: [{
         name: 'test',
         root: 'literal test'
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.suggestion.words).to.have.length(1);
-      expect(data.suggestion.charactersComplete).to.equal(1);
-      expect(data.suggestion.words[0].string).to.equal('literal test');
-      expect(data.result).to.be.empty;
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].suggestion.words).to.have.length(1);
+      expect(data[0].suggestion.charactersComplete).to.equal(1);
+      expect(data[0].suggestion.words[0].string).to.equal('literal test');
+      expect(data[0].result).to.be.empty;
       done();
-    };
+    }
 
-    parser
-    .understand(schema)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('l');
+    parser.understand(grammar);
+    testUtil.toStream(['l'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
   it('handles a fully-qualified literal (no id)', function (done) {
-    var schema = {
+    var grammar = {
       phrases: [{
         name: 'test',
         root: {
@@ -58,27 +43,23 @@ describe('literal', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.suggestion.words).to.have.length(1);
-      expect(data.suggestion.charactersComplete).to.equal(1);
-      expect(data.suggestion.words[0].string).to.equal('literal test');
-      expect(data.result).to.be.empty;
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].suggestion.words).to.have.length(1);
+      expect(data[0].suggestion.charactersComplete).to.equal(1);
+      expect(data[0].suggestion.words[0].string).to.equal('literal test');
+      expect(data[0].result).to.be.empty;
       done();
-    };
+    }
 
-    parser
-    .understand(schema)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('l');
+    parser.understand(grammar);
+    testUtil.toStream(['l'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
   it('handles a fully-qualified literal with an id', function (done) {
-    var schema = {
+    var grammar = {
       phrases: [{
         name: 'test',
         root: {
@@ -90,25 +71,18 @@ describe('literal', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.suggestion.words).to.have.length(1);
-      expect(data.suggestion.charactersComplete).to.equal(1);
-      expect(data.suggestion.words[0].string).to.equal('literal test');
-      expect(data.result).to.deep.equal({
-        testId: 'test'
-      });
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].suggestion.words).to.have.length(1);
+      expect(data[0].suggestion.charactersComplete).to.equal(1);
+      expect(data[0].suggestion.words[0].string).to.equal('literal test');
+      expect(data[0].result).to.deep.equal({testId: 'test'});
       done();
-    };
+    }
 
-    parser
-    .understand(schema)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('l');
-
+    parser.understand(grammar);
+    testUtil.toStream(['l'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 });

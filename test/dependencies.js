@@ -1,20 +1,11 @@
 var chai = require('chai');
 var expect = chai.expect;
-var lacona;
-var sinon = require('sinon');
-
-chai.use(require('sinon-chai'));
-
-if (typeof window !== 'undefined' && window.lacona) {
-  lacona = window.lacona;
-} else {
-  lacona = require('..');
-}
+var testUtil = require('./util');
 
 describe('dependencies', function () {
   var parser;
   beforeEach(function() {
-    parser = new lacona.Parser({sentences: ['test']});
+    parser = new testUtil.lacona.Parser({sentences: ['test']});
   });
 
   it('handles basic dependencies', function (done) {
@@ -31,20 +22,16 @@ describe('dependencies', function () {
       }]
     };
 
-    var onData = sinon.spy(function (data) {
-      expect(data.suggestion.words[0].string).to.equal('something');
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].suggestion.words[0].string).to.equal('something');
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('s');
+    parser.understand(grammar);
+    testUtil.toStream(['s'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
 });

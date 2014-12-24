@@ -1,23 +1,12 @@
 var chai = require('chai');
 var expect = chai.expect;
-var lacona;
-var sinon = require('sinon');
-
-chai.use(require('sinon-chai'));
-
-if (typeof window !== 'undefined' && window.lacona) {
-  lacona = window.lacona;
-} else {
-  lacona = require('..');
-}
-
-chai.config.includeStack = true;
+var testUtil = require('./util');
 
 describe('sequence', function() {
   var parser;
 
   beforeEach(function() {
-    parser = new lacona.Parser({sentences: ['test']});
+    parser = new testUtil.lacona.Parser({sentences: ['test']});
   });
 
   it('puts two elements in order', function (done) {
@@ -34,21 +23,17 @@ describe('sequence', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.suggestion.words[0].string).to.equal('man');
-      expect(data.result).to.be.empty;
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].suggestion.words[0].string).to.equal('man');
+      expect(data[0].result).to.be.empty;
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('super m');
+    parser.understand(grammar);
+    testUtil.toStream(['superm'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
   // it('space is punctuation - tacked onto suggestion', function (done) {
@@ -84,36 +69,60 @@ describe('sequence', function() {
   //   .parse('sup');
   // });
 
-  it('empty separator', function (done) {
+  it('handles an empty separator', function (done) {
     var grammar = {
       phrases: [{
         name: 'test',
         root: {
           type: 'sequence',
           children: [
-            'super',
-            'man'
+          'super',
+          'man'
           ],
           separator: ''
         }
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.suggestion.words[0].string).to.equal('man');
-      expect(data.result).to.be.empty;
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].suggestion.words[0].string).to.equal('man');
+      expect(data[0].result).to.be.empty;
       done();
+    }
+
+    parser.understand(grammar);
+    testUtil.toStream(['superm'])
+    .pipe(parser)
+    .pipe(testUtil.toArray(callback));
+  });
+
+  it('handles a null separator', function (done) {
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        root: {
+          type: 'sequence',
+          children: [
+          'super',
+          'man'
+          ],
+          separator: null
+        }
+      }]
     };
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('superm');
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].suggestion.words[0].string).to.equal('man');
+      expect(data[0].result).to.be.empty;
+      done();
+    }
+
+    parser.understand(grammar);
+    testUtil.toStream(['superm'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
 
@@ -131,18 +140,15 @@ describe('sequence', function() {
       }]
     };
 
-    var onData = sinon.spy();
-
-    var onEnd = function() {
-      expect(onData).to.not.have.been.called;
+    function callback(data) {
+      expect(data).to.have.length(0);
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('super man ');
+    parser.understand(grammar);
+    testUtil.toStream(['super man '])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
   it('custom separator', function (done) {
@@ -160,20 +166,16 @@ describe('sequence', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.suggestion.words[0].string).to.equal('man');
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].suggestion.words[0].string).to.equal('man');
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('super test m');
+    parser.understand(grammar);
+    testUtil.toStream(['super test m'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
   it('optional child', function (done) {
@@ -182,6 +184,7 @@ describe('sequence', function() {
         name: 'test',
         root: {
           type: 'sequence',
+          separator: ' ',
           children: [
             'super', {
               type: 'literal',
@@ -196,25 +199,24 @@ describe('sequence', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(['maximum', 'man']).to.contain(data.suggestion.words[0].string);
-      if (data.suggestion.words[0].string === 'maximum') {
-        expect(data.result.optionalId).to.equal('optionalValue');
+    function callback(data) {
+      expect(data).to.have.length(2);
+      expect(['maximum', 'man']).to.contain(data[0].suggestion.words[0].string);
+      expect(['maximum', 'man']).to.contain(data[1].suggestion.words[0].string);
+      if (data[0].suggestion.words[0].string === 'maximum') {
+        expect(data[0].result.optionalId).to.equal('optionalValue');
+        expect(data[1].result).to.be.empty;
       } else {
-        expect(data.result).to.be.empty;
+        expect(data[1].result.optionalId).to.equal('optionalValue');
+        expect(data[0].result).to.be.empty;
       }
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.called.twice;
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('super m');
+    parser.understand(grammar);
+    testUtil.toStream(['super m'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 
   it('can set a value to the result', function (done) {
@@ -233,19 +235,15 @@ describe('sequence', function() {
       }]
     };
 
-    var onData = sinon.spy(function(data) {
-      expect(data.result.testId).to.equal('testValue');
-    });
-
-    var onEnd = function() {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].result.testId).to.equal('testValue');
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('super m');
+    parser.understand(grammar);
+    testUtil.toStream(['superm'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 });

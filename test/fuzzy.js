@@ -1,20 +1,11 @@
 var chai = require('chai');
 var expect = chai.expect;
-var lacona;
-var sinon = require('sinon');
-
-chai.use(require('sinon-chai'));
-
-if (typeof window !== 'undefined' && window.lacona) {
-  lacona = window.lacona;
-} else {
-  lacona = require('..');
-}
+var testUtil = require('./util');
 
 describe('Parser with fuzzy matching', function () {
   var parser;
   beforeEach(function() {
-    parser = new lacona.Parser({fuzzy: true, sentences: ['test']});
+    parser = new testUtil.lacona.Parser({fuzzy: true, sentences: ['test']});
   });
 
   it('supports fuzzy matching', function (done) {
@@ -25,20 +16,16 @@ describe('Parser with fuzzy matching', function () {
       }]
     };
 
-    var onData = sinon.spy(function (data) {
-      expect(data.suggestion.charactersComplete).to.equal(10);
-      expect(data.suggestion.words[0].string).to.equal('a simple test');
-    });
-
-    var onEnd = function () {
-      expect(onData).to.have.been.calledOnce;
+    function callback(data) {
+      expect(data).to.have.length(1);
+      expect(data[0].suggestion.charactersComplete).to.equal(10);
+      expect(data[0].suggestion.words[0].string).to.equal('a simple test');
       done();
-    };
+    }
 
-    parser
-    .understand(grammar)
-    .on('data', onData)
-    .on('end', onEnd)
-    .parse('asmlt');
+    parser.understand(grammar);
+    testUtil.toStream(['asmlt'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
   });
 });
