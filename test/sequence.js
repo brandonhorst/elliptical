@@ -24,9 +24,9 @@ describe('sequence', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].suggestion.words[0].string).to.equal('man');
-      expect(data[0].result).to.be.empty;
+      expect(data).to.have.length(3);
+      expect(data[1].data.suggestion.words[0].string).to.equal('man');
+      expect(data[1].data.result).to.be.empty;
       done();
     }
 
@@ -51,7 +51,7 @@ describe('sequence', function() {
   //   };
   //
   //   var onData = sinon.spy(function(data) {
-  //     expect(data.suggestion.words).to.have.length(2);
+  //     expect(data.suggestion.words).to.have.length(4);
   //     expect(data.suggestion.words[0].string).to.equal('super');
   //     expect(data.suggestion.words[1].string).to.equal(' ');
   //     expect(data.result).to.be.empty;
@@ -85,9 +85,9 @@ describe('sequence', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].suggestion.words[0].string).to.equal('man');
-      expect(data[0].result).to.be.empty;
+      expect(data).to.have.length(3);
+      expect(data[1].data.suggestion.words[0].string).to.equal('man');
+      expect(data[1].data.result).to.be.empty;
       done();
     }
 
@@ -113,9 +113,9 @@ describe('sequence', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].suggestion.words[0].string).to.equal('man');
-      expect(data[0].result).to.be.empty;
+      expect(data).to.have.length(3);
+      expect(data[1].data.suggestion.words[0].string).to.equal('man');
+      expect(data[1].data.result).to.be.empty;
       done();
     }
 
@@ -141,7 +141,7 @@ describe('sequence', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(0);
+      expect(data).to.have.length(2);
       done();
     }
 
@@ -167,8 +167,8 @@ describe('sequence', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].suggestion.words[0].string).to.equal('man');
+      expect(data).to.have.length(3);
+      expect(data[1].data.suggestion.words[0].string).to.equal('man');
       done();
     }
 
@@ -200,15 +200,15 @@ describe('sequence', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(2);
-      expect(['maximum', 'man']).to.contain(data[0].suggestion.words[0].string);
-      expect(['maximum', 'man']).to.contain(data[1].suggestion.words[0].string);
-      if (data[0].suggestion.words[0].string === 'maximum') {
-        expect(data[0].result.optionalId).to.equal('optionalValue');
-        expect(data[1].result).to.be.empty;
+      expect(data).to.have.length(4);
+      expect(['maximum', 'man']).to.contain(data[1].data.suggestion.words[0].string);
+      expect(['maximum', 'man']).to.contain(data[2].data.suggestion.words[0].string);
+      if (data[1].data.suggestion.words[0].string === 'maximum') {
+        expect(data[1].data.result.optionalId).to.equal('optionalValue');
+        expect(data[2].data.result).to.be.empty;
       } else {
-        expect(data[1].result.optionalId).to.equal('optionalValue');
-        expect(data[0].result).to.be.empty;
+        expect(data[2].data.result.optionalId).to.equal('optionalValue');
+        expect(data[1].data.result).to.be.empty;
       }
       done();
     }
@@ -236,8 +236,8 @@ describe('sequence', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].result.testId).to.equal('testValue');
+      expect(data).to.have.length(3);
+      expect(data[1].data.result.testId).to.equal('testValue');
       done();
     }
 

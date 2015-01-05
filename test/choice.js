@@ -24,9 +24,9 @@ describe('choice', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].suggestion.words[0].string).to.equal('right');
-      expect(data[0].result).to.be.empty;
+      expect(data).to.have.length(3);
+      expect(data[1].data.suggestion.words[0].string).to.equal('right');
+      expect(data[1].data.result).to.be.empty;
       done();
     }
 
@@ -51,11 +51,11 @@ describe('choice', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(2);
-      expect(data[0].suggestion.words[0].string).to.contain('right');
-      expect(data[0].result).to.be.empty;
-      expect(data[1].suggestion.words[0].string).to.contain('right');
-      expect(data[1].result).to.be.empty;
+      expect(data).to.have.length(4);
+      expect(data[1].data.suggestion.words[0].string).to.contain('right');
+      expect(data[1].data.result).to.be.empty;
+      expect(data[2].data.suggestion.words[0].string).to.contain('right');
+      expect(data[2].data.result).to.be.empty;
       done();
     }
 
@@ -80,7 +80,7 @@ describe('choice', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(0);
+      expect(data).to.have.length(2);
       done();
     }
 
@@ -110,10 +110,10 @@ describe('choice', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].suggestion.words[0].string).to.equal('right');
-      expect(data[0].result.testId).to.equal('testValue');
-      expect(data[0].result.subId).to.equal('testValue');
+      expect(data).to.have.length(3);
+      expect(data[1].data.suggestion.words[0].string).to.equal('right');
+      expect(data[1].data.result.testId).to.equal('testValue');
+      expect(data[1].data.result.subId).to.equal('testValue');
       done();
     }
 
@@ -139,8 +139,8 @@ describe('choice', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].suggestion.words[0].string).to.equal('right');
+      expect(data).to.have.length(3);
+      expect(data[1].data.suggestion.words[0].string).to.equal('right');
       done();
     }
 
@@ -170,8 +170,8 @@ describe('choice', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].result.testId).to.equal('testValue');
+      expect(data).to.have.length(3);
+      expect(data[1].data.result.testId).to.equal('testValue');
       done();
     }
 
@@ -198,9 +198,9 @@ describe('choice', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(2);
-      expect(data[0].suggestion.words[0].string).to.contain('right');
-      expect(data[1].suggestion.words[0].string).to.contain('right');
+      expect(data).to.have.length(4);
+      expect(data[1].data.suggestion.words[0].string).to.contain('right');
+      expect(data[2].data.suggestion.words[0].string).to.contain('right');
       done();
     }
 
@@ -233,10 +233,10 @@ describe('choice', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(3);
-      expect(data[0].suggestion.words[0].string).to.contain('right');
-      expect(data[1].suggestion.words[0].string).to.contain('right');
-      expect(data[2].suggestion.words[0].string).to.contain('right');
+      expect(data).to.have.length(5);
+      expect(data[1].data.suggestion.words[0].string).to.contain('right');
+      expect(data[2].data.suggestion.words[0].string).to.contain('right');
+      expect(data[3].data.suggestion.words[0].string).to.contain('right');
       done();
     }
 

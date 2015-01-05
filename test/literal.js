@@ -18,11 +18,11 @@ describe('literal', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].suggestion.words).to.have.length(1);
-      expect(data[0].suggestion.charactersComplete).to.equal(1);
-      expect(data[0].suggestion.words[0].string).to.equal('literal test');
-      expect(data[0].result).to.be.empty;
+      expect(data).to.have.length(3);
+      expect(data[1].data.suggestion.words).to.have.length(1);
+      expect(data[1].data.suggestion.charactersComplete).to.equal(1);
+      expect(data[1].data.suggestion.words[0].string).to.equal('literal test');
+      expect(data[1].data.result).to.be.empty;
       done();
     }
 
@@ -44,11 +44,11 @@ describe('literal', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].suggestion.words).to.have.length(1);
-      expect(data[0].suggestion.charactersComplete).to.equal(1);
-      expect(data[0].suggestion.words[0].string).to.equal('literal test');
-      expect(data[0].result).to.be.empty;
+      expect(data).to.have.length(3);
+      expect(data[1].data.suggestion.words).to.have.length(1);
+      expect(data[1].data.suggestion.charactersComplete).to.equal(1);
+      expect(data[1].data.suggestion.words[0].string).to.equal('literal test');
+      expect(data[1].data.result).to.be.empty;
       done();
     }
 
@@ -72,11 +72,11 @@ describe('literal', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].suggestion.words).to.have.length(1);
-      expect(data[0].suggestion.charactersComplete).to.equal(1);
-      expect(data[0].suggestion.words[0].string).to.equal('literal test');
-      expect(data[0].result).to.deep.equal({testId: 'test'});
+      expect(data).to.have.length(3);
+      expect(data[1].data.suggestion.words).to.have.length(1);
+      expect(data[1].data.suggestion.charactersComplete).to.equal(1);
+      expect(data[1].data.suggestion.words[0].string).to.equal('literal test');
+      expect(data[1].data.result).to.deep.equal({testId: 'test'});
       done();
     }
 

@@ -22,7 +22,7 @@ describe('repeat', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(0);
+      expect(data).to.have.length(2);
       done();
     }
 
@@ -45,8 +45,8 @@ describe('repeat', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].suggestion.words[0].string).to.equal('man');
+      expect(data).to.have.length(3);
+      expect(data[1].data.suggestion.words[0].string).to.equal('man');
       done();
     }
 
@@ -69,8 +69,8 @@ describe('repeat', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].suggestion.words[0].string).to.equal('super');
+      expect(data).to.have.length(3);
+      expect(data[1].data.suggestion.words[0].string).to.equal('super');
       done();
     }
 
@@ -99,9 +99,9 @@ describe('repeat', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].result.testId).to.deep.equal(['testValue', 'testValue']);
-      expect(data[0].result.subElementId).to.be.undefined;
+      expect(data).to.have.length(3);
+      expect(data[1].data.result.testId).to.deep.equal(['testValue', 'testValue']);
+      expect(data[1].data.result.subElementId).to.be.undefined;
       done();
     }
 
@@ -128,8 +128,8 @@ describe('repeat', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].result.testId).to.equal('testValue');
+      expect(data).to.have.length(3);
+      expect(data[1].data.result.testId).to.equal('testValue');
       done();
     }
 
@@ -154,10 +154,10 @@ describe('repeat', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].match[0].string).to.equal('a');
-      expect(data[0].suggestion.words[0].string).to.equal('b');
-      expect(data[0].completion[0].string).to.equal('a');
+      expect(data).to.have.length(3);
+      expect(data[1].data.match[0].string).to.equal('a');
+      expect(data[1].data.suggestion.words[0].string).to.equal('b');
+      expect(data[1].data.completion[0].string).to.equal('a');
       done();
     }
 
@@ -182,9 +182,9 @@ describe('repeat', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].suggestion.words).to.be.empty;
-      expect(data[0].match[0].string).to.equal('a');
+      expect(data).to.have.length(3);
+      expect(data[1].data.suggestion.words).to.be.empty;
+      expect(data[1].data.match[0].string).to.equal('a');
       done();
     }
 
@@ -215,7 +215,7 @@ describe('repeat', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(0);
+      expect(data).to.have.length(2);
       done();
     }
 
@@ -245,9 +245,9 @@ describe('repeat', function() {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].match[0].string).to.equal('a');
-      expect(data[0].match[2].string).to.equal('b');
+      expect(data).to.have.length(3);
+      expect(data[1].data.match[0].string).to.equal('a');
+      expect(data[1].data.match[2].string).to.equal('b');
       done();
     }
 

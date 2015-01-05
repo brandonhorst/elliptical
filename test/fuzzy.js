@@ -17,9 +17,9 @@ describe('Parser with fuzzy matching', function () {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].suggestion.charactersComplete).to.equal(10);
-      expect(data[0].suggestion.words[0].string).to.equal('a simple test');
+      expect(data).to.have.length(3);
+      expect(data[1].data.suggestion.charactersComplete).to.equal(10);
+      expect(data[1].data.suggestion.words[0].string).to.equal('a simple test');
       done();
     }
 

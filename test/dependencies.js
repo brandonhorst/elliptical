@@ -23,8 +23,8 @@ describe('dependencies', function () {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].suggestion.words[0].string).to.equal('something');
+      expect(data).to.have.length(3);
+      expect(data[1].data.suggestion.words[0].string).to.equal('something');
       done();
     }
 

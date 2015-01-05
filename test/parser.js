@@ -11,9 +11,13 @@ describe('Parser', function () {
     parser = new testUtil.lacona.Parser({sentences: ['test']});
   });
 
-  it('never calls data without a schema', function (done) {
+  it('passes start and end', function (done) {
     function callback(data) {
-      expect(data).to.be.empty;
+      expect(data).to.have.length(2);
+      expect(data[0].event).to.equal('start');
+      expect(data[1].event).to.equal('end');
+      expect(data[0].id).to.equal(data[1].id);
+      expect(data[0].id).to.equal(0);
       done();
     }
 
@@ -42,8 +46,16 @@ describe('Parser', function () {
     };
 
     function callback(data) {
-      expect(data).to.have.length(2);
-      expect(data[0].id).to.not.equal(data[1].id);
+      expect(data).to.have.length(6);
+      expect(data[0].event).to.equal('start');
+      expect(data[2].event).to.equal('end');
+      expect(data[3].event).to.equal('start');
+      expect(data[5].event).to.equal('end');
+      expect(data[1].id).to.equal(data[0].id);
+      expect(data[1].id).to.equal(data[2].id);
+      expect(data[4].id).to.equal(data[3].id);
+      expect(data[4].id).to.equal(data[5].id);
+      expect(data[1].id).to.be.below(data[4].id);
       done();
     }
 
@@ -69,8 +81,8 @@ describe('Parser', function () {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].suggestion.words[0].string).to.equal('prueba');
+      expect(data).to.have.length(3);
+      expect(data[1].data.suggestion.words[0].string).to.equal('prueba');
       done();
     }
 
@@ -96,8 +108,8 @@ describe('Parser', function () {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].suggestion.words[0].string).to.equal('tren');
+      expect(data).to.have.length(3);
+      expect(data[1].data.suggestion.words[0].string).to.equal('tren');
       done();
     }
 

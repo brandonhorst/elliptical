@@ -1,8 +1,8 @@
 Lacona
 ======
 
-[![Build Status](https://travis-ci.org/lacona/lacona.svg?branch=master)](https://travis-ci.org/lacona/lacona)
-[![Coverage Status](https://img.shields.io/coveralls/lacona/lacona.svg)](https://coveralls.io/r/lacona/lacona)
+[![Build Status](https://img.shields.io/travis/lacona/lacona.svg?style=flat)](https://travis-ci.org/lacona/lacona)
+[![Coverage Status](https://img.shields.io/coveralls/lacona/lacona.svg?style=flat)](https://coveralls.io/r/lacona/lacona)
 
 Lacona is a Javascript library for parsing and predicting natural language according to an arbitrary but well-defined schema.
 
@@ -258,27 +258,25 @@ To teach a `Parser` some phrases, you call
 parser.understand(grammar);
 ```
 
-To start parsing phrase, you call
+The parser is actually just a standard node `Transform` stream. It accepts strings and outputs objects.
 
-```javascript
-parser.parse(stringToParse);
+You can consume it by handling the `data` event or piping it to a Writable stream. The stream is in `objectMode`, and each entry is an object with `event` and `id` properties and maybe a `data` property. `event` will be either `'start'`, `'end'`, or `'data'`, which mark the beginning and end of a specific parse. All output for a specific input string will have the same numeric `id`. `start` events will always happen in `id` order, but `end` and `data` events may not.
+
+```js
+{
+	event: eventName,
+	id: numericId,
+	data: data
+}
 ```
 
-To get the results of a parse, `Parser` will emit events. These can be captured with
+When a new string is parsed, an object with `event` `'start'` will be emitted. Then, `data` events will be emitted with a single `OutputOption` in the `data` property for every valid result, in the order that they are recieved. Then, an `end` event will be emitted.
 
-```javascript
-parser.on(event, handler);
-```
-
-where `event` is a string and `handler` is a function. Whenever an event named `event` is emitted, the `handler` will be called.
-
-When `parse` is called, `data` events will be emitted with a single `OutputOption` argument for every valid result in the order that they are recieved. Then, `end` will be emitted. If something goes wrong, `error` will be emitted with a single `Error` argument.
-
-If you are implementing a UI that will be maintaining state between requests, look into `lacona-stateful` ([GitHub](https://github.com/brandonhorst/lacona-stateful), [npm](https://www.npmjs.org/package/lacona-stateful)).
+If you are implementing a UI that will be maintaining state between requests, look into `lacona-addon-stateful` ([GitHub](https://github.com/lacona/lacona-addon-stateful), [npm](https://www.npmjs.org/package/lacona-addon-stateful)). If you need Lacona for a simple application and do not want to deal with streams, look into `lacona-addon-simple`, ([GitHub](https://github.com/lacona/lacona-addon-simple), [npm](https://www.npmjs.org/package/lacona-addon-simple))
 
 #Reference
 
-Remember, nothing is set in stone yet.
+Nothing is set in stone yet.
 
 [Parser](doc/parser.md)
 [Grammar](doc/grammar.md)

@@ -5,13 +5,13 @@ var testUtil = require('./util');
 
 chai.use(require('sinon-chai'));
 
-describe('Parser', function () {
+describe('value', function () {
   var parser;
   beforeEach(function() {
     parser = new testUtil.lacona.Parser({sentences: ['test']});
   });
 
-  it('suggests a value', function () {
+  it('suggests a value', function (done) {
     var grammar = {
       scope: {
         fun: function (input, data, done) {
@@ -26,9 +26,10 @@ describe('Parser', function () {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].result.test).to.equal('val');
-      expect(data[0].suggestion.words[0].string).to.equal('disp');
+      expect(data).to.have.length(3);
+      expect(data[1].data.result.test).to.equal('val');
+      expect(data[1].data.suggestion.words[0].string).to.equal('disp');
+      done();
     }
 
     parser.understand(grammar);
@@ -37,7 +38,7 @@ describe('Parser', function () {
       .pipe(testUtil.toArray(callback));
   });
 
-  it('can access variables in parent in its function', function () {
+  it('can access variables in parent in its function', function (done) {
     function fun(input, data, done) {
       expect(this.myVar).to.equal('myVal');
       data({display: 'disp', value: 'val'});
@@ -59,7 +60,8 @@ describe('Parser', function () {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
+      expect(data).to.have.length(3);
+      done();
     }
 
     parser.understand(grammar);
@@ -97,7 +99,7 @@ describe('Parser', function () {
     };
 
     function callback(data) {
-      expect(data).to.have.length(0);
+      expect(data).to.have.length(2);
       expect(fun).to.have.been.calledOnce;
       expect(depFun).to.have.been.calledOnce;
       done();
@@ -138,7 +140,7 @@ describe('Parser', function () {
     };
 
     function callback(data) {
-      expect(data).to.have.length(0);
+      expect(data).to.have.length(2);
       expect(fun).to.have.been.calledOnce;
       expect(depFun).to.have.been.calledOnce;
       done();
@@ -198,7 +200,7 @@ describe('Parser', function () {
     };
 
     function callback(data) {
-      expect(data).to.have.length(0);
+      expect(data).to.have.length(2);
       expect(fun).to.have.been.calledOnce;
       expect(depFun).to.have.been.calledOnce;
       expect(depDepFun).to.have.been.calledOnce;
@@ -211,7 +213,7 @@ describe('Parser', function () {
       .pipe(testUtil.toArray(callback));
   });
 
-  it('has no variables when called in a sentence', function () {
+  it('has no variables when called in a sentence', function (done) {
     var fun = sinon.spy(function fun(input, data, done) {
       expect(this.myVar).to.not.exist;
       done();
@@ -227,8 +229,9 @@ describe('Parser', function () {
     };
 
     function callback(data) {
-      expect(data).to.have.length(0);
+      expect(data).to.have.length(2);
       expect(fun).to.have.been.calledOnce;
+      done();
     }
 
     parser.understand(grammar);

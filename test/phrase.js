@@ -24,9 +24,9 @@ describe('Phrase', function () {
     };
 
     function callback(data) {
-      expect(data).to.have.length(2);
-      expect(['test', 'totally']).to.contain(data[0].suggestion.words[0].string);
-      expect(['test', 'totally']).to.contain(data[1].suggestion.words[0].string);
+      expect(data).to.have.length(4);
+      expect(['test', 'totally']).to.contain(data[1].data.suggestion.words[0].string);
+      expect(['test', 'totally']).to.contain(data[2].data.suggestion.words[0].string);
       done();
     }
 
@@ -53,9 +53,9 @@ describe('Phrase', function () {
     };
 
     function callback(data) {
-      expect(data).to.have.length(2);
-      expect(['test', 'totally']).to.contain(data[0].suggestion.words[0].string);
-      expect(['test', 'totally']).to.contain(data[1].suggestion.words[0].string);
+      expect(data).to.have.length(4);
+      expect(['test', 'totally']).to.contain(data[1].data.suggestion.words[0].string);
+      expect(['test', 'totally']).to.contain(data[2].data.suggestion.words[0].string);
       done();
     }
 
@@ -82,8 +82,8 @@ describe('Phrase', function () {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].suggestion.words[0].string).to.equal('test');
+      expect(data).to.have.length(3);
+      expect(data[1].data.suggestion.words[0].string).to.equal('test');
       done();
     }
 
@@ -110,9 +110,9 @@ describe('Phrase', function () {
     };
 
     function callback(data) {
-      expect(data).to.have.length(2);
-      expect(['the ', 'test']).to.contain(data[0].suggestion.words[0].string);
-      expect(['the ', 'test']).to.contain(data[1].suggestion.words[0].string);
+      expect(data).to.have.length(4);
+      expect(['the ', 'test']).to.contain(data[1].data.suggestion.words[0].string);
+      expect(['the ', 'test']).to.contain(data[2].data.suggestion.words[0].string);
       done();
     }
 
@@ -139,9 +139,9 @@ describe('Phrase', function () {
     };
 
     function callback(data) {
-      expect(data).to.have.length(1);
-      expect(data[0].suggestion.words[0].string).to.equal('test');
-      expect(data[0].result.test).to.equal('test');
+      expect(data).to.have.length(3);
+      expect(data[1].data.suggestion.words[0].string).to.equal('test');
+      expect(data[1].data.result.test).to.equal('test');
       done();
     }
 
@@ -160,7 +160,7 @@ describe('Phrase', function () {
     };
 
     function callback(data) {
-      expect(data).to.have.length(0);
+      expect(data).to.have.length(2);
       done();
     }
 
