@@ -26,6 +26,26 @@ describe('Parser', function () {
       .pipe(testUtil.toArray(callback));
   });
 
+  it ('will clear out an understood grammar', function (done) {
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        root: 'test',
+      }]
+    };
+
+    function callback(data) {
+      expect(data).to.have.length(2);
+      done();
+    }
+
+    parser.understand(grammar).clearGrammars();
+
+    testUtil.toStream(['t'])
+      .pipe(parser)
+      .pipe(testUtil.toArray(callback));
+  });
+
   it('requires string input', function (done) {
     var callback = sinon.spy(function (err) {
       expect(err).to.be.an.instanceof(testUtil.lacona.Error);
