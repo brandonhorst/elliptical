@@ -11,7 +11,7 @@ describe('Parser', function () {
     parser = new testUtil.lacona.Parser({sentences: ['test']});
   });
 
-  it('passes start and end', function (done) {
+  it('passes start and end for sync parse', function (done) {
     function callback(data) {
       expect(data).to.have.length(2);
       expect(data[0].event).to.equal('start');
@@ -162,4 +162,39 @@ describe('Parser', function () {
     }).to.throw(testUtil.lacona.Error);
   });
 
+  describe('async parse', function () {
+    var grammar = {
+      scope: {
+        delay: function (input, data, done) {
+          setTimeout(function () {
+            data({display: 'test', value: 'test'});
+            done();
+          }, 0);
+        }
+      },
+      phrases: [{
+        name: 'test',
+        root: {
+          type: 'value',
+          compute: 'delay'
+        }
+      }]
+    };
+
+    it('passes start and end for async parse', function(done) {
+
+      function callback(data) {
+        expect(data).to.have.length(2);
+        expect(data[0].event).to.equal('start');
+        expect(data[1].event).to.equal('end');
+        expect(data[0].id).to.equal(data[1].id);
+        expect(data[0].id).to.equal(0);
+        done();
+      }
+      parser.understand(grammar);
+      testUtil.toStream(['invalid'])
+        .pipe(parser)
+        .pipe(testUtil.toArray(callback));
+    });
+  });
 });
