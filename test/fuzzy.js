@@ -25,7 +25,26 @@ describe('Parser with fuzzy matching', function () {
 
     parser.understand(grammar);
     testUtil.toStream(['asmlt'])
-      .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+    .pipe(parser)
+    .pipe(testUtil.toArray(callback));
+  });
+
+  it('rejects misses properly with fuzzy matching', function (done) {
+    var grammar = {
+      phrases: [{
+        name: 'test',
+        root: 'a simple test'
+      }]
+    };
+
+    function callback(data) {
+      expect(data).to.have.length(2);
+      done();
+    }
+
+    parser.understand(grammar);
+    testUtil.toStream(['fff'])
+    .pipe(parser)
+    .pipe(testUtil.toArray(callback));
   });
 });
