@@ -41,7 +41,7 @@ describe('Parser', function () {
     var test = u.lacona.createPhrase({
       name: 'test/test',
       describe: function () {
-        return u.lacona.literal({display: 'test'});
+        return u.lacona.literal({text: 'test'});
       }
     });
 
@@ -69,15 +69,15 @@ describe('Parser', function () {
   it('can parse in a specified language', function (done) {
     var test = u.lacona.createPhrase({
       name: 'test/test',
-      schemas: [{
+      translations: [{
         langs: ['en', 'default'],
         describe: function () {
-          return u.lacona.literal({display: 'test'});
+          return u.lacona.literal({text: 'test'});
         }
       }, {
         langs: ['es'],
         describe: function () {
-          return u.lacona.literal({display: 'prueba'});
+          return u.lacona.literal({text: 'prueba'});
         }
       }]
     });
@@ -99,15 +99,15 @@ describe('Parser', function () {
   it('falls back on a less specific language if a more specific one is not provided', function (done) {
     var test = u.lacona.createPhrase({
       name: 'test/test',
-      schemas: [{
+      translations: [{
         langs: ['en', 'default'],
         describe: function () {
-          return u.lacona.literal({display: 'train'});
+          return u.lacona.literal({text: 'train'});
         }
       }, {
         langs: ['es'],
         describe: function () {
-          return u.lacona.literal({display: 'tren'});
+          return u.lacona.literal({text: 'tren'});
         }
       }]
     });
@@ -134,7 +134,7 @@ describe('Parser', function () {
         name: 'test/test',
         delay: function (input, data, done) {
           setTimeout(function () {
-            data({display: 'test', value: 'test'});
+            data({text: 'test', value: 'test'});
             done();
           }, 0);
         },

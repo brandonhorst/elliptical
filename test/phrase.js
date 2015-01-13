@@ -12,7 +12,7 @@ describe('Phrase', function () {
     var extended = u.lacona.createPhrase({
       name: 'test/extended',
       describe: function () {
-        return u.lacona.literal({display: 'test a'});
+        return u.lacona.literal({text: 'test a'});
       }
     });
 
@@ -20,7 +20,7 @@ describe('Phrase', function () {
       name: 'test/extender',
       extends: ['test/extended'],
       describe: function () {
-        return u.lacona.literal({display: 'test b'});
+        return u.lacona.literal({text: 'test b'});
       }
     });
 
@@ -50,7 +50,7 @@ describe('Phrase', function () {
     var overridden = u.lacona.createPhrase({
       name: 'test/overridden',
       describe: function () {
-        return u.lacona.literal({display: 'test a'});
+        return u.lacona.literal({text: 'test a'});
       }
     });
 
@@ -58,7 +58,7 @@ describe('Phrase', function () {
       name: 'test/overrider',
       overrides: ['test/overridden'],
       describe: function () {
-        return u.lacona.literal({display: 'test b'});
+        return u.lacona.literal({text: 'test b'});
       }
     });
 
@@ -88,9 +88,9 @@ describe('Phrase', function () {
       name: 'test/test',
       describe: function () {
         return u.lacona.sequence({children: [
-          u.lacona.literal({display: 'na '}),
+          u.lacona.literal({text: 'na '}),
           u.lacona.choice({children: [
-            u.lacona.literal({display: 'nopeman'}),
+            u.lacona.literal({text: 'nopeman'}),
             test()
           ]})
         ]});
@@ -126,7 +126,7 @@ describe('Phrase', function () {
     var include2 = u.lacona.createPhrase({
       name: 'test/include2',
       describe: function () {
-        return u.lacona.literal({value: 'val', display: 'disp', id: 'test'});
+        return u.lacona.literal({value: 'val', text: 'disp', id: 'test'});
       }
     });
 
@@ -147,23 +147,23 @@ describe('Phrase', function () {
     expect(function() {
       u.lacona.createPhrase({
         name: 'test/test',
-        schemas: [{
+        translations: [{
           langs: ['en-US'],
           describe: function () {
-            return u.lacona.literal({display: 'whatever'});
+            return u.lacona.literal({text: 'whatever'});
           }
         }]
       });
     }).to.throw(u.lacona.Error);
   });
 
-  it('throws for phrases without a lang', function () {
+  it('throws for translations without a lang', function () {
     expect(function() {
       u.lacona.createPhrase({
         name: 'test/test',
-        schemas: [{
+        translations: [{
           describe: function () {
-            return u.lacona.literal({display: 'whatever'});
+            return u.lacona.literal({text: 'whatever'});
           }
         }]
       });
@@ -182,7 +182,7 @@ describe('Phrase', function () {
     expect(function() {
       u.lacona.createPhrase({
         describe: function() {
-          return u.lacona.literal({display: 'test'});
+          return u.lacona.literal({text: 'test'});
         }
       });
     }).to.throw(u.lacona.Error);

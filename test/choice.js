@@ -14,8 +14,8 @@ describe('choice', function() {
       name: 'test/test',
       describe: function () {
         return u.lacona.choice({children: [
-          u.lacona.literal({display: 'right'}),
-          u.lacona.literal({display: 'wrong'})
+          u.lacona.literal({text: 'right'}),
+          u.lacona.literal({text: 'wrong'})
         ]});
       }
     });
@@ -38,8 +38,8 @@ describe('choice', function() {
       name: 'test/test',
       describe: function () {
         return u.lacona.choice({children: [
-          u.lacona.literal({display: 'right'}),
-          u.lacona.literal({display: 'right also'})
+          u.lacona.literal({text: 'right'}),
+          u.lacona.literal({text: 'right also'})
         ]});
       }
     });
@@ -64,8 +64,8 @@ describe('choice', function() {
       name: 'test/test',
       describe: function () {
         return u.lacona.choice({children: [
-          u.lacona.literal({display: 'wrong'}),
-          u.lacona.literal({display: 'wrong also'})
+          u.lacona.literal({text: 'wrong'}),
+          u.lacona.literal({text: 'wrong also'})
         ]});
       }
     });
@@ -90,10 +90,10 @@ describe('choice', function() {
           children: [
             u.lacona.literal({
               id: 'subId',
-              display: 'right',
+              text: 'right',
               value: 'testValue'
             }),
-            u.lacona.literal({display: 'wrong'})
+            u.lacona.literal({text: 'wrong'})
           ]
         });
       }
@@ -120,8 +120,8 @@ describe('choice', function() {
         return u.lacona.choice({
           limit: 1,
           children: [
-            u.lacona.literal({display: 'right'}),
-            u.lacona.literal({display: 'right also'})
+            u.lacona.literal({text: 'right'}),
+            u.lacona.literal({text: 'right also'})
           ]
         });
       }
@@ -149,10 +149,10 @@ describe('choice', function() {
           children: [
             u.lacona.literal({
               id: 'subId',
-              display: 'right',
+              text: 'right',
               value: 'testValue'
             }),
-            u.lacona.literal({display: 'right also'})
+            u.lacona.literal({text: 'right also'})
           ]});
         }
       });
@@ -177,9 +177,9 @@ describe('choice', function() {
         return u.lacona.choice({
           limit: 2,
           children: [
-            u.lacona.literal({display: 'right'}),
-            u.lacona.literal({display: 'right also'}),
-            u.lacona.literal({display: 'right but excluded'})
+            u.lacona.literal({text: 'right'}),
+            u.lacona.literal({text: 'right also'}),
+            u.lacona.literal({text: 'right but excluded'})
           ]});
         }
       });
@@ -205,11 +205,11 @@ describe('choice', function() {
           limit: 2,
           children: [
             u.lacona.choice({children: [
-              u.lacona.literal({display: 'right'}),
-              u.lacona.literal({display: 'right also'})
+              u.lacona.literal({text: 'right'}),
+              u.lacona.literal({text: 'right also'})
             ]}),
-            u.lacona.literal({display: 'wrong'}),
-            u.lacona.literal({display: 'right third'})
+            u.lacona.literal({text: 'wrong'}),
+            u.lacona.literal({text: 'right third'})
           ]
         });
       }

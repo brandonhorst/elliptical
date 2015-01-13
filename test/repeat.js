@@ -17,8 +17,8 @@ describe('repeat', function() {
         name: 'test/test',
         describe: function () {
           return u.lacona.repeat({
-            child: u.lacona.literal({display: 'super'}),
-            separator: u.lacona.literal({display: 'man'})
+            child: u.lacona.literal({text: 'super'}),
+            separator: u.lacona.literal({text: 'man'})
           });
         }
       });
@@ -71,7 +71,7 @@ describe('repeat', function() {
         name: 'test/test',
         describe: function () {
           return u.lacona.repeat({
-            child: u.lacona.literal({display: 'super'})
+            child: u.lacona.literal({text: 'super'})
           });
         }
       });
@@ -123,9 +123,9 @@ describe('repeat', function() {
       describe: function () {
         return u.lacona.repeat({
           id: 'testId',
-          separator: u.lacona.literal({display: 'man'}),
+          separator: u.lacona.literal({text: 'man'}),
           child: u.lacona.literal({
-            display: 'super',
+            text: 'super',
             value: 'testValue',
             id: 'subElementId'
           })
@@ -152,8 +152,8 @@ describe('repeat', function() {
       describe: function () {
         return u.lacona.repeat({
           min: 2,
-          child: u.lacona.literal({display: 'a'}),
-          separator: u.lacona.literal({display: 'b'})
+          child: u.lacona.literal({text: 'a'}),
+          separator: u.lacona.literal({text: 'b'})
         });
       }
     });
@@ -179,8 +179,8 @@ describe('repeat', function() {
       describe: function () {
         return u.lacona.repeat({
           max: 1,
-          child: u.lacona.literal({display: 'a'}),
-          separator: u.lacona.literal({display: 'b'})
+          child: u.lacona.literal({text: 'a'}),
+          separator: u.lacona.literal({text: 'b'})
         });
       }
     });
@@ -209,8 +209,8 @@ describe('repeat', function() {
             unique: true,
             child: u.lacona.choice({
               children: [
-                u.lacona.literal({display: 'a', value: 'a'}),
-                u.lacona.literal({display: 'b', value: 'b'})
+                u.lacona.literal({text: 'a', value: 'a'}),
+                u.lacona.literal({text: 'b', value: 'b'})
               ]
             })
           });

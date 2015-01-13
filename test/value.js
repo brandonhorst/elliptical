@@ -15,7 +15,7 @@ describe('value', function () {
     var test = u.lacona.createPhrase({
       name: 'test/test',
       fun: function (input, data, done) {
-        data({display: 'disp', value: 'val'});
+        data({text: 'disp', value: 'val'});
         done();
       },
       describe: function () {

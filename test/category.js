@@ -13,7 +13,7 @@ describe('category', function () {
     var test = u.lacona.createPhrase({
       name: 'test/test',
       describe: function () {
-        return u.lacona.literal({display: 'test', category: 'myCat'});
+        return u.lacona.literal({text: 'test', category: 'myCat'});
       }
     });
 
@@ -42,7 +42,7 @@ describe('category', function () {
       name: 'test/dep',
       describe: function () {
         return u.lacona.literal({
-          display: 'test',
+          text: 'test',
           category: this.props.category + 'Modified'
         });
       }
@@ -73,7 +73,7 @@ describe('category', function () {
       name: 'test/dep',
       describe: function () {
         return u.lacona.literal({
-          display: 'test'
+          text: 'test'
         });
       }
     });

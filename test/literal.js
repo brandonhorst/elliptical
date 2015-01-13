@@ -13,7 +13,7 @@ describe('literal', function() {
     var test = u.lacona.createPhrase({
       name: 'test/test',
       describe: function () {
-        return u.lacona.literal({display: 'literal test'});
+        return u.lacona.literal({text: 'literal test'});
       }
     });
 
@@ -37,7 +37,7 @@ describe('literal', function() {
       name: 'test/test',
       describe: function () {
         return u.lacona.literal({
-          display: 'literal test',
+          text: 'literal test',
           value: 'test',
           id: 'testId'
         });

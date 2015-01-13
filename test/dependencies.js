@@ -12,7 +12,7 @@ describe('dependencies', function () {
     var dep = u.lacona.createPhrase({
       name: 'test/dep',
       describe: function () {
-        return u.lacona.literal({display: 'something'});
+        return u.lacona.literal({text: 'something'});
       }
     });
 

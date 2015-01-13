@@ -44,7 +44,7 @@ The `value` phrase allows you define how your element is parsed with code. This 
 
 ```
 {
-	display: String
+	text: String
 	value: String
 }
 ```
@@ -54,7 +54,7 @@ The `value` phrase allows you define how your element is parsed with code. This 
 ###`literal`
 
 	{
-		display: String, //required
+		text: String, //required
 		value: String
 	}
 

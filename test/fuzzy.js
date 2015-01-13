@@ -15,7 +15,7 @@ describe('fuzzy matching', function () {
       test = u.lacona.createPhrase({
         name: 'test/test',
         describe: function () {
-          return u.lacona.literal({display: 'a simple test'});
+          return u.lacona.literal({text: 'a simple test'});
         }
       });
     });
@@ -65,7 +65,7 @@ describe('fuzzy matching', function () {
     var test = u.lacona.createPhrase({
       name: 'test/test',
       describe: function () {
-        return u.lacona.literal({display: '[whatever]'});
+        return u.lacona.literal({text: '[whatever]'});
       }
     });
 
@@ -87,8 +87,8 @@ describe('fuzzy matching', function () {
       name: 'test/test',
       describe: function () {
         return u.lacona.sequence({children: [
-          u.lacona.literal({display: 'abc'}),
-          u.lacona.literal({display: 'def'})
+          u.lacona.literal({text: 'abc'}),
+          u.lacona.literal({text: 'def'})
         ]});
       }
     });
@@ -112,10 +112,10 @@ describe('fuzzy matching', function () {
       name: 'test/test',
       describe: function () {
         return u.lacona.sequence({children: [
-          u.lacona.literal({display: 'abc'}),
-          u.lacona.literal({display: 'def'}),
-          u.lacona.literal({display: 'ghi'}),
-          u.lacona.literal({display: 'jkl'})
+          u.lacona.literal({text: 'abc'}),
+          u.lacona.literal({text: 'def'}),
+          u.lacona.literal({text: 'ghi'}),
+          u.lacona.literal({text: 'jkl'})
         ]});
       }
     });

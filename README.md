@@ -101,15 +101,15 @@ var reminder = lacona.createPhrase({
 	describe: function () {
 		return lacona.choice({children: [
 			lacona.sequence({children: [
-				lacona.literal({'display': 'remind me to '}),
-				freetext({'id': 'taskName'}),
-				lacona.literal({'display': ' '}),
-				datetime({'id': 'dateAndTime'})
+				lacona.literal({text: 'remind me to '}),
+				freetext({id: 'taskName'}),
+				lacona.literal({text: ' '}),
+				datetime({id: 'dateAndTime'})
 			]}),
 			lacona.sequence({children: [
-				datetime({'id': 'dateAndTime'})
-				lacona.literal({'display': ', remind me to '}),
-				freetext({'id': 'taskName'}),
+				datetime({id: 'dateAndTime'})
+				lacona.literal({text: ', remind me to '}),
+				freetext({id: 'taskName'}),
 			]})
 		]});
 	}
@@ -153,7 +153,7 @@ By means of example, let's support Spanish in our Phrase, shall we?
 ```javascript
 var remindMe = lacona.createphrase({
 	name: 'brandonhorst/remindme',
-	schemas: [{
+	translations: [{
 		langs: ['en', 'default'],
 		describe: function () {
 			return lacona.literal('remind me to ');
@@ -172,15 +172,15 @@ var reminder = lacona.createPhrase({
 		return lacona.choice({children: [
 			lacona.sequence({children: [
 				remindMe(),
-				freetext({'id': 'taskName'}),
-				lacona.literal({'display': ' '}),
-				datetime({'id': 'dateAndTime'})
+				freetext({id: 'taskName'}),
+				lacona.literal({text: ' '}),
+				datetime({id: 'dateAndTime'})
 			]}),
 			lacona.sequence({children: [
-				datetime({'id': 'dateAndTime'})
-				lacona.literal({'display': ', '}),
+				datetime({id: 'dateAndTime'})
+				lacona.literal({text: ', '}),
 				remindMe(),
-				freetext({'id': 'taskName'}),
+				freetext({id: 'taskName'}),
 			]})
 		]});
 	}

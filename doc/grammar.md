@@ -73,10 +73,10 @@ String || [ phraseReference ] || {
 }
 ```
 
-If a `String` is provided, it will be used as the `value` and `display` of a `literal`. If an `Array` is provided, it will be used as the `children` of a `sequence`.
+If a `String` is provided, it will be used as the `value` and `text` of a `literal`. If an `Array` is provided, it will be used as the `children` of a `sequence`.
 
 ```
-'test' == {type: 'literal', display: 'test', value: 'test'}
+'test' == {type: 'literal', text: 'test', value: 'test'}
 
 [phraseRef1, phraseRef2] == {type: sequence, children: [phraseRef1, phraseRef2]}
 ```

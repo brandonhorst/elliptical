@@ -14,8 +14,8 @@ describe('sequence', function() {
       name: 'test/test',
       describe: function () {
         return u.lacona.sequence({children: [
-          u.lacona.literal({display: 'super'}),
-          u.lacona.literal({display: 'man'})
+          u.lacona.literal({text: 'super'}),
+          u.lacona.literal({text: 'man'})
         ]});
       }
     });
@@ -39,10 +39,10 @@ describe('sequence', function() {
       describe: function () {
         return u.lacona.sequence({
           children: [
-            u.lacona.literal({display: 'super'}),
-            u.lacona.literal({display: 'man'})
+            u.lacona.literal({text: 'super'}),
+            u.lacona.literal({text: 'man'})
           ],
-          separator: u.lacona.literal({display: ' '})
+          separator: u.lacona.literal({text: ' '})
         });
       }
     });
@@ -65,16 +65,16 @@ describe('sequence', function() {
       name: 'test/test',
       describe: function () {
         return u.lacona.sequence({
-          separator: u.lacona.literal({display: ' '}),
+          separator: u.lacona.literal({text: ' '}),
           children: [
-            u.lacona.literal({display: 'super'}),
+            u.lacona.literal({text: 'super'}),
             u.lacona.literal({
-              display: 'maximum',
+              text: 'maximum',
               value: 'optionalValue',
               id: 'optionalId',
               optional: true
             }),
-            u.lacona.literal({display: 'man'})
+            u.lacona.literal({text: 'man'})
           ]
         });
       }
@@ -114,8 +114,8 @@ describe('sequence', function() {
           id: 'testId',
           value: 'testValue',
           children: [
-            u.lacona.literal({display: 'super'}),
-            u.lacona.literal({display: 'man'})
+            u.lacona.literal({text: 'super'}),
+            u.lacona.literal({text: 'man'})
           ]
         });
       }
