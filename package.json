@@ -60,6 +60,8 @@
     "inherits": "^2.0.1",
     "lodash.clone": "^2.4.1",
     "lodash.difference": "^2.4.1",
+    "lodash.find": "^2.4.1",
+    "lodash.findlast": "^2.4.1",
     "lodash.omit": "^2.4.1"
   }
 }
