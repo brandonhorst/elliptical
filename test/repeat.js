@@ -1,102 +1,137 @@
 var chai = require('chai');
 var expect = chai.expect;
-var testUtil = require('./util');
+var u = require('./util');
 
 describe('repeat', function() {
   var parser;
 
   beforeEach(function() {
-    parser = new testUtil.lacona.Parser({sentences: ['test']});
+    parser = new u.lacona.Parser();
   });
 
-  it('does not accept input that does not match the child', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'repeat',
-          child: 'super',
-          separator: 'man'
+  describe('basic usage', function () {
+    var test;
+
+    beforeEach(function () {
+      test = u.lacona.createPhrase({
+        name: 'test/test',
+        describe: function () {
+          return u.lacona.repeat({
+            child: u.lacona.literal({display: 'super'}),
+            separator: u.lacona.literal({display: 'man'})
+          });
         }
-      }]
-    };
+      });
+    });
 
-    function callback(data) {
-      expect(data).to.have.length(2);
-      done();
-    }
+    it('does not accept input that does not match the child', function (done) {
+      function callback(data) {
+        expect(data).to.have.length(2);
+        done();
+      }
 
-    parser.understand(grammar);
-    testUtil.toStream(['wrong'])
-      .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      parser.sentences = [test()];
+      u.toStream(['wrong'])
+        .pipe(parser)
+        .pipe(u.toArray(callback));
+    });
+
+    it('accepts the child on its own', function (done) {
+      function callback(data) {
+        expect(data).to.have.length(3);
+        expect(data[1].data.suggestion.words[0].string).to.equal('man');
+        done();
+      }
+
+      parser.sentences = [test()];
+      u.toStream(['superm'])
+        .pipe(parser)
+        .pipe(u.toArray(callback));
+    });
+
+    it('accepts the child twice, with the separator in the middle', function (done) {
+      function callback(data) {
+        expect(data).to.have.length(3);
+        expect(data[1].data.suggestion.words[0].string).to.equal('super');
+        done();
+      }
+
+      parser.sentences = [test()];
+      u.toStream(['supermans'])
+        .pipe(parser)
+        .pipe(u.toArray(callback));
+    });
   });
 
-  it('accepts the child on its own', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'repeat',
-          child: 'super',
-          separator: 'man'
+  describe('basic usage (no separator)', function () {
+    var test;
+
+    beforeEach(function () {
+      test = u.lacona.createPhrase({
+        name: 'test/test',
+        describe: function () {
+          return u.lacona.repeat({
+            child: u.lacona.literal({display: 'super'})
+          });
         }
-      }]
-    };
+      });
+    });
 
-    function callback(data) {
-      expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.words[0].string).to.equal('man');
-      done();
-    }
+    it('does not accept input that does not match the child', function (done) {
+      function callback(data) {
+        expect(data).to.have.length(2);
+        done();
+      }
 
-    parser.understand(grammar);
-    testUtil.toStream(['superm'])
-      .pipe(parser)
-      .pipe(testUtil.toArray(callback));
-  });
+      parser.sentences = [test()];
+      u.toStream(['wrong'])
+        .pipe(parser)
+        .pipe(u.toArray(callback));
+    });
 
-  it('accepts the child twice, with the separator in the middle', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'repeat',
-          child: 'super',
-          separator: 'man'
-        }
-      }]
-    };
+    it('accepts the child on its own', function (done) {
+      function callback(data) {
+        expect(data).to.have.length(3);
+        expect(data[1].data.suggestion.words[0].string).to.equal('super');
+        done();
+      }
 
-    function callback(data) {
-      expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.words[0].string).to.equal('super');
-      done();
-    }
+      parser.sentences = [test()];
+      u.toStream(['sup'])
+        .pipe(parser)
+        .pipe(u.toArray(callback));
+    });
 
-    parser.understand(grammar);
-    testUtil.toStream(['supermans'])
-      .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+    it('accepts the child twice', function (done) {
+      function callback(data) {
+        expect(data).to.have.length(3);
+        expect(data[1].data.suggestion.words[0].string).to.equal('super');
+        expect(data[1].data.match[0].string).to.equal('super');
+        done();
+      }
+
+      parser.sentences = [test()];
+      u.toStream(['supers'])
+        .pipe(parser)
+        .pipe(u.toArray(callback));
+    });
   });
 
   it('creates an array from the values of the children', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'repeat',
-          child: {
-            type: 'literal',
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.repeat({
+          id: 'testId',
+          separator: u.lacona.literal({display: 'man'}),
+          child: u.lacona.literal({
             display: 'super',
             value: 'testValue',
             id: 'subElementId'
-          },
-          separator: 'man',
-          id: 'testId'
-        }
-      }]
-    };
+          })
+        });
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(3);
@@ -105,53 +140,23 @@ describe('repeat', function() {
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['supermans'])
+    parser.sentences = [test()];
+    u.toStream(['supermans'])
     .pipe(parser)
-    .pipe(testUtil.toArray(callback));
+    .pipe(u.toArray(callback));
   });
-
-  it('can set a value to the result', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'sequence',
-          id: 'testId',
-          value: 'testValue',
-          children: [
-            'super',
-            'man'
-          ]
-        }
-      }]
-    };
-
-    function callback(data) {
-      expect(data).to.have.length(3);
-      expect(data[1].data.result.testId).to.equal('testValue');
-      done();
-    }
-
-    parser.understand(grammar);
-    testUtil.toStream(['superm'])
-    .pipe(parser)
-    .pipe(testUtil.toArray(callback));
-  });
-
 
   it('does not accept fewer than min iterations', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'repeat',
-          child: 'a',
-          separator: 'b',
-          min: 2
-        }
-      }]
-    };
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.repeat({
+          min: 2,
+          child: u.lacona.literal({display: 'a'}),
+          separator: u.lacona.literal({display: 'b'})
+        });
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(3);
@@ -161,25 +166,24 @@ describe('repeat', function() {
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['a'])
+    parser.sentences = [test()];
+    u.toStream(['a'])
       .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      .pipe(u.toArray(callback));
   });
 
 
   it('does not accept more than max iterations', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'repeat',
-          child: 'a',
-          separator: 'b',
-          max: 1
-        }
-      }]
-    };
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.repeat({
+          max: 1,
+          child: u.lacona.literal({display: 'a'}),
+          separator: u.lacona.literal({display: 'b'})
+        });
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(3);
@@ -188,72 +192,56 @@ describe('repeat', function() {
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['a'])
+    parser.sentences = [test()];
+    u.toStream(['a'])
       .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      .pipe(u.toArray(callback));
   });
 
+  describe('unique', function () {
+    var test;
 
-  it('rejects non-unique repeated elements', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'repeat',
-          child: {
-            type: 'choice',
-            children: [
-              'a',
-              'b'
-            ]
-          },
-          id: 'rep',
-          unique: true
+    beforeEach(function () {
+      test = u.lacona.createPhrase({
+        name: 'test/test',
+        describe: function () {
+          return u.lacona.repeat({
+            unique: true,
+            child: u.lacona.choice({
+              children: [
+                u.lacona.literal({display: 'a', value: 'a'}),
+                u.lacona.literal({display: 'b', value: 'b'})
+              ]
+            })
+          });
         }
-      }]
-    };
+      });
+    });
 
-    function callback(data) {
-      expect(data).to.have.length(2);
-      done();
-    }
+    it('rejects non-unique repeated elements', function (done) {
+      function callback(data) {
+        expect(data).to.have.length(2);
+        done();
+      }
 
-    parser.understand(grammar);
-    testUtil.toStream(['a a'])
-      .pipe(parser)
-      .pipe(testUtil.toArray(callback));
-  });
+      parser.sentences = [test()];
+      u.toStream(['aa'])
+        .pipe(parser)
+        .pipe(u.toArray(callback));
+    });
 
+    it('accepts unique repeated elements', function (done) {
+      function callback(data) {
+        expect(data).to.have.length(3);
+        expect(data[1].data.match[0].string).to.equal('a');
+        expect(data[1].data.match[1].string).to.equal('b');
+        done();
+      }
 
-  it('accepts unique repeated elements', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'repeat',
-          child: {
-            type: 'choice',
-            children: [
-              'a',
-              'b'
-            ]
-          },
-          unique: true
-        }
-      }]
-    };
-
-    function callback(data) {
-      expect(data).to.have.length(3);
-      expect(data[1].data.match[0].string).to.equal('a');
-      expect(data[1].data.match[2].string).to.equal('b');
-      done();
-    }
-
-    parser.understand(grammar);
-    testUtil.toStream(['a b'])
-      .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      parser.sentences = [test()];
+      u.toStream(['ab'])
+        .pipe(parser)
+        .pipe(u.toArray(callback));
+    });
   });
 });

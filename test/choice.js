@@ -1,27 +1,24 @@
 var chai = require('chai');
 var expect = chai.expect;
-var testUtil = require('./util.js');
+var u = require('./util');
 
 describe('choice', function() {
   var parser;
 
   beforeEach(function() {
-    parser = new testUtil.lacona.Parser({sentences: ['test']});
+    parser = new u.lacona.Parser();
   });
 
   it('suggests one valid choice', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'choice',
-          children: [
-            'right',
-            'wrong'
-          ]
-        }
-      }]
-    };
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.choice({children: [
+          u.lacona.literal({display: 'right'}),
+          u.lacona.literal({display: 'wrong'})
+        ]});
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(3);
@@ -30,25 +27,22 @@ describe('choice', function() {
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['r'])
+    parser.sentences = [test()];
+    u.toStream(['r'])
       .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      .pipe(u.toArray(callback));
   });
 
   it('suggests multiple valid choices', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'choice',
-          children: [
-            'right',
-            'right also'
-          ]
-        }
-      }]
-    };
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.choice({children: [
+          u.lacona.literal({display: 'right'}),
+          u.lacona.literal({display: 'right also'})
+        ]});
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(4);
@@ -59,55 +53,51 @@ describe('choice', function() {
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['r'])
+    parser.sentences = [test()];
+    u.toStream(['r'])
       .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      .pipe(u.toArray(callback));
   });
 
   it('suggests no valid choices', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'choice',
-          children: [
-            'wrong',
-            'wrong also'
-          ]
-        }
-      }]
-    };
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.choice({children: [
+          u.lacona.literal({display: 'wrong'}),
+          u.lacona.literal({display: 'wrong also'})
+        ]});
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(2);
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['r'])
+    parser.sentences = [test()];
+    u.toStream(['r'])
       .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      .pipe(u.toArray(callback));
   });
 
   it('adopts the value of the child', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'choice',
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.choice({
           id: 'testId',
-          children: [{
-            type: 'literal',
-            display: 'right',
-            value: 'testValue',
-            id: 'subId'
-          },
-            'wrong'
+          children: [
+            u.lacona.literal({
+              id: 'subId',
+              display: 'right',
+              value: 'testValue'
+            }),
+            u.lacona.literal({display: 'wrong'})
           ]
-        }
-      }]
-    };
+        });
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(3);
@@ -117,26 +107,25 @@ describe('choice', function() {
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['r'])
+    parser.sentences = [test()];
+    u.toStream(['r'])
       .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      .pipe(u.toArray(callback));
   });
 
   it('can be restricted by a limit of 1', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'choice',
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.choice({
+          limit: 1,
           children: [
-            'right',
-            'really wrong'
-          ],
-          limit: 1
-        }
-      }]
-    };
+            u.lacona.literal({display: 'right'}),
+            u.lacona.literal({display: 'right also'})
+          ]
+        });
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(3);
@@ -144,58 +133,56 @@ describe('choice', function() {
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['r'])
+    parser.sentences = [test()];
+    u.toStream(['r'])
     .pipe(parser)
-    .pipe(testUtil.toArray(callback));
+    .pipe(u.toArray(callback));
   });
 
   it('has a value when limited', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'choice',
-          children: [{
-              type: 'literal',
-              value: 'testValue',
-              display: 'right'
-            },
-            'really wrong'
-          ],
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.choice({
+          id: 'testId',
           limit: 1,
-          id: 'testId'
+          children: [
+            u.lacona.literal({
+              id: 'subId',
+              display: 'right',
+              value: 'testValue'
+            }),
+            u.lacona.literal({display: 'right also'})
+          ]});
         }
-      }]
-    };
+      });
 
     function callback(data) {
       expect(data).to.have.length(3);
       expect(data[1].data.result.testId).to.equal('testValue');
+      expect(data[1].data.result.subId).to.equal('testValue');
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['r'])
+    parser.sentences = [test()];
+    u.toStream(['r'])
       .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      .pipe(u.toArray(callback));
   });
 
   it('can be restricted by a limit of more than 1', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'choice',
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.choice({
+          limit: 2,
           children: [
-            'right',
-            'right too',
-            'really wrong'
-          ],
-          limit: 2
+            u.lacona.literal({display: 'right'}),
+            u.lacona.literal({display: 'right also'}),
+            u.lacona.literal({display: 'right but excluded'})
+          ]});
         }
-      }]
-    };
+      });
 
     function callback(data) {
       expect(data).to.have.length(4);
@@ -204,45 +191,41 @@ describe('choice', function() {
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['r'])
+    parser.sentences = [test()];
+    u.toStream(['r'])
       .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      .pipe(u.toArray(callback));
   });
 
   it('still works when a limited child has multiple options', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'choice',
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.choice({
+          limit: 2,
           children: [
-            {
-              type: 'choice',
-              children: [
-                'right',
-                'right too'
-              ]
-            },
-            'wrong',
-            'right as well'
-          ],
-          limit: 2
-        }
-      }]
-    };
+            u.lacona.choice({children: [
+              u.lacona.literal({display: 'right'}),
+              u.lacona.literal({display: 'right also'})
+            ]}),
+            u.lacona.literal({display: 'wrong'}),
+            u.lacona.literal({display: 'right third'})
+          ]
+        });
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(5);
-      expect(data[1].data.suggestion.words[0].string).to.contain('right');
-      expect(data[2].data.suggestion.words[0].string).to.contain('right');
-      expect(data[3].data.suggestion.words[0].string).to.contain('right');
+      expect(data[1].data.suggestion.words[0].string).to.equal('right');
+      expect(data[2].data.suggestion.words[0].string).to.equal('right also');
+      expect(data[3].data.suggestion.words[0].string).to.equal('right third');
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['r'])
+    parser.sentences = [test()];
+    u.toStream(['r'])
       .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      .pipe(u.toArray(callback));
   });
 });

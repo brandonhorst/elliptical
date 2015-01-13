@@ -1,81 +1,73 @@
 var chai = require('chai');
 var expect = chai.expect;
-var testUtil = require('./util');
+var u = require('./util');
 
-describe('Parser with fuzzy matching', function () {
+describe('fuzzy matching', function () {
   var parser;
-  beforeEach(function() {
-    parser = new testUtil.lacona.Parser({fuzzy: true, sentences: ['test']});
+  beforeEach(function () {
+    parser = new u.lacona.Parser({fuzzy: true});
   });
 
-  it('supports fuzzy matching', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: 'a simple test'
-      }]
-    };
+  describe('basic usage', function () {
+    var test;
 
-    function callback(data) {
-      expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.charactersComplete).to.equal(10);
-      expect(data[1].data.suggestion.words[0].string).to.equal('a simple test');
-      done();
-    }
+    beforeEach(function () {
+      test = u.lacona.createPhrase({
+        name: 'test/test',
+        describe: function () {
+          return u.lacona.literal({display: 'a simple test'});
+        }
+      });
+    });
 
-    parser.understand(grammar);
-    testUtil.toStream(['asmlt'])
-    .pipe(parser)
-    .pipe(testUtil.toArray(callback));
-  });
+    it('supports fuzzy matching', function (done) {
+      function callback(data) {
+        expect(data).to.have.length(3);
+        expect(data[1].data.suggestion.charactersComplete).to.equal(10);
+        expect(data[1].data.suggestion.words[0].string).to.equal('a simple test');
+        done();
+      }
 
-  it('rejects misses properly with fuzzy matching', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: 'a simple test'
-      }]
-    };
+      parser.sentences = [test()];
+      u.toStream(['asmlt'])
+      .pipe(parser)
+      .pipe(u.toArray(callback));
+    });
 
-    function callback(data) {
-      expect(data).to.have.length(2);
-      done();
-    }
+    it('rejects misses properly with fuzzy matching', function (done) {
+      function callback(data) {
+        expect(data).to.have.length(2);
+        done();
+      }
 
-    parser.understand(grammar);
-    testUtil.toStream(['fff'])
-    .pipe(parser)
-    .pipe(testUtil.toArray(callback));
-  });
+      parser.sentences = [test()];
+      u.toStream(['fff'])
+      .pipe(parser)
+      .pipe(u.toArray(callback));
+    });
 
-  it('suggests properly when fuzzy matching is enabled', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: 'a simple test'
-      }]
-    };
+    it('suggests properly when fuzzy matching is enabled', function (done) {
+      function callback(data) {
+        expect(data).to.have.length(3);
+        expect(data[1].data.suggestion.charactersComplete).to.equal(0);
+        expect(data[1].data.suggestion.words[0].string).to.equal('a simple test');
+        done();
+      }
 
-    function callback(data) {
-      expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.charactersComplete).to.equal(0);
-      expect(data[1].data.suggestion.words[0].string).to.equal('a simple test');
-      done();
-    }
-
-    parser.understand(grammar);
-    testUtil.toStream([''])
-    .pipe(parser)
-    .pipe(testUtil.toArray(callback));
+      parser.sentences = [test()];
+      u.toStream([''])
+      .pipe(parser)
+      .pipe(u.toArray(callback));
+    });
   });
 
   it('can do fuzzy matching with regex special characters', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: '[whatever]'
-      }]
-    };
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.literal({display: '[whatever]'});
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(3);
@@ -84,19 +76,22 @@ describe('Parser with fuzzy matching', function () {
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['[]'])
+    parser.sentences = [test()];
+    u.toStream(['[]'])
     .pipe(parser)
-    .pipe(testUtil.toArray(callback));
+    .pipe(u.toArray(callback));
   });
 
   it('supports sequence when fuzzy is enabled', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: ['abc', 'def']
-      }]
-    };
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.sequence({children: [
+          u.lacona.literal({display: 'abc'}),
+          u.lacona.literal({display: 'def'})
+        ]});
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(3);
@@ -106,19 +101,24 @@ describe('Parser with fuzzy matching', function () {
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['ad'])
+    parser.sentences = [test()];
+    u.toStream(['ad'])
     .pipe(parser)
-    .pipe(testUtil.toArray(callback));
+    .pipe(u.toArray(callback));
   });
 
-  it('sequence can skip entire values', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: ['abc', 'def', 'ghi', 'jkl']
-      }]
-    };
+  it('sequence can skip entire elements', function (done) {
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.sequence({children: [
+          u.lacona.literal({display: 'abc'}),
+          u.lacona.literal({display: 'def'}),
+          u.lacona.literal({display: 'ghi'}),
+          u.lacona.literal({display: 'jkl'})
+        ]});
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(3);
@@ -132,9 +132,9 @@ describe('Parser with fuzzy matching', function () {
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['agjkl'])
+    parser.sentences = [test()];
+    u.toStream(['agjkl'])
     .pipe(parser)
-    .pipe(testUtil.toArray(callback));
+    .pipe(u.toArray(callback));
   });
 });

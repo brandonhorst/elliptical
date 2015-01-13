@@ -1,29 +1,30 @@
 var chai = require('chai');
 var expect = chai.expect;
 var sinon = require('sinon');
-var testUtil = require('./util');
+var u = require('./util');
 
 chai.use(require('sinon-chai'));
 
 describe('value', function () {
   var parser;
   beforeEach(function() {
-    parser = new testUtil.lacona.Parser({sentences: ['test']});
+    parser = new u.lacona.Parser();
   });
 
   it('suggests a value', function (done) {
-    var grammar = {
-      scope: {
-        fun: function (input, data, done) {
-          data({display: 'disp', value: 'val'});
-          done();
-        }
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      fun: function (input, data, done) {
+        data({display: 'disp', value: 'val'});
+        done();
       },
-      phrases: [{
-        name: 'test',
-        root: {type: 'value', compute: 'fun', id: 'test'}
-      }]
-    };
+      describe: function () {
+        return u.lacona.value({
+          compute: this.fun,
+          id: 'test'
+        });
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(3);
@@ -32,212 +33,70 @@ describe('value', function () {
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['di'])
+    parser.sentences = [test()];
+    u.toStream(['di'])
       .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      .pipe(u.toArray(callback));
   });
 
-  it('can access variables in parent in its function', function (done) {
-    function fun(input, data, done) {
-      expect(this.myVar).to.equal('myVal');
-      data({display: 'disp', value: 'val'});
-      done();
-    }
-
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {type: 'depPhrase', myVar: 'myVal'}
-      }],
-      dependencies: [{
-        scope: {depFun: fun},
-        phrases: [{
-          name: 'depPhrase',
-          root: {type: 'value', compute: 'depFun'}
-        }]
-      }]
-    };
-
-    function callback(data) {
-      expect(data).to.have.length(3);
-      done();
-    }
-
-    parser.understand(grammar);
-    testUtil.toStream(['di'])
-      .pipe(parser)
-      .pipe(testUtil.toArray(callback));
-  });
-
-  it('can $call functions defined', function (done) {
-
-    var fun = sinon.spy(function (done) {
-      done();
-    });
-
-    var depFun = sinon.spy(function depFun(input, data, done) {
-      this.$call('fun', function (err) {
-        expect(err).to.not.exist;
-      });
-      done();
-    });
-
-    var grammar = {
-      scope: {fun: fun},
-      phrases: [{
-        name: 'test',
-        root: {type: 'depPhrase'}
-      }],
-      dependencies: [{
-        scope: {depFun: depFun},
-        phrases: [{
-          name: 'depPhrase',
-          root: {type: 'value', compute: 'depFun'}
-        }]
-      }]
-    };
-
-    function callback(data) {
-      expect(data).to.have.length(2);
-      expect(fun).to.have.been.calledOnce;
-      expect(depFun).to.have.been.calledOnce;
-      done();
-    }
-
-    parser.understand(grammar);
-    testUtil.toStream(['di'])
-      .pipe(parser)
-      .pipe(testUtil.toArray(callback));
-  });
-
-  it('can $call functions defined with variables', function (done) {
-    var fun = sinon.spy(function fun(done) {
-      expect(this.myVar).to.equal('myVal');
-      done();
-    });
-
-    var depFun = sinon.spy(function depFun(input, data, done) {
-      this.$call('fun', function (err) {
-        expect(err).to.not.exist;
-      });
-      done();
-    });
-
-    var grammar = {
-      scope: {fun: fun},
-      phrases: [{
-        name: 'test',
-        root: {type: 'depPhrase', myVar: 'myVal'}
-      }],
-      dependencies: [{
-        scope: {depFun: depFun},
-        phrases: [{
-          name: 'depPhrase',
-          root: {type: 'value', compute: 'depFun'}
-        }]
-      }]
-    };
-
-    function callback(data) {
-      expect(data).to.have.length(2);
-      expect(fun).to.have.been.calledOnce;
-      expect(depFun).to.have.been.calledOnce;
-      done();
-    }
-
-    parser.understand(grammar);
-    testUtil.toStream(['di'])
-      .pipe(parser)
-      .pipe(testUtil.toArray(callback));
-  });
-
-  it('can $call functions defined (2 levels deep)', function (done) {
-    var fun = sinon.spy(function fun(done) {
-      expect(this.myVar).to.equal('val');
-      done();
-    });
-
-    var depFun = sinon.spy(function depFun(done) {
-      expect(this.myVar).to.equal('val');
-      this.$call('fun', function (err) {
-        expect(err).to.not.exist;
+  it('can access props its function', function (done) {
+    var spy = sinon.spy();
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      fun: function (input, data, done) {
+        expect(this.props.myVar).to.equal('myVal');
+        spy();
         done();
-      });
+      },
+      describe: function () {
+        return u.lacona.value({compute: this.fun});
+      }
     });
 
-    var depDepFun = sinon.spy(function depDepFun(input, data, done) {
-      expect(this.myVar).to.equal('depVal');
-      this.$call('depFun', function (err) {
-        expect(err).to.not.exist;
-        done();
-      });
-    });
-    var grammar = {
-      scope: {fun: fun},
-      phrases: [{
-        name: 'test',
-        root: {type: 'depPhrase', myVar: 'val'}
-      }],
-      dependencies: [{
-        scope: {
-          depFun: depFun
-        },
-        phrases: [{
-          name: 'depPhrase',
-          root: {type: 'depDepPhrase', myVar: 'depVal'}
-        }],
-        dependencies: [{
-          scope: {
-            depDepFun: depDepFun
-          },
-          phrases: [{
-            name: 'depDepPhrase',
-            root: {type: 'value', compute: 'depDepFun'}
-          }],
-        }]
-      }]
-    };
+    function callback() {
+      expect(spy).to.have.been.calledOnce;
 
-    function callback(data) {
-      expect(data).to.have.length(2);
-      expect(fun).to.have.been.calledOnce;
-      expect(depFun).to.have.been.calledOnce;
-      expect(depDepFun).to.have.been.calledOnce;
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['di'])
+    parser.sentences = [test({myVar: 'myVal'})];
+    u.toStream(['di'])
       .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      .pipe(u.toArray(callback));
   });
 
-  it('has no variables when called in a sentence', function (done) {
-    var fun = sinon.spy(function fun(input, data, done) {
-      expect(this.myVar).to.not.exist;
-      done();
+  it('can call functions in props', function (done) {
+    var spy = sinon.spy();
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      someFun: function () {
+        spy();
+      },
+      describe: function () {
+        return dep({propFunction: this.someFun});
+      }
     });
 
-    var grammar = {
-      scope: {fun: fun},
-      phrases: [{
-        name: 'test',
-        myVar: 'myVal', //this is never used
-        root: {type: 'value', compute: 'fun'}
-      }]
-    };
+    var dep = u.lacona.createPhrase({
+      name: 'test/dep',
+      fun: function (input, data, done) {
+        this.props.propFunction();
+        done();
+      },
+      describe: function () {
+        return u.lacona.value({compute: this.fun});
+      }
+    });
 
-    function callback(data) {
-      expect(data).to.have.length(2);
-      expect(fun).to.have.been.calledOnce;
+    function callback() {
+      expect(spy).to.have.been.calledOnce;
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['di'])
+    parser.sentences = [test()];
+    u.toStream(['di'])
       .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      .pipe(u.toArray(callback));
   });
 
 });

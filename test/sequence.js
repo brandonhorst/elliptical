@@ -1,27 +1,24 @@
 var chai = require('chai');
 var expect = chai.expect;
-var testUtil = require('./util');
+var u = require('./util');
 
 describe('sequence', function() {
   var parser;
 
   beforeEach(function() {
-    parser = new testUtil.lacona.Parser({sentences: ['test']});
+    parser = new u.lacona.Parser();
   });
 
   it('puts two elements in order', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'sequence',
-          children: [
-            'super',
-            'man'
-          ]
-        }
-      }]
-    };
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.sequence({children: [
+          u.lacona.literal({display: 'super'}),
+          u.lacona.literal({display: 'man'})
+        ]});
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(3);
@@ -30,59 +27,25 @@ describe('sequence', function() {
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['superm'])
+    parser.sentences = [test()];
+    u.toStream(['superm'])
       .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      .pipe(u.toArray(callback));
   });
 
-  // it('space is punctuation - tacked onto suggestion', function (done) {
-  //   var grammar = {
-  //     phrases: [{
-  //       name: 'test',
-  //       root: {
-  //         type: 'sequence',
-  //         children: [
-  //         'super',
-  //         'man'
-  //         ]
-  //       }
-  //     }]
-  //   };
-  //
-  //   var onData = sinon.spy(function(data) {
-  //     expect(data.suggestion.words).to.have.length(4);
-  //     expect(data.suggestion.words[0].string).to.equal('super');
-  //     expect(data.suggestion.words[1].string).to.equal(' ');
-  //     expect(data.result).to.be.empty;
-  //   });
-  //
-  //   var onEnd = function() {
-  //     expect(onData).to.have.been.calledOnce;
-  //     done();
-  //   };
-  //
-  //   parser
-  //   .understand(grammar)
-  //   .on('data', onData)
-  //   .on('end', onEnd)
-  //   .parse('sup');
-  // });
-
-  it('handles an empty separator', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'sequence',
+  it('handles a separator', function (done) {
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.sequence({
           children: [
-          'super',
-          'man'
+            u.lacona.literal({display: 'super'}),
+            u.lacona.literal({display: 'man'})
           ],
-          separator: ''
-        }
-      }]
-    };
+          separator: u.lacona.literal({display: ' '})
+        });
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(3);
@@ -91,149 +54,72 @@ describe('sequence', function() {
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['superm'])
+    parser.sentences = [test()];
+    u.toStream(['super m'])
     .pipe(parser)
-    .pipe(testUtil.toArray(callback));
+    .pipe(u.toArray(callback));
   });
 
-  it('handles a null separator', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'sequence',
+  it('handles an optional child with a separator', function (done) {
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.sequence({
+          separator: u.lacona.literal({display: ' '}),
           children: [
-          'super',
-          'man'
-          ],
-          separator: null
-        }
-      }]
-    };
-
-    function callback(data) {
-      expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.words[0].string).to.equal('man');
-      expect(data[1].data.result).to.be.empty;
-      done();
-    }
-
-    parser.understand(grammar);
-    testUtil.toStream(['superm'])
-      .pipe(parser)
-      .pipe(testUtil.toArray(callback));
-  });
-
-
-  it('rejects input with a separator at the end', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'sequence',
-          children: [
-            'super',
-            'man'
-          ]
-        }
-      }]
-    };
-
-    function callback(data) {
-      expect(data).to.have.length(2);
-      done();
-    }
-
-    parser.understand(grammar);
-    testUtil.toStream(['super man '])
-      .pipe(parser)
-      .pipe(testUtil.toArray(callback));
-  });
-
-  it('custom separator', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'sequence',
-          children: [
-            'super',
-            'man'
-          ],
-          separator: ' test '
-        }
-      }]
-    };
-
-    function callback(data) {
-      expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.words[0].string).to.equal('man');
-      done();
-    }
-
-    parser.understand(grammar);
-    testUtil.toStream(['super test m'])
-      .pipe(parser)
-      .pipe(testUtil.toArray(callback));
-  });
-
-  it('optional child', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'sequence',
-          separator: ' ',
-          children: [
-            'super', {
-              type: 'literal',
-              optional: 'true',
+            u.lacona.literal({display: 'super'}),
+            u.lacona.literal({
               display: 'maximum',
               value: 'optionalValue',
               id: 'optionalId',
-            },
-            'man'
+              optional: true
+            }),
+            u.lacona.literal({display: 'man'})
           ]
-        }
-      }]
-    };
+        });
+      }
+    });
 
     function callback(data) {
+      var dataWithOptional, dataWithoutOptional;
+
       expect(data).to.have.length(4);
       expect(['maximum', 'man']).to.contain(data[1].data.suggestion.words[0].string);
       expect(['maximum', 'man']).to.contain(data[2].data.suggestion.words[0].string);
+
       if (data[1].data.suggestion.words[0].string === 'maximum') {
-        expect(data[1].data.result.optionalId).to.equal('optionalValue');
-        expect(data[2].data.result).to.be.empty;
+        dataWithOptional = data[1];
+        dataWithoutOptional = data[2];
       } else {
-        expect(data[2].data.result.optionalId).to.equal('optionalValue');
-        expect(data[1].data.result).to.be.empty;
+        dataWithoutOptional = data[1];
+        dataWithOptional = data[2];
       }
+
+      expect(dataWithOptional.data.result.optionalId).to.equal('optionalValue');
+      expect(dataWithoutOptional.data.result).to.be.empty;
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['super m'])
+    parser.sentences = [test()];
+    u.toStream(['super m'])
       .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      .pipe(u.toArray(callback));
   });
 
   it('can set a value to the result', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {
-          type: 'sequence',
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.sequence({
           id: 'testId',
           value: 'testValue',
           children: [
-            'super',
-            'man'
+            u.lacona.literal({display: 'super'}),
+            u.lacona.literal({display: 'man'})
           ]
-        }
-      }]
-    };
+        });
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(3);
@@ -241,9 +127,9 @@ describe('sequence', function() {
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['superm'])
+    parser.sentences = [test()];
+    u.toStream(['superm'])
       .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      .pipe(u.toArray(callback));
   });
 });

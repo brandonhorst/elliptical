@@ -1,26 +1,27 @@
 var chai = require('chai');
 var expect = chai.expect;
-var testUtil = require('./util');
+var u = require('./util');
 
 describe('dependencies', function () {
   var parser;
   beforeEach(function() {
-    parser = new testUtil.lacona.Parser({sentences: ['test']});
+    parser = new u.lacona.Parser();
   });
 
   it('handles basic dependencies', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {type: 'dep'}
-      }],
-      dependencies: [{
-        phrases: [{
-          name: 'dep',
-          root: 'something'
-        }]
-      }]
-    };
+    var dep = u.lacona.createPhrase({
+      name: 'test/dep',
+      describe: function () {
+        return u.lacona.literal({display: 'something'});
+      }
+    });
+
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return dep();
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(3);
@@ -28,10 +29,10 @@ describe('dependencies', function () {
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['s'])
+    parser.sentences = [test()];
+    u.toStream(['s'])
       .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      .pipe(u.toArray(callback));
   });
 
 });

@@ -10,7 +10,6 @@ var parser = new lacona.Parser(options);
 
 `options` can contain the following properties, which can be set after construction as well:
 
-- `sentences: [String]` - an array of names of phrases that should be treated as complete parsable entities. For example, if you want to use Lacona to accept a date, but the grammar that you `understand` also includes `day-of-the-week`, you should specify `sentences` to be `['date']`.
 - `langs: [String]` - an array of acceptable input languages, in the order that the parser should prefer. Each language should be specified in IETF format (e.g. `es` for Spanish, `en-US` for English spoken in the US). For example, if I speak Castilian Spanish as my first language, but also learned English in the UK, my `langs` should probably be `['es-ES', 'es', 'en-GB', 'en']`. If a phrase does not support any of those languages, `default` will always be used.
 - `fuzzy: Boolean` - if true, Lacona will use fuzzy parsing similar to Sublime Text. That is, input can skip letters and Lacona will do its best to understand.
 

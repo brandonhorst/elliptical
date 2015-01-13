@@ -1,215 +1,191 @@
 var chai = require('chai');
 var expect = chai.expect;
-var testUtil = require('./util');
+var u = require('./util');
 
 describe('Phrase', function () {
   var parser;
   beforeEach(function() {
-    parser = new testUtil.lacona.Parser({sentences: ['test']});
+    parser = new u.lacona.Parser();
   });
 
   it('handles phrases with extension', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'extended',
-        root: 'test'
-      }, {
-        name: 'extender',
-        inherits: ['extended'],
-        root: 'totally'
-      }, {
-        name: 'test',
-        root: {type: 'extended'}
-      }]
-    };
+    var extended = u.lacona.createPhrase({
+      name: 'test/extended',
+      describe: function () {
+        return u.lacona.literal({display: 'test a'});
+      }
+    });
+
+    var extender = u.lacona.createPhrase({
+      name: 'test/extender',
+      extends: ['test/extended'],
+      describe: function () {
+        return u.lacona.literal({display: 'test b'});
+      }
+    });
+
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return extended();
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(4);
-      expect(['test', 'totally']).to.contain(data[1].data.suggestion.words[0].string);
-      expect(['test', 'totally']).to.contain(data[2].data.suggestion.words[0].string);
+      expect(['test a', 'test b']).to.contain(data[1].data.suggestion.words[0].string);
+      expect(['test a', 'test b']).to.contain(data[2].data.suggestion.words[0].string);
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['t'])
-      .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+    parser.sentences = [test()];
+    parser.extensions = [extender];
+
+    u.toStream(['t'])
+    .pipe(parser)
+    .pipe(u.toArray(callback));
   });
 
-  it('handles phrases with extension and a specified version', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'extended',
-        version: '1.2.3',
-        root: 'test'
-      }, {
-        name: 'extender',
-        inherits: {extended: '^1.0.0'},
-        root: 'totally'
-      }, {
-        name: 'test',
-        root: {type: 'extended'}
-      }]
-    };
+  it('handles phrases with overriding', function (done) {
+    var overridden = u.lacona.createPhrase({
+      name: 'test/overridden',
+      describe: function () {
+        return u.lacona.literal({display: 'test a'});
+      }
+    });
 
-    function callback(data) {
-      expect(data).to.have.length(4);
-      expect(['test', 'totally']).to.contain(data[1].data.suggestion.words[0].string);
-      expect(['test', 'totally']).to.contain(data[2].data.suggestion.words[0].string);
-      done();
-    }
+    var overrider = u.lacona.createPhrase({
+      name: 'test/overrider',
+      overrides: ['test/overridden'],
+      describe: function () {
+        return u.lacona.literal({display: 'test b'});
+      }
+    });
 
-    parser.understand(grammar);
-    testUtil.toStream(['t'])
-      .pipe(parser)
-      .pipe(testUtil.toArray(callback));
-  });
-
-  it('rejects phrases with an incorrect version specified version', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'extended',
-        version: '2.3.4',
-        root: 'test'
-      }, {
-        name: 'extender',
-        inherits: {extended: '^1.0.0'},
-        root: 'totally'
-      }, {
-        name: 'test',
-        root: {type: 'extended'}
-      }]
-    };
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return overridden();
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.words[0].string).to.equal('test');
+      expect(data[1].data.suggestion.words[0].string).to.equal('test b');
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['t'])
-      .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+    parser.sentences = [test()];
+    parser.extensions = [overrider];
+
+    u.toStream(['t'])
+    .pipe(parser)
+    .pipe(u.toArray(callback));
   });
 
-  it('allows for recursive phrases (no infinite loop)', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: [
-          'the ', {
-            type: 'choice',
-            children: [
-              'test',
-              {type: 'test'}
-            ]
-          }
-        ]
-      }]
-    };
+  it('allows for recursive phrases without creating an infinite loop', function (done) {
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.sequence({children: [
+          u.lacona.literal({display: 'na '}),
+          u.lacona.choice({children: [
+            u.lacona.literal({display: 'nopeman'}),
+            test()
+          ]})
+        ]});
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(4);
-      expect(['the ', 'test']).to.contain(data[1].data.suggestion.words[0].string);
-      expect(['the ', 'test']).to.contain(data[2].data.suggestion.words[0].string);
+      expect(['na ', 'nopeman']).to.contain(data[1].data.suggestion.words[0].string);
+      expect(['na ', 'nopeman']).to.contain(data[2].data.suggestion.words[0].string);
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['the t'])
+    parser.sentences = [test()];
+    u.toStream(['na n'])
       .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      .pipe(u.toArray(callback));
   });
-
-
 
   it('allows for nested phrases with the same id', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: { type: 'include1', id: 'test' }
-      }, {
-        name: 'include1',
-        root: { type: 'include2', id: '@value' }
-      }, {
-        name: 'include2',
-        root: { type: 'literal', value: 'test', display: 'test', id: '@value' }
-      }]
-    };
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return include1({id: 'test'});
+      }
+    });
+    var include1 = u.lacona.createPhrase({
+      name: 'test/include1',
+      describe: function () {
+        return include2({id: 'test'});
+      }
+    });
+    var include2 = u.lacona.createPhrase({
+      name: 'test/include2',
+      describe: function () {
+        return u.lacona.literal({value: 'val', display: 'disp', id: 'test'});
+      }
+    });
 
     function callback(data) {
       expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.words[0].string).to.equal('test');
-      expect(data[1].data.result.test).to.equal('test');
+      expect(data[1].data.suggestion.words[0].string).to.equal('disp');
+      expect(data[1].data.result.test.test.test).to.equal('val');
       done();
     }
 
-    parser.understand(grammar);
-    testUtil.toStream(['tes'])
+    parser.sentences = [test()];
+    u.toStream(['d'])
       .pipe(parser)
-      .pipe(testUtil.toArray(callback));
-  });
-
-  it('simply ignores phrases that do not exist', function (done) {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        root: {type: 'nonexistant'}
-      }]
-    };
-
-    function callback(data) {
-      expect(data).to.have.length(2);
-      done();
-    }
-
-    parser.understand(grammar);
-    testUtil.toStream(['t'])
-      .pipe(parser)
-      .pipe(testUtil.toArray(callback));
+      .pipe(u.toArray(callback));
   });
 
   it('throws for phrases without a default-lang schema', function () {
-    var grammar = {
-      phrases: [{
-        name: 'test',
+    expect(function() {
+      u.lacona.createPhrase({
+        name: 'test/test',
         schemas: [{
           langs: ['en-US'],
-          root: 'whatever'
+          describe: function () {
+            return u.lacona.literal({display: 'whatever'});
+          }
         }]
-      }]
-    };
-
-    expect(function() {
-      parser.understand(grammar);
-    }).to.throw(testUtil.lacona.Error);
+      });
+    }).to.throw(u.lacona.Error);
   });
 
   it('throws for phrases without a lang', function () {
-    var grammar = {
-      phrases: [{
-        name: 'test',
-        schemas: [{
-          root: 'whatever'
-        }]
-      }]
-    };
-
     expect(function() {
-      parser.understand(grammar);
-    }).to.throw(testUtil.lacona.Error);
+      u.lacona.createPhrase({
+        name: 'test/test',
+        schemas: [{
+          describe: function () {
+            return u.lacona.literal({display: 'whatever'});
+          }
+        }]
+      });
+    }).to.throw(u.lacona.Error);
   });
 
   it('throws for phrases without a root', function () {
-    var grammar = {
-      phrases: [{
-        name: 'test'
-      }]
-    };
-
     expect(function() {
-      parser.understand(grammar);
-    }).to.throw(testUtil.lacona.Error);
+      u.lacona.createPhrase({
+        name: 'test/test'
+      });
+    }).to.throw(u.lacona.Error);
   });
+
+  it('throws for phrases without a name', function () {
+    expect(function() {
+      u.lacona.createPhrase({
+        describe: function() {
+          return u.lacona.literal({display: 'test'});
+        }
+      });
+    }).to.throw(u.lacona.Error);
+  });
+
 });
