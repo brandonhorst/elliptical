@@ -143,6 +143,35 @@ describe('Phrase', function () {
       .pipe(u.toArray(callback));
   });
 
+  it('tracks history', function (done) {
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return include({id: '1'});
+      }
+    });
+    var include = u.lacona.createPhrase({
+      name: 'test/include',
+      describe: function () {
+        return u.lacona.sequence({id: '2', children: [
+          u.lacona.literal({text: 'a', id: '3'}),
+          u.lacona.literal({text: 'b', id: '4'}),
+        ]});
+      }
+    });
+
+    function callback(data) {
+      expect(data).to.have.length(3);
+      expect(data[1].data.history).to.include.members(['0', '1', '2', '3', '4']);
+      done();
+    }
+
+    parser.sentences = [test({id: '0'})];
+    u.toStream(['ab'])
+      .pipe(parser)
+      .pipe(u.toArray(callback));
+  });
+
   it('throws for phrases without a default-lang schema', function () {
     expect(function() {
       u.lacona.createPhrase({
