@@ -22,7 +22,7 @@ describe('choice', function() {
 
     function callback(data) {
       expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.words[0].string).to.equal('right');
+      expect(u.ft.suggestion(data[1].data)).to.equal('right');
       expect(data[1].data.result).to.be.empty;
       done();
     }
@@ -46,9 +46,9 @@ describe('choice', function() {
 
     function callback(data) {
       expect(data).to.have.length(4);
-      expect(data[1].data.suggestion.words[0].string).to.contain('right');
+      expect(u.ft.suggestion(data[1].data)).to.contain('right');
       expect(data[1].data.result).to.be.empty;
-      expect(data[2].data.suggestion.words[0].string).to.contain('right');
+      expect(u.ft.suggestion(data[2].data)).to.contain('right');
       expect(data[2].data.result).to.be.empty;
       done();
     }
@@ -101,7 +101,7 @@ describe('choice', function() {
 
     function callback(data) {
       expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.words[0].string).to.equal('right');
+      expect(u.ft.suggestion(data[1].data)).to.equal('right');
       expect(data[1].data.result.testId).to.equal('testValue');
       expect(data[1].data.result.subId).to.equal('testValue');
       done();
@@ -129,7 +129,7 @@ describe('choice', function() {
 
     function callback(data) {
       expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.words[0].string).to.equal('right');
+      expect(u.ft.suggestion(data[1].data)).to.equal('right');
       done();
     }
 
@@ -186,8 +186,8 @@ describe('choice', function() {
 
     function callback(data) {
       expect(data).to.have.length(4);
-      expect(data[1].data.suggestion.words[0].string).to.contain('right');
-      expect(data[2].data.suggestion.words[0].string).to.contain('right');
+      expect(u.ft.suggestion(data[1].data)).to.contain('right');
+      expect(u.ft.suggestion(data[2].data)).to.contain('right');
       done();
     }
 
@@ -217,9 +217,9 @@ describe('choice', function() {
 
     function callback(data) {
       expect(data).to.have.length(5);
-      expect(data[1].data.suggestion.words[0].string).to.equal('right');
-      expect(data[2].data.suggestion.words[0].string).to.equal('right also');
-      expect(data[3].data.suggestion.words[0].string).to.equal('right third');
+      expect(u.ft.suggestion(data[1].data)).to.equal('right');
+      expect(u.ft.suggestion(data[2].data)).to.equal('right also');
+      expect(u.ft.suggestion(data[3].data)).to.equal('right third');
       done();
     }
 
@@ -246,8 +246,8 @@ describe('choice', function() {
 
     function callback(data) {
       expect(data).to.have.length(4);
-      expect(data[1].data.suggestion.words[0].category).to.equal('myCat');
-      expect(data[2].data.suggestion.words[0].category).to.equal('myCat');
+      expect(data[1].data.suggestion[0].category).to.equal('myCat');
+      expect(data[2].data.suggestion[0].category).to.equal('myCat');
       done();
     }
 

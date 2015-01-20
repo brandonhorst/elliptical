@@ -39,7 +39,7 @@ describe('repeat', function() {
     it('accepts the child on its own', function (done) {
       function callback(data) {
         expect(data).to.have.length(3);
-        expect(data[1].data.suggestion.words[0].string).to.equal('man');
+        expect(u.ft.suggestion(data[1].data)).to.equal('man');
         done();
       }
 
@@ -52,7 +52,7 @@ describe('repeat', function() {
     it('accepts the child twice, with the separator in the middle', function (done) {
       function callback(data) {
         expect(data).to.have.length(3);
-        expect(data[1].data.suggestion.words[0].string).to.equal('super');
+        expect(u.ft.suggestion(data[1].data)).to.equal('super');
         done();
       }
 
@@ -92,7 +92,7 @@ describe('repeat', function() {
     it('accepts the child on its own', function (done) {
       function callback(data) {
         expect(data).to.have.length(3);
-        expect(data[1].data.suggestion.words[0].string).to.equal('super');
+        expect(u.ft.suggestion(data[1].data)).to.equal('super');
         done();
       }
 
@@ -105,8 +105,8 @@ describe('repeat', function() {
     it('accepts the child twice', function (done) {
       function callback(data) {
         expect(data).to.have.length(3);
-        expect(data[1].data.suggestion.words[0].string).to.equal('super');
-        expect(data[1].data.match[0].string).to.equal('super');
+        expect(u.ft.suggestion(data[1].data)).to.equal('super');
+        expect(u.ft.match(data[1].data)).to.equal('super');
         done();
       }
 
@@ -160,9 +160,9 @@ describe('repeat', function() {
 
     function callback(data) {
       expect(data).to.have.length(3);
-      expect(data[1].data.match[0].string).to.equal('a');
-      expect(data[1].data.suggestion.words[0].string).to.equal('b');
-      expect(data[1].data.completion[0].string).to.equal('a');
+      expect(u.ft.match(data[1].data)).to.equal('a');
+      expect(u.ft.suggestion(data[1].data)).to.equal('b');
+      expect(u.ft.completion(data[1].data)).to.equal('a');
       done();
     }
 
@@ -187,8 +187,8 @@ describe('repeat', function() {
 
     function callback(data) {
       expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.words).to.be.empty;
-      expect(data[1].data.match[0].string).to.equal('a');
+      expect(u.ft.suggestion(data[1].data)).to.equal('');
+      expect(u.ft.match(data[1].data)).to.equal('a');
       done();
     }
 
@@ -257,8 +257,7 @@ describe('repeat', function() {
     it('accepts unique repeated elements', function (done) {
       function callback(data) {
         expect(data).to.have.length(3);
-        expect(data[1].data.match[0].string).to.equal('a');
-        expect(data[1].data.match[1].string).to.equal('b');
+        expect(u.ft.match(data[1].data)).to.equal('ab');
         done();
       }
 

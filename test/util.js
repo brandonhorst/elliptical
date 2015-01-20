@@ -1,5 +1,7 @@
 var stream = require('stream');
 
+var fulltext = require('lacona-util-fulltext');
+
 var lacona;
 
 if (typeof window !== 'undefined' && window.lacona) {
@@ -36,5 +38,6 @@ function toStream(strings) {
 module.exports = {
   lacona: lacona,
   toArray: toArray,
-  toStream: toStream
+  toStream: toStream,
+  ft: fulltext
 };

@@ -9,7 +9,7 @@ describe('literal', function() {
     parser = new u.lacona.Parser();
   });
 
-  it('handles an implicit literal (string in schema)', function (done) {
+  it('handles a literal', function (done) {
     var test = u.lacona.createPhrase({
       name: 'test/test',
       describe: function () {
@@ -19,9 +19,11 @@ describe('literal', function() {
 
     function callback(data) {
       expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.words).to.have.length(1);
-      expect(data[1].data.suggestion.charactersComplete).to.equal(1);
-      expect(data[1].data.suggestion.words[0].string).to.equal('literal test');
+      expect(data[1].data.suggestion).to.have.length(2);
+      expect(data[1].data.suggestion[0].string).to.equal('l');
+      expect(data[1].data.suggestion[0].input).to.be.true;
+      expect(data[1].data.suggestion[1].string).to.equal('iteral test');
+      expect(data[1].data.suggestion[1].input).to.be.false;
       expect(data[1].data.result).to.be.empty;
       done();
     }
@@ -46,9 +48,7 @@ describe('literal', function() {
 
     function callback(data) {
       expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.words).to.have.length(1);
-      expect(data[1].data.suggestion.charactersComplete).to.equal(1);
-      expect(data[1].data.suggestion.words[0].string).to.equal('literal test');
+      expect(u.ft.suggestion(data[1].data)).to.equal('literal test');
       expect(data[1].data.result).to.deep.equal({testId: 'test'});
       done();
     }

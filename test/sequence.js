@@ -22,7 +22,7 @@ describe('sequence', function() {
 
     function callback(data) {
       expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.words[0].string).to.equal('man');
+      expect(u.ft.suggestion(data[1].data)).to.equal('man');
       expect(data[1].data.result).to.be.empty;
       done();
     }
@@ -49,7 +49,7 @@ describe('sequence', function() {
 
     function callback(data) {
       expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.words[0].string).to.equal('man');
+      expect(u.ft.suggestion(data[1].data)).to.equal('man');
       expect(data[1].data.result).to.be.empty;
       done();
     }
@@ -65,7 +65,6 @@ describe('sequence', function() {
       name: 'test/test',
       describe: function () {
         return u.lacona.sequence({
-          separator: u.lacona.literal({text: ' '}),
           children: [
             u.lacona.literal({text: 'super'}),
             u.lacona.literal({
@@ -81,27 +80,16 @@ describe('sequence', function() {
     });
 
     function callback(data) {
-      var dataWithOptional, dataWithoutOptional;
-
       expect(data).to.have.length(4);
-      expect(['maximum', 'man']).to.contain(data[1].data.suggestion.words[0].string);
-      expect(['maximum', 'man']).to.contain(data[2].data.suggestion.words[0].string);
-
-      if (data[1].data.suggestion.words[0].string === 'maximum') {
-        dataWithOptional = data[1];
-        dataWithoutOptional = data[2];
-      } else {
-        dataWithoutOptional = data[1];
-        dataWithOptional = data[2];
-      }
-
-      expect(dataWithOptional.data.result.optionalId).to.equal('optionalValue');
-      expect(dataWithoutOptional.data.result).to.be.empty;
+      expect(u.ft.suggestion(data[1].data)).to.equal('man');
+      expect(data[1].data.result).to.be.empty;
+      expect(data[2].data.result.optionalId).to.equal('optionalValue');
+      expect(u.ft.suggestion(data[2].data)).to.equal('maximum');
       done();
     }
 
     parser.sentences = [test()];
-    u.toStream(['super m'])
+    u.toStream(['superm'])
       .pipe(parser)
       .pipe(u.toArray(callback));
   });
@@ -150,7 +138,7 @@ describe('sequence', function() {
     function callback(data) {
       expect(data).to.have.length(3);
       expect(data[1].data.match[0].category).to.equal('myCat');
-      expect(data[1].data.suggestion.words[0].category).to.equal('myCat');
+      expect(data[1].data.suggestion[0].category).to.equal('myCat');
       done();
     }
 

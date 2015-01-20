@@ -33,8 +33,8 @@ describe('Phrase', function () {
 
     function callback(data) {
       expect(data).to.have.length(4);
-      expect(['test a', 'test b']).to.contain(data[1].data.suggestion.words[0].string);
-      expect(['test a', 'test b']).to.contain(data[2].data.suggestion.words[0].string);
+      expect(u.ft.suggestion(data[1].data)).to.equal('test b');
+      expect(u.ft.suggestion(data[2].data)).to.equal('test a');
       done();
     }
 
@@ -71,7 +71,7 @@ describe('Phrase', function () {
 
     function callback(data) {
       expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.words[0].string).to.equal('test b');
+      expect(u.ft.suggestion(data[1].data)).to.equal('test b');
       done();
     }
 
@@ -99,8 +99,10 @@ describe('Phrase', function () {
 
     function callback(data) {
       expect(data).to.have.length(4);
-      expect(['na ', 'nopeman']).to.contain(data[1].data.suggestion.words[0].string);
-      expect(['na ', 'nopeman']).to.contain(data[2].data.suggestion.words[0].string);
+      expect(u.ft.match(data[1].data)).to.equal('na ');
+      expect(u.ft.suggestion(data[1].data)).to.equal('nopeman');
+      expect(u.ft.match(data[2].data)).to.equal('na ');
+      expect(u.ft.suggestion(data[2].data)).to.equal('na ');
       done();
     }
 
@@ -132,7 +134,7 @@ describe('Phrase', function () {
 
     function callback(data) {
       expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.words[0].string).to.equal('disp');
+      expect(u.ft.suggestion(data[1].data)).to.equal('disp');
       expect(data[1].data.result.test.test.test).to.equal('val');
       done();
     }

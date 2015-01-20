@@ -84,7 +84,7 @@ describe('Parser', function () {
 
     function callback(data) {
       expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.words[0].string).to.equal('prueba');
+      expect(u.ft.suggestion(data[1].data)).to.equal('prueba');
       done();
     }
 
@@ -114,7 +114,7 @@ describe('Parser', function () {
 
     function callback(data) {
       expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.words[0].string).to.equal('tren');
+      expect(u.ft.suggestion(data[1].data)).to.equal('tren');
       done();
     }
 
@@ -165,7 +165,7 @@ describe('Parser', function () {
       function callback(data) {
         expect(data).to.have.length(3);
         expect(data[0].event).to.equal('start');
-        expect(data[1].data.suggestion.words[0].string).to.equal('test');
+        expect(u.ft.suggestion(data[1].data)).to.equal('test');
         expect(data[2].event).to.equal('end');
         expect(data[0].id).to.equal(data[2].id);
         expect(data[0].id).to.equal(0);

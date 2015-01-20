@@ -29,7 +29,7 @@ describe('value', function () {
     function callback(data) {
       expect(data).to.have.length(3);
       expect(data[1].data.result.test).to.equal('val');
-      expect(data[1].data.suggestion.words[0].string).to.equal('disp');
+      expect(u.ft.suggestion(data[1].data)).to.equal('disp');
       done();
     }
 

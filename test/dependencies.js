@@ -25,7 +25,7 @@ describe('dependencies', function () {
 
     function callback(data) {
       expect(data).to.have.length(3);
-      expect(data[1].data.suggestion.words[0].string).to.equal('something');
+      expect(u.ft.suggestion(data[1].data)).to.equal('something');
       done();
     }
 
