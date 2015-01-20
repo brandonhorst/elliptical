@@ -228,4 +228,32 @@ describe('choice', function() {
       .pipe(parser)
       .pipe(u.toArray(callback));
   });
+
+
+  it('passes on its category', function (done) {
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.choice({
+          category: 'myCat',
+          children: [
+            u.lacona.literal({text: 'aaa'}),
+            u.lacona.literal({text: 'aab'})
+          ]
+        });
+      }
+    });
+
+    function callback(data) {
+      expect(data).to.have.length(4);
+      expect(data[1].data.suggestion.words[0].category).to.equal('myCat');
+      expect(data[2].data.suggestion.words[0].category).to.equal('myCat');
+      done();
+    }
+
+    parser.sentences = [test()];
+    u.toStream(['aa'])
+      .pipe(parser)
+      .pipe(u.toArray(callback));
+  });
 });

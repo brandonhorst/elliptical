@@ -198,6 +198,30 @@ describe('repeat', function() {
       .pipe(u.toArray(callback));
   });
 
+  it('passes on its category', function (done) {
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.repeat({
+          category: 'myCat',
+          child: u.lacona.literal({text: 'a'})
+        });
+      }
+    });
+
+    function callback(data) {
+      expect(data).to.have.length(4);
+      expect(data[1].data.match[0].category).to.equal('myCat');
+      expect(data[2].data.match[0].category).to.equal('myCat');
+      done();
+    }
+
+    parser.sentences = [test()];
+    u.toStream(['a'])
+      .pipe(parser)
+      .pipe(u.toArray(callback));
+  });
+
   describe('unique', function () {
     var test;
 
