@@ -17,7 +17,7 @@
     "make:test": "mkdirp tmp && browserify test/*.js --ignore lacona --outfile tmp/tests.js",
     "uglify": "uglifyjs --output dist/lacona.min.js dist/lacona.js ",
     "clean": "rimraf tmp && rimraf dist",
-    "prepublish": "npm run make"
+    "prepublish": "npm run validate && npm run clean && npm run make"
   },
   "repository": {
     "type": "git",
