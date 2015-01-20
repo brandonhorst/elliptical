@@ -182,8 +182,8 @@ describe('Parser', function () {
 
   describe('utils', function () {
     it('returns all substrings', function() {
-      var input = "asdf";
-      var substrings = u.lacona.util.substrings(input)
+      var input = 'asdf';
+      var substrings = u.lacona.util.substrings(input);
 
       expect(substrings).to.have.length(4);
       expect(substrings).to.contain('a');
