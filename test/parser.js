@@ -179,17 +179,4 @@ describe('Parser', function () {
       .pipe(u.toArray(callback));
     });
   });
-
-  describe('utils', function () {
-    it('returns all substrings', function() {
-      var input = 'asdf';
-      var substrings = u.lacona.util.substrings(input);
-
-      expect(substrings).to.have.length(4);
-      expect(substrings).to.contain('a');
-      expect(substrings).to.contain('as');
-      expect(substrings).to.contain('asd');
-      expect(substrings).to.contain('asdf');
-    });
-  });
 });
