@@ -4,20 +4,14 @@
   "description": "Natural Language Parsing Framework",
   "main": "lib/lacona.js",
   "scripts": {
-    "test": "npm run test:node && npm run test:phantom",
     "lint": "npm run lint:lib && npm run lint:test",
     "lint:lib": "jshint --config node_modules/lacona-util-jshint/lib.json lib",
     "lint:test": "jshint --config node_modules/lacona-util-jshint/test.json test",
-    "test:phantom": "npm run make && npm run make:test && mocha-phantomjs test/mocha.html",
-    "test:node": "mocha test",
-    "validate": "npm run lint && npm run test",
+    "test": "mocha test",
+    "validate": "npm run lint && npm test",
     "cover": "istanbul cover _mocha test -- -R dot && istanbul report text",
     "coveralls": "istanbul cover _mocha test --report lcovonly -- -R dot && cat coverage/lcov.info | coveralls && rimraf ./coverage",
-    "make": "mkdirp dist && browserify lib/lacona.js --standalone lacona --outfile dist/lacona.js && npm run uglify",
-    "make:test": "mkdirp tmp && browserify test/*.js --ignore lacona --outfile tmp/tests.js",
-    "uglify": "uglifyjs --output dist/lacona.min.js dist/lacona.js ",
-    "clean": "rimraf tmp && rimraf dist",
-    "prepublish": "npm run validate && npm run clean && npm run make"
+    "prepublish": "npm run validate"
   },
   "repository": {
     "type": "git",
@@ -40,20 +34,15 @@
   },
   "homepage": "https://github.com/brandonhorst/lacona",
   "devDependencies": {
-    "browserify": "^8.1.0",
     "chai": "^1.10.0",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.5",
     "jshint": "^2.5.11",
     "lacona-util-fulltext": "^0.2.0",
     "lacona-util-jshint": "^0.2.0",
-    "mkdirp": "^0.5.0",
     "mocha": "^2.1.0",
-    "mocha-phantomjs": "^3.5.2",
-    "rimraf": "^2.2.8",
     "sinon": "^1.12.2",
-    "sinon-chai": "^2.6.0",
-    "uglify-js": "^2.4.16"
+    "sinon-chai": "^2.6.0"
   },
   "dependencies": {
     "async-each": "^0.1.6",

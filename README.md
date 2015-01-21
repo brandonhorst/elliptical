@@ -28,11 +28,10 @@ npm install lacona
 
 lacona contains a full set of BDD unit tests. They are designed to run both in node.js and in the browser (including PhantomJS).
 
-- `npm test`: run unit tests on node and PhantomJS
+- `npm test`: run unit tests on node
 - `npm run lint`: run jshint on packages and tests
 - `npm run validate`: lint, then test
 - `npm run cover`: generate coverage report
-- `npm run clean`: clean out temp files
 
 You can also run the tests in a browser of your choice by running `npm run make:test` and then opening `test/mocha.html`.
 
@@ -41,32 +40,18 @@ You can also run the tests in a browser of your choice by running `npm run make:
 - `lib`: Javascript source
 - `test`: Unit tests
 - `test/mocha.html`: Page for running tests in browser
-- `dist`: Browserify'd classes, for running in browser
 - `doc`: Documentation files
 
 #Building for the Browser
 
-`npm install`: Browserify the source (`dist/lacona.js`), and uglify it (`dist/lacona.min.js`).
+Because it is built modularly, Lacona is best consumed in the browser using Browserify.
 
 #Usage
-
-##Node
 
 ```javascript
 var lacona = require('lacona');
 var parser = new lacona.Parser();
 ```
-
-##Browser
-
-```html
-<script src="node_modules/dist/lacona.min.js"></script>
-<script>
-	var parser = new lacona.Parser();
-</script>
-```
-
-`lacona` doesn't do anything special with browserification. Feel free to include it as a module in your project, and then browserify it yourself.
 
 #Getting Started
 
