@@ -173,4 +173,34 @@ describe('fuzzy matching', function () {
       .pipe(parser)
       .pipe(u.toArray(callback));
   });
+
+
+  it('handles a choice', function (done) {
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.sequence({children: [
+          u.lacona.literal({text: 'abc'}),
+          u.lacona.choice({children: [
+            u.lacona.literal({text: 'def'}),
+            u.lacona.literal({text: 'ghi'}),
+          ]})
+        ]});
+      }
+    });
+
+    function callback(data) {
+      expect(data).to.have.length(4);
+      expect(u.ft.suggestion(data[1].data)).to.equal('abc');
+      expect(u.ft.completion(data[1].data)).to.equal('def');
+      expect(u.ft.suggestion(data[2].data)).to.equal('abc');
+      expect(u.ft.completion(data[2].data)).to.equal('ghi');
+      done();
+    }
+
+    parser.sentences = [test()];
+    u.toStream(['ab'])
+      .pipe(parser)
+      .pipe(u.toArray(callback));
+  });
 });
