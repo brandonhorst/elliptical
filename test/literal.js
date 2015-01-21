@@ -58,4 +58,24 @@ describe('literal', function() {
       .pipe(parser)
       .pipe(u.toArray(callback));
   });
+
+  it('maintains case', function (done) {
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.literal({text: 'Test'});
+      }
+    });
+
+    function callback(data) {
+      expect(data).to.have.length(3);
+      expect(u.ft.suggestion(data[1].data)).to.equal('Test');
+      done();
+    }
+
+    parser.sentences = [test()];
+    u.toStream(['t'])
+      .pipe(parser)
+      .pipe(u.toArray(callback));
+  });
 });
