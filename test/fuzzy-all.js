@@ -2,10 +2,10 @@ var chai = require('chai');
 var expect = chai.expect;
 var u = require('./util');
 
-describe('fuzzy matching', function () {
+describe('fuzzy: all', function () {
   var parser;
   beforeEach(function () {
-    parser = new u.lacona.Parser({fuzzy: true});
+    parser = new u.lacona.Parser({fuzzy: 'all'});
   });
 
   describe('basic usage', function () {
