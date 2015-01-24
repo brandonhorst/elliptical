@@ -46,7 +46,6 @@
   },
   "dependencies": {
     "async-each": "^0.1.6",
-    "async-each-series": "^0.1.1",
     "inherits": "^2.0.1",
     "lodash": "^2.4.1"
   }
