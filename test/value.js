@@ -98,5 +98,34 @@ describe('value', function () {
       .pipe(parser)
       .pipe(u.toArray(callback));
   });
+  it('can override fuzzy settings', function (done) {
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      fun: function (input, data, done) {
+        data({text: 'tst', value: 'non-fuzzy'});
+        data({text: 'test', value: 'fuzzy'});
+        done();
+      },
+      describe: function () {
+        return u.lacona.value({
+          compute: this.fun,
+          id: 'test',
+          fuzzy: 'none'
+        });
+      }
+    });
 
+    function callback(data) {
+      expect(data).to.have.length(3);
+      expect(u.ft.match(data[1].data)).to.equal('tst');
+      expect(data[1].data.result.test).to.equal('non-fuzzy');
+      done();
+    }
+
+    parser.sentences = [test()];
+    parser.fuzzy = 'all';
+    u.toStream(['tst'])
+      .pipe(parser)
+      .pipe(u.toArray(callback));
+  });
 });
