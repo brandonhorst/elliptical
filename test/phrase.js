@@ -1,6 +1,11 @@
 var chai = require('chai');
 var expect = chai.expect;
+var sinon = require('sinon');
 var u = require('./util');
+var Readable = require('stream').Readable;
+var Writable = require('stream').Writable;
+
+chai.use(require('sinon-chai'));
 
 describe('Phrase', function () {
   var parser;
@@ -143,6 +148,75 @@ describe('Phrase', function () {
     u.toStream(['d'])
       .pipe(parser)
       .pipe(u.toArray(callback));
+  });
+
+  it('caches calls to describe', function (done) {
+    var callbackSpy = sinon.spy();
+    var describeSpy = sinon.spy();
+
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        describeSpy();
+        return u.lacona.literal({text: 'test'});
+      }
+    });
+
+    var start = new Readable({objectMode: true});
+    var end = new Writable({objectMode: true});
+    start._read = function noop() {};
+    end.write = function (obj) {
+      if (obj.event === 'data') {
+        callbackSpy();
+        if (callbackSpy.calledOnce) {
+          start.push('t');
+          start.push();
+        } else {
+          expect(describeSpy).to.have.been.calledOnce;
+          done();
+        }
+      }
+    };
+
+    parser.sentences = [test()];
+
+    start.pipe(parser).pipe(end);
+    start.push('t');
+  });
+
+  it('can clear the describe cache', function (done) {
+    var callbackSpy = sinon.spy();
+    var describeSpy = sinon.spy();
+
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        describeSpy();
+        return u.lacona.literal({text: 'test'});
+      }
+    });
+
+    var start = new Readable({objectMode: true});
+    var end = new Writable({objectMode: true});
+    start._read = function noop() {};
+    end.write = function (obj) {
+      if (obj.event === 'data') {
+        callbackSpy();
+        if (callbackSpy.calledOnce) {
+          parser.sentences[0]._clearDescribeCache();
+          start.push('t');
+          start.push();
+        } else {
+          expect(describeSpy).to.have.been.calledTwice;
+          done();
+        }
+      }
+    };
+
+    parser.sentences = [test()];
+
+    start.pipe(parser).pipe(end);
+    start.push('t');
   });
 
   it('throws for phrases without a default-lang schema', function () {
