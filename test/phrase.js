@@ -170,7 +170,7 @@ describe('Phrase', function () {
         callbackSpy();
         if (callbackSpy.calledOnce) {
           start.push('t');
-          start.push();
+          start.push(null);
         } else {
           expect(describeSpy).to.have.been.calledOnce;
           done();
@@ -205,7 +205,7 @@ describe('Phrase', function () {
         if (callbackSpy.calledOnce) {
           parser.sentences[0]._clearDescribeCache();
           start.push('t');
-          start.push();
+          start.push(null);
         } else {
           expect(describeSpy).to.have.been.calledTwice;
           done();
