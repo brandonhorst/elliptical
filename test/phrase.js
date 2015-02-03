@@ -219,6 +219,21 @@ describe('Phrase', function () {
     start.push('t');
   });
 
+  it('allows phrases to have additions', function (done) {
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      onCreate: function () {
+        expect(this.config).to.equal('test');
+        done();
+      },
+      describe: function () {}
+    });
+
+    test.additions = {config: 'test'};
+
+    test();
+  });
+
   it('throws for phrases without a default-lang schema', function () {
     expect(function() {
       u.lacona.createPhrase({
