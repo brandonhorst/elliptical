@@ -234,6 +234,40 @@ describe('Phrase', function () {
     test();
   });
 
+  it('allows extensions to keep their additions', function (done) {
+    var test = u.lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return u.lacona.literal({text: 'test'});
+      }
+    });
+
+    var extender = u.lacona.createPhrase({
+      name: 'test/extender',
+      extends: 'test/test',
+      describe: function () {
+        expect(this.config).to.equal('test');
+        return u.lacona.literal({text: 'ext'});
+      }
+    });
+
+    function callback(data) {
+      expect(data).to.have.length(3);
+      expect(u.ft.all(data[1].data)).to.equal('ext');
+      done();
+    }
+
+    extender.additions = {config: 'test'};
+
+    parser.sentences = [test()];
+    parser.extensions = [extender];
+
+    u.toStream(['e'])
+      .pipe(parser)
+      .pipe(u.toArray(callback));
+
+  });
+
   it('throws for phrases without a default-lang schema', function () {
     expect(function() {
       u.lacona.createPhrase({
