@@ -1,34 +1,36 @@
 var chai = require('chai');
+var es = require('event-stream');
 var expect = chai.expect;
-var u = require('./util');
+var fulltext = require('lacona-util-fulltext');
+var lacona = require('..');
 
 describe('join', function () {
   var parser;
   beforeEach(function() {
-    parser = new u.lacona.Parser();
+    parser = new lacona.Parser();
   });
 
   it('joins literals onto the suggestion', function (done) {
-    var test = u.lacona.createPhrase({
+    var test = lacona.createPhrase({
       name: 'test/test',
       describe: function () {
-        return u.lacona.sequence({children: [
-          u.lacona.literal({text: 'aaa'}),
-          u.lacona.literal({text: 'bbb', join: true})
+        return lacona.sequence({children: [
+          lacona.literal({text: 'aaa'}),
+          lacona.literal({text: 'bbb', join: true})
           ]});
         }
       });
 
-    function callback(data) {
+    function callback(err, data) {
       expect(data).to.have.length(3);
-      expect(u.ft.suggestion(data[1].data)).to.equal('aaabbb');
+      expect(fulltext.suggestion(data[1].data)).to.equal('aaabbb');
       done();
     }
 
     parser.sentences = [test()];
 
-    u.toStream(['a'])
+    es.readArray(['a'])
       .pipe(parser)
-      .pipe(u.toArray(callback));
+      .pipe(es.writeArray(callback));
   });
 });

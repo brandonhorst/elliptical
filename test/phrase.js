@@ -1,8 +1,10 @@
 var chai = require('chai');
+var es = require('event-stream');
 var expect = chai.expect;
-var sinon = require('sinon');
-var u = require('./util');
+var fulltext = require('lacona-util-fulltext');
+var lacona = require('..');
 var Readable = require('stream').Readable;
+var sinon = require('sinon');
 var Writable = require('stream').Writable;
 
 chai.use(require('sinon-chai'));
@@ -10,155 +12,155 @@ chai.use(require('sinon-chai'));
 describe('Phrase', function () {
   var parser;
   beforeEach(function() {
-    parser = new u.lacona.Parser();
+    parser = new lacona.Parser();
   });
 
   it('handles phrases with extension', function (done) {
-    var extended = u.lacona.createPhrase({
+    var extended = lacona.createPhrase({
       name: 'test/extended',
       describe: function () {
-        return u.lacona.literal({text: 'test a'});
+        return lacona.literal({text: 'test a'});
       }
     });
 
-    var extender = u.lacona.createPhrase({
+    var extender = lacona.createPhrase({
       name: 'test/extender',
       extends: ['test/extended'],
       describe: function () {
-        return u.lacona.literal({text: 'test b'});
+        return lacona.literal({text: 'test b'});
       }
     });
 
-    var test = u.lacona.createPhrase({
+    var test = lacona.createPhrase({
       name: 'test/test',
       describe: function () {
         return extended();
       }
     });
 
-    function callback(data) {
+    function callback(err, data) {
       expect(data).to.have.length(4);
-      expect(u.ft.suggestion(data[1].data)).to.equal('test b');
-      expect(u.ft.suggestion(data[2].data)).to.equal('test a');
+      expect(fulltext.suggestion(data[1].data)).to.equal('test b');
+      expect(fulltext.suggestion(data[2].data)).to.equal('test a');
       done();
     }
 
     parser.sentences = [test()];
     parser.extensions = [extender];
 
-    u.toStream(['t'])
+    es.readArray(['t'])
     .pipe(parser)
-    .pipe(u.toArray(callback));
+    .pipe(es.writeArray(callback));
   });
 
   it('handles phrases with overriding', function (done) {
-    var overridden = u.lacona.createPhrase({
+    var overridden = lacona.createPhrase({
       name: 'test/overridden',
       describe: function () {
-        return u.lacona.literal({text: 'test a'});
+        return lacona.literal({text: 'test a'});
       }
     });
 
-    var overrider = u.lacona.createPhrase({
+    var overrider = lacona.createPhrase({
       name: 'test/overrider',
       overrides: ['test/overridden'],
       describe: function () {
-        return u.lacona.literal({text: 'test b'});
+        return lacona.literal({text: 'test b'});
       }
     });
 
-    var test = u.lacona.createPhrase({
+    var test = lacona.createPhrase({
       name: 'test/test',
       describe: function () {
         return overridden();
       }
     });
 
-    function callback(data) {
+    function callback(err, data) {
       expect(data).to.have.length(3);
-      expect(u.ft.suggestion(data[1].data)).to.equal('test b');
+      expect(fulltext.suggestion(data[1].data)).to.equal('test b');
       done();
     }
 
     parser.sentences = [test()];
     parser.extensions = [overrider];
 
-    u.toStream(['t'])
+    es.readArray(['t'])
     .pipe(parser)
-    .pipe(u.toArray(callback));
+    .pipe(es.writeArray(callback));
   });
 
   it('allows for recursive phrases without creating an infinite loop', function (done) {
-    var test = u.lacona.createPhrase({
+    var test = lacona.createPhrase({
       name: 'test/test',
       describe: function () {
-        return u.lacona.sequence({children: [
-          u.lacona.literal({text: 'na '}),
-          u.lacona.choice({children: [
-            u.lacona.literal({text: 'nopeman'}),
+        return lacona.sequence({children: [
+          lacona.literal({text: 'na '}),
+          lacona.choice({children: [
+            lacona.literal({text: 'nopeman'}),
             test()
           ]})
         ]});
       }
     });
 
-    function callback(data) {
+    function callback(err, data) {
       expect(data).to.have.length(4);
-      expect(u.ft.match(data[1].data)).to.equal('na ');
-      expect(u.ft.suggestion(data[1].data)).to.equal('nopeman');
-      expect(u.ft.match(data[2].data)).to.equal('na ');
-      expect(u.ft.suggestion(data[2].data)).to.equal('na ');
+      expect(fulltext.match(data[1].data)).to.equal('na ');
+      expect(fulltext.suggestion(data[1].data)).to.equal('nopeman');
+      expect(fulltext.match(data[2].data)).to.equal('na ');
+      expect(fulltext.suggestion(data[2].data)).to.equal('na ');
       done();
     }
 
     parser.sentences = [test()];
-    u.toStream(['na n'])
+    es.readArray(['na n'])
       .pipe(parser)
-      .pipe(u.toArray(callback));
+      .pipe(es.writeArray(callback));
   });
 
   it('allows for nested phrases with the same id', function (done) {
-    var test = u.lacona.createPhrase({
+    var test = lacona.createPhrase({
       name: 'test/test',
       describe: function () {
         return include1({id: 'test'});
       }
     });
-    var include1 = u.lacona.createPhrase({
+    var include1 = lacona.createPhrase({
       name: 'test/include1',
       describe: function () {
         return include2({id: 'test'});
       }
     });
-    var include2 = u.lacona.createPhrase({
+    var include2 = lacona.createPhrase({
       name: 'test/include2',
       describe: function () {
-        return u.lacona.literal({value: 'val', text: 'disp', id: 'test'});
+        return lacona.literal({value: 'val', text: 'disp', id: 'test'});
       }
     });
 
-    function callback(data) {
+    function callback(err, data) {
       expect(data).to.have.length(3);
-      expect(u.ft.suggestion(data[1].data)).to.equal('disp');
+      expect(fulltext.suggestion(data[1].data)).to.equal('disp');
       expect(data[1].data.result.test.test.test).to.equal('val');
       done();
     }
 
     parser.sentences = [test()];
-    u.toStream(['d'])
+    es.readArray(['d'])
       .pipe(parser)
-      .pipe(u.toArray(callback));
+      .pipe(es.writeArray(callback));
   });
 
   it('caches calls to describe', function (done) {
     var callbackSpy = sinon.spy();
     var describeSpy = sinon.spy();
 
-    var test = u.lacona.createPhrase({
+    var test = lacona.createPhrase({
       name: 'test/test',
       describe: function () {
         describeSpy();
-        return u.lacona.literal({text: 'test'});
+        return lacona.literal({text: 'test'});
       }
     });
 
@@ -188,11 +190,11 @@ describe('Phrase', function () {
     var callbackSpy = sinon.spy();
     var describeSpy = sinon.spy();
 
-    var test = u.lacona.createPhrase({
+    var test = lacona.createPhrase({
       name: 'test/test',
       describe: function () {
         describeSpy();
-        return u.lacona.literal({text: 'test'});
+        return lacona.literal({text: 'test'});
       }
     });
 
@@ -220,7 +222,7 @@ describe('Phrase', function () {
   });
 
   it('allows phrases to have additions', function (done) {
-    var test = u.lacona.createPhrase({
+    var test = lacona.createPhrase({
       name: 'test/test',
       onCreate: function () {
         expect(this.config).to.equal('test');
@@ -235,25 +237,25 @@ describe('Phrase', function () {
   });
 
   it('allows extensions to keep their additions', function (done) {
-    var test = u.lacona.createPhrase({
+    var test = lacona.createPhrase({
       name: 'test/test',
       describe: function () {
-        return u.lacona.literal({text: 'test'});
+        return lacona.literal({text: 'test'});
       }
     });
 
-    var extender = u.lacona.createPhrase({
+    var extender = lacona.createPhrase({
       name: 'test/extender',
       extends: 'test/test',
       describe: function () {
         expect(this.config).to.equal('test');
-        return u.lacona.literal({text: 'ext'});
+        return lacona.literal({text: 'ext'});
       }
     });
 
-    function callback(data) {
+    function callback(err, data) {
       expect(data).to.have.length(3);
-      expect(u.ft.all(data[1].data)).to.equal('ext');
+      expect(fulltext.all(data[1].data)).to.equal('ext');
       done();
     }
 
@@ -262,55 +264,55 @@ describe('Phrase', function () {
     parser.sentences = [test()];
     parser.extensions = [extender];
 
-    u.toStream(['e'])
+    es.readArray(['e'])
       .pipe(parser)
-      .pipe(u.toArray(callback));
+      .pipe(es.writeArray(callback));
 
   });
 
   it('throws for phrases without a default-lang schema', function () {
     expect(function() {
-      u.lacona.createPhrase({
+      lacona.createPhrase({
         name: 'test/test',
         translations: [{
           langs: ['en-US'],
           describe: function () {
-            return u.lacona.literal({text: 'whatever'});
+            return lacona.literal({text: 'whatever'});
           }
         }]
       });
-    }).to.throw(u.lacona.Error);
+    }).to.throw(lacona.Error);
   });
 
   it('throws for translations without a lang', function () {
     expect(function() {
-      u.lacona.createPhrase({
+      lacona.createPhrase({
         name: 'test/test',
         translations: [{
           describe: function () {
-            return u.lacona.literal({text: 'whatever'});
+            return lacona.literal({text: 'whatever'});
           }
         }]
       });
-    }).to.throw(u.lacona.Error);
+    }).to.throw(lacona.Error);
   });
 
   it('throws for phrases without a root', function () {
     expect(function() {
-      u.lacona.createPhrase({
+      lacona.createPhrase({
         name: 'test/test'
       });
-    }).to.throw(u.lacona.Error);
+    }).to.throw(lacona.Error);
   });
 
   it('throws for phrases without a name', function () {
     expect(function() {
-      u.lacona.createPhrase({
+      lacona.createPhrase({
         describe: function() {
-          return u.lacona.literal({text: 'test'});
+          return lacona.literal({text: 'test'});
         }
       });
-    }).to.throw(u.lacona.Error);
+    }).to.throw(lacona.Error);
   });
 
 });

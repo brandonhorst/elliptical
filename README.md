@@ -33,13 +33,10 @@ lacona contains a full set of BDD unit tests. They are designed to run both in n
 - `npm run validate`: lint, then test
 - `npm run cover`: generate coverage report
 
-You can also run the tests in a browser of your choice by running `npm run make:test` and then opening `test/mocha.html`.
-
 #Directories
 
 - `lib`: Javascript source
 - `test`: Unit tests
-- `test/mocha.html`: Page for running tests in browser
 - `doc`: Documentation files
 
 #Building for the Browser

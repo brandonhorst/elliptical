@@ -1,29 +1,31 @@
 var chai = require('chai');
+var es = require('event-stream');
 var expect = chai.expect;
-var u = require('./util');
+var fulltext = require('lacona-util-fulltext');
+var lacona = require('..');
 
 describe('fuzzy: all', function () {
   var parser;
   beforeEach(function () {
-    parser = new u.lacona.Parser({fuzzy: 'all'});
+    parser = new lacona.Parser({fuzzy: 'all'});
   });
 
   describe('basic usage', function () {
     var test;
 
     beforeEach(function () {
-      test = u.lacona.createPhrase({
+      test = lacona.createPhrase({
         name: 'test/test',
         describe: function () {
-          return u.lacona.literal({text: 'a simple test'});
+          return lacona.literal({text: 'a simple test'});
         }
       });
     });
 
     it('supports fuzzy matching', function (done) {
-      function callback(data) {
+      function callback(err, data) {
         expect(data).to.have.length(3);
-        expect(u.ft.suggestion(data[1].data)).to.equal('a simple test');
+        expect(fulltext.suggestion(data[1].data)).to.equal('a simple test');
         expect(data[1].data.suggestion[0].string).to.equal('a');
         expect(data[1].data.suggestion[0].input).to.be.true;
         expect(data[1].data.suggestion[1].string).to.equal(' ');
@@ -48,50 +50,50 @@ describe('fuzzy: all', function () {
       }
 
       parser.sentences = [test()];
-      u.toStream(['asmlte'])
+      es.readArray(['asmlte'])
         .pipe(parser)
-        .pipe(u.toArray(callback));
+        .pipe(es.writeArray(callback));
     });
 
     it('rejects misses properly with fuzzy matching', function (done) {
-      function callback(data) {
+      function callback(err, data) {
         expect(data).to.have.length(2);
         done();
       }
 
       parser.sentences = [test()];
-      u.toStream(['fff'])
+      es.readArray(['fff'])
         .pipe(parser)
-        .pipe(u.toArray(callback));
+        .pipe(es.writeArray(callback));
     });
 
     it('suggests properly when fuzzy matching is enabled', function (done) {
-      function callback(data) {
+      function callback(err, data) {
         expect(data).to.have.length(3);
         expect(data[1].data.suggestion[0].string).to.equal('a simple test');
         expect(data[1].data.suggestion[0].input).to.be.false;
-        expect(u.ft.suggestion(data[1].data)).to.equal('a simple test');
+        expect(fulltext.suggestion(data[1].data)).to.equal('a simple test');
         done();
       }
 
       parser.sentences = [test()];
-      u.toStream([''])
+      es.readArray([''])
         .pipe(parser)
-        .pipe(u.toArray(callback));
+        .pipe(es.writeArray(callback));
     });
   });
 
   it('can do fuzzy matching with regex special characters', function (done) {
-    var test = u.lacona.createPhrase({
+    var test = lacona.createPhrase({
       name: 'test/test',
       describe: function () {
-        return u.lacona.literal({text: '[whatever]'});
+        return lacona.literal({text: '[whatever]'});
       }
     });
 
-    function callback(data) {
+    function callback(err, data) {
       expect(data).to.have.length(3);
-      expect(u.ft.suggestion(data[1].data)).to.equal('[whatever]');
+      expect(fulltext.suggestion(data[1].data)).to.equal('[whatever]');
       expect(data[1].data.suggestion[0].string).to.equal('[');
       expect(data[1].data.suggestion[0].input).to.be.true;
       expect(data[1].data.suggestion[1].string).to.equal('whatever');
@@ -102,25 +104,25 @@ describe('fuzzy: all', function () {
     }
 
     parser.sentences = [test()];
-    u.toStream(['[]'])
+    es.readArray(['[]'])
       .pipe(parser)
-      .pipe(u.toArray(callback));
+      .pipe(es.writeArray(callback));
   });
 
   it('supports sequence when fuzzy is enabled', function (done) {
-    var test = u.lacona.createPhrase({
+    var test = lacona.createPhrase({
       name: 'test/test',
       describe: function () {
-        return u.lacona.sequence({children: [
-          u.lacona.literal({text: 'abc'}),
-          u.lacona.literal({text: 'def'})
+        return lacona.sequence({children: [
+          lacona.literal({text: 'abc'}),
+          lacona.literal({text: 'def'})
         ]});
       }
     });
 
-    function callback(data) {
+    function callback(err, data) {
       expect(data).to.have.length(3);
-      expect(u.ft.suggestion(data[1].data)).to.equal('abcdef');
+      expect(fulltext.suggestion(data[1].data)).to.equal('abcdef');
       expect(data[1].data.suggestion[0].string).to.equal('a');
       expect(data[1].data.suggestion[0].input).to.be.true;
       expect(data[1].data.suggestion[1].string).to.equal('bc');
@@ -133,27 +135,27 @@ describe('fuzzy: all', function () {
     }
 
     parser.sentences = [test()];
-    u.toStream(['ad'])
+    es.readArray(['ad'])
       .pipe(parser)
-      .pipe(u.toArray(callback));
+      .pipe(es.writeArray(callback));
   });
 
   it('sequence can skip entire elements', function (done) {
-    var test = u.lacona.createPhrase({
+    var test = lacona.createPhrase({
       name: 'test/test',
       describe: function () {
-        return u.lacona.sequence({children: [
-          u.lacona.literal({text: 'abc'}),
-          u.lacona.literal({text: 'def'}),
-          u.lacona.literal({text: 'ghi'}),
-          u.lacona.literal({text: 'jkl'})
+        return lacona.sequence({children: [
+          lacona.literal({text: 'abc'}),
+          lacona.literal({text: 'def'}),
+          lacona.literal({text: 'ghi'}),
+          lacona.literal({text: 'jkl'})
         ]});
       }
     });
 
-    function callback(data) {
+    function callback(err, data) {
       expect(data).to.have.length(3);
-      expect(u.ft.suggestion(data[1].data)).to.equal('abcdefghijkl');
+      expect(fulltext.suggestion(data[1].data)).to.equal('abcdefghijkl');
       expect(data[1].data.suggestion[0].string).to.equal('a');
       expect(data[1].data.suggestion[0].input).to.be.true;
       expect(data[1].data.suggestion[1].string).to.equal('bcdef');
@@ -169,38 +171,38 @@ describe('fuzzy: all', function () {
     }
 
     parser.sentences = [test()];
-    u.toStream(['agjkl'])
+    es.readArray(['agjkl'])
       .pipe(parser)
-      .pipe(u.toArray(callback));
+      .pipe(es.writeArray(callback));
   });
 
 
   it('handles a choice', function (done) {
-    var test = u.lacona.createPhrase({
+    var test = lacona.createPhrase({
       name: 'test/test',
       describe: function () {
-        return u.lacona.sequence({children: [
-          u.lacona.literal({text: 'abc'}),
-          u.lacona.choice({children: [
-            u.lacona.literal({text: 'def'}),
-            u.lacona.literal({text: 'ghi'}),
+        return lacona.sequence({children: [
+          lacona.literal({text: 'abc'}),
+          lacona.choice({children: [
+            lacona.literal({text: 'def'}),
+            lacona.literal({text: 'ghi'}),
           ]})
         ]});
       }
     });
 
-    function callback(data) {
+    function callback(err, data) {
       expect(data).to.have.length(4);
-      expect(u.ft.suggestion(data[1].data)).to.equal('abc');
-      expect(u.ft.completion(data[1].data)).to.equal('def');
-      expect(u.ft.suggestion(data[2].data)).to.equal('abc');
-      expect(u.ft.completion(data[2].data)).to.equal('ghi');
+      expect(fulltext.suggestion(data[1].data)).to.equal('abc');
+      expect(fulltext.completion(data[1].data)).to.equal('def');
+      expect(fulltext.suggestion(data[2].data)).to.equal('abc');
+      expect(fulltext.completion(data[2].data)).to.equal('ghi');
       done();
     }
 
     parser.sentences = [test()];
-    u.toStream(['ab'])
+    es.readArray(['ab'])
       .pipe(parser)
-      .pipe(u.toArray(callback));
+      .pipe(es.writeArray(callback));
   });
 });
