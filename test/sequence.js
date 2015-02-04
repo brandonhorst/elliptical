@@ -76,7 +76,8 @@ describe('sequence', function() {
               optional: true
             }),
             lacona.literal({text: 'man'})
-          ]
+          ],
+          separator: lacona.literal({text: ''})
         });
       }
     });
