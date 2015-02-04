@@ -53,6 +53,58 @@ describe('Phrase', function () {
     .pipe(es.writeArray(callback));
   });
 
+  it('accepts extensions being removed', function (done) {
+    var callbackSpy = sinon.spy();
+
+    var extended = lacona.createPhrase({
+      name: 'test/extended',
+      describe: function () {
+        return lacona.literal({text: 'test a'});
+      }
+    });
+
+    var extender = lacona.createPhrase({
+      name: 'test/extender',
+      extends: ['test/extended'],
+      describe: function () {
+        return lacona.literal({text: 'test b'});
+      }
+    });
+
+    var test = lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return extended();
+      }
+    });
+
+    var start = new Readable({objectMode: true});
+    var end = new Writable({objectMode: true});
+    start._read = function noop() {};
+    end.write = function (obj) {
+      if (obj.event === 'data') {
+        callbackSpy();
+        if (callbackSpy.calledOnce) {
+          expect(fulltext.all(obj.data)).to.equal('test b');
+        } else if (callbackSpy.calledTwice) {
+          expect(fulltext.all(obj.data)).to.equal('test a');
+          parser.extensions = [];
+          start.push('t');
+          start.push(null);
+        } else {
+          expect(fulltext.all(obj.data)).to.equal('test a');
+          done();
+        }
+      }
+    };
+
+    parser.sentences = [test()];
+    parser.extensions = [extender];
+
+    start.pipe(parser).pipe(end);
+    start.push('t');
+  });
+
   it('handles phrases with overriding', function (done) {
     var overridden = lacona.createPhrase({
       name: 'test/overridden',
