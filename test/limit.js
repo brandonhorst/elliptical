@@ -38,6 +38,32 @@ describe('limit', function() {
         .pipe(parser)
         .pipe(es.writeArray(callback));
     });
+
+    it('accepts fewer than limit', function (done) {
+      var test = lacona.createPhrase({
+        name: 'test/test',
+        compute: function (input, data, done) {
+          data({text: 'testa'});
+          data({text: 'testb'});
+          done();
+        },
+        describe: function () {
+          return lacona.value({limit: 3, compute: this.compute});
+        }
+      });
+
+      function callback(err, data) {
+        expect(data).to.have.length(4);
+        expect(fulltext.all(data[1].data)).to.equal('testa');
+        expect(fulltext.all(data[2].data)).to.equal('testb');
+        done();
+      }
+
+      parser.sentences = [test()];
+      es.readArray(['test'])
+        .pipe(parser)
+        .pipe(es.writeArray(callback));
+    });
   });
 
   describe('choice', function () {
