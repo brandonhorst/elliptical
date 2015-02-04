@@ -186,7 +186,7 @@ describe('Phrase', function () {
     start.push('t');
   });
 
-  it('can clear the describe cache', function (done) {
+  it('changing additions clears the describe cache', function (done) {
     var callbackSpy = sinon.spy();
     var describeSpy = sinon.spy();
 
@@ -194,6 +194,11 @@ describe('Phrase', function () {
       name: 'test/test',
       describe: function () {
         describeSpy();
+        if (!callbackSpy.called) {
+          expect(this.config).to.be.undefined;
+        } else {
+          expect(this.config).to.equal('test');
+        }
         return lacona.literal({text: 'test'});
       }
     });
@@ -205,7 +210,7 @@ describe('Phrase', function () {
       if (obj.event === 'data') {
         callbackSpy();
         if (callbackSpy.calledOnce) {
-          parser.sentences[0]._clearDescribeCache();
+          test.additions = {config: 'test'};
           start.push('t');
           start.push(null);
         } else {
@@ -221,19 +226,31 @@ describe('Phrase', function () {
     start.push('t');
   });
 
-  it('allows phrases to have additions', function (done) {
+  it('allows phrases to have additions (but not passed to onCreate)', function (done) {
     var test = lacona.createPhrase({
       name: 'test/test',
       onCreate: function () {
-        expect(this.config).to.equal('test');
-        done();
+        expect(this.config).to.be.undefined;
       },
-      describe: function () {}
+      describe: function () {
+        expect(this.config).to.equal('test');
+        return lacona.literal({text: 'test'});
+      }
     });
+
+    function callback(err, data) {
+      expect(data).to.have.length(3);
+      expect(fulltext.all(data[1].data)).to.equal('test');
+      done();
+    }
 
     test.additions = {config: 'test'};
 
-    test();
+    parser.sentences = [test()];
+
+    es.readArray([''])
+      .pipe(parser)
+      .pipe(es.writeArray(callback));
   });
 
   it('allows extensions to keep their additions', function (done) {
