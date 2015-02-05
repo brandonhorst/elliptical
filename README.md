@@ -3,6 +3,7 @@ lacona
 
 [![Build Status](https://img.shields.io/travis/lacona/lacona.svg?style=flat)](https://travis-ci.org/lacona/lacona)
 [![Coverage Status](https://img.shields.io/coveralls/lacona/lacona.svg?style=flat)](https://coveralls.io/r/lacona/lacona)
+[![Join Gitter Chat](https://img.shields.io/badge/gitter-join%20chat-00DA75.svg)](https://gitter.im/lacona/lacona)
 
 lacona is a Javascript library for parsing and predicting natural language according to an arbitrary but well-defined schema.
 
