@@ -1,6 +1,8 @@
 lacona
 ======
 
+[![Join the chat at https://gitter.im/lacona/lacona](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/lacona/lacona?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://img.shields.io/travis/lacona/lacona.svg?style=flat)](https://travis-ci.org/lacona/lacona)
 [![Coverage Status](https://img.shields.io/coveralls/lacona/lacona.svg?style=flat)](https://coveralls.io/r/lacona/lacona)
 [![Join Gitter Chat](https://img.shields.io/badge/gitter-join%20chat-00DA75.svg)](https://gitter.im/lacona/lacona)
