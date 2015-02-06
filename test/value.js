@@ -41,6 +41,37 @@ describe('value', function () {
       .pipe(es.writeArray(callback));
   });
 
+  it('suggests a value', function (done) {
+    var test = lacona.createPhrase({
+      name: 'test/test',
+      fun: function (input, data, done) {
+        data({text: 'disp', value: 'val'});
+        done();
+      },
+      describe: function () {
+        return lacona.sequence({children: [
+          lacona.literal({text: 'test'}),
+          lacona.value({
+            compute: this.fun,
+            id: 'test'
+          })
+        ]});
+      }
+    });
+
+    function callback(err, data) {
+      expect(data).to.have.length(3);
+      expect(data[1].data.result.test).to.equal('val');
+      expect(fulltext.completion(data[1].data)).to.equal('disp');
+      done();
+    }
+
+    parser.sentences = [test()];
+    es.readArray(['te'])
+      .pipe(parser)
+      .pipe(es.writeArray(callback));
+  });
+
   it('can access props its function', function (done) {
     var spy = sinon.spy();
     var test = lacona.createPhrase({
