@@ -67,6 +67,26 @@ describe('Parser', function () {
       .pipe(es.writeArray(callback));
   });
 
+  it('passes the sentence name to the output', function (done) {
+    var test = lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return lacona.literal({text: 'test'});
+      }
+    });
+
+    function callback(err, data) {
+      expect(data).to.have.length(3);
+      expect(data[1].data.sentence).to.equal('test/test');
+      done();
+    }
+
+    parser.sentences = [test()];
+    es.readArray(['t'])
+      .pipe(parser)
+      .pipe(es.writeArray(callback));
+  });
+
 
   it('can parse in a specified language', function (done) {
     var test = lacona.createPhrase({
