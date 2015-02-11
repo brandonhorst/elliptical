@@ -278,6 +278,48 @@ describe('Phrase', function () {
     start.push('t');
   });
 
+  it('can remove additions', function (done) {
+    var callbackSpy = sinon.spy();
+    var describeSpy = sinon.spy();
+
+    var test = lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        describeSpy();
+        if (!callbackSpy.called) {
+          expect(this.config).to.equal('test');
+        } else {
+          expect(this.config).to.be.undefined;
+        }
+        return lacona.literal({text: 'test'});
+      }
+    });
+
+    var start = new Readable({objectMode: true});
+    var end = new Writable({objectMode: true});
+    start._read = function noop() {};
+    end.write = function (obj) {
+      if (obj.event === 'data') {
+        callbackSpy();
+        if (callbackSpy.calledOnce) {
+          test.setAdditions({});
+          start.push('t');
+          start.push(null);
+        } else {
+          expect(describeSpy).to.have.been.calledTwice;
+          done();
+        }
+      }
+    };
+
+    test.setAdditions({config: 'test'});
+
+    parser.sentences = [test()];
+
+    start.pipe(parser).pipe(end);
+    start.push('t');
+  });
+
   it('allows phrases to have additions (but not passed to onCreate)', function (done) {
     var test = lacona.createPhrase({
       name: 'test/test',
@@ -305,7 +347,6 @@ describe('Phrase', function () {
       .pipe(es.writeArray(callback));
   });
 
-
   it('allows phrases to modify set their additions', function (done) {
     var test = lacona.createPhrase({
       name: 'test/test',
@@ -324,7 +365,7 @@ describe('Phrase', function () {
 
     function callback(newAdditions) {
       expect(newAdditions.config).to.equal('new test');
-      done()
+      done();
     }
 
     test.setAdditions({config: 'test'}, callback);
