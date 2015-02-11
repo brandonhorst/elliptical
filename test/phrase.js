@@ -262,7 +262,7 @@ describe('Phrase', function () {
       if (obj.event === 'data') {
         callbackSpy();
         if (callbackSpy.calledOnce) {
-          test.additions = {config: 'test'};
+          test.setAdditions({config: 'test'});
           start.push('t');
           start.push(null);
         } else {
@@ -296,13 +296,42 @@ describe('Phrase', function () {
       done();
     }
 
-    test.additions = {config: 'test'};
+    test.setAdditions({config: 'test'});
 
     parser.sentences = [test()];
 
     es.readArray([''])
       .pipe(parser)
       .pipe(es.writeArray(callback));
+  });
+
+
+  it('allows phrases to modify set their additions', function (done) {
+    var test = lacona.createPhrase({
+      name: 'test/test',
+      onCreate: function () {
+        expect(this.config).to.be.undefined;
+      },
+      changeConfig: function () {
+        this.setConfig('new test');
+      },
+      describe: function () {
+        expect(this.config).to.equal('test');
+
+        return lacona.literal({text: 'test'});
+      }
+    });
+
+    function callback(newAdditions) {
+      expect(newAdditions.config).to.equal('new test');
+      done()
+    }
+
+    test.setAdditions({config: 'test'}, callback);
+
+    var instance = test();
+
+    instance.changeConfig();
   });
 
   it('allows extensions to keep their additions', function (done) {
@@ -328,7 +357,7 @@ describe('Phrase', function () {
       done();
     }
 
-    extender.additions = {config: 'test'};
+    extender.setAdditions({config: 'test'});
 
     parser.sentences = [test()];
     parser.extensions = [extender];
