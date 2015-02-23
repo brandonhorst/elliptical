@@ -39,6 +39,46 @@ describe('Parser', function () {
       .on('error', callback);
   });
 
+  it('allows object input if it has a data property', function (done) {
+    function callback(err, data) {
+      expect(data).to.have.length(2);
+      expect(data[0].event).to.equal('start');
+      expect(data[1].event).to.equal('end');
+      expect(data[0].id).to.equal(data[1].id);
+      expect(data[0].id).to.equal(0);
+      done();
+    }
+
+    es.readArray([{data: 'test'}])
+      .pipe(parser)
+      .pipe(es.writeArray(callback));
+  });
+
+  it('passes a given group', function (done) {
+    var test = lacona.createPhrase({
+      name: 'test/test',
+      describe: function () {
+        return lacona.literal({text: 'test'});
+      }
+    });
+
+    function callback(err, data) {
+      expect(data).to.have.length(3);
+      expect(data[0].event).to.equal('start');
+      expect(data[0].group).to.equal('someGroup');
+      expect(data[1].event).to.equal('data');
+      expect(data[1].group).to.equal('someGroup');
+      expect(data[2].event).to.equal('end');
+      expect(data[2].group).to.equal('someGroup');
+      done();
+    }
+
+    parser.sentences = [test()];
+    es.readArray([{group: 'someGroup', data: 'test'}])
+      .pipe(parser)
+      .pipe(es.writeArray(callback));
+  });
+
   it('parses have separate ids', function (done) {
     var test = lacona.createPhrase({
       name: 'test/test',
