@@ -1,15 +1,16 @@
-var chai = require('chai');
-var es = require('event-stream');
-var expect = chai.expect;
-var fulltext = require('lacona-util-fulltext');
-var lacona = require('..');
+/*eslint-env mocha*/
+var chai = require('chai')
+var es = require('event-stream')
+var expect = chai.expect
+var fulltext = require('lacona-util-fulltext')
+var lacona = require('..')
 
-describe('sequence', function() {
-  var parser;
+describe('sequence', function () {
+  var parser
 
-  beforeEach(function() {
-    parser = new lacona.Parser();
-  });
+  beforeEach(function () {
+    parser = new lacona.Parser()
+  })
 
   it('puts two elements in order', function (done) {
     var test = lacona.createPhrase({
@@ -18,22 +19,23 @@ describe('sequence', function() {
         return lacona.sequence({children: [
           lacona.literal({text: 'super'}),
           lacona.literal({text: 'man'})
-        ]});
+        ]})
       }
-    });
+    })
 
-    function callback(err, data) {
-      expect(data).to.have.length(3);
-      expect(fulltext.suggestion(data[1].data)).to.equal('man');
-      expect(data[1].data.result).to.be.empty;
-      done();
+    function callback (err, data) {
+      expect(err).to.not.exist
+      expect(data).to.have.length(3)
+      expect(fulltext.suggestion(data[1].data)).to.equal('man')
+      expect(data[1].data.result).to.be.empty
+      done()
     }
 
-    parser.sentences = [test()];
+    parser.sentences = [test()]
     es.readArray(['superm'])
       .pipe(parser)
-      .pipe(es.writeArray(callback));
-  });
+      .pipe(es.writeArray(callback))
+  })
 
   it('handles a separator', function (done) {
     var test = lacona.createPhrase({
@@ -45,22 +47,23 @@ describe('sequence', function() {
             lacona.literal({text: 'man'})
           ],
           separator: lacona.literal({text: ' '})
-        });
+        })
       }
-    });
+    })
 
-    function callback(err, data) {
-      expect(data).to.have.length(3);
-      expect(fulltext.suggestion(data[1].data)).to.equal('man');
-      expect(data[1].data.result).to.be.empty;
-      done();
+    function callback (err, data) {
+      expect(err).to.not.exist
+      expect(data).to.have.length(3)
+      expect(fulltext.suggestion(data[1].data)).to.equal('man')
+      expect(data[1].data.result).to.be.empty
+      done()
     }
 
-    parser.sentences = [test()];
+    parser.sentences = [test()]
     es.readArray(['super m'])
     .pipe(parser)
-    .pipe(es.writeArray(callback));
-  });
+    .pipe(es.writeArray(callback))
+  })
 
   it('handles an optional child with a separator', function (done) {
     var test = lacona.createPhrase({
@@ -78,24 +81,25 @@ describe('sequence', function() {
             lacona.literal({text: 'man'})
           ],
           separator: lacona.literal({text: ''})
-        });
+        })
       }
-    });
+    })
 
-    function callback(err, data) {
-      expect(data).to.have.length(4);
-      expect(fulltext.suggestion(data[1].data)).to.equal('man');
-      expect(data[1].data.result).to.be.empty;
-      expect(data[2].data.result.optionalId).to.equal('optionalValue');
-      expect(fulltext.suggestion(data[2].data)).to.equal('maximum');
-      done();
+    function callback (err, data) {
+      expect(err).to.not.exist
+      expect(data).to.have.length(4)
+      expect(fulltext.suggestion(data[1].data)).to.equal('man')
+      expect(data[1].data.result).to.be.empty
+      expect(data[2].data.result.optionalId).to.equal('optionalValue')
+      expect(fulltext.suggestion(data[2].data)).to.equal('maximum')
+      done()
     }
 
-    parser.sentences = [test()];
+    parser.sentences = [test()]
     es.readArray(['superm'])
       .pipe(parser)
-      .pipe(es.writeArray(callback));
-  });
+      .pipe(es.writeArray(callback))
+  })
 
   it('can set a value to the result', function (done) {
     var test = lacona.createPhrase({
@@ -108,21 +112,22 @@ describe('sequence', function() {
             lacona.literal({text: 'super'}),
             lacona.literal({text: 'man'})
           ]
-        });
+        })
       }
-    });
+    })
 
-    function callback(err, data) {
-      expect(data).to.have.length(3);
-      expect(data[1].data.result.testId).to.equal('testValue');
-      done();
+    function callback (err, data) {
+      expect(err).to.not.exist
+      expect(data).to.have.length(3)
+      expect(data[1].data.result.testId).to.equal('testValue')
+      done()
     }
 
-    parser.sentences = [test()];
+    parser.sentences = [test()]
     es.readArray(['superm'])
       .pipe(parser)
-      .pipe(es.writeArray(callback));
-  });
+      .pipe(es.writeArray(callback))
+  })
 
   it('passes on its category', function (done) {
     var test = lacona.createPhrase({
@@ -134,20 +139,21 @@ describe('sequence', function() {
             lacona.literal({text: 'super'}),
             lacona.literal({text: 'man'})
           ]
-        });
+        })
       }
-    });
+    })
 
-    function callback(err, data) {
-      expect(data).to.have.length(3);
-      expect(data[1].data.match[0].category).to.equal('myCat');
-      expect(data[1].data.suggestion[0].category).to.equal('myCat');
-      done();
+    function callback (err, data) {
+      expect(err).to.not.exist
+      expect(data).to.have.length(3)
+      expect(data[1].data.match[0].category).to.equal('myCat')
+      expect(data[1].data.suggestion[0].category).to.equal('myCat')
+      done()
     }
 
-    parser.sentences = [test()];
+    parser.sentences = [test()]
     es.readArray(['superm'])
       .pipe(parser)
-      .pipe(es.writeArray(callback));
-  });
-});
+      .pipe(es.writeArray(callback))
+  })
+})

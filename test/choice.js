@@ -1,15 +1,16 @@
-var chai = require('chai');
-var es = require('event-stream');
-var expect = chai.expect;
-var fulltext = require('lacona-util-fulltext');
-var lacona = require('..');
+/*eslint-env mocha*/
+var chai = require('chai')
+var es = require('event-stream')
+var expect = chai.expect
+var fulltext = require('lacona-util-fulltext')
+var lacona = require('..')
 
-describe('choice', function() {
-  var parser;
+describe('choice', function () {
+  var parser
 
-  beforeEach(function() {
-    parser = new lacona.Parser();
-  });
+  beforeEach(function () {
+    parser = new lacona.Parser()
+  })
 
   it('suggests one valid choice', function (done) {
     var test = lacona.createPhrase({
@@ -18,22 +19,23 @@ describe('choice', function() {
         return lacona.choice({children: [
           lacona.literal({text: 'right'}),
           lacona.literal({text: 'wrong'})
-        ]});
+        ]})
       }
-    });
+    })
 
-    function callback(err, data) {
-      expect(data).to.have.length(3);
-      expect(fulltext.suggestion(data[1].data)).to.equal('right');
-      expect(data[1].data.result).to.be.empty;
-      done();
+    function callback (err, data) {
+      expect(err).to.not.exist
+      expect(data).to.have.length(3)
+      expect(fulltext.suggestion(data[1].data)).to.equal('right')
+      expect(data[1].data.result).to.be.empty
+      done()
     }
 
-    parser.sentences = [test()];
+    parser.sentences = [test()]
     es.readArray(['r'])
       .pipe(parser)
-      .pipe(es.writeArray(callback));
-  });
+      .pipe(es.writeArray(callback))
+  })
 
   it('suggests multiple valid choices', function (done) {
     var test = lacona.createPhrase({
@@ -42,24 +44,25 @@ describe('choice', function() {
         return lacona.choice({children: [
           lacona.literal({text: 'right'}),
           lacona.literal({text: 'right also'})
-        ]});
+        ]})
       }
-    });
+    })
 
-    function callback(err, data) {
-      expect(data).to.have.length(4);
-      expect(fulltext.suggestion(data[1].data)).to.contain('right');
-      expect(data[1].data.result).to.be.empty;
-      expect(fulltext.suggestion(data[2].data)).to.contain('right');
-      expect(data[2].data.result).to.be.empty;
-      done();
+    function callback (err, data) {
+      expect(err).to.not.exist
+      expect(data).to.have.length(4)
+      expect(fulltext.suggestion(data[1].data)).to.contain('right')
+      expect(data[1].data.result).to.be.empty
+      expect(fulltext.suggestion(data[2].data)).to.contain('right')
+      expect(data[2].data.result).to.be.empty
+      done()
     }
 
-    parser.sentences = [test()];
+    parser.sentences = [test()]
     es.readArray(['r'])
       .pipe(parser)
-      .pipe(es.writeArray(callback));
-  });
+      .pipe(es.writeArray(callback))
+  })
 
   it('suggests no valid choices', function (done) {
     var test = lacona.createPhrase({
@@ -68,20 +71,21 @@ describe('choice', function() {
         return lacona.choice({children: [
           lacona.literal({text: 'wrong'}),
           lacona.literal({text: 'wrong also'})
-        ]});
+        ]})
       }
-    });
+    })
 
-    function callback(err, data) {
-      expect(data).to.have.length(2);
-      done();
+    function callback (err, data) {
+      expect(err).to.not.exist
+      expect(data).to.have.length(2)
+      done()
     }
 
-    parser.sentences = [test()];
+    parser.sentences = [test()]
     es.readArray(['r'])
       .pipe(parser)
-      .pipe(es.writeArray(callback));
-  });
+      .pipe(es.writeArray(callback))
+  })
 
   it('adopts the value of the child', function (done) {
     var test = lacona.createPhrase({
@@ -97,24 +101,24 @@ describe('choice', function() {
             }),
             lacona.literal({text: 'wrong'})
           ]
-        });
+        })
       }
-    });
+    })
 
-    function callback(err, data) {
-      expect(data).to.have.length(3);
-      expect(fulltext.suggestion(data[1].data)).to.equal('right');
-      expect(data[1].data.result.testId).to.equal('testValue');
-      expect(data[1].data.result.subId).to.equal('testValue');
-      done();
+    function callback (err, data) {
+      expect(err).to.not.exist
+      expect(data).to.have.length(3)
+      expect(fulltext.suggestion(data[1].data)).to.equal('right')
+      expect(data[1].data.result.testId).to.equal('testValue')
+      expect(data[1].data.result.subId).to.equal('testValue')
+      done()
     }
 
-    parser.sentences = [test()];
+    parser.sentences = [test()]
     es.readArray(['r'])
       .pipe(parser)
-      .pipe(es.writeArray(callback));
-  });
-
+      .pipe(es.writeArray(callback))
+  })
 
   it('passes on its category', function (done) {
     var test = lacona.createPhrase({
@@ -126,20 +130,21 @@ describe('choice', function() {
             lacona.literal({text: 'aaa'}),
             lacona.literal({text: 'aab'})
           ]
-        });
+        })
       }
-    });
+    })
 
-    function callback(err, data) {
-      expect(data).to.have.length(4);
-      expect(data[1].data.suggestion[0].category).to.equal('myCat');
-      expect(data[2].data.suggestion[0].category).to.equal('myCat');
-      done();
+    function callback (err, data) {
+      expect(err).to.not.exist
+      expect(data).to.have.length(4)
+      expect(data[1].data.suggestion[0].category).to.equal('myCat')
+      expect(data[2].data.suggestion[0].category).to.equal('myCat')
+      done()
     }
 
-    parser.sentences = [test()];
+    parser.sentences = [test()]
     es.readArray(['aa'])
       .pipe(parser)
-      .pipe(es.writeArray(callback));
-  });
-});
+      .pipe(es.writeArray(callback))
+  })
+})
