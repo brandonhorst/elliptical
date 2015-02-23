@@ -1,4 +1,4 @@
-var _ = require('lodash')
+import _ from 'lodash'
 
 function startsWith (string1, string2) {
   return string1.toLowerCase().lastIndexOf(string2.toLowerCase(), 0) === 0
@@ -10,7 +10,7 @@ function regexSplit (str) {
   })
 }
 
-class InputOption {
+export default class InputOption {
   constructor(options) {
     this.fuzzy = options.fuzzy || 'none'
     this.text = options.text || ''
@@ -175,5 +175,3 @@ class InputOption {
     // return new InputOption(newOptions)
   }
 }
-
-module.exports = InputOption

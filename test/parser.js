@@ -1,12 +1,13 @@
 /*eslint-env mocha*/
-var chai = require('chai')
-var es = require('event-stream')
+import chai from 'chai'
+import es from 'event-stream'
 var expect = chai.expect
-var fulltext = require('lacona-util-fulltext')
-var lacona = require('..')
-var sinon = require('sinon')
+import fulltext from 'lacona-util-fulltext'
+import * as lacona from '..'
+import sinon from 'sinon'
+import sinonChai from 'sinon-chai'
 
-chai.use(require('sinon-chai'))
+chai.use(sinonChai)
 
 describe('Parser', function () {
   var parser

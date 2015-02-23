@@ -47,7 +47,7 @@ Because it is built modularly, Lacona is best consumed in the browser using Brow
 #Usage
 
 ```javascript
-var lacona = require('lacona');
+import lacona from 'lacona';
 var parser = new lacona.Parser();
 ```
 
@@ -75,9 +75,9 @@ As long as lacona knows what a `<task name>` and a `<date and time>` look like, 
 Making a lacona grammar to understand those options is easy:
 
 ```javascript
-var lacona = require('lacona');
-var freetext = require('lacona-phrase-freetext');
-var datetime = require('lacona-phrase-datetime').datetime;
+import lacona from 'lacona';
+import freetext from 'lacona-phrase-freetext';
+import datetime from 'lacona-phrase-datetime'.datetime;
 
 var reminder = lacona.createPhrase({
 	name: "brandonhorst/reminder",

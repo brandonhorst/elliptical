@@ -1,14 +1,14 @@
 /*eslint-env mocha*/
-var chai = require('chai')
-var es = require('event-stream')
+import chai from 'chai'
+import es from 'event-stream'
 var expect = chai.expect
-var fulltext = require('lacona-util-fulltext')
-var lacona = require('..')
-var Readable = require('stream').Readable
-var sinon = require('sinon')
-var Writable = require('stream').Writable
+import fulltext from 'lacona-util-fulltext'
+import * as lacona from '..'
+import stream from 'stream'
+import sinon from 'sinon'
+import sinonChai from 'sinon-chai'
 
-chai.use(require('sinon-chai'))
+chai.use(sinonChai)
 
 describe('Phrase', function () {
   var parser
@@ -80,8 +80,8 @@ describe('Phrase', function () {
       }
     })
 
-    var start = new Readable({objectMode: true})
-    var end = new Writable({objectMode: true})
+    var start = new stream.Readable({objectMode: true})
+    var end = new stream.Writable({objectMode: true})
     start._read = function noop () {}
     end.write = function (obj) {
       if (obj.event === 'data') {
@@ -221,8 +221,8 @@ describe('Phrase', function () {
       }
     })
 
-    var start = new Readable({objectMode: true})
-    var end = new Writable({objectMode: true})
+    var start = new stream.Readable({objectMode: true})
+    var end = new stream.Writable({objectMode: true})
     start._read = function noop () {}
     end.write = function (obj) {
       if (obj.event === 'data') {
@@ -260,8 +260,8 @@ describe('Phrase', function () {
       }
     })
 
-    var start = new Readable({objectMode: true})
-    var end = new Writable({objectMode: true})
+    var start = new stream.Readable({objectMode: true})
+    var end = new stream.Writable({objectMode: true})
     start._read = function noop () {}
     end.write = function (obj) {
       if (obj.event === 'data') {
@@ -300,8 +300,8 @@ describe('Phrase', function () {
       }
     })
 
-    var start = new Readable({objectMode: true})
-    var end = new Writable({objectMode: true})
+    var start = new stream.Readable({objectMode: true})
+    var end = new stream.Writable({objectMode: true})
     start._read = function noop () {}
     end.write = function (obj) {
       if (obj.event === 'data') {

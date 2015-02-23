@@ -1,7 +1,5 @@
-class LaconaError extends Error {
+export default class LaconaError extends Error {
   constructor(message) {
     super(message)
   }
 }
-
-module.exports = LaconaError

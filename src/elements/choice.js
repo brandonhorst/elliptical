@@ -1,9 +1,9 @@
-var asyncEach = require('async-each')
+import asyncEach from 'async-each'
 
-var createPhrase = require('../create-phrase')
-var InputOption = require('../input-option')
+import createPhrase from '../create-phrase'
+import InputOption from '../input-option'
 
-module.exports = createPhrase({
+export default createPhrase({
   name: 'choice',
   _handleParse(input, options, applyLimit, data, done) {
     const eachChild = (child, done) => {

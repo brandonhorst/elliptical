@@ -1,7 +1,7 @@
-var createPhrase = require('../create-phrase')
-var value = require('./value')
+import createPhrase from '../create-phrase'
+import value from './value'
 
-module.exports = createPhrase({
+export default createPhrase({
   name: 'literal',
   computeLiteral(inputString, data, done) {
     data({

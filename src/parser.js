@@ -1,9 +1,9 @@
-var asyncEach = require('async-each')
-var Transform = require('stream').Transform
-var _ = require('lodash')
+import asyncEach from 'async-each'
+import stream from 'stream'
+import _ from 'lodash'
 
-var InputOption = require('./input-option')
-var LaconaError = require('./error')
+import InputOption from './input-option'
+import LaconaError from './error'
 
 function normalizeOutput (option) {
   var output = _.pick(option, ['match', 'completion', 'result', 'sentence'])
@@ -27,9 +27,9 @@ function normalizeOutput (option) {
   return output
 }
 
-class Parser extends Transform {
+export default class Parser extends stream.Transform {
   constructor(options) {
-    Transform.call(this, {objectMode: true})
+    super({objectMode: true})
 
     options = options || {}
 
@@ -207,5 +207,3 @@ class Parser extends Transform {
     }
   }
 }
-
-module.exports = Parser

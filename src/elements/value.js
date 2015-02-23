@@ -1,8 +1,8 @@
-var createPhrase = require('../create-phrase')
-var InputOption = require('../input-option')
-var _ = require('lodash')
+import createPhrase from '../create-phrase'
+import InputOption from '../input-option'
+import _ from 'lodash'
 
-module.exports = createPhrase({
+export default createPhrase({
   name: 'value',
   getDefaultProps() {
     return {

@@ -1,10 +1,8 @@
-module.exports = {
-  Parser: require('./parser'),
-  Error: require('./error'),
-  createPhrase: require('./create-phrase'),
-  literal: require('./elements/literal'),
-  value: require('./elements/value'),
-  choice: require('./elements/choice'),
-  sequence: require('./elements/sequence'),
-  repeat: require('./elements/repeat')
-}
+export {default as Parser} from './parser'
+export {default as Error} from './error'
+export {default as createPhrase} from './create-phrase'
+export {default as literal} from './elements/literal'
+export {default as value} from './elements/value'
+export {default as choice} from './elements/choice'
+export {default as sequence} from './elements/sequence'
+export {default as repeat} from './elements/repeat'

@@ -1,9 +1,7 @@
-var createPhrase = require('../create-phrase')
-var InputOption = require('../input-option')
+import createPhrase from '../create-phrase'
+import InputOption from '../input-option'
 
-var _ = require('lodash')
-
-var sequence
+import _ from 'lodash'
 
 function addSeparator (child, separator) {
   var newChild, newProps
@@ -25,7 +23,7 @@ function addSeparator (child, separator) {
   }
 }
 
-sequence = createPhrase({
+const sequence = createPhrase({
   name: 'sequence',
   // take the props, and set the actualChildren property
   onCreate() {
@@ -71,4 +69,4 @@ sequence = createPhrase({
   }
 })
 
-module.exports = sequence
+export default sequence

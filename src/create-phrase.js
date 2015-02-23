@@ -1,6 +1,6 @@
-var Phrase = require('./phrase')
-var LaconaError = require('./error')
-var _ = require('lodash')
+import Phrase from './phrase'
+import LaconaError from './error'
+import _ from 'lodash'
 
 var nextGUID = 0
 
@@ -34,7 +34,7 @@ function createPhraseFactory (obj) {
   return phraseFactory
 }
 
-function createPhrase (obj) {
+export default function createPhrase (obj) {
   var workingObj = _.omit(obj, ['translations', 'describe'])
   var hasDefault = false
 
@@ -67,5 +67,3 @@ function createPhrase (obj) {
 
   return createPhraseFactory(workingObj)
 }
-
-module.exports = createPhrase

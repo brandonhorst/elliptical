@@ -1,7 +1,7 @@
-var asyncEach = require('async-each')
-var _ = require('lodash')
+import asyncEach from 'async-each'
+import _ from 'lodash'
 
-var InputOption = require('./input-option')
+import InputOption from './input-option'
 
 var nextTempId = 0
 
@@ -15,7 +15,7 @@ function getBestElementLang (translations, langs) {
   }).value() || 'default'
 }
 
-class Phrase {
+export default class Phrase {
   constructor(obj, props, factory, guid) {
     // set each property on the class object to be a property on this
     _.assign(this, obj)
@@ -248,5 +248,3 @@ class Phrase {
     }
   }
 }
-
-module.exports = Phrase
