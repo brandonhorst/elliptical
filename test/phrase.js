@@ -1,7 +1,6 @@
 /*eslint-env mocha*/
-import chai from 'chai'
+import chai, {expect} from 'chai'
 import es from 'event-stream'
-var expect = chai.expect
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
 import stream from 'stream'
