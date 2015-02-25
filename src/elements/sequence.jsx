@@ -1,19 +1,20 @@
 /** @jsx createElement */
 import _ from 'lodash'
 import {Content, Separator} from './noop'
-import {createElement} from '../create-element'
+import {createElement} from 'lacona-phrase'
 import InputOption from '../input-option'
+import {Phrase} from 'lacona-phrase'
 
-function addSeparator (child, separator, Phrase) {
+function addSeparator (child, separator, Constructor) {
   if (child.element.props.optional) {
-    return new Phrase(
+    return new Constructor(
       <Sequence optional={true}>
         <child.elementConstructor {...child.element.props} optional={false} />
         <separator.elementConstructor {...separator.element.props} />
       </Sequence>
     )
   } else {
-    return new Phrase(
+    return new Constructor(
       <Sequence>
         <child.elementConstructor {...child.element.props} />
         <separator.elementConstructor {...separator.element.props} />
@@ -22,7 +23,7 @@ function addSeparator (child, separator, Phrase) {
   }
 }
 
-export default class Sequence {
+export default class Sequence extends Phrase {
   _handleParse(input, options, applyLimit, data, done) {
     let actualChildren
     if (this.props.children.length > 0 && this.props.children[0].elementConstructor === 'content') {

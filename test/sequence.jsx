@@ -1,10 +1,10 @@
-/** @jsx createElement */
+/** @jsx phrase.createElement */
 /* eslint-env mocha */
-import {expect} from 'chai'
 import es from 'event-stream'
+import {expect} from 'chai'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
-import {createElement} from '../lib/create-element'
+import * as phrase from 'lacona-phrase'
 
 describe('sequence', function () {
   var parser

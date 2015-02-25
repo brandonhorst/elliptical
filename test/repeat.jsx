@@ -1,10 +1,10 @@
-/** @jsx createElement */
+/** @jsx phrase.createElement */
 /* eslint-env mocha */
-import {expect} from 'chai'
 import es from 'event-stream'
+import {expect} from 'chai'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
-import {createElement} from '../lib/create-element'
+import * as phrase from 'lacona-phrase'
 
 describe('repeat', function () {
   var parser
@@ -143,7 +143,7 @@ describe('repeat', function () {
   })
 
   it('does not pass on child values to phrases', function (done) {
-    class Test {
+    class Test extends phrase.Phrase {
       describe() {
         return (
           <repeat id='testId'>

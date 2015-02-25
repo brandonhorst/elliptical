@@ -1,7 +1,8 @@
 import _ from 'lodash'
 import InputOption from '../input-option'
+import {Phrase} from 'lacona-phrase'
 
-export default class Value {
+export default class Value extends Phrase {
   static getDefaultProps() {
     return {
       join: false,

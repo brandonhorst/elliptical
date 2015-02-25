@@ -2,7 +2,7 @@
 import _ from 'lodash'
 import asyncEach from 'async-each'
 import * as builtins from './elements'
-import {createElement} from './create-element'
+import {createElement} from 'lacona-phrase'
 import InputOption from './input-option'
 import LaconaError from './error'
 

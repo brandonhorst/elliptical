@@ -1,7 +1,8 @@
 import _ from 'lodash'
 import InputOption from '../input-option'
+import {Phrase} from 'lacona-phrase'
 
-export default class Repeat {
+export default class Repeat extends Phrase {
   static getDefaultProps() {
     return {
       max: Number.MAX_VALUE,

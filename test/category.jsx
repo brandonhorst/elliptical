@@ -1,10 +1,10 @@
-/** @jsx createElement */
+/** @jsx phrase.createElement */
 /* eslint-env mocha */
-import {expect} from 'chai'
 import es from 'event-stream'
+import {expect} from 'chai'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
-import {createElement} from '../lib/create-element'
+import * as phrase from 'lacona-phrase'
 
 describe('category', function () {
   var parser
@@ -28,7 +28,7 @@ describe('category', function () {
   })
 
   it('custom phrases can modify the category', function (done) {
-    class Test {
+    class Test extends phrase.Phrase {
       describe() {
         return <literal text='test' category={this.props.category + 'Modified'} />
       }
@@ -48,7 +48,7 @@ describe('category', function () {
   })
 
   it('custom phrases will inherit the category if none is specified', function (done) {
-    class Test {
+    class Test extends phrase.Phrase {
       describe() {
         return <literal text='test' />
       }

@@ -1,12 +1,12 @@
-/** @jsx createElement */
+/** @jsx phrase.createElement */
 /* eslint-env mocha */
 import chai, {expect} from 'chai'
 import es from 'event-stream'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
-import {createElement} from '../lib/create-element'
-import {spy} from 'sinon'
+import * as phrase from 'lacona-phrase'
 import sinonChai from 'sinon-chai'
+import {spy} from 'sinon'
 
 chai.use(sinonChai)
 
@@ -40,7 +40,7 @@ describe('value', function () {
   it('can access props its function', function (done) {
     var funSpy = spy()
 
-    class Test {
+    class Test extends phrase.Phrase {
       fun(input, data, done) {
         expect(this.props.myVar).to.equal('myVal')
         funSpy()

@@ -1,7 +1,8 @@
 import asyncEach from 'async-each'
 import InputOption from '../input-option'
+import {Phrase} from 'lacona-phrase'
 
-export default class Choice {
+export default class Choice extends Phrase {
   _handleParse(input, options, applyLimit, data, done) {
     const eachChild = (child, done) => {
       const childData = (input) => {

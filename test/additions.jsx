@@ -1,13 +1,15 @@
-/** @jsx createElement */
+/** @jsx phrase.createElement */
 /* eslint-env mocha */
 import chai, {expect} from 'chai'
 import es from 'event-stream'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
-import {createElement} from '../lib/create-element'
-import stream from 'stream'
-import {spy} from 'sinon'
+import * as phrase from 'lacona-phrase'
 import sinonChai from 'sinon-chai'
+import {spy} from 'sinon'
+import stream from 'stream'
+
+chai.use(sinonChai)
 
 describe('additions', () => {
   let parser
@@ -16,7 +18,7 @@ describe('additions', () => {
   })
 
   it('allows phrases to have additions (but not passed to constructor)', function (done) {
-    class Test {
+    class Test extends phrase.Phrase {
       constructor() {
         expect(this.config).to.be.undefined
       }
@@ -37,7 +39,7 @@ describe('additions', () => {
     var callbackSpy = spy()
     var describeSpy = spy()
 
-    class Test {
+    class Test extends phrase.Phrase {
       describe() {
         describeSpy()
         if (!callbackSpy.called) {
@@ -76,7 +78,7 @@ describe('additions', () => {
     var callbackSpy = spy()
     var describeSpy = spy()
 
-    class Test {
+    class Test extends phrase.Phrase {
       describe() {
         describeSpy()
         if (!callbackSpy.called) {
@@ -116,7 +118,7 @@ describe('additions', () => {
   })
 
   it('allows phrases to modify set their additions, and it calls additionsCallback', function (done) {
-    class Test {
+    class Test extends phrase.Phrase {
       changeConfig() {
         this.setConfig('new test')
       }
@@ -141,13 +143,13 @@ describe('additions', () => {
   })
 
   it('allows extensions to keep their additions', function (done) {
-    class Test {
+    class Test extends phrase.Phrase {
       describe() {
         return <literal text='test' />
       }
     }
 
-    class Extender {
+    class Extender extends phrase.Phrase {
       describe() {
         expect(this.config).to.equal('test')
         done()

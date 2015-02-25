@@ -1,14 +1,14 @@
-/** @jsx createElement */
+/** @jsx phrase.createElement */
 /* eslint-env mocha */
 import chai, {expect} from 'chai'
 import es from 'event-stream'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
+import * as phrase from 'lacona-phrase'
 import Phrase from '../lib/phrase'
-import {createElement} from '../lib/create-element'
-import stream from 'stream'
 import {spy} from 'sinon'
 import sinonChai from 'sinon-chai'
+import stream from 'stream'
 
 chai.use(sinonChai)
 
@@ -19,11 +19,11 @@ describe('Phrase', function () {
   })
 
   it('handles phrases with supplements', function (done) {
-    class Extended {
+    class Extended extends phrase.Phrase {
       describe() { return <literal text='test a' /> }
     }
 
-    class Extender {
+    class Extender extends phrase.Phrase {
       describe() { return <literal text='test b' /> }
     }
     Extender.supplements = [Extended]
@@ -47,11 +47,11 @@ describe('Phrase', function () {
   it('accepts supplements being removed', function (done) {
     var callbackSpy = spy()
 
-    class Extended {
+    class Extended extends phrase.Phrase {
       describe() { return <literal text='test a' /> }
     }
 
-    class Extender {
+    class Extender extends phrase.Phrase {
       describe() { return <literal text='test b' /> }
     }
     Extender.supplements = [Extended]
@@ -84,10 +84,10 @@ describe('Phrase', function () {
   })
 
   it('handles phrases with overriding', function (done) {
-    class Overridden {
+    class Overridden extends phrase.Phrase {
       describe() { return <literal text='test a' /> }
     }
-    class Overrider {
+    class Overrider extends phrase.Phrase {
       describe() { return <literal text='test b' /> }
     }
     Overrider.overrides = [Overridden]
@@ -108,7 +108,7 @@ describe('Phrase', function () {
   })
 
   it('allows for recursive phrases without creating an infinite loop', function (done) {
-    class Test {
+    class Test extends phrase.Phrase {
       describe() {
         return (
           <sequence>
@@ -139,13 +139,13 @@ describe('Phrase', function () {
   })
 
   it('allows for nested phrases with the same id', function (done) {
-    class Test {
+    class Test extends phrase.Phrase {
       describe() { return <Include1 id='test' /> }
     }
-    class Include1 {
+    class Include1 extends phrase.Phrase {
       describe() { return <Include2 id='test' /> }
     }
-    class Include2 {
+    class Include2 extends phrase.Phrase {
       describe() { return <literal text='disp' value='val' id='test' /> }
     }
 
@@ -163,11 +163,54 @@ describe('Phrase', function () {
       .pipe(es.writeArray(callback))
   })
 
+  it('calls getValue when on the Phrase context', function (done) {
+    const getVal = spy()
+    class Test extends phrase.Phrase {
+      getValue(result) {
+        getVal()
+        expect(this.props.test).to.equal('myProp')
+        expect(result).to.eql({myId: 'myVal'})
+      }
+      describe() { return <literal id='myId' value='myVal' text='test' /> }
+    }
+
+    function callback(err, data) {
+      expect(err).to.not.exist
+      expect(data).to.have.length(3)
+      expect(getVal).to.have.been.calledOnce
+      done()
+    }
+
+    parser.sentences = [<Test test='myProp' />]
+    es.readArray(['t'])
+      .pipe(parser)
+      .pipe(es.writeArray(callback))
+  })
+
+  it('sentence passes on result if getValue was not supplied', function (done) {
+    const getVal = spy()
+    class Test extends phrase.Phrase {
+      describe() { return <literal id='myId' value='myVal' text='test' /> }
+    }
+
+    function callback(err, data) {
+      expect(err).to.not.exist
+      expect(data).to.have.length(3)
+      expect(data[1].data.result).to.eql({myId: 'myVal'})
+      done()
+    }
+
+    parser.sentences = [<Test test='myProp' />]
+    es.readArray(['t'])
+      .pipe(parser)
+      .pipe(es.writeArray(callback))
+  })
+
   it('caches calls to describe', function (done) {
     var callbackSpy = spy()
     var describeSpy = spy()
 
-    class Test {
+    class Test extends phrase.Phrase {
       describe() {
         describeSpy()
         return <literal text='test' />
@@ -199,7 +242,7 @@ describe('Phrase', function () {
   it('throws for phrases without a default-lang schema', function () {
 
     expect(function () {
-      new Phrase(class Test {
+      new Phrase(class Test extends phrase.Phrase {
         getTranslations() {
           return [{
             langs: ['en-US'],
@@ -214,7 +257,7 @@ describe('Phrase', function () {
 
   it('throws for translations without a lang', function () {
     expect(function () {
-      new Phrase(class Test {
+      new Phrase(class Test extends phrase.Phrase {
         getTranslations() {
           return [{
             describe: function () {
@@ -228,7 +271,7 @@ describe('Phrase', function () {
 
   it('throws for phrases without a describe', function () {
     expect(function () {
-      new Phrase(class Test {})
+      new Phrase(class Test extends phrase.Phrase {})
     }).to.throw(lacona.Error)
   })
 })

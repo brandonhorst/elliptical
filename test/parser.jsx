@@ -1,13 +1,14 @@
-/** @jsx createElement */
+/** @jsx phrase.createElement */
 /* eslint-env mocha */
 import chai, {expect} from 'chai'
 import es from 'event-stream'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
-import {createElement} from '../lib/create-element'
 import Literal from '../lib/elements/literal'
-import sinon from 'sinon'
+import * as phrase from 'lacona-phrase'
 import sinonChai from 'sinon-chai'
+import {spy} from 'sinon'
+console.log(phrase)
 
 chai.use(sinonChai)
 
@@ -34,7 +35,7 @@ describe('Parser', function () {
   })
 
   it('requires string input', function (done) {
-    var callback = sinon.spy(function (err) {
+    var callback = spy(function (err) {
       expect(err).to.be.an.instanceof(lacona.Error)
       done()
     })
@@ -101,7 +102,7 @@ describe('Parser', function () {
       .pipe(es.writeArray(callback))
   })
 
-  it('passes the sentence name to the output', function (done) {
+  it('passes the sentence to the output', function (done) {
     const lit = <literal text='test' />
 
     function callback (err, data) {
@@ -118,7 +119,7 @@ describe('Parser', function () {
   })
 
   it('can parse in a specified language', function (done) {
-    class Test {
+    class Test extends phrase.Phrase {
       static getTranslations() {
         return [{
           langs: ['en', 'default'],
@@ -150,7 +151,7 @@ describe('Parser', function () {
   })
 
   it('falls back on a less specific language if a more specific one is not provided', function (done) {
-    class Test {
+    class Test extends phrase.Phrase {
       static getTranslations() {
         return [{
           langs: ['en', 'default'],
@@ -182,7 +183,7 @@ describe('Parser', function () {
   })
 
   describe('async parse', function () {
-    class Test {
+    class Test extends phrase.Phrase {
       delay(input, data, done) {
         setTimeout(function () {
           data({text: 'test', value: 'test'})

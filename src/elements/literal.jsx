@@ -1,8 +1,8 @@
 /** @jsx createElement */
-import {createElement} from '../create-element'
+import {createElement, Phrase} from 'lacona-phrase'
 import value from './value'
 
-export default class Literal {
+export default class Literal extends Phrase {
   computeLiteral(inputString, data, done) {
     data({
       text: this.props.text,
