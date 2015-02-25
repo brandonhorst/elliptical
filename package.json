@@ -30,17 +30,17 @@
   },
   "homepage": "https://github.com/lacona/lacona",
   "devDependencies": {
-    "babel": "^4.4.5",
-    "chai": "^1.10.0",
+    "babel": "^4.5.1",
+    "chai": "^2.1.0",
     "event-stream": "^3.2.2",
     "lacona-util-fulltext": "^0.2.0",
     "mocha": "^2.1.0",
     "rimraf": "^2.2.8",
     "sinon": "^1.12.2",
-    "sinon-chai": "^2.6.0"
+    "sinon-chai": "^2.7.0"
   },
   "dependencies": {
     "async-each": "^0.1.6",
-    "lodash": "^3.0.0"
+    "lodash": "^3.3.1"
   }
 }
