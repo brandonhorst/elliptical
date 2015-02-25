@@ -1,8 +1,11 @@
-/*eslint-env mocha*/
+/** @jsx createElement */
+/* eslint-env mocha */
 import chai, {expect} from 'chai'
 import es from 'event-stream'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
+import {createElement} from '../lib/create-element'
+import Literal from '../lib/elements/literal'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 
@@ -58,13 +61,6 @@ describe('Parser', function () {
   })
 
   it('passes a given group', function (done) {
-    var test = lacona.createPhrase({
-      name: 'test/test',
-      describe: function () {
-        return lacona.literal({text: 'test'})
-      }
-    })
-
     function callback (err, data) {
       expect(err).to.not.exist
       expect(data).to.have.length(3)
@@ -77,20 +73,13 @@ describe('Parser', function () {
       done()
     }
 
-    parser.sentences = [test()]
+    parser.sentences = [<literal text='test' />]
     es.readArray([{group: 'someGroup', data: 'test'}])
       .pipe(parser)
       .pipe(es.writeArray(callback))
   })
 
   it('parses have separate ids', function (done) {
-    var test = lacona.createPhrase({
-      name: 'test/test',
-      describe: function () {
-        return lacona.literal({text: 'test'})
-      }
-    })
-
     function callback (err, data) {
       expect(err).to.not.exist
       expect(data).to.have.length(6)
@@ -106,48 +95,44 @@ describe('Parser', function () {
       done()
     }
 
-    parser.sentences = [test()]
+    parser.sentences = [<literal text='test' />]
     es.readArray(['t', 't'])
       .pipe(parser)
       .pipe(es.writeArray(callback))
   })
 
   it('passes the sentence name to the output', function (done) {
-    var test = lacona.createPhrase({
-      name: 'test/test',
-      describe: function () {
-        return lacona.literal({text: 'test'})
-      }
-    })
+    const lit = <literal text='test' />
 
     function callback (err, data) {
       expect(err).to.not.exist
       expect(data).to.have.length(3)
-      expect(data[1].data.sentence).to.equal('test/test')
+      expect(data[1].data.sentence).to.be.an.instanceof(Literal)
       done()
     }
 
-    parser.sentences = [test()]
+    parser.sentences = [lit]
     es.readArray(['t'])
       .pipe(parser)
       .pipe(es.writeArray(callback))
   })
 
   it('can parse in a specified language', function (done) {
-    var test = lacona.createPhrase({
-      name: 'test/test',
-      translations: [{
-        langs: ['en', 'default'],
-        describe: function () {
-          return lacona.literal({text: 'test'})
-        }
-      }, {
-        langs: ['es'],
-        describe: function () {
-          return lacona.literal({text: 'prueba'})
-        }
-      }]
-    })
+    class Test {
+      static getTranslations() {
+        return [{
+          langs: ['en', 'default'],
+          describe() {
+            return <literal text='test' />
+          }
+        }, {
+          langs: ['es'],
+          describe() {
+            return <literal text='prueba' />
+          }
+        }]
+      }
+    }
 
     function callback (err, data) {
       expect(err).to.not.exist
@@ -157,7 +142,7 @@ describe('Parser', function () {
     }
 
     parser.langs = ['es']
-    parser.sentences = [test()]
+    parser.sentences = [<Test />]
 
     es.readArray(['p'])
       .pipe(parser)
@@ -165,20 +150,21 @@ describe('Parser', function () {
   })
 
   it('falls back on a less specific language if a more specific one is not provided', function (done) {
-    var test = lacona.createPhrase({
-      name: 'test/test',
-      translations: [{
-        langs: ['en', 'default'],
-        describe: function () {
-          return lacona.literal({text: 'train'})
-        }
-      }, {
-        langs: ['es'],
-        describe: function () {
-          return lacona.literal({text: 'tren'})
-        }
-      }]
-    })
+    class Test {
+      static getTranslations() {
+        return [{
+          langs: ['en', 'default'],
+          describe() {
+            return <literal text='train' />
+          }
+        }, {
+          langs: ['es'],
+          describe() {
+            return <literal text='tren' />
+          }
+        }]
+      }
+    }
 
     function callback (err, data) {
       expect(err).to.not.exist
@@ -189,29 +175,25 @@ describe('Parser', function () {
 
     parser.langs = ['es_ES']
 
-    parser.sentences = [test()]
+    parser.sentences = [<Test />]
     es.readArray(['tr'])
       .pipe(parser)
       .pipe(es.writeArray(callback))
   })
 
   describe('async parse', function () {
-    var test
+    class Test {
+      delay(input, data, done) {
+        setTimeout(function () {
+          data({text: 'test', value: 'test'})
+          done()
+        }, 0)
+      }
 
-    beforeEach(function () {
-      test = lacona.createPhrase({
-        name: 'test/test',
-        delay: function (input, data, done) {
-          setTimeout(function () {
-            data({text: 'test', value: 'test'})
-            done()
-          }, 0)
-        },
-        describe: function () {
-          return lacona.value({compute: this.delay})
-        }
-      })
-    })
+      describe() {
+        return <value compute={this.delay} />
+      }
+    }
 
     it('passes start and end for async parse', function (done) {
       function callback (err, data) {
@@ -224,7 +206,7 @@ describe('Parser', function () {
         done()
       }
 
-      parser.sentences = [test()]
+      parser.sentences = [<Test />]
 
       es.readArray(['invalid'])
       .pipe(parser)
@@ -243,7 +225,7 @@ describe('Parser', function () {
         done()
       }
 
-      parser.sentences = [test()]
+      parser.sentences = [<Test />]
 
       es.readArray(['t'])
       .pipe(parser)

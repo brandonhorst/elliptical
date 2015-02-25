@@ -1,8 +1,10 @@
-/*eslint-env mocha*/
+/** @jsx createElement */
+/* eslint-env mocha */
 import {expect} from 'chai'
 import es from 'event-stream'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
+import {createElement} from '../lib/create-element'
 
 describe('literal', function () {
   var parser
@@ -12,12 +14,6 @@ describe('literal', function () {
   })
 
   it('handles a literal', function (done) {
-    var test = lacona.createPhrase({
-      name: 'test/test',
-      describe: function () {
-        return lacona.literal({text: 'literal test'})
-      }
-    })
 
     function callback (err, data) {
       expect(err).to.not.exist
@@ -31,46 +27,28 @@ describe('literal', function () {
       done()
     }
 
-    parser.sentences = [test()]
+    parser.sentences = [<literal text='literal test' />]
     es.readArray(['l'])
       .pipe(parser)
       .pipe(es.writeArray(callback))
   })
 
   it('handles a literal with an id', function (done) {
-    var test = lacona.createPhrase({
-      name: 'test/test',
-      describe: function () {
-        return lacona.literal({
-          text: 'literal test',
-          value: 'test',
-          id: 'testId'
-        })
-      }
-    })
-
     function callback (err, data) {
       expect(err).to.not.exist
       expect(data).to.have.length(3)
       expect(fulltext.suggestion(data[1].data)).to.equal('literal test')
-      expect(data[1].data.result).to.deep.equal({testId: 'test'})
+      expect(data[1].data.result).to.equal('test')
       done()
     }
 
-    parser.sentences = [test()]
+    parser.sentences = [<literal text='literal test' value='test'/>]
     es.readArray(['l'])
       .pipe(parser)
       .pipe(es.writeArray(callback))
   })
 
   it('maintains case', function (done) {
-    var test = lacona.createPhrase({
-      name: 'test/test',
-      describe: function () {
-        return lacona.literal({text: 'Test'})
-      }
-    })
-
     function callback (err, data) {
       expect(err).to.not.exist
       expect(data).to.have.length(3)
@@ -78,7 +56,7 @@ describe('literal', function () {
       done()
     }
 
-    parser.sentences = [test()]
+    parser.sentences = [<literal text='Test' />]
     es.readArray(['t'])
       .pipe(parser)
       .pipe(es.writeArray(callback))

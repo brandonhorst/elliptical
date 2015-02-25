@@ -2,14 +2,14 @@ import createPhrase from '../create-phrase'
 import InputOption from '../input-option'
 import _ from 'lodash'
 
-export default createPhrase({
-  name: 'value',
-  getDefaultProps() {
+export default class Value {
+  static getDefaultProps() {
     return {
       join: false,
       fuzzy: 'all'
     }
-  },
+  }
+
   _handleParse(input, options, applyLimit, data, done) {
     var handleStringOptions = {
       join: this.props.join,
@@ -42,4 +42,4 @@ export default createPhrase({
 
     return this.props.compute(input.text, computeData, done)
   }
-})
+}

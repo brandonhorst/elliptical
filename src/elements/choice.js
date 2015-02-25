@@ -1,15 +1,13 @@
 import asyncEach from 'async-each'
 
-import createPhrase from '../create-phrase'
 import InputOption from '../input-option'
 
-export default createPhrase({
-  name: 'choice',
+export default class Choice {
   _handleParse(input, options, applyLimit, data, done) {
     const eachChild = (child, done) => {
       const childData = (input) => {
         var inputData = input.getData()
-        inputData.result[this.props.id] = input.result[child.props.id]
+        inputData.result[this.props.id] = input.result[child.element.props.id]
         data(new InputOption(inputData))
       }
 
@@ -27,4 +25,4 @@ export default createPhrase({
     // Parse each child asyncronously
     asyncEach(this.props.children, eachChild, done)
   }
-})
+}

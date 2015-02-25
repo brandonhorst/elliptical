@@ -1,5 +1,5 @@
 export default class LaconaError extends Error {
   constructor(message) {
-    super(message)
+    super(`Lacona Error: ${message}`)
   }
 }

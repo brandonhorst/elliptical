@@ -4,9 +4,8 @@
   "description": "Natural Language Parsing Framework",
   "main": "lib/lacona.js",
   "scripts": {
-    "test": "mocha test --compilers js:babel/register",
+    "test": "babel test --out-dir tmp && mocha tmp",
     "build": "babel src --out-dir lib",
-    "build:dev": "babel src --out-dir lib -s",
     "validate": "standard src test && npm run build && npm test",
     "cover": "istanbul cover _mocha test -- -R dot && istanbul report text",
     "coveralls": "istanbul cover _mocha test --report lcovonly -- -R dot && cat coverage/lcov.info | coveralls && rimraf ./coverage",

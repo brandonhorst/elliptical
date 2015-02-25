@@ -1,8 +1,10 @@
-/*eslint-env mocha*/
+/** @jsx createElement */
+/* eslint-env mocha */
 import {expect} from 'chai'
 import es from 'event-stream'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
+import {createElement} from '../lib/create-element'
 
 describe('join', function () {
   var parser
@@ -11,16 +13,6 @@ describe('join', function () {
   })
 
   it('joins literals onto the suggestion', function (done) {
-    var test = lacona.createPhrase({
-      name: 'test/test',
-      describe: function () {
-        return lacona.sequence({children: [
-          lacona.literal({text: 'aaa'}),
-          lacona.literal({text: 'bbb', join: true})
-        ]})
-      }
-    })
-
     function callback (err, data) {
       expect(err).to.not.exist
       expect(data).to.have.length(3)
@@ -28,7 +20,12 @@ describe('join', function () {
       done()
     }
 
-    parser.sentences = [test()]
+    parser.sentences = [
+      <sequence>
+        <literal text='aaa' />
+        <literal text='bbb' join={true} />
+      </sequence>
+    ]
 
     es.readArray(['a'])
       .pipe(parser)

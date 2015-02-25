@@ -1,8 +1,13 @@
-/*eslint-env mocha*/
+/** @jsx createElement */
+/* eslint-env mocha */
+import {install} from 'source-map-support'
 import {expect} from 'chai'
 import es from 'event-stream'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
+import {createElement} from '../lib/create-element'
+
+install()
 
 describe('choice', function () {
   var parser
@@ -12,16 +17,6 @@ describe('choice', function () {
   })
 
   it('suggests one valid choice', function (done) {
-    var test = lacona.createPhrase({
-      name: 'test/test',
-      describe: function () {
-        return lacona.choice({children: [
-          lacona.literal({text: 'right'}),
-          lacona.literal({text: 'wrong'})
-        ]})
-      }
-    })
-
     function callback (err, data) {
       expect(err).to.not.exist
       expect(data).to.have.length(3)
@@ -30,23 +25,19 @@ describe('choice', function () {
       done()
     }
 
-    parser.sentences = [test()]
+    parser.sentences = [
+      <choice>
+        <literal text='right' />
+        <literal text='wrong' />
+      </choice>
+    ]
+
     es.readArray(['r'])
       .pipe(parser)
       .pipe(es.writeArray(callback))
   })
 
   it('suggests multiple valid choices', function (done) {
-    var test = lacona.createPhrase({
-      name: 'test/test',
-      describe: function () {
-        return lacona.choice({children: [
-          lacona.literal({text: 'right'}),
-          lacona.literal({text: 'right also'})
-        ]})
-      }
-    })
-
     function callback (err, data) {
       expect(err).to.not.exist
       expect(data).to.have.length(4)
@@ -57,82 +48,56 @@ describe('choice', function () {
       done()
     }
 
-    parser.sentences = [test()]
+    parser.sentences = [
+      <choice>
+        <literal text='right' />
+        <literal text='right also' />
+      </choice>
+    ]
     es.readArray(['r'])
       .pipe(parser)
       .pipe(es.writeArray(callback))
   })
 
   it('suggests no valid choices', function (done) {
-    var test = lacona.createPhrase({
-      name: 'test/test',
-      describe: function () {
-        return lacona.choice({children: [
-          lacona.literal({text: 'wrong'}),
-          lacona.literal({text: 'wrong also'})
-        ]})
-      }
-    })
-
     function callback (err, data) {
       expect(err).to.not.exist
       expect(data).to.have.length(2)
       done()
     }
 
-    parser.sentences = [test()]
+    parser.sentences = [
+      <choice>
+        <literal text='wrong' />
+        <literal text='wrong also' />
+      </choice>
+    ]
     es.readArray(['r'])
       .pipe(parser)
       .pipe(es.writeArray(callback))
   })
 
   it('adopts the value of the child', function (done) {
-    var test = lacona.createPhrase({
-      name: 'test/test',
-      describe: function () {
-        return lacona.choice({
-          id: 'testId',
-          children: [
-            lacona.literal({
-              id: 'subId',
-              text: 'right',
-              value: 'testValue'
-            }),
-            lacona.literal({text: 'wrong'})
-          ]
-        })
-      }
-    })
-
     function callback (err, data) {
       expect(err).to.not.exist
       expect(data).to.have.length(3)
       expect(fulltext.suggestion(data[1].data)).to.equal('right')
-      expect(data[1].data.result.testId).to.equal('testValue')
-      expect(data[1].data.result.subId).to.equal('testValue')
+      expect(data[1].data.result).to.equal('testValue')
       done()
     }
 
-    parser.sentences = [test()]
+    parser.sentences = [
+      <choice>
+        <literal text='right' value='testValue' />
+        <literal text='wrong' />
+      </choice>
+    ]
     es.readArray(['r'])
       .pipe(parser)
       .pipe(es.writeArray(callback))
   })
 
   it('passes on its category', function (done) {
-    var test = lacona.createPhrase({
-      name: 'test/test',
-      describe: function () {
-        return lacona.choice({
-          category: 'myCat',
-          children: [
-            lacona.literal({text: 'aaa'}),
-            lacona.literal({text: 'aab'})
-          ]
-        })
-      }
-    })
-
     function callback (err, data) {
       expect(err).to.not.exist
       expect(data).to.have.length(4)
@@ -141,7 +106,12 @@ describe('choice', function () {
       done()
     }
 
-    parser.sentences = [test()]
+    parser.sentences = [
+      <choice category='myCat'>
+        <literal text='aaa' />
+        <literal text='aab' />
+      </choice>
+    ]
     es.readArray(['aa'])
       .pipe(parser)
       .pipe(es.writeArray(callback))

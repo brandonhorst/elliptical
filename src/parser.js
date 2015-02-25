@@ -4,6 +4,8 @@ import _ from 'lodash'
 
 import InputOption from './input-option'
 import LaconaError from './error'
+import PhraseManager from './phrase-manager'
+import Phrase from './phrase'
 
 function normalizeOutput (option) {
   var output = _.pick(option, ['match', 'completion', 'result', 'sentence'])
@@ -28,40 +30,33 @@ function normalizeOutput (option) {
 }
 
 export default class Parser extends stream.Transform {
-  constructor(options) {
+  constructor({langs = ['default'], sentences = [], extensions = [], fuzzy} = {}) {
     super({objectMode: true})
 
-    options = options || {}
+    this.langs = langs
+    this.sentences = sentences
+    this.extensions = extensions
+    this.fuzzy = fuzzy
 
-    _.defaults(
-      this,
-      _.pick(options, ['langs', 'sentences', 'extensions', 'fuzzy']),
-      {
-        langs: ['default'],
-        sentences: [],
-        extensions: []
-      }
-    )
-
+    this._manager = new PhraseManager()
     this._currentParseNumber = 0
     this._currentPhraseParseId = 0
     this._flushcallback = null
     this._pending = 0
   }
 
-  _getExtensions(name) {
-    return _.reduce(this.extensions, (acc, extension) => {
-      if (_.contains(extension.extends, name)) {
-        acc.extenders[extension.elementName] = extension
+  _getExtensions(Constructor) {
+    return _.reduce(this.extensions, (acc, Extension) => {
+      if (_.includes(Extension.supplements, Constructor)) {
+        acc.supplementers.push(Extension)
       }
-      if (_.contains(extension.overrides, name)) {
-        acc.overriders[extension.elementName] = extension
+      if (_.includes(Extension.overrides, Constructor)) {
+        acc.overriders.push(Extension)
       }
-
       return acc
     }, {
-      extenders: {},
-      overriders: {}
+      supplementers: [],
+      overriders: []
     })
   }
 
@@ -98,14 +93,15 @@ export default class Parser extends stream.Transform {
       var input = new InputOption({
         fuzzy: this.fuzzy,
         text: inputText,
-        sentence: phrase.name,
+        sentence: phrase.element,
         group: group
       })
       var options = {
         langs: this.langs,
         addLimit: addLimit,
         getExtensions: this._getExtensions.bind(this),
-        generatePhraseParseId: this._generatePhraseParseId.bind(this)
+        generatePhraseParseId: this._generatePhraseParseId.bind(this),
+        Phrase: Phrase
       }
 
       const sentenceData = (input) => {
@@ -116,7 +112,7 @@ export default class Parser extends stream.Transform {
           newInputData = input.getData()
 
           // result should be the result of the phrase
-          newInputData.result = input.result[phrase.props.id]
+          newInputData.result = input.result[phrase.element.props.id]
           newInput = new InputOption(newInputData)
 
           if (_.isEmpty(input.limit)) {
@@ -195,7 +191,9 @@ export default class Parser extends stream.Transform {
       group: group
     })
 
-    asyncEach(this.sentences, parseSentence, allPhrasesDone)
+    this._manager.update(this.sentences)
+
+    asyncEach(this._manager.sentences, parseSentence, allPhrasesDone)
     callback()
   }
 

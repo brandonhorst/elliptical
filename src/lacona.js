@@ -1,8 +1,2 @@
 export {default as Parser} from './parser'
 export {default as Error} from './error'
-export {default as createPhrase} from './create-phrase'
-export {default as literal} from './elements/literal'
-export {default as value} from './elements/value'
-export {default as choice} from './elements/choice'
-export {default as sequence} from './elements/sequence'
-export {default as repeat} from './elements/repeat'

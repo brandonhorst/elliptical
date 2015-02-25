@@ -1,8 +1,10 @@
-/*eslint-env mocha*/
+/** @jsx createElement */
+/* eslint-env mocha */
 import {expect} from 'chai'
 import es from 'event-stream'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
+import {createElement} from '../lib/create-element'
 
 describe('sequence', function () {
   var parser
@@ -12,16 +14,6 @@ describe('sequence', function () {
   })
 
   it('puts two elements in order', function (done) {
-    var test = lacona.createPhrase({
-      name: 'test/test',
-      describe: function () {
-        return lacona.sequence({children: [
-          lacona.literal({text: 'super'}),
-          lacona.literal({text: 'man'})
-        ]})
-      }
-    })
-
     function callback (err, data) {
       expect(err).to.not.exist
       expect(data).to.have.length(3)
@@ -30,26 +22,18 @@ describe('sequence', function () {
       done()
     }
 
-    parser.sentences = [test()]
+    parser.sentences = [
+      <sequence>
+        <literal text='super' />
+        <literal text='man' />
+      </sequence>
+    ]
     es.readArray(['superm'])
       .pipe(parser)
       .pipe(es.writeArray(callback))
   })
 
   it('handles a separator', function (done) {
-    var test = lacona.createPhrase({
-      name: 'test/test',
-      describe: function () {
-        return lacona.sequence({
-          children: [
-            lacona.literal({text: 'super'}),
-            lacona.literal({text: 'man'})
-          ],
-          separator: lacona.literal({text: ' '})
-        })
-      }
-    })
-
     function callback (err, data) {
       expect(err).to.not.exist
       expect(data).to.have.length(3)
@@ -58,90 +42,65 @@ describe('sequence', function () {
       done()
     }
 
-    parser.sentences = [test()]
+    parser.sentences = [
+      <sequence>
+        <content>
+          <literal text='super' />
+          <literal text='man' />
+        </content>
+        <separator>
+          <literal text=' ' />
+        </separator>
+      </sequence>
+    ]
     es.readArray(['super m'])
     .pipe(parser)
     .pipe(es.writeArray(callback))
   })
 
   it('handles an optional child with a separator', function (done) {
-    var test = lacona.createPhrase({
-      name: 'test/test',
-      describe: function () {
-        return lacona.sequence({
-          children: [
-            lacona.literal({text: 'super'}),
-            lacona.literal({
-              text: 'maximum',
-              value: 'optionalValue',
-              id: 'optionalId',
-              optional: true
-            }),
-            lacona.literal({text: 'man'})
-          ],
-          separator: lacona.literal({text: ''})
-        })
-      }
-    })
 
     function callback (err, data) {
       expect(err).to.not.exist
       expect(data).to.have.length(4)
       expect(fulltext.suggestion(data[1].data)).to.equal('man')
-      expect(data[1].data.result).to.be.empty
-      expect(data[2].data.result.optionalId).to.equal('optionalValue')
       expect(fulltext.suggestion(data[2].data)).to.equal('maximum')
       done()
     }
 
-    parser.sentences = [test()]
+    parser.sentences = [
+      <sequence>
+        <literal text='super' />
+        <literal text='maximum' optional={true} />
+        <literal text='man' />
+      </sequence>
+    ]
     es.readArray(['superm'])
       .pipe(parser)
       .pipe(es.writeArray(callback))
   })
 
   it('can set a value to the result', function (done) {
-    var test = lacona.createPhrase({
-      name: 'test/test',
-      describe: function () {
-        return lacona.sequence({
-          id: 'testId',
-          value: 'testValue',
-          children: [
-            lacona.literal({text: 'super'}),
-            lacona.literal({text: 'man'})
-          ]
-        })
-      }
-    })
-
     function callback (err, data) {
       expect(err).to.not.exist
       expect(data).to.have.length(3)
-      expect(data[1].data.result.testId).to.equal('testValue')
+      expect(data[1].data.result).to.equal('testValue')
       done()
     }
 
-    parser.sentences = [test()]
+    parser.sentences = [
+      <sequence value='testValue'>
+        <literal text='super' />
+        <literal text='man' />
+      </sequence>
+    ]
+
     es.readArray(['superm'])
       .pipe(parser)
       .pipe(es.writeArray(callback))
   })
 
   it('passes on its category', function (done) {
-    var test = lacona.createPhrase({
-      name: 'test/test',
-      describe: function () {
-        return lacona.sequence({
-          category: 'myCat',
-          children: [
-            lacona.literal({text: 'super'}),
-            lacona.literal({text: 'man'})
-          ]
-        })
-      }
-    })
-
     function callback (err, data) {
       expect(err).to.not.exist
       expect(data).to.have.length(3)
@@ -150,7 +109,12 @@ describe('sequence', function () {
       done()
     }
 
-    parser.sentences = [test()]
+    parser.sentences = [
+      <sequence category='myCat'>
+        <literal text='super' />
+        <literal text='man' />
+      </sequence>
+    ]
     es.readArray(['superm'])
       .pipe(parser)
       .pipe(es.writeArray(callback))

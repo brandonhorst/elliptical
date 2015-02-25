@@ -2,16 +2,27 @@ import _ from 'lodash'
 import createPhrase from '../create-phrase'
 import InputOption from '../input-option'
 
-export default createPhrase({
-  name: 'repeat',
-  getDefaultProps() {
+export default class Repeat {
+  static getDefaultProps() {
     return {
       max: Number.MAX_VALUE,
       min: 0,
       unique: false
     }
-  },
+  }
+
   _handleParse(input, options, applyLimit, data, done) {
+    let child
+    let separator
+    if (this.props.children.length > 0 && this.props.children[0].elementConstructor === 'content') {
+      child = this.props.children[0].element.props.children[0]
+      if (this.props.children.length === 2 && this.props.children[1].elementConstructor === 'separator') {
+        separator = this.props.children[1].element.props.children[0]
+      }
+    } else {
+      child = this.props.children[0]
+    }
+
     var parsesActive = 0
 
     const parseChild = (input, level) => {
@@ -19,7 +30,7 @@ export default createPhrase({
         var newInputData = input.getData()
         var newResult = _.clone(input.result)
         var ownResult = input.result[this.props.id] || []
-        var childResult = input.result[this.props.child.props.id]
+        var childResult = input.result[child.element.props.id]
         var newInput
         var continueToSeparator
 
@@ -37,7 +48,7 @@ export default createPhrase({
         newResult[this.props.id] = ownResult
 
         // clear out the child's result
-        delete newResult[this.props.child.props.id]
+        delete newResult[child.element.props.id]
 
         newInputData.result = newResult
 
@@ -69,7 +80,7 @@ export default createPhrase({
       }
 
       parsesActive++
-      this.props.child.parse(input, options, childData, childDone)
+      child.parse(input, options, childData, childDone)
     }
 
     const parseSeparator = (input, level) => {
@@ -88,8 +99,8 @@ export default createPhrase({
         }
       }
 
-      if (this.props.separator) {
-        this.props.separator.parse(input, options, separatorData, separatorDone)
+      if (separator) {
+        separator.parse(input, options, separatorData, separatorDone)
       } else {
         separatorData(input)
         separatorDone()
@@ -98,4 +109,4 @@ export default createPhrase({
 
     parseChild(input, 1)
   }
-})
+}
