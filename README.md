@@ -24,20 +24,16 @@ lacona is under _very active development_ right now. Absolutely nothing is set i
 npm install lacona
 ```
 
-#Testing and Linting
+#Testing
 
-lacona contains a full set of BDD unit tests. They are designed to run both in node.js and in the browser (including PhantomJS).
-
-- `npm test`: run unit tests on node
-- `npm run lint`: run jshint on packages and tests
-- `npm run validate`: lint, then test
-- `npm run cover`: generate coverage report
+- `npm run validate`
 
 #Directories
 
-- `lib`: Javascript source
-- `test`: Unit tests
-- `doc`: Documentation files
+- `src`: Source (ES6/JSX)
+- `lib`: Compiled source (ES5)
+- `test`
+- `doc`
 
 #Building for the Browser
 
@@ -231,7 +227,7 @@ If you need lacona for a simple application and do not want to deal with streams
 
 #Reference
 
-The following documents are out-of-date:
+The following documents are **out-of-date**:
 
 [Parser](doc/parser.md)
 [Grammar](doc/grammar.md)
