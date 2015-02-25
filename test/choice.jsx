@@ -1,13 +1,10 @@
 /** @jsx createElement */
 /* eslint-env mocha */
-import {install} from 'source-map-support'
 import {expect} from 'chai'
 import es from 'event-stream'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
 import {createElement} from '../lib/create-element'
-
-install()
 
 describe('choice', function () {
   var parser

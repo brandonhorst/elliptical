@@ -4,12 +4,12 @@
   "description": "Natural Language Parsing Framework",
   "main": "lib/lacona.js",
   "scripts": {
-    "test": "babel test --out-dir tmp && mocha tmp",
+    "test": "mocha --compilers jsx:babel/register",
     "build": "babel src --out-dir lib",
-    "validate": "standard src test && npm run build && npm test",
-    "cover": "istanbul cover _mocha test -- -R dot && istanbul report text",
-    "coveralls": "istanbul cover _mocha test --report lcovonly -- -R dot && cat coverage/lcov.info | coveralls && rimraf ./coverage",
-    "prepublish": "npm run validate"
+    "validate": "npm run build && npm test",
+    "clean": "rimraf lib coverage",
+    "cover": "istanbul cover _mocha test -- -R dot --compilers jsx:babel/register && istanbul report text",
+    "coveralls": "npm run cover && cat coverage/lcov.info | coveralls"
   },
   "repository": {
     "type": "git",
@@ -39,9 +39,9 @@
     "istanbul": "^0.3.5",
     "lacona-util-fulltext": "^0.2.0",
     "mocha": "^2.1.0",
+    "rimraf": "^2.2.8",
     "sinon": "^1.12.2",
-    "sinon-chai": "^2.6.0",
-    "standard": "^2.7.3"
+    "sinon-chai": "^2.6.0"
   },
   "dependencies": {
     "async-each": "^0.1.6",
