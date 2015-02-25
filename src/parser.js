@@ -1,11 +1,10 @@
-import asyncEach from 'async-each'
-import stream from 'stream'
 import _ from 'lodash'
-
+import asyncEach from 'async-each'
 import InputOption from './input-option'
 import LaconaError from './error'
 import PhraseManager from './phrase-manager'
 import Phrase from './phrase'
+import stream from 'stream'
 
 function normalizeOutput (option) {
   var output = _.pick(option, ['match', 'completion', 'result', 'sentence'])

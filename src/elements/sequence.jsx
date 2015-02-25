@@ -1,10 +1,8 @@
 /** @jsx createElement */
+import _ from 'lodash'
+import {Content, Separator} from './noop'
 import {createElement} from '../create-element'
 import InputOption from '../input-option'
-
-import {Separator, Content} from './noop'
-
-import _ from 'lodash'
 
 function addSeparator (child, separator, Phrase) {
   if (child.element.props.optional) {

@@ -1,5 +1,4 @@
 import asyncEach from 'async-each'
-
 import InputOption from '../input-option'
 
 export default class Choice {

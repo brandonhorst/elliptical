@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import createPhrase from '../create-phrase'
 import InputOption from '../input-option'
 
 export default class Repeat {

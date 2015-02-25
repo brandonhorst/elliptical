@@ -1,10 +1,9 @@
 /** @jsx createElement */
-import {createElement} from './create-element'
-import asyncEach from 'async-each'
 import _ from 'lodash'
-
-import InputOption from './input-option'
+import asyncEach from 'async-each'
 import * as builtins from './elements'
+import {createElement} from './create-element'
+import InputOption from './input-option'
 import LaconaError from './error'
 
 var nextTempId = 0

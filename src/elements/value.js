@@ -1,6 +1,5 @@
-import createPhrase from '../create-phrase'
-import InputOption from '../input-option'
 import _ from 'lodash'
+import InputOption from '../input-option'
 
 export default class Value {
   static getDefaultProps() {
