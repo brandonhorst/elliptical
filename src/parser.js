@@ -99,8 +99,7 @@ export default class Parser extends stream.Transform {
         langs: this.langs,
         addLimit: addLimit,
         getExtensions: this._getExtensions.bind(this),
-        generatePhraseParseId: this._generatePhraseParseId.bind(this),
-        Phrase: Phrase
+        generatePhraseParseId: this._generatePhraseParseId.bind(this)
       }
 
       const sentenceData = (input) => {

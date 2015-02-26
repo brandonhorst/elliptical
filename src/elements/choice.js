@@ -1,8 +1,13 @@
+import _ from 'lodash'
 import asyncEach from 'async-each'
 import InputOption from '../input-option'
 import {Phrase} from 'lacona-phrase'
 
 export default class Choice extends Phrase {
+  constructor(props, Phrase) {
+    this.children = _.map(props.children, child => new Phrase(child))
+  }
+
   _handleParse(input, options, applyLimit, data, done) {
     const eachChild = (child, done) => {
       const childData = (input) => {
@@ -23,6 +28,6 @@ export default class Choice extends Phrase {
     }
 
     // Parse each child asyncronously
-    asyncEach(this.props.children, eachChild, done)
+    asyncEach(this.children, eachChild, done)
   }
 }

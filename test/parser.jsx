@@ -8,7 +8,6 @@ import Literal from '../lib/elements/literal'
 import * as phrase from 'lacona-phrase'
 import sinonChai from 'sinon-chai'
 import {spy} from 'sinon'
-console.log(phrase)
 
 chai.use(sinonChai)
 

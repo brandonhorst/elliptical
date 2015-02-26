@@ -3,6 +3,20 @@ import InputOption from '../input-option'
 import {Phrase} from 'lacona-phrase'
 
 export default class Repeat extends Phrase {
+  constructor(props, Phrase) {
+    let child, separator
+    if (props.children.length > 0 && props.children[0].constructor === 'content') {
+      child = props.children[0].children[0]
+      if (props.children.length > 1 && props.children[1].constructor === 'separator') {
+        separator = props.children[1].children[0]
+      }
+    } else {
+      child = props.children[0]
+    }
+    this.child = new Phrase(child)
+    if (separator) this.separator = new Phrase(separator)
+  }
+
   static getDefaultProps() {
     return {
       max: Number.MAX_VALUE,
@@ -12,17 +26,6 @@ export default class Repeat extends Phrase {
   }
 
   _handleParse(input, options, applyLimit, data, done) {
-    let child
-    let separator
-    if (this.props.children.length > 0 && this.props.children[0].elementConstructor === 'content') {
-      child = this.props.children[0].element.props.children[0]
-      if (this.props.children.length === 2 && this.props.children[1].elementConstructor === 'separator') {
-        separator = this.props.children[1].element.props.children[0]
-      }
-    } else {
-      child = this.props.children[0]
-    }
-
     var parsesActive = 0
 
     const parseChild = (input, level) => {
@@ -30,7 +33,7 @@ export default class Repeat extends Phrase {
         var newInputData = input.getData()
         var newResult = _.clone(input.result)
         var ownResult = input.result[this.props.id] || []
-        var childResult = input.result[child.element.props.id]
+        var childResult = input.result[this.child.element.props.id]
         var newInput
         var continueToSeparator
 
@@ -40,16 +43,10 @@ export default class Repeat extends Phrase {
           return
         }
 
-        if (typeof childResult !== 'undefined') {
-          ownResult.push(childResult)
-        }
-
-        // set this repeat's result to the new ownResult
+        // update the results
+        if (!_.isUndefined(childResult)) ownResult.push(childResult)
         newResult[this.props.id] = ownResult
-
-        // clear out the child's result
-        delete newResult[child.element.props.id]
-
+        delete newResult[this.child.element.props.id]
         newInputData.result = newResult
 
         newInput = new InputOption(newInputData)
@@ -62,7 +59,7 @@ export default class Repeat extends Phrase {
           data(newInput)
         }
 
-        // parse the separator
+        // parse the separator, unless we are above max
         if (level < this.props.max && continueToSeparator) {
           parseSeparator(newInput, level)
         }
@@ -80,7 +77,7 @@ export default class Repeat extends Phrase {
       }
 
       parsesActive++
-      child.parse(input, options, childData, childDone)
+      this.child.parse(input, options, childData, childDone)
     }
 
     const parseSeparator = (input, level) => {
@@ -99,8 +96,8 @@ export default class Repeat extends Phrase {
         }
       }
 
-      if (separator) {
-        separator.parse(input, options, separatorData, separatorDone)
+      if (this.separator) {
+        this.separator.parse(input, options, separatorData, separatorDone)
       } else {
         separatorData(input)
         separatorDone()

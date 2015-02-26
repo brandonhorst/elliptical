@@ -1,7 +1,5 @@
 export {default as choice} from './choice'
-export {default as content} from './noop'
 export {default as literal} from './literal'
 export {default as repeat} from './repeat'
-export {default as separator} from './noop'
 export {default as sequence} from './sequence'
 export {default as value} from './value'

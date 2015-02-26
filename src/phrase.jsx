@@ -89,12 +89,16 @@ export default class Phrase {
 
     //normalize props
     let realProps = _.clone(props || {})
-    realProps.children = _.map(children, child => new Phrase(child) )
+    realProps.children = _.flattenDeep(children)
     if (!realProps.id) {realProps.id = _.uniqueId('_temp')}
     realProps = _.defaults(realProps, Constructor.defaultProps)
 
     //instantiate and validate the constructor
-    this.element = new Constructor(realProps)
+    if (Constructor.prototype._handleParse) {
+      this.element = new Constructor(realProps, Phrase)
+    } else {
+      this.element = new Constructor(realProps)
+    }
     this.element.props = realProps
 
     this.oldAdditions = {}
