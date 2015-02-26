@@ -5,6 +5,7 @@ import * as builtins from './elements'
 import {createElement} from 'lacona-phrase'
 import InputOption from './input-option'
 import LaconaError from './error'
+import updateList from './utils/update-list'
 
 var nextTempId = 0
 
@@ -73,31 +74,45 @@ function validate(Constructor) {
   return true
 }
 
+function clearTemps(result) {
+  if (_.isPlainObject(result)) {
+    return _.omit(result, (value, key) => {
+      return _.startsWith(key, '_temp') || _.isUndefined(value)
+    })
+  } else if (_.isArray(result)) {
+    return _.filter(result, _.isUndefined)
+  } else {
+    return result
+  }
+}
+
+
 export default class Phrase {
-  constructor({constructor, props, children}) {
+  constructor(options) {
     // store the constructor in case it needs to be cloned (by sequence)
-    this.elementConstructor = constructor
+    this.descriptor = options
+
+    const {Constructor, props, children} = options
 
     // get the actual constructor, as constructor could be a string
-    const Constructor = getConstructor(constructor)
-    validate(Constructor)
+    const TrueConstructor = getConstructor(Constructor)
+    validate(TrueConstructor)
 
     // get the translations, or handleParse if it is provided
-    if (!Constructor.prototype._handleParse) {
-      this.translations = getElements(Constructor)
+    if (!TrueConstructor.prototype._handleParse) {
+      this.translations = getElements(TrueConstructor)
     }
 
     //normalize props
-    let realProps = _.clone(props || {})
+    let realProps = props ? _.clone(props) : {}
     realProps.children = _.flattenDeep(children)
-    if (!realProps.id) {realProps.id = _.uniqueId('_temp')}
-    realProps = _.defaults(realProps, Constructor.defaultProps)
+    realProps = _.defaults(realProps, TrueConstructor.defaultProps)
 
     //instantiate and validate the constructor
-    if (Constructor.prototype._handleParse) {
-      this.element = new Constructor(realProps, Phrase)
+    if (TrueConstructor.prototype._handleParse) {
+      this.element = new TrueConstructor(realProps, Phrase)
     } else {
-      this.element = new Constructor(realProps)
+      this.element = new TrueConstructor(realProps)
     }
     this.element.props = realProps
 
@@ -113,36 +128,29 @@ export default class Phrase {
       delete this.element[name]
     })
 
-    _.forEach(this.elementConstructor.additions, (value, name) => {
+    _.forEach(this.descriptor.Constructor.additions, (value, name) => {
       this.element[name] = value
       this.element[`set${_.capitalize(name)}`] = (newValue) => {
         var arg = {[name]: newValue}
-        if (this.elementConstructor.additionsCallback) {
-          this.elementConstructor.additionsCallback(arg)
+        if (this.descriptor.Constructor.additionsCallback) {
+          this.descriptor.Constructor.additionsCallback(arg)
         }
       }
     })
 
-    this.oldAdditions = this.elementConstructor.additions
+    this.oldAdditions = this.descriptor.Constructor.additions
   }
 
   // given all extensions (from the parser), make sure our cache is up-to-date
   // if it is not, update it
   _checkExtensions(extensions) {
-    _.forEach(['supplementers', 'overriders'], name => {
-      var cachedExtensions = this[name]
-      var currentExtensions = extensions[name]
-
-      var newExtensions = _.difference(currentExtensions, cachedExtensions)
-      var removedExtensions = _.difference(cachedExtensions, currentExtensions)
-
-      newExtensions.forEach(NewExtension => {
-        this[name].push(new Phrase(<NewExtension {...this.props} />))
-      })
-
-      removedExtensions.forEach(RemovedExtension => {
-        _.remove(this[name], _.identity, RemovedExtension)
-      })
+    _.forEach(['supplementers', 'overriders'], kind => {
+      this[kind] = updateList(
+        extensions[kind],
+        this[kind],
+        instance => instance.descriptor.Constructor,
+        Constructor => new Phrase(<Constructor {...this.element.props} />)
+      )
     })
   }
 
@@ -158,9 +166,9 @@ export default class Phrase {
       var newInputData = input.getData()
       var oldResult = _.clone(oldResultStored)
 
-      let newResult = input.clearTemps()
+      let newResult = _.clone(input.result)
       if (this.element.getValue) newResult = this.element.getValue.call(this.element, newResult)
-      if (_.isObject(newResult)) newResult = _.omit(newResult, _.isUndefined)
+      newResult = clearTemps(newResult)
 
       oldResult[this.element.props.id] = newResult
       newInputData.result = oldResult
@@ -230,7 +238,7 @@ export default class Phrase {
       preParseInputData.result = {}
 
       // if describe has never been executed, execute it and cache it
-      if (this.oldAdditions !== this.elementConstructor.additions) {
+      if (this.oldAdditions !== this.descriptor.Constructor.additions) {
         this.applyAdditions()
         this.translations[lang].cache = null
       }
@@ -247,7 +255,7 @@ export default class Phrase {
       // add this to the stack before doing anything
       preParseInputData = input.getData()
       preParseInputData.stack = input.stackPush({
-        constructor: this.elementConstructor,
+        constructor: this.descriptor.Constructor,
         category: this.element.props.category
       })
 
@@ -261,9 +269,9 @@ export default class Phrase {
     // if this is already on the stack, and we've made a suggestion, we need to stop
     // we don't want to cause an infinite loop
     if (
-      !_.isString(this.elementConstructor) && // do not apply this restriction to system classes
+      !_.isString(this.descriptor.Constructor) && // do not apply this restriction to system classes
       input.suggestion.length > 0 &&
-      _.find(input.stack, {constructor: this.elementConstructor})
+      _.find(input.stack, {constructor: this.descriptor.Constructor})
     ) return done()
 
     // If it is optional, a branch will skip it entirely
@@ -275,8 +283,7 @@ export default class Phrase {
       parseElement()
     } else {
       // Update the extension cache
-      this._checkExtensions(options.getExtensions(this.elementConstructor))
-
+      this._checkExtensions(options.getExtensions(this.descriptor.Constructor))
 
       // Check the extenders - don't call done until all are complete
       asyncEach(Object.keys(this.supplementers), (supplementer, done) => {

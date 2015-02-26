@@ -1,6 +1,5 @@
 /** @jsx createElement */
 import _ from 'lodash'
-import {Content, Separator} from './noop'
 import {createElement} from 'lacona-phrase'
 import InputOption from '../input-option'
 import {Phrase} from 'lacona-phrase'
@@ -18,9 +17,9 @@ function addSeparator (child, separator) {
 
 function getPieces (children) {
   let content, separator
-  if (children.length > 0 && children[0].constructor === 'content') {
+  if (children.length > 0 && children[0].Constructor === 'content') {
     content = children[0].children
-    if (children.length > 1 && children[1].constructor === 'separator') {
+    if (children.length > 1 && children[1].Constructor === 'separator') {
       separator = children[1].children[0]
     }
   } else {

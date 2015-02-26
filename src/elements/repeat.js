@@ -5,9 +5,9 @@ import {Phrase} from 'lacona-phrase'
 export default class Repeat extends Phrase {
   constructor(props, Phrase) {
     let child, separator
-    if (props.children.length > 0 && props.children[0].constructor === 'content') {
+    if (props.children.length > 0 && props.children[0].Constructor === 'content') {
       child = props.children[0].children[0]
-      if (props.children.length > 1 && props.children[1].constructor === 'separator') {
+      if (props.children.length > 1 && props.children[1].Constructor === 'separator') {
         separator = props.children[1].children[0]
       }
     } else {

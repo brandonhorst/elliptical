@@ -1,9 +1,5 @@
 import _ from 'lodash'
 
-function startsWith (string1, string2) {
-  return string1.toLowerCase().lastIndexOf(string2.toLowerCase(), 0) === 0
-}
-
 function regexSplit (str) {
   return str.split('').map(function (char) {
     return char.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')
@@ -49,18 +45,6 @@ export default class InputOption {
 
   stackPop() {
     return this.stack.slice(0, -1)
-  }
-
-  clearTemps() {
-    var newResult = _.clone(this.result)
-    var id
-
-    for (id in newResult) {
-      if (startsWith(id, '_temp')) {
-        delete newResult[id]
-      }
-    }
-    return newResult
   }
 
   fuzzyMatch(text, string, category) {
@@ -116,7 +100,7 @@ export default class InputOption {
     } else if (actualFuzzy === 'phrase') {
       return this.fuzzyMatch(this.text, string, options.category)
     } else {
-      if (startsWith(string, this.text)) {
+      if (_.startsWith(string.toLowerCase(), this.text.toLowerCase())) {
         return {
           suggestion: [
             {string: string.substring(0, this.text.length), category: options.category, input: true},
@@ -156,7 +140,7 @@ export default class InputOption {
     // The text is not complete - this is a part of the text
     } else {
       // If the provided string is fully consumed by this.text
-      if (this.suggestion.length === 0 && startsWith(this.text, string)) {
+      if (this.suggestion.length === 0 && _.startsWith(this.text.toLowerCase(), string.toLowerCase())) {
         // it's a match
         newOptions.match = this.match.concat(newWord)
         newOptions.text = this.text.substring(string.length)

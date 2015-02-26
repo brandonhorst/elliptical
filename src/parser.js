@@ -2,9 +2,9 @@ import _ from 'lodash'
 import asyncEach from 'async-each'
 import InputOption from './input-option'
 import LaconaError from './error'
-import PhraseManager from './phrase-manager'
 import Phrase from './phrase'
 import stream from 'stream'
+import updateList from './utils/update-list'
 
 function normalizeOutput (option) {
   var output = _.pick(option, ['match', 'completion', 'result', 'sentence'])
@@ -37,9 +37,8 @@ export default class Parser extends stream.Transform {
     this.extensions = extensions
     this.fuzzy = fuzzy
 
-    this._manager = new PhraseManager()
+    this._sentenceInstances = []
     this._currentParseNumber = 0
-    this._currentPhraseParseId = 0
     this._flushcallback = null
     this._pending = 0
   }
@@ -57,10 +56,6 @@ export default class Parser extends stream.Transform {
       supplementers: [],
       overriders: []
     })
-  }
-
-  _generatePhraseParseId() {
-    return this._currentPhraseParseId++
   }
 
   _transform(input, encoding, callback) {
@@ -99,7 +94,7 @@ export default class Parser extends stream.Transform {
         langs: this.langs,
         addLimit: addLimit,
         getExtensions: this._getExtensions.bind(this),
-        generatePhraseParseId: this._generatePhraseParseId.bind(this)
+        generatePhraseParseId: () => _.uniqueId
       }
 
       const sentenceData = (input) => {
@@ -189,9 +184,14 @@ export default class Parser extends stream.Transform {
       group: group
     })
 
-    this._manager.update(this.sentences)
+    this._sentenceInstances = updateList(
+      this.sentences,
+      this._sentenceInstances,
+      instance => instance.descriptor,
+      descriptor => new Phrase(descriptor)
+    )
 
-    asyncEach(this._manager.sentences, parseSentence, allPhrasesDone)
+    asyncEach(this._sentenceInstances, parseSentence, allPhrasesDone)
     callback()
   }
 

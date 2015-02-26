@@ -8,6 +8,11 @@ export default class Choice extends Phrase {
     this.children = _.map(props.children, child => new Phrase(child))
   }
 
+  getValue(results) {
+    console.log(results)
+    return results
+  }
+
   _handleParse(input, options, applyLimit, data, done) {
     const eachChild = (child, done) => {
       const childData = (input) => {

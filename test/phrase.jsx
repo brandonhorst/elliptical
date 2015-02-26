@@ -240,38 +240,43 @@ describe('Phrase', function () {
   })
 
   it('throws for phrases without a default-lang schema', function () {
+    class Test extends phrase.Phrase {
+      getTranslations() {
+        return [{
+          langs: ['en-US'],
+          describe: function () {
+            return lacona.literal({text: 'whatever'})
+          }
+        }]
+      }
+    }
 
     expect(function () {
-      new Phrase(class Test extends phrase.Phrase {
-        getTranslations() {
-          return [{
-            langs: ['en-US'],
-            describe: function () {
-              return lacona.literal({text: 'whatever'})
-            }
-          }]
-        }
-      })
+      new Phrase(<Test />)
     }).to.throw(lacona.Error)
   })
 
   it('throws for translations without a lang', function () {
+    class Test extends phrase.Phrase {
+      getTranslations() {
+        return [{
+          describe: function () {
+            return lacona.literal({text: 'whatever'})
+          }
+        }]
+      }
+    }
+
     expect(function () {
-      new Phrase(class Test extends phrase.Phrase {
-        getTranslations() {
-          return [{
-            describe: function () {
-              return lacona.literal({text: 'whatever'})
-            }
-          }]
-        }
-      })
+      new Phrase(<Test />)
     }).to.throw(lacona.Error)
   })
 
   it('throws for phrases without a describe', function () {
+    class Test extends phrase.Phrase {}
+    
     expect(function () {
-      new Phrase(class Test extends phrase.Phrase {})
+      new Phrase(<Test />)
     }).to.throw(lacona.Error)
   })
 })

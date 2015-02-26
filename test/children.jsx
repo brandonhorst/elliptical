@@ -17,18 +17,16 @@ describe('children', function () {
     class Test extends phrase.Phrase {
       describe() {
         expect(this.props.children).to.have.length(2)
-        expect(this.props.children[0].constructor).to.equal('literal')
-        expect(this.props.children[0].props).to.eql({text: 'a'})
-        expect(this.props.children[0].children).to.eql([])
-        expect(this.props.children[1].constructor).to.equal('literal')
-        expect(this.props.children[1].props).to.eql({text: 'b'})
-        expect(this.props.children[1].children).to.eql([])
-
-        done()
-        return <literal /> // whatever
+        return this.props.children[1]
       }
     }
-    Test.additions = {config: 'test'}
+
+    function callback(err, data) {
+      expect(err).to.not.exist
+      expect(data).to.have.length(3)
+      expect(fulltext.suggestion(data[1].data)).to.equal('b')
+      done()
+    }
 
     parser.sentences = [
       <Test>
@@ -36,28 +34,25 @@ describe('children', function () {
         <literal text='b' />
       </Test>
     ]
-    es.readArray(['']).pipe(parser)
+    es.readArray([''])
+      .pipe(parser)
+      .pipe(es.writeArray(callback))
   })
 
   it('flattens children as props', function (done) {
     class Test extends phrase.Phrase {
       describe() {
         expect(this.props.children).to.have.length(3)
-        expect(this.props.children[0].constructor).to.equal('literal')
-        expect(this.props.children[0].props).to.eql({text: 'a'})
-        expect(this.props.children[0].children).to.eql([])
-        expect(this.props.children[1].constructor).to.equal('literal')
-        expect(this.props.children[1].props).to.eql({text: 'b'})
-        expect(this.props.children[1].children).to.eql([])
-        expect(this.props.children[2].constructor).to.equal('literal')
-        expect(this.props.children[2].props).to.eql({text: 'c'})
-        expect(this.props.children[2].children).to.eql([])
-
-        done()
-        return <literal /> // whatever
+        return this.props.children[1]
       }
     }
-    Test.additions = {config: 'test'}
+
+    function callback(err, data) {
+      expect(err).to.not.exist
+      expect(data).to.have.length(3)
+      expect(fulltext.suggestion(data[1].data)).to.equal('b')
+      done()
+    }
 
     const literals = [<literal text='b' />, <literal text='c' />]
     parser.sentences = [
@@ -66,6 +61,37 @@ describe('children', function () {
         {literals}
       </Test>
     ]
-    es.readArray(['']).pipe(parser)
+    es.readArray([''])
+      .pipe(parser)
+      .pipe(es.writeArray(callback))
+  })
+
+  it('passes the child id for use in getValue', function (done) {
+    class Test extends phrase.Phrase {
+      describe() {
+        return this.props.children[0]
+      }
+      getValue(result) {
+        expect(result[this.props.children[0].props.id]).to.equal('b')
+        return 'something'
+      }
+    }
+
+    function callback(err, data) {
+      expect(err).to.not.exist
+      expect(data).to.have.length(3)
+      expect(fulltext.suggestion(data[1].data)).to.equal('a')
+      expect(data[1].data.result).to.equal('something')
+      done()
+    }
+
+    parser.sentences = [
+      <Test>
+        <literal text='a' value='b' />
+      </Test>
+    ]
+    es.readArray([''])
+      .pipe(parser)
+      .pipe(es.writeArray(callback))
   })
 })
