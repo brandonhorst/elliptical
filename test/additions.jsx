@@ -89,7 +89,7 @@ describe('additions', () => {
         return <literal text='test' />
       }
 
-      static getInitialAdditions() {
+      static get initialAdditions() {
         return {config: 'test'}
       }
     }

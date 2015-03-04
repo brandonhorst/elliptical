@@ -119,7 +119,7 @@ describe('Parser', function () {
 
   it('can parse in a specified language', function (done) {
     class Test extends phrase.Phrase {
-      static getTranslations() {
+      static get translations() {
         return [{
           langs: ['en', 'default'],
           describe() {
@@ -151,7 +151,7 @@ describe('Parser', function () {
 
   it('falls back on a less specific language if a more specific one is not provided', function (done) {
     class Test extends phrase.Phrase {
-      static getTranslations() {
+      static get translations() {
         return [{
           langs: ['en', 'default'],
           describe() {

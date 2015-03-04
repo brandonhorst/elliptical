@@ -17,7 +17,7 @@ export default class Repeat extends Phrase {
     if (separator) this.separator = new Phrase(separator)
   }
 
-  static getDefaultProps() {
+  static get defaultProps() {
     return {
       max: Number.MAX_VALUE,
       min: 0,

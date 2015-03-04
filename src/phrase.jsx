@@ -31,11 +31,7 @@ function getConstructor(constructor) {
     Constructor = constructor
   }
 
-  if (Constructor.getSupplements) Constructor.supplements = Constructor.getSupplements()
-  if (Constructor.getOverrides) Constructor.overrides = Constructor.getOverrides()
-  if (Constructor.getDefaultProps) Constructor.defaultProps = Constructor.getDefaultProps()
-  if (Constructor.getInitialAdditions) Constructor.additions = Constructor.getInitialAdditions()
-  if (Constructor.getTranslations) Constructor.translations = Constructor.getTranslations()
+  if (Constructor.initialAdditions) Constructor.additions = Constructor.initialAdditions
   if (!Constructor.translations && !Constructor.prototype._handleParse) {
     if (!Constructor.prototype.describe) {
       throw new LaconaError('Phrases must either have translations on the constructor or describe on the prototype')
