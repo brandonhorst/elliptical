@@ -3,7 +3,8 @@ import _ from 'lodash'
 import asyncEach from 'async-each'
 import * as builtins from './elements'
 import {createElement} from 'lacona-phrase'
-import InputOption from './input-option'
+import I from 'immutable'
+import Option from './input-option'
 import LaconaError from './error'
 import updateList from './utils/update-list'
 
@@ -165,24 +166,33 @@ export default class Phrase {
 
   parse(input, options, data, done) {
     var preParseInputData
-    var oldResultStored = input.result
+    var oldResultStored = input.get('result')
     var phraseRunning = false
     var extendersRunning = true
     var overridersRunning = true
     var overriderGotData = false
 
     const phraseData = (input) => {
-      var newInputData = input.getData()
-      var oldResult = _.clone(oldResultStored)
+      const newResult = clearTemps(this.element.getValue ?
+        I.fromJS(this.element.getValue(input.get('result').toJS())) :
+        input.get('result'))
 
-      let newResult = _.clone(input.result)
-      if (this.element.getValue) newResult = this.element.getValue.call(this.element, newResult)
-      newResult = clearTemps(newResult)
+      let newOption = input.set('result', oldResultStored.set(this.element.props.id, newResult))
 
-      oldResult[this.element.props.id] = newResult
-      newInputData.result = oldResult
+      sendData(newOption)
 
-      return sendData(new InputOption(newInputData))
+      // oldResultStored.set(this.element.props.id, )
+      // var newInputData = input.getData()
+      // var oldResult = _.clone(oldResultStored)
+      //
+      // let newResult = _.clone(input.result)
+      // if (this.element.getValue) newResult = this.element.getValue.call(this.element, newResult)
+      // newResult = clearTemps(newResult)
+      //
+      // oldResult[this.element.props.id] = newResult
+      // newInputData.result = oldResult
+      //
+      // return sendData(new InputOption(newInputData))
     }
 
     const phraseDone = () => {
@@ -202,9 +212,11 @@ export default class Phrase {
     }
 
     const sendData = (input) => {
-      var newInput = input.getData()
-      newInput.stack = input.stackPop()
-      data(new InputOption(newInput))
+      data(input.update('stack', stack => stack.pop()))
+      //
+      // var newInput = input.getData()
+      // newInput.stack = input.stackPop()
+      // data(new InputOption(newInput))
     }
 
     const overriderData = (newOption) => {
@@ -225,13 +237,11 @@ export default class Phrase {
 
       // bound to preParseOptions
       const applyLimit = (input) => {
-        var newLimit = input.addLimit(phraseParseId, dataNumber)
-        options.addLimit(phraseParseId, this.element.props.limit)
         dataNumber++
-        return newLimit
+        return input.update('limit', limit => limit.set(phraseParseId, dataNumber))
       }
 
-      newInput = new InputOption(preParseInputData)
+      newInput = preParseInputData
 
       if (this.element.props.limit) {
         dataNumber = 0
@@ -244,7 +254,7 @@ export default class Phrase {
     const doDescribeParse = () => {
       var lang = getBestElementLang(this.translations, options.langs)
 
-      preParseInputData.result = {}
+      const preDescribeInput = preParseInputData.set('result', I.Map())
 
       // if describe has never been executed, execute it and cache it
       if (this.oldAdditions !== this.descriptor.Constructor.additions) {
@@ -258,18 +268,17 @@ export default class Phrase {
         this.translations[lang].cache = new Phrase(this.translations[lang].describe.call(this.element))
       }
 
-      this.translations[lang].cache.parse(new InputOption(preParseInputData), options, phraseData, phraseDone)
+      this.translations[lang].cache.parse(preDescribeInput, options, phraseData, phraseDone)
     }
 
     const parseElement = () => {
       phraseRunning = true
 
       // add this to the stack before doing anything
-      preParseInputData = input.getData()
-      preParseInputData.stack = input.stackPush({
+      preParseInputData = input.update('stack', stack => stack.push(I.Map({
         constructor: this.descriptor.Constructor,
         category: this.element.props.category
-      })
+      })))
 
       if (this.element._handleParse) {
         doHandleParse()
@@ -282,8 +291,9 @@ export default class Phrase {
     // we don't want to cause an infinite loop
     if (
       !_.isString(this.descriptor.Constructor) && // do not apply this restriction to system classes
-      input.suggestion.length > 0 &&
-      _.find(input.stack, {constructor: this.descriptor.Constructor})
+      input.get('suggestion').count() > 0 &&
+      // TODO: This is TERRIBLY ineffecient use of lodash/immutable
+      _.find(input.get('stack').toJS(), {constructor: this.descriptor.Constructor})
     ) return done()
 
     // If it is optional, a branch will skip it entirely

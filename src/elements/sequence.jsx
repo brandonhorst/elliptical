@@ -1,7 +1,6 @@
 /** @jsx createElement */
 import _ from 'lodash'
 import {createElement} from 'lacona-phrase'
-import InputOption from '../input-option'
 import {Phrase} from 'lacona-phrase'
 
 function addSeparator (child, separator) {
@@ -48,11 +47,11 @@ export default class Sequence extends Phrase {
 
     const parseChild = (childIndex, input) => {
       const childData = (input) => {
-        var newInputData
         if (childIndex === this.children.length - 1) {
-          newInputData = input.getData()
-          newInputData.result[this.props.id] = this.props.value
-          data(new InputOption(newInputData))
+          data(input.update('result', result => result.set(this.props.id, this.props.value)))
+          // newInputData = input.getData()
+          // newInputData.result[this.props.id] = this.props.value
+          // data(new InputOption(newInputData))
         } else {
           parseChild(childIndex + 1, input)
         }

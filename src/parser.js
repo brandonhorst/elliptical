@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import asyncEach from 'async-each'
-import InputOption from './input-option'
+import {createOption} from './input-option'
 import LaconaError from './error'
 import Phrase from './phrase'
 import stream from 'stream'
@@ -84,7 +84,7 @@ export default class Parser extends stream.Transform {
     }
 
     const parseSentence = (phrase, done) => {
-      var input = new InputOption({
+      var input = createOption({
         fuzzy: this.fuzzy,
         text: inputText,
         sentence: phrase.element,
@@ -98,21 +98,15 @@ export default class Parser extends stream.Transform {
       }
 
       const sentenceData = (input) => {
-        var newInputData, newInput
-
         // only send the result if the parse is complete
-        if (input.text === '') {
-          newInputData = input.getData()
-
-          // result should be the result of the phrase
-          newInputData.result = input.result[phrase.element.props.id]
-          newInput = new InputOption(newInputData)
+        if (input.get('text') === '') {
+          const newInput = input.set('result', input.get('result').get(phrase.element.props.id))
 
           if (_.isEmpty(input.limit)) {
             this.push({
               event: 'data',
               id: currentParseNumber,
-              data: normalizeOutput(newInput),
+              data: normalizeOutput(newInput.toJS()),
               group: group
             })
           } else {
@@ -148,7 +142,7 @@ export default class Parser extends stream.Transform {
           this.push({
             event: 'data',
             id: currentParseNumber,
-            data: normalizeOutput(value),
+            data: normalizeOutput(value.toJS()),
             group: group
           })
         }

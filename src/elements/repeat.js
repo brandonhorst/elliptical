@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import InputOption from '../input-option'
+import I from 'immutable'
 import {Phrase} from 'lacona-phrase'
 
 export default class Repeat extends Phrase {
@@ -30,29 +30,21 @@ export default class Repeat extends Phrase {
 
     const parseChild = (input, level) => {
       const childData = (input) => {
-        var newInputData = input.getData()
-        var newResult = _.clone(input.result)
-        var ownResult = input.result[this.props.id] || []
-        var childResult = input.result[this.child.element.props.id]
-        var newInput
-        var continueToSeparator
+        var ownResult = input.get('result').get(this.props.id) || I.List()
+        var childResult = input.get('result').get(this.child.element.props.id)
 
         // if the repeat is unique and the childResult already exists in the result,
         // just stop - we will not do this branch
-        if (this.props.unique && ownResult.indexOf(childResult) !== -1) {
-          return
-        }
+        if (this.props.unique && ownResult.contains(childResult)) return
 
-        // update the results
-        if (!_.isUndefined(childResult)) ownResult.push(childResult)
-        newResult[this.props.id] = ownResult
-        delete newResult[this.child.element.props.id]
-        newInputData.result = newResult
-
-        newInput = new InputOption(newInputData)
+        const newOwnResult = ownResult.push(childResult)
+        const newInput = input
+          .update('result', result => result
+            .set(this.props.id, newOwnResult)
+            .delete(this.child.element.props.id))
 
         // store continueToSeparator, in case the call to data data changes newOption
-        continueToSeparator = input.suggestion.length === 0
+        const continueToSeparator = input.get('suggestion').count() === 0
 
         // only call data if we are within the min/max repeat range
         if (level >= this.props.min && level <= this.props.max) {

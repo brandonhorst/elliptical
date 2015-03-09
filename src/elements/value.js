@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import InputOption from '../input-option'
+import {handleString} from '../input-option'
 import {Phrase} from 'lacona-phrase'
 
 export default class Value extends Phrase {
@@ -17,26 +17,26 @@ export default class Value extends Phrase {
     }
 
     const computeData = (suggestion) => {
-      var stackEntry
-      var newInput, newResult
-
       // if this has a category, use that
       // if not, use the last category on the stack
       handleStringOptions.category = this.props.category
       if (!handleStringOptions.category) {
-        stackEntry = _.findLast(input.stack, 'category')
+        //TODO HORRIBLY INEFFECIENT
+        const stackEntry = _.findLast(input.get('stack').toJS(), 'category')
         handleStringOptions.category = stackEntry ? stackEntry.category : null
       }
 
-      newInput = input.handleString(suggestion.text, handleStringOptions)
+      const newInput = handleString(input, suggestion.text, handleStringOptions)
       if (newInput !== null) {
-        newResult = _.clone(input.result)
-        newResult[this.props.id] = suggestion.value
-        newInput.result = newResult
+        const resultInput = newInput.update('result', result => result.set(this.props.id, suggestion.value))
+        // newResult = _.clone(input.result)
+        // newResult[this.props.id] = suggestion.value
+        // newInput.result = newResult
         if (this.props.limit) {
-          newInput.limit = applyLimit(input)
+          data(applyLimit(resultInput))
+        } else {
+          data(resultInput)
         }
-        data(new InputOption(newInput))
       }
     }
 

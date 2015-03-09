@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "async-each": "^0.1.6",
+    "immutable": "^3.6.4",
     "lacona-phrase": "^0.2.0",
     "lodash": "^3.3.1"
   }

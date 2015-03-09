@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import I from 'immutable'
 
 function regexSplit (str) {
   return str.split('').map(function (char) {
@@ -6,156 +7,173 @@ function regexSplit (str) {
   })
 }
 
-export default class InputOption {
-  constructor(options) {
-    this.fuzzy = options.fuzzy || 'none'
-    this.text = options.text || ''
-    this.match = options.match || []
-    this.suggestion = options.suggestion || []
-    this.completion = options.completion || []
-    this.result = options.result || {}
-    this.stack = options.stack || []
-    this.limit = options.limit || {}
-    this.sentence = options.sentence
-  }
+const defaults = {
+  fuzzy: 'none',
+  text: '',
+  match: [],
+  suggestion: [],
+  completion: [],
+  result: {},
+  stack: [],
+  limit: {}
+}
 
-  getData() {
-    return {
-      fuzzy: this.fuzzy,
-      text: this.text,
-      match: this.match,
-      suggestion: this.suggestion,
-      completion: this.completion,
-      result: this.result,
-      stack: this.stack,
-      limit: this.limit,
-      sentence: this.sentence
-    }
-  }
+export function createOption(options) {
+  return I.fromJS(_.defaults(options, defaults))
+}
 
-  addLimit(phraseParseId, number) {
-    var newLimit = _.clone(this.limit)
-    newLimit[phraseParseId] = number
-    return newLimit
-  }
+// export default class InputOption {
+//   constructor(options) {
+//     this.fuzzy = options.fuzzy || 'none'
+//     this.text = options.text || ''
+//     this.match = I.Array(options.match || [])
+//     this.suggestion = I.Array(options.suggestion || [])
+//     this.completion = I.Array(options.completion || [])
+//     this.result = I.Map(options.result || {})
+//     this.stack = I.Array(options.stack || [])
+//     this.limit = I.Map(options.limit || {})
+//     this.sentence = options.sentence
+//   }
+//
+//   getData() {
+//     return {
+//       fuzzy: this.fuzzy,
+//       text: this.text,
+//       match: this.match,
+//       suggestion: this.suggestion,
+//       completion: this.completion,
+//       result: this.result,
+//       stack: this.stack,
+//       limit: this.limit,
+//       sentence: this.sentence
+//     }
+//   }
+//
+export function addLimit(option, phraseParseId, number) {
+  option.update('limit', limit => limit.set(phraseParseId, number))
+  // const newLimit = _.clone(option.get('limit'))
+  // newLimit[phraseParseId] = number
+  // return newLimit
+}
 
-  stackPush(element) {
-    return this.stack.concat(element)
-  }
+// export function stackPush(option, element) {
+//   option.update('stack', stack => stack.push(element))
+//     // return this.stack.concat(element)
+// }
+//
+// export function stackPop(option, element) {
+//   option.update('stack', stack => stack.pop(element))
+// }
+//   // stackPop() {
+//   //   return this.stack.slice(0, -1)
+//   // }
 
-  stackPop() {
-    return this.stack.slice(0, -1)
-  }
-
-  fuzzyMatch(text, string, category) {
-    var i, l
-    var suggestions = []
-    var fuzzyString = '^(.*?)(' + regexSplit(text).join(')(.*?)(') + ')(.*?$)'
-    var fuzzyRegex = new RegExp(fuzzyString, 'i')
-    var fuzzyMatches = string.match(fuzzyRegex)
-    if (fuzzyMatches) {
-      for (i = 1, l = fuzzyMatches.length; i < l; i++) {
-        if (fuzzyMatches[i].length > 0) {
-          suggestions.push({
-            string: fuzzyMatches[i],
-            category: category,
-            input: i % 2 === 0
-          })
-        }
+function fuzzyMatch(option, text, string, category) {
+  var i, l
+  var suggestions = []
+  var fuzzyString = '^(.*?)(' + regexSplit(text).join(')(.*?)(') + ')(.*?$)'
+  var fuzzyRegex = new RegExp(fuzzyString, 'i')
+  var fuzzyMatches = string.match(fuzzyRegex)
+  if (fuzzyMatches) {
+    for (i = 1, l = fuzzyMatches.length; i < l; i++) {
+      if (fuzzyMatches[i].length > 0) {
+        suggestions.push({
+          string: fuzzyMatches[i],
+          category: category,
+          input: i % 2 === 0
+        })
       }
-      return {suggestion: suggestions, text: this.text.substring(text.length)}
     }
-    return null
+    return I.fromJS({suggestion: suggestions, text: option.get('text').substring(text.length)})
   }
+  return null
+}
 
-  getActualFuzzy(fuzzyOverride) {
-    if (this.fuzzy === 'none' || fuzzyOverride === 'none') {
-      return 'none'
-    } else if (this.fuzzy === 'phrase' || fuzzyOverride === 'phrase') {
-      return 'phrase'
+function getActualFuzzy(option, fuzzyOverride) {
+  if (option.get('fuzzy') === 'none' || fuzzyOverride === 'none') {
+    return 'none'
+  } else if (option.get('fuzzy') === 'phrase' || fuzzyOverride === 'phrase') {
+    return 'phrase'
+  } else {
+    return 'all'
+  }
+}
+
+function matchString(option, string, options) {
+  var i, substring
+  var result
+  var actualFuzzy = getActualFuzzy(option, options.fuzzy)
+  var text = option.get('text')
+
+  if (actualFuzzy === 'all') {
+    for (i = Math.min(text.length, string.length); i > 0; i--) {
+      substring = text.slice(0, i)
+      result = fuzzyMatch(option, substring, string, options.category)
+      if (result) {
+        return result
+      }
+    }
+
+    // if there are no fuzzy matches
+    return I.fromJS({
+      suggestion: [{string: string, category: options.category, input: false}],
+      text: text
+    })
+  } else if (actualFuzzy === 'phrase') {
+    return fuzzyMatch(option, text, string, options.category)
+  } else {
+    if (_.startsWith(string.toLowerCase(), text.toLowerCase())) {
+      return I.fromJS({
+        suggestion: [
+          {string: string.substring(0, text.length), category: options.category, input: true},
+          {string: string.substring(text.length), category: options.category, input: false}
+        ],
+        text: text.substring(string.length)
+      })
     } else {
-      return 'all'
+      return null
     }
   }
+}
 
-  matchString(string, options) {
-    var i, substring
-    var result
-    var actualFuzzy = this.getActualFuzzy(options.fuzzy)
+export function handleString(option, string, options) {
+  const newWord = I.Map({
+    string: string,
+    category: options.category
+  })
 
-    if (actualFuzzy === 'all') {
-      for (i = Math.min(this.text.length, string.length); i > 0; i--) {
-        substring = this.text.slice(0, i)
-        result = this.fuzzyMatch(substring, string, options.category)
-        if (result) {
-          return result
-        }
-      }
+  // If the text is complete
+  if (option.get('text').length === 0) {
+    if (
+      (option.get('suggestion').count() === 0) || // no suggestion
+      (option.get('completion').count() === 0 && options.join) // no completion, and it's a join
+    ) {
+      return option.update('suggestion', suggestion => suggestion.push(newWord.set('input', false)))
 
-      // if there are no fuzzy matches
-      return {
-        suggestion: [{string: string, category: options.category, input: false}],
-        text: this.text
-      }
-    } else if (actualFuzzy === 'phrase') {
-      return this.fuzzyMatch(this.text, string, options.category)
+    // There is a suggestion
     } else {
-      if (_.startsWith(string.toLowerCase(), this.text.toLowerCase())) {
-        return {
-          suggestion: [
-            {string: string.substring(0, this.text.length), category: options.category, input: true},
-            {string: string.substring(this.text.length), category: options.category, input: false}
-          ],
-          text: this.text.substring(string.length)
-        }
+      // This is part of the completion
+      return option.update('completion', completion => completion.push(newWord))
+    }
+
+  // The text is not complete - it's a part of the text
+  } else {
+    // If the provided string is fully consumed by option.text
+    if (option.get('suggestion').count() === 0 && _.startsWith(option.get('text').toLowerCase(), string.toLowerCase())) {
+      // it's a match
+      return option
+        .update('match', match => match.push(newWord))
+        .update('text', text => text.substring(string.length))
+    // the provided string is not fully consumed - it may be a suggestion
+    } else {
+      const matches = matchString(option, string, options)
+      if (matches) {
+        return option
+          .update('suggestion', suggestion => suggestion.concat(matches.get('suggestion')))
+          .set('text', matches.get('text'))
       } else {
         return null
       }
     }
-  }
-
-  handleString(string, options) {
-    var newOptions = _.clone(this)
-    var newWord = {
-      string: string,
-      category: options.category
-    }
-    var matches
-
-    // If the text is complete
-    if (this.text.length === 0) {
-      if (
-        (this.suggestion.length === 0) || // no suggestion
-        (this.completion.length === 0 && options.join) // no completion, and this is join
-      ) {
-        newWord.input = false
-        newOptions.suggestion = this.suggestion.concat(newWord)
-
-      // There is a suggestion
-      } else {
-        // This is part of the completion
-        newOptions.completion = this.completion.concat(newWord)
-      }
-
-    // The text is not complete - this is a part of the text
-    } else {
-      // If the provided string is fully consumed by this.text
-      if (this.suggestion.length === 0 && _.startsWith(this.text.toLowerCase(), string.toLowerCase())) {
-        // it's a match
-        newOptions.match = this.match.concat(newWord)
-        newOptions.text = this.text.substring(string.length)
-      // the provided string is not fully consumed - it may be a suggestion
-      } else {
-        matches = this.matchString(string, options)
-        if (matches) {
-          newOptions.suggestion = this.suggestion.concat(matches.suggestion)
-          newOptions.text = matches.text
-        } else {
-          return null
-        }
-      }
-    }
-    return newOptions
-    // return new InputOption(newOptions)
   }
 }
