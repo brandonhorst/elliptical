@@ -82,7 +82,6 @@ function clearTemps(result) {
   }
 }
 
-
 export default class Phrase {
   constructor(options) {
     // store the constructor in case it needs to be cloned (by sequence)
@@ -104,6 +103,11 @@ export default class Phrase {
     realProps.children = _.flattenDeep(children)
     realProps = _.defaults(realProps, TrueConstructor.defaultProps)
 
+    //set up state
+    this.state = TrueConstructor.initialState
+    this.stateChanged = false
+    TrueConstructor.prototype.setState = this.setState.bind(this)
+
     //instantiate and validate the constructor
     if (TrueConstructor.prototype._handleParse) {
       this.element = new TrueConstructor(realProps, Phrase)
@@ -111,12 +115,21 @@ export default class Phrase {
       this.element = new TrueConstructor(realProps)
     }
     this.element.props = realProps
+    this.element.state = this.state
 
     this.oldAdditions = {}
 
     // initialize extenders and overriders
     this.supplementers = []
     this.overriders = []
+  }
+
+  setState(nextState) {
+    this.stateChanged = true
+    this.state = nextState
+
+    //if this.setState is called in the Constructor, this.element will not exist yet
+    if (this.element) this.element.state = nextState
   }
 
   applyAdditions() {
@@ -236,6 +249,9 @@ export default class Phrase {
       // if describe has never been executed, execute it and cache it
       if (this.oldAdditions !== this.descriptor.Constructor.additions) {
         this.applyAdditions()
+        this.translations[lang].cache = null
+      }
+      if (this.stateChanged) {
         this.translations[lang].cache = null
       }
       if (!this.translations[lang].cache) {
