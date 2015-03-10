@@ -217,11 +217,10 @@ export default class Phrase {
 
     // if this is already on the stack, and we've made a suggestion, we need to stop
     // we don't want to cause an infinite loop
-    // TODO: This is TERRIBLY ineffecient use of lodash/immutable
     if (
       !_.isString(this.descriptor.Constructor) && // do not apply this restriction to system classes
       !input.get('suggestion').isEmpty() &&
-      _.find(input.get('stack').toJS(), {constructor: this.descriptor.Constructor})
+      input.get('stack').find(entry => entry.get('constructor') === this.descriptor.Constructor)
     ) return []
 
     let outputs = []
