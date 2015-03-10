@@ -38,9 +38,8 @@ export default class Parser extends stream.Transform {
     this.fuzzy = fuzzy
 
     this._sentenceInstances = []
-    this._currentParseNumber = 0
-    this._flushcallback = null
-    this._pending = 0
+    // this._flushcallback = null
+    // this._pending = 0
   }
 
   _getExtensions(Constructor) {
@@ -58,125 +57,37 @@ export default class Parser extends stream.Transform {
     })
   }
 
+  parseSentence(sentence, input) {
+    const input = createOption({
+      fuzzy: this.fuzzy,
+      text: input,
+      sentence: sentence.element
+    })
+    const options = {
+      langs: this.langs,
+      getExtensions: this._getExtensions.bind(this),
+      generatePhraseParseId: () => _.uniqueId
+    }
+
+    _.chain(sentence.parse(input, options))
+      .filter(output => output.get('text') === '')
+      .map(output => output.set('result', output.get('result').get(sentence.element.props.id)))
+      .forEach(output => {
+        this.push({
+          event: 'data',
+          data: normalizeOutput(output.toJS())
+        })
+      })
+      .value()
+  }
+
   _transform(input, encoding, callback) {
-
-    var currentParseNumber = this._currentParseNumber
-    var limits = {}
-    var limitCache = []
-
-    var inputText
-    var group
-
     // Do not accept non-string input
-    if (_.isString(input)) {
-      inputText = input
-    } else if (_.isObject(input) && _.isString(input.data)) {
-      inputText = input.data
-      group = input.group
-    } else {
+    if (!_.isString(input)) {
       return callback(new LaconaError('parse input must be a string'))
     }
 
-    const addLimit = (phraseParseId, limit) => {
-      if (!limits[phraseParseId]) {
-        limits[phraseParseId] = limit
-      }
-    }
-
-    const parseSentence = (phrase, done) => {
-      var input = createOption({
-        fuzzy: this.fuzzy,
-        text: inputText,
-        sentence: phrase.element,
-        group: group
-      })
-      var options = {
-        langs: this.langs,
-        addLimit: addLimit,
-        getExtensions: this._getExtensions.bind(this),
-        generatePhraseParseId: () => _.uniqueId
-      }
-
-      const sentenceData = (input) => {
-        // only send the result if the parse is complete
-        if (input.get('text') === '') {
-          const newInput = input.set('result', input.get('result').get(phrase.element.props.id))
-
-          if (_.isEmpty(input.limit)) {
-            this.push({
-              event: 'data',
-              id: currentParseNumber,
-              data: normalizeOutput(newInput.toJS()),
-              group: group
-            })
-          } else {
-            limitCache.push(newInput)
-          }
-        }
-      }
-
-      phrase.parse(input, options, sentenceData, done)
-    }
-
-    const handleLimitCache = () => {
-      // for each phraseParseId, make an array of all of the limitValues submitted
-      var maxNums = _.chain(limitCache).pluck('limit').reduce((acc, limit) => {
-        _.forEach(limit, (limitValue, phraseParseId) => {
-          if (acc[phraseParseId]) {
-            acc[phraseParseId].push(limitValue)
-          } else {
-            acc[phraseParseId] = [limitValue]
-          }
-        })
-        return acc
-      // sort them numerically and uniquify them (these could be reordered if that would enhance perf)
-      }, {}).mapValues((value) => _.sortBy(value))
-      .mapValues((value) => _.uniq(value, true))
-      // return the maximum limitValue caceptable for each phraseParseId
-      .mapValues((value, key) =>
-        limits[key] > value.length ? value[value.length - 1] : value[limits[key] - 1]
-      ).value()
-
-      _.forEach(limitCache, (value) => {
-        if (_.every(value.limit, (dataNum, phraseParseId) => dataNum <= maxNums[phraseParseId])) {
-          this.push({
-            event: 'data',
-            id: currentParseNumber,
-            data: normalizeOutput(value.toJS()),
-            group: group
-          })
-        }
-      })
-    }
-
-    const allPhrasesDone = (err) => {
-      if (err) {
-        this.emit('error', err)
-      } else {
-        handleLimitCache()
-
-        this.push({
-          event: 'end',
-          id: currentParseNumber,
-          group: group
-        })
-
-        this._pending--
-        if (this._pending === 0 && this._flushcallback) {
-          this._flushcallback()
-        }
-      }
-    }
-
-    this._pending++
-
-    this._currentParseNumber++
-
-    this.push({
-      event: 'start',
-      id: currentParseNumber,
-      group: group
-    })
+    this.push({event: 'start'})
 
     this._sentenceInstances = updateList(
       this.sentences,
@@ -185,15 +96,71 @@ export default class Parser extends stream.Transform {
       descriptor => new Phrase(descriptor)
     )
 
-    asyncEach(this._sentenceInstances, parseSentence, allPhrasesDone)
+    this._sentenceInstances.forEach(sentence => this.parseSentence(sentence, input))
+
+    this.push({event: 'end'})
+
     callback()
+    // asyncEach(this._sentenceInstances, parseSentence, allPhrasesDone)
+    //
+    // const addLimit = (phraseParseId, limit) => {
+    //   if (!limits[phraseParseId]) {
+    //     limits[phraseParseId] = limit
+    //   }
+    // }
+    //
+    // const handleLimitCache = () => {
+    //   // for each phraseParseId, make an array of all of the limitValues submitted
+    //   var maxNums = _.chain(limitCache).pluck('limit').reduce((acc, limit) => {
+    //     _.forEach(limit, (limitValue, phraseParseId) => {
+    //       if (acc[phraseParseId]) {
+    //         acc[phraseParseId].push(limitValue)
+    //       } else {
+    //         acc[phraseParseId] = [limitValue]
+    //       }
+    //     })
+    //     return acc
+    //   // sort them numerically and uniquify them (these could be reordered if that would enhance perf)
+    //   }, {}).mapValues((value) => _.sortBy(value))
+    //   .mapValues((value) => _.uniq(value, true))
+    //   // return the maximum limitValue caceptable for each phraseParseId
+    //   .mapValues((value, key) =>
+    //     limits[key] > value.length ? value[value.length - 1] : value[limits[key] - 1]
+    //   ).value()
+    //
+    //   _.forEach(limitCache, (value) => {
+    //     if (_.every(value.limit, (dataNum, phraseParseId) => dataNum <= maxNums[phraseParseId])) {
+    //       this.push({
+    //         event: 'data',
+    //         id: currentParseNumber,
+    //         data: normalizeOutput(value.toJS()),
+    //         group: group
+    //       })
+    //     }
+    //   })
+    // }
+
+    // const allPhrasesDone = (err) => {
+    //   if (err) {
+    //     this.emit('error', err)
+    //   } else {
+    //     handleLimitCache()
+    //
+    //
+    //     this._pending--
+    //     if (this._pending === 0 && this._flushcallback) {
+    //       this._flushcallback()
+    //     }
+    //   }
+    // }
+
   }
 
-  _flush(callback) {
-    if (this._pending === 0) {
-      callback()
-    } else {
-      this._flushcallback = callback
-    }
-  }
+  // _flush(callback) {
+  //   if (this._pending === 0) {
+  //     callback()
+  //   } else {
+  //     this._flushcallback = callback
+  //   }
+  // }
 }

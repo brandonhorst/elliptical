@@ -41,37 +41,20 @@ export default class Sequence extends Phrase {
     }
   }
 
-  _handleParse(input, options, applyLimit, data, done) {
-
-    var parsesActive = 0
+  _handleParse(input, options) {
+    const outputs = []
 
     const parseChild = (childIndex, input) => {
-      const childData = (input) => {
+      this.children[childIndex].parse(input, options).forEach(output => {
         if (childIndex === this.children.length - 1) {
-          data(input.update('result', result => result.set(this.props.id, this.props.value)))
-          // newInputData = input.getData()
-          // newInputData.result[this.props.id] = this.props.value
-          // data(new InputOption(newInputData))
+          outputs.push(output.update('result', result => result.set(this.props.id, this.props.value)))
         } else {
-          parseChild(childIndex + 1, input)
+          parseChild(childIndex + 1, output)
         }
-      }
-
-      const childDone = (err) => {
-        if (err) {
-          done(err)
-        } else {
-          parsesActive--
-          if (parsesActive === 0) {
-            done()
-          }
-        }
-      }
-
-      parsesActive++
-      this.children[childIndex].parse(input, options, childData, childDone)
+      })
     }
 
     parseChild(0, input)
+    return outputs
   }
 }

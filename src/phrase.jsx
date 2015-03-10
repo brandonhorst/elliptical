@@ -165,21 +165,6 @@ export default class Phrase {
   }
 
   parse(input, options, data, done) {
-    var preParseInputData
-    var oldResultStored = input.get('result')
-    var phraseRunning = false
-    var extendersRunning = true
-    var overridersRunning = true
-    var overriderGotData = false
-
-    const phraseData = (input) => {
-      const newResult = clearTemps(this.element.getValue ?
-        I.fromJS(this.element.getValue(input.get('result').toJS())) :
-        input.get('result'))
-
-      let newOption = input.set('result', oldResultStored.set(this.element.props.id, newResult))
-
-      sendData(newOption)
 
       // oldResultStored.set(this.element.props.id, )
       // var newInputData = input.getData()
@@ -193,129 +178,118 @@ export default class Phrase {
       // newInputData.result = oldResult
       //
       // return sendData(new InputOption(newInputData))
-    }
+    // }
 
-    const phraseDone = () => {
-      phraseRunning = false
-      checkDoneCondition()
-    }
+    // const phraseDone = () => {
+    //   phraseRunning = false
+    //   checkDoneCondition()
+    // }
+    //
+    // const extendersDone = () => {
+    //   extendersRunning = false
+    //   checkDoneCondition()
+    // }
+    //
+    // const checkDoneCondition = () => {
+    //   if (!extendersRunning && !phraseRunning && !overridersRunning) {
+    //     done()
+    //   }
+    // }
+    //
+    // const sendData = (input) => {
+    //   data(input.update('stack', stack => stack.pop()))
+    // }
+    //
+    // const overriderData = (newOption) => {
+    //   overriderGotData = true
+    //   sendData(newOption)
+    // }
+    //
+    // const overridersDone = () => {
+    //   overridersRunning = false
+    //   if (!overriderGotData) {
+    //     parseElement()
+    //   } else {
+    //     checkDoneCondition()
+    //   }
+    // }
 
-    const extendersDone = () => {
-      extendersRunning = false
-      checkDoneCondition()
-    }
-
-    const checkDoneCondition = () => {
-      if (!extendersRunning && !phraseRunning && !overridersRunning) {
-        done()
-      }
-    }
-
-    const sendData = (input) => {
-      data(input.update('stack', stack => stack.pop()))
-      //
-      // var newInput = input.getData()
-      // newInput.stack = input.stackPop()
-      // data(new InputOption(newInput))
-    }
-
-    const overriderData = (newOption) => {
-      overriderGotData = true
-      sendData(newOption)
-    }
-
-    const overridersDone = () => {
-      overridersRunning = false
-      if (!overriderGotData) {
-        parseElement()
-      } else {
-        checkDoneCondition()
-      }
-    }
-    const doHandleParse = () => {
-      var dataNumber, phraseParseId, newInput
-
-      // bound to preParseOptions
-      const applyLimit = (input) => {
-        dataNumber++
-        return input.update('limit', limit => limit.set(phraseParseId, dataNumber))
-      }
-
-      newInput = preParseInputData
-
-      if (this.element.props.limit) {
-        dataNumber = 0
-        phraseParseId = options.generatePhraseParseId()
-      }
-
-      this.element._handleParse(newInput, options, applyLimit, sendData, done)
-    }
-
-    const doDescribeParse = () => {
-      var lang = getBestElementLang(this.translations, options.langs)
-
-      const preDescribeInput = preParseInputData.set('result', I.Map())
-
-      // if describe has never been executed, execute it and cache it
-      if (this.oldAdditions !== this.descriptor.Constructor.additions) {
-        this.applyAdditions()
-        this.translations[lang].cache = null
-      }
-      if (this.stateChanged) {
-        this.translations[lang].cache = null
-      }
-      if (!this.translations[lang].cache) {
-        this.translations[lang].cache = new Phrase(this.translations[lang].describe.call(this.element))
-      }
-
-      this.translations[lang].cache.parse(preDescribeInput, options, phraseData, phraseDone)
-    }
-
-    const parseElement = () => {
-      phraseRunning = true
-
-      // add this to the stack before doing anything
-      preParseInputData = input.update('stack', stack => stack.push(I.Map({
-        constructor: this.descriptor.Constructor,
-        category: this.element.props.category
-      })))
-
-      if (this.element._handleParse) {
-        doHandleParse()
-      } else {
-        doDescribeParse()
-      }
-    }
 
     // if this is already on the stack, and we've made a suggestion, we need to stop
     // we don't want to cause an infinite loop
+    // TODO: This is TERRIBLY ineffecient use of lodash/immutable
     if (
       !_.isString(this.descriptor.Constructor) && // do not apply this restriction to system classes
-      input.get('suggestion').count() > 0 &&
-      // TODO: This is TERRIBLY ineffecient use of lodash/immutable
+      !input.get('suggestion').isEmpty() &&
       _.find(input.get('stack').toJS(), {constructor: this.descriptor.Constructor})
-    ) return done()
+    ) return []
 
-    // If it is optional, a branch will skip it entirely
+    let outputs = []
+
+    // If it is optional, the input is a valid output
     if (this.element.props.optional) {
-      data(input)
+      outputs.push(input)
     }
+
+    this._checkExtensions(options.getExtensions(this.descriptor.Constructor))
+
+    // check overriders, stop if you get any
+    const overrideOutput = _.chain(this.overriders)
+      .map(overrider => overrider.parse(input, options))
+      .flatten()
+      .value()
+    if (overrideOutput.length) return outputs.concat(overrideOutput)
+
+    //if there are no overriders, do extenders and this phrase
+    const supplementOutput = _.chain(this.supplementers)
+      .map(supplementer => supplementer.parse(input, options))
+      .flatten()
+      .value()
+
+    const ownOutput = this.parseElement(input, options)
+      .map(output => output.update('stack', stack => stack.pop()))
+    return outputs.concat(supplementOutput).concat(ownOutput)
+  }
+
+  parseElement(input, options) {
+    // add this to the stack before doing anything
+    const inputWithStack = input.update('stack', stack => stack.push(I.Map({
+      constructor: this.descriptor.Constructor,
+      category: this.element.props.category
+    })))
 
     if (this.element._handleParse) {
-      parseElement()
+      return this.element._handleParse(inputWithStack, options)
     } else {
-      // Update the extension cache
-      this._checkExtensions(options.getExtensions(this.descriptor.Constructor))
+      const lang = getBestElementLang(this.translations, options.langs)
+      const inputWithoutResult = inputWithStack.set('result', I.Map())
+      const cache = this.getCache(lang)
 
-      // Check the extenders - don't call done until all are complete
-      asyncEach(Object.keys(this.supplementers), (supplementer, done) => {
-        this.supplementers[supplementer].parse(input, options, sendData, done)
-      }, extendersDone)
+      return cache
+        .parse(inputWithoutResult, options)
+        .map(output => {
+          const newResult = this.element.getValue ?
+            I.fromJS(this.element.getValue(output.get('result').toJS())) :
+            output.get('result')
+          const cleared = clearTemps(newResult)
 
-      // Check the overriders - don't call phrase parse unless none return data
-      asyncEach(Object.keys(this.overriders), (overrider, done) => {
-        this.overriders[overrider].parse(input, options, overriderData, done)
-      }, overridersDone)
+          return output.set('result', input.get('result').set(this.element.props.id, cleared))
+        })
     }
+  }
+
+  // if describe has never been executed, execute it and cache it
+  getCache(lang) {
+    if (this.oldAdditions !== this.descriptor.Constructor.additions) {
+      this.applyAdditions()
+      this.translations[lang].cache = null
+    }
+    if (this.stateChanged) {
+      this.translations[lang].cache = null
+    }
+    if (!this.translations[lang].cache) {
+      this.translations[lang].cache = new Phrase(this.translations[lang].describe.call(this.element))
+    }
+    return this.translations[lang].cache
   }
 }

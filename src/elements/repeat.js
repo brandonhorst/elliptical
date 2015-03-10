@@ -25,77 +25,46 @@ export default class Repeat extends Phrase {
     }
   }
 
-  _handleParse(input, options, applyLimit, data, done) {
-    var parsesActive = 0
+  _handleParse(input, options) {
+    const outputs = []
 
     const parseChild = (input, level) => {
-      const childData = (input) => {
-        var ownResult = input.get('result').get(this.props.id) || I.List()
-        var childResult = input.get('result').get(this.child.element.props.id)
+      this.child.parse(input, options).forEach(output => {
+        var ownResult = output.get('result').get(this.props.id) || I.List()
+        var childResult = output.get('result').get(this.child.element.props.id)
 
         // if the repeat is unique and the childResult already exists in the result,
         // just stop - we will not do this branch
         if (this.props.unique && ownResult.contains(childResult)) return
 
         const newOwnResult = ownResult.push(childResult)
-        const newInput = input
-          .update('result', result => result
-            .set(this.props.id, newOwnResult)
-            .delete(this.child.element.props.id))
-
-        // store continueToSeparator, in case the call to data data changes newOption
-        const continueToSeparator = input.get('suggestion').count() === 0
+        const newOutput = output.update('result', result => result
+          .set(this.props.id, newOwnResult)
+          .delete(this.child.element.props.id)
+        )
 
         // only call data if we are within the min/max repeat range
         if (level >= this.props.min && level <= this.props.max) {
-          data(newInput)
+          outputs.push(newOutput)
         }
 
-        // parse the separator, unless we are above max
-        if (level < this.props.max && continueToSeparator) {
-          parseSeparator(newInput, level)
+        // parse the separator, unless we are above max or there is a suggestion
+        if (level < this.props.max && output.get('suggestion').count() === 0) {
+          parseSeparator(newOutput, level)
         }
-      }
-
-      const childDone = (err) => {
-        if (err) {
-          done(err)
-        } else {
-          parsesActive--
-          if (parsesActive === 0) {
-            done()
-          }
-        }
-      }
-
-      parsesActive++
-      this.child.parse(input, options, childData, childDone)
+      })
     }
 
     const parseSeparator = (input, level) => {
-      const separatorData = (option) => {
-        parseChild(option, level + 1)
-      }
-
-      function separatorDone (err) {
-        if (err) {
-          done(err)
-        } else {
-          parsesActive--
-          if (parsesActive === 0) {
-            done()
-          }
-        }
-      }
-
       if (this.separator) {
-        this.separator.parse(input, options, separatorData, separatorDone)
+        this.separator.parse(input, options).forEach(output => parseChild(output, level + 1))
       } else {
-        separatorData(input)
-        separatorDone()
+        parseChild(input, level + 1)
       }
     }
 
     parseChild(input, 1)
+
+    return outputs
   }
 }

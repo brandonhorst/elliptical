@@ -3,12 +3,11 @@ import {createElement, Phrase} from 'lacona-phrase'
 import value from './value'
 
 export default class Literal extends Phrase {
-  computeLiteral(inputString, data, done) {
-    data({
+  computeLiteral(inputString) {
+    return [{
       text: this.props.text,
       value: this.props.value
-    })
-    return done()
+    }]
   }
 
   getValue(result) {

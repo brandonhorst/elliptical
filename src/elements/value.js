@@ -10,36 +10,29 @@ export default class Value extends Phrase {
     }
   }
 
-  _handleParse(input, options, applyLimit, data, done) {
-    var handleStringOptions = {
+  _handleParse(input, options) {
+    // if this has a category, use that
+    // if not, use the last category on the stack
+    let category = this.props.category
+    if (_.isUndefined(category)) {
+      const stackEntry = input.get('stack').findLast(entry => !_.isUndefined(entry.get('category')))
+      category = stackEntry ? stackEntry.get('category') : null
+    }
+
+    const handleStringOptions = {
       join: this.props.join,
-      fuzzy: this.props.fuzzy
+      fuzzy: this.props.fuzzy,
+      category: category
     }
 
-    const computeData = (suggestion) => {
-      // if this has a category, use that
-      // if not, use the last category on the stack
-      handleStringOptions.category = this.props.category
-      if (!handleStringOptions.category) {
-        //TODO HORRIBLY INEFFECIENT
-        const stackEntry = _.findLast(input.get('stack').toJS(), 'category')
-        handleStringOptions.category = stackEntry ? stackEntry.category : null
-      }
-
-      const newInput = handleString(input, suggestion.text, handleStringOptions)
-      if (newInput !== null) {
-        const resultInput = newInput.update('result', result => result.set(this.props.id, suggestion.value))
-        // newResult = _.clone(input.result)
-        // newResult[this.props.id] = suggestion.value
-        // newInput.result = newResult
-        if (this.props.limit) {
-          data(applyLimit(resultInput))
-        } else {
-          data(resultInput)
+    return _.chain(this.props.compute(input.get('text')))
+      .map(({text, value}) => {
+        const newInput = handleString(input, text, handleStringOptions)
+        if (newInput !== null) {
+          return newInput.update('result', result => result.set(this.props.id, value))
         }
-      }
-    }
-
-    return this.props.compute(input.text, computeData, done)
+      })
+      .filter(_.negate(_.isUndefined))
+      .value()
   }
 }

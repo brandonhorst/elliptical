@@ -17,9 +17,8 @@ describe('value', function () {
   })
 
   it('suggests a value', function (done) {
-    function fun(input, data, done) {
-      data({text: 'tex', value: 'val'})
-      done()
+    function fun() {
+      return [{text: 'tex', value: 'val'}]
     }
 
     function callback (err, data) {
@@ -41,10 +40,10 @@ describe('value', function () {
     var funSpy = spy()
 
     class Test extends phrase.Phrase {
-      fun(input, data, done) {
+      fun() {
         expect(this.props.myVar).to.equal('myVal')
         funSpy()
-        done()
+        return []
       }
 
       describe() {
@@ -66,9 +65,10 @@ describe('value', function () {
 
   it('can override fuzzy settings', function (done) {
     function fun (input, data, done) {
-      data({text: 'tst', value: 'non-fuzzy'})
-      data({text: 'test', value: 'fuzzy'})
-      done()
+      return [
+        {text: 'tst', value: 'non-fuzzy'},
+        {text: 'test', value: 'fuzzy'}
+      ]
     }
 
     function callback (err, data) {
