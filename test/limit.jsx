@@ -15,11 +15,12 @@ describe('limit', function () {
 
   describe('value', function () {
     it('limits calls to data', function (done) {
-      function compute(input, data, done) {
-        data({text: 'testa'})
-        data({text: 'testb'})
-        data({text: 'testc'})
-        done()
+      function compute(input) {
+        return [
+          {text: 'testa'},
+          {text: 'testb'},
+          {text: 'testc'}
+        ]
       }
 
       function callback (err, data) {
@@ -38,9 +39,10 @@ describe('limit', function () {
 
     it('accepts fewer than limit', function (done) {
       function compute(input, data, done) {
-        data({text: 'testa'})
-        data({text: 'testb'})
-        done()
+        return [
+          {text: 'testa'},
+          {text: 'testb'}
+        ]
       }
 
       function callback (err, data) {
