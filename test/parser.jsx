@@ -33,7 +33,7 @@ describe('Parser', function () {
 
   it('requires string input', function (done) {
     var callback = spy(function (err) {
-      expect(err).to.be.an.instanceof(lacona.Error)
+      expect(err).to.be.an.instanceof(Error)
       done()
     })
 
@@ -41,7 +41,7 @@ describe('Parser', function () {
       .pipe(parser)
       .on('error', callback)
   })
-  // 
+  //
   // it('allows object input if it has a data property', function (done) {
   //   function callback (err, data) {
   //     expect(err).to.not.exist

@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import asyncEach from 'async-each'
 import {createOption} from './input-option'
-import LaconaError from './error'
 import Phrase from './phrase'
 import stream from 'stream'
 import updateList from './utils/update-list'
@@ -84,7 +83,7 @@ export default class Parser extends stream.Transform {
   _transform(input, encoding, callback) {
     // Do not accept non-string input
     if (!_.isString(input)) {
-      return callback(new LaconaError('parse input must be a string'))
+      return callback(new Error('parse input must be a string'))
     }
 
     this.push({event: 'start'})

@@ -32,19 +32,19 @@
   },
   "homepage": "https://github.com/lacona/lacona",
   "devDependencies": {
-    "babel": "^4.5.5",
-    "chai": "^2.1.0",
-    "event-stream": "^3.2.2",
+    "babel": "^4.7.7",
+    "chai": "^2.1.1",
+    "event-stream": "^3.3.0",
     "lacona-util-fulltext": "^0.2.0",
-    "mocha": "^2.1.0",
-    "rimraf": "^2.2.8",
-    "sinon": "^1.12.2",
+    "mocha": "^2.2.1",
+    "rimraf": "^2.3.2",
+    "sinon": "^1.13.0",
     "sinon-chai": "^2.7.0"
   },
   "dependencies": {
     "async-each": "^0.1.6",
     "immutable": "^3.6.4",
-    "lacona-phrase": "^0.2.0",
-    "lodash": "^3.3.1"
+    "lacona-phrase": "^0.4.1",
+    "lodash": "^3.5.0"
   }
 }

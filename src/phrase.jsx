@@ -5,7 +5,6 @@ import * as builtins from './elements'
 import {createElement} from 'lacona-phrase'
 import I from 'immutable'
 import Option from './input-option'
-import LaconaError from './error'
 import updateList from './utils/update-list'
 
 var nextTempId = 0
@@ -26,16 +25,16 @@ function getConstructor(constructor) {
     if (_.has(builtins, constructor)) {
       Constructor = builtins[constructor]
     } else {
-      throw new LaconaError('Invalid phrase. Note: non-builtin phrases must be uppercase')
+      throw new Error('Invalid phrase. Note: non-builtin phrases must be uppercase')
     }
   } else {
     Constructor = constructor
   }
 
   if (Constructor.initialAdditions) Constructor.additions = Constructor.initialAdditions
-  if (!Constructor.translations && !Constructor.prototype._handleParse) {
-    if (!Constructor.prototype.describe) {
-      throw new LaconaError('Phrases must either have translations on the constructor or describe on the prototype')
+  if (!Constructor.translations) {
+    if (!Constructor.prototype.describe && !Constructor.prototype._handleParse) {
+      throw new Error('Phrases must either have translations on the constructor or describe on the prototype')
     } else {
       Constructor.translations = [{langs: ['default'], describe: Constructor.prototype.describe}]
       delete Constructor.prototype.describe
@@ -56,28 +55,24 @@ function getElements(Constructor) {
 }
 
 function validate(Constructor) {
-  if (!Constructor.prototype._handleParse) {
-    let hasDefault = false
-    if (!_.every(Constructor.translations, _.partial(_.has, _, 'describe'))) {
-      throw new LaconaError('Every translation must have a describe method')
-    }
-    if (!_.every(Constructor.translations, _.partial(_.has, _, 'langs'))) {
-      throw new LaconaError('Every translation must have a langs property')
-    }
-    if (!_.some(Constructor.translations, translation => _.indexOf(translation.langs, 'default') > -1)) {
-      throw new LaconaError('All elements must have a describe method defined for the default language')
-    }
+  let hasDefault = false
+  if (!_.every(Constructor.translations, _.partial(_.has, _, 'describe'))) {
+    throw new Error('Every translation must have a describe method')
+  }
+  if (!_.every(Constructor.translations, _.partial(_.has, _, 'langs'))) {
+    throw new Error('Every translation must have a langs property')
+  }
+  if (!_.some(Constructor.translations, translation => _.indexOf(translation.langs, 'default') > -1)) {
+    throw new Error('All elements must have a describe method defined for the default language')
   }
   return true
 }
 
 function clearTemps(result) {
-  if (_.isPlainObject(result)) {
-    return _.omit(result, (value, key) => {
-      return _.startsWith(key, '_temp') || _.isUndefined(value)
-    })
+  if (I.Map.isMap(result)) {
+    return result.filter((value, key) => !_.startsWith(key, '_temp') && !_.isUndefined(value))
   } else if (_.isArray(result)) {
-    return _.filter(result, _.isUndefined)
+    return result.filter(_.isUndefined)
   } else {
     return result
   }
@@ -94,10 +89,7 @@ export default class Phrase {
     const TrueConstructor = getConstructor(Constructor)
     validate(TrueConstructor)
 
-    // get the translations, or handleParse if it is provided
-    if (!TrueConstructor.prototype._handleParse) {
-      this.translations = getElements(TrueConstructor)
-    }
+    this.translations = getElements(TrueConstructor)
 
     //normalize props
     let realProps = props ? _.clone(props) : {}
@@ -110,11 +102,7 @@ export default class Phrase {
     TrueConstructor.prototype.setState = this.setState.bind(this)
 
     //instantiate and validate the constructor
-    if (TrueConstructor.prototype._handleParse) {
-      this.element = new TrueConstructor(realProps, Phrase)
-    } else {
-      this.element = new TrueConstructor(realProps)
-    }
+    this.element = new TrueConstructor(realProps)
     this.element.props = realProps
     this.element.state = this.state
 
@@ -257,12 +245,11 @@ export default class Phrase {
       category: this.element.props.category
     })))
 
-    if (this.element._handleParse) {
-      return this.element._handleParse(inputWithStack, options)
-    } else {
-      const lang = getBestElementLang(this.translations, options.langs)
+    const lang = getBestElementLang(this.translations, options.langs)
+    const cache = this.translations ? this.getDescribeCache(lang) : null
+
+    if (cache) {
       const inputWithoutResult = inputWithStack.set('result', I.Map())
-      const cache = this.getCache(lang)
 
       return cache
         .parse(inputWithoutResult, options)
@@ -274,11 +261,14 @@ export default class Phrase {
 
           return output.set('result', input.get('result').set(this.element.props.id, cleared))
         })
+    } else {
+      return this.element._handleParse(inputWithStack, options, parse)
     }
   }
 
+
   // if describe has never been executed, execute it and cache it
-  getCache(lang) {
+  getDescribeCache(lang) {
     if (this.oldAdditions !== this.descriptor.Constructor.additions) {
       this.applyAdditions()
       this.translations[lang].cache = null
@@ -286,9 +276,22 @@ export default class Phrase {
     if (this.stateChanged) {
       this.translations[lang].cache = null
     }
+
     if (!this.translations[lang].cache) {
-      this.translations[lang].cache = new Phrase(this.translations[lang].describe.call(this.element))
+      const describe = this.translations[lang].describe
+      let description
+      if (describe) {
+        description = describe.call(this.element)
+      }
+      if (description) {
+        this.translations[lang].cache = new Phrase(description)
+      }
     }
     return this.translations[lang].cache
   }
+}
+
+function parse(element, input, options) {
+  const phrase = new Phrase(element)
+  return phrase.parse(input, options)
 }

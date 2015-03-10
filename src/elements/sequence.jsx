@@ -14,39 +14,39 @@ function addSeparator (child, separator) {
   }
 }
 
-function getPieces (children) {
-  let content, separator
-  if (children.length > 0 && children[0].Constructor === 'content') {
-    content = children[0].children
-    if (children.length > 1 && children[1].Constructor === 'separator') {
-      separator = children[1].children[0]
-    }
-  } else {
-    content = children
-  }
-  return {content, separator}
-}
-
 export default class Sequence extends Phrase {
-  constructor(props, Phrase) {
-    const pieces = getPieces(props.children)
-    if (pieces.separator) {
-      this.children = _.chain(pieces.content.slice(0, -1))
-        .map(_.partial(addSeparator, _, pieces.separator))
-        .concat(_.last(pieces.content))
-        .map(child => new Phrase(child))
-        .value()
+  describe() {
+    let content, separator
+    if (this.props.children.length > 0 && this.props.children[0].Constructor === 'content') {
+      content = this.props.children[0].children
+      if (this.props.children.length > 1 && this.props.children[1].Constructor === 'separator') {
+        separator = this.props.children[1].children[0]
+      }
     } else {
-      this.children = _.map(pieces.content, child => new Phrase(child))
+      return //no content, we're good to go!
+    }
+
+    if (separator) {
+      return (
+        <sequence {...this.props}>
+          {_.chain(content.slice(0, -1))
+            .map(_.partial(addSeparator, _, separator))
+            .concat(_.last(content))
+            .value()
+          }
+        </sequence>
+      )
+    } else {
+      return <sequence {...this.props}>{content}</sequence>
     }
   }
 
-  _handleParse(input, options) {
+  _handleParse(input, options, parse) {
     const outputs = []
 
     const parseChild = (childIndex, input) => {
-      this.children[childIndex].parse(input, options).forEach(output => {
-        if (childIndex === this.children.length - 1) {
+      parse(this.props.children[childIndex], input, options).forEach(output => {
+        if (childIndex === this.props.children.length - 1) {
           outputs.push(output.update('result', result => result.set(this.props.id, this.props.value)))
         } else {
           parseChild(childIndex + 1, output)

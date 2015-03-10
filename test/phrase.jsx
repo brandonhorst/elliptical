@@ -253,7 +253,7 @@ describe('Phrase', function () {
 
     expect(function () {
       new Phrase(<Test />)
-    }).to.throw(lacona.Error)
+    }).to.throw(Error)
   })
 
   it('throws for translations without a lang', function () {
@@ -269,14 +269,14 @@ describe('Phrase', function () {
 
     expect(function () {
       new Phrase(<Test />)
-    }).to.throw(lacona.Error)
+    }).to.throw(Error)
   })
 
   it('throws for phrases without a describe', function () {
     class Test extends phrase.Phrase {}
-    
+
     expect(function () {
       new Phrase(<Test />)
-    }).to.throw(lacona.Error)
+    }).to.throw(Error)
   })
 })
