@@ -58,6 +58,28 @@ describe('limit', function () {
         .pipe(parser)
         .pipe(es.writeArray(callback))
     })
+
+    it('ignores invalids', function (done) {
+      function compute(input, data, done) {
+        return [
+          {text: 'wrong'},
+          {text: 'testa'},
+          {text: 'testb'}
+        ]
+      }
+
+      function callback (err, data) {
+        expect(err).to.not.exist
+        expect(data).to.have.length(3)
+        expect(fulltext.all(data[1].data)).to.equal('testa')
+        done()
+      }
+
+      parser.sentences = [<value limit={1} compute={compute} />]
+      es.readArray(['test'])
+        .pipe(parser)
+        .pipe(es.writeArray(callback))
+    })
   })
 
   describe('choice', function () {
@@ -127,6 +149,33 @@ describe('limit', function () {
         .pipe(es.writeArray(callback))
     })
 
+    it('allows choices in sequences to be limited', function (done) {
+      function callback (err, data) {
+        expect(err).to.not.exist
+        expect(data).to.have.length(4)
+        expect(fulltext.suggestion(data[1].data)).to.equal('testa')
+        expect(fulltext.completion(data[1].data)).to.equal('also')
+        expect(fulltext.suggestion(data[2].data)).to.equal('testb')
+        expect(fulltext.completion(data[2].data)).to.equal('also')
+        done()
+      }
+
+      parser.sentences = [
+        <sequence>
+          <choice limit={2}>
+            <literal text='testa' />
+            <literal text='x' />
+            <literal text='testb' />
+            <literal text='testc' />
+          </choice>
+          <literal text='also' />
+        </sequence>
+      ]
+      es.readArray(['test'])
+        .pipe(parser)
+        .pipe(es.writeArray(callback))
+    })
+
     it('limits even if valid parses do not parse to completion', function (done) {
       function callback (err, data) {
         expect(err).to.not.exist
@@ -139,13 +188,66 @@ describe('limit', function () {
       parser.sentences = [
         <sequence>
           <choice limit={1}>
-            <literal text='rightalso' />
+            <literal text='righ' />
             <literal text='right' />
+            <literal text='righta' />
           </choice>
           <literal text='also' />
         </sequence>
       ]
       es.readArray(['righta'])
+        .pipe(parser)
+        .pipe(es.writeArray(callback))
+    })
+
+    it('allows for choices inside of repeats to be limited', function (done) {
+      function callback (err, data) {
+        expect(err).to.not.exist
+        expect(data).to.have.length(3)
+        expect(fulltext.match(data[1].data)).to.equal('ab')
+        expect(fulltext.suggestion(data[1].data)).to.equal('aa')
+        done()
+      }
+
+      parser.sentences = [
+        <repeat>
+          <choice limit={1}>
+            <literal text='aa' />
+            <literal text='ab' />
+            <literal text='ac' />
+          </choice>
+        </repeat>
+      ]
+      es.readArray(['aba'])
+        .pipe(parser)
+        .pipe(es.writeArray(callback))
+    })
+
+    it('allows for choices inside of repeat separators to be limited', function (done) {
+      function callback (err, data) {
+        expect(err).to.not.exist
+        expect(data).to.have.length(3)
+        expect(fulltext.match(data[1].data)).to.equal('x')
+        expect(fulltext.suggestion(data[1].data)).to.equal('aa')
+        expect(fulltext.completion(data[1].data)).to.equal('x')
+        done()
+      }
+
+      parser.sentences = [
+        <repeat>
+          <content>
+            <literal text='x' />
+          </content>
+          <separator>
+            <choice limit={1}>
+              <literal text='aa' />
+              <literal text='ab' />
+              <literal text='ac' />
+            </choice>
+          </separator>
+        </repeat>
+      ]
+      es.readArray(['xa'])
         .pipe(parser)
         .pipe(es.writeArray(callback))
     })

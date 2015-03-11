@@ -69,13 +69,19 @@ export default class Parser extends stream.Transform {
     }
 
     const iterator = sentence.parse(input, options)
-    for (let output of iterator) {
-      if (output && output.get('text') === '') {
-        const finalOutput = output.set('result', output.get('result').get(sentence.props.id))
+    let lastRun = false
+    while (true) {
+      let {value, done} = iterator.next(lastRun)
+      if (done || _.isUndefined(value)) break
+      if (value && value.get('text') === '') {
+        lastRun = true
+        const finalOutput = value.set('result', value.get('result').get(sentence.props.id))
         this.push({
           event: 'data',
           data: normalizeOutput(finalOutput.toJS())
         })
+      } else {
+        lastRun = false
       }
     }
   }

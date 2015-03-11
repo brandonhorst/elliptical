@@ -13,6 +13,7 @@ export default class Value extends Phrase {
   *_handleParse(input, options) {
     // if this has a category use that, else the last category on the stack
     let category = this.props.category
+    let successfulDataCount = 0
     if (_.isUndefined(category)) {
       const stackEntry = input.get('stack').findLast(entry => !_.isUndefined(entry.get('category')))
       category = stackEntry ? stackEntry.get('category') : null
@@ -29,7 +30,9 @@ export default class Value extends Phrase {
       if (suggestion) {
         const newInput = handleString(input, suggestion.text, handleStringOptions)
         if (newInput !== null) {
-          yield newInput.update('result', result => result.set(this.props.id, suggestion.value))
+          let completed = yield newInput.update('result', result => result.set(this.props.id, suggestion.value))
+          if (completed) successfulDataCount++
+          if (this.props.limit && successfulDataCount >= this.props.limit) break
         }
       }
     }

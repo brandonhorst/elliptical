@@ -133,10 +133,12 @@ export default class Phrase {
         input.get('stack').find(entry => entry.get('constructor') === this.descriptor.Constructor)) {
       return
     }
+    let lastOptionalRun = false
+    let lastRun = false
 
     // If it is optional, the input is a valid output
     if (this.props.optional) {
-      yield input
+      lastOptionalRun = yield input
     }
 
     // this._checkExtensions(options.getExtensions(this.descriptor.Constructor))
@@ -158,8 +160,10 @@ export default class Phrase {
     //   .map(output => output.update('stack', stack => stack.pop()))
     // return outputs.concat(supplementOutput).concat(ownOutput)
     const iterator = this.parseElement(input, options)
-    for (let output of iterator) {
-      yield output.update('stack', stack => stack.pop())
+    while (true) {
+      let {value, done} = iterator.next(lastRun || lastOptionalRun)
+      if (done || _.isUndefined(value)) break
+      lastRun = yield value.update('stack', stack => stack.pop())
     }
   }
 

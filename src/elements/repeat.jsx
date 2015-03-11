@@ -40,28 +40,39 @@ export default class Repeat extends Phrase {
 
     function *parseChild (input, level) {
       const iterator = parse(child, input, options)
-      for (let output of iterator) {
-        var ownResult = output.get('result').get(self.props.id) || I.List()
-        var childResult = output.get('result').get(child.props.id)
+      let lastRun = false
+      while (true) {
+        let {value, done} = iterator.next(lastRun)
+        if (done) break
+
+        var ownResult = value.get('result').get(self.props.id) || I.List()
+        var childResult = value.get('result').get(child.props.id)
 
         // if the repeat is unique and the childResult already exists in the result,
         // just stop - we will not do this branch
-        if (self.props.unique && ownResult.contains(childResult)) return
+        if (self.props.unique && ownResult.contains(childResult)) break
 
         const newOwnResult = ownResult.push(childResult)
-        const newOutput = output.update('result', result => result
+        const newOutput = value.update('result', result => result
           .set(self.props.id, newOwnResult)
           .delete(child.props.id)
         )
 
         // only call data if we are within the min/max repeat range
         if (level >= self.props.min && level <= self.props.max) {
-          yield newOutput
+          lastRun = yield newOutput
         }
 
         // parse the separator, unless we are above max or there is a suggestion
-        if (level < self.props.max && output.get('suggestion').count() === 0) {
-          yield* parseSeparator(newOutput, level)
+        if (level < self.props.max && value.get('suggestion').count() === 0) {
+          const sepIterator = parseSeparator(newOutput, level)
+          let lastRun = false
+          while (true) {
+            let {value, done} = sepIterator.next(lastRun)
+            if (done) break
+
+            lastRun = yield value
+          }
         }
       }
     }
@@ -69,8 +80,19 @@ export default class Repeat extends Phrase {
     function *parseSeparator (input, level) {
       if (separator) {
         const iterator = parse(separator, input, options)
-        for (let output of iterator) {
-          yield* parseChild(output, level + 1)
+        let lastRun = false
+        while (true) {
+          let {value, done} = iterator.next(lastRun)
+          if (done) break
+
+          if (value) {
+            const childIterator = parseChild(value, level + 1)
+            while (true) {
+              let {value, done} = childIterator.next(lastRun)
+              if (done) break
+              lastRun = yield value
+            }
+          }
         }
       } else {
         yield* parseChild(input, level + 1)
