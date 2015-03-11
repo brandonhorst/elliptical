@@ -10,9 +10,8 @@ export default class Value extends Phrase {
     }
   }
 
-  _handleParse(input, options) {
-    // if this has a category, use that
-    // if not, use the last category on the stack
+  *_handleParse(input, options) {
+    // if this has a category use that, else the last category on the stack
     let category = this.props.category
     if (_.isUndefined(category)) {
       const stackEntry = input.get('stack').findLast(entry => !_.isUndefined(entry.get('category')))
@@ -25,14 +24,14 @@ export default class Value extends Phrase {
       category: category
     }
 
-    return _.chain(this.props.compute(input.get('text')))
-      .map(({text, value}) => {
-        const newInput = handleString(input, text, handleStringOptions)
+    let iterator = this.props.compute(input.get('text'))
+    for (let suggestion of iterator) {
+      if (suggestion) {
+        const newInput = handleString(input, suggestion.text, handleStringOptions)
         if (newInput !== null) {
-          return newInput.update('result', result => result.set(this.props.id, value))
+          yield newInput.update('result', result => result.set(this.props.id, suggestion.value))
         }
-      })
-      .filter(_.negate(_.isUndefined))
-      .value()
+      }
+    }
   }
 }

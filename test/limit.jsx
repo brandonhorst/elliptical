@@ -126,5 +126,28 @@ describe('limit', function () {
         .pipe(parser)
         .pipe(es.writeArray(callback))
     })
+
+    it('limits even if valid parses do not parse to completion', function (done) {
+      function callback (err, data) {
+        expect(err).to.not.exist
+        expect(data).to.have.length(3)
+        expect(fulltext.match(data[1].data)).to.equal('right')
+        expect(fulltext.suggestion(data[1].data)).to.equal('also')
+        done()
+      }
+
+      parser.sentences = [
+        <sequence>
+          <choice limit={1}>
+            <literal text='rightalso' />
+            <literal text='right' />
+          </choice>
+          <literal text='also' />
+        </sequence>
+      ]
+      es.readArray(['righta'])
+        .pipe(parser)
+        .pipe(es.writeArray(callback))
+    })
   })
 })

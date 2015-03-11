@@ -41,20 +41,21 @@ export default class Sequence extends Phrase {
     }
   }
 
-  _handleParse(input, options, parse) {
-    const outputs = []
-
-    const parseChild = (childIndex, input) => {
-      parse(this.props.children[childIndex], input, options).forEach(output => {
-        if (childIndex === this.props.children.length - 1) {
-          outputs.push(output.update('result', result => result.set(this.props.id, this.props.value)))
-        } else {
-          parseChild(childIndex + 1, output)
+  *_handleParse(input, options, parse) {
+    var self = this
+    function *parseChild (childIndex, input) {
+      const iterator = parse(self.props.children[childIndex], input, options)
+      for (let output of iterator) {
+        if (output) {
+          if (childIndex === self.props.children.length - 1) {
+            yield output.update('result', result => result.set(self.props.id, self.props.value))
+          } else {
+            yield* parseChild(childIndex + 1, output)
+          }
         }
-      })
+      }
     }
 
-    parseChild(0, input)
-    return outputs
+    yield* parseChild(0, input)
   }
 }

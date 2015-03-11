@@ -6,7 +6,7 @@
   "scripts": {
     "pretest": "babel test --out-dir tmp",
     "test": "mocha tmp",
-    "build": "babel src --out-dir lib",
+    "build": "babel src --out-dir lib -b regenerator",
     "validate": "npm run build && npm test",
     "clean": "rimraf lib tmp",
     "prepublish": "npm run clean && npm run build"

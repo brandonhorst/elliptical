@@ -68,16 +68,16 @@ export default class Parser extends stream.Transform {
       generatePhraseParseId: () => _.uniqueId
     }
 
-    _.chain(sentence.parse(input, options))
-      .filter(output => output.get('text') === '')
-      .map(output => output.set('result', output.get('result').get(sentence.props.id)))
-      .forEach(output => {
+    const iterator = sentence.parse(input, options)
+    for (let output of iterator) {
+      if (output && output.get('text') === '') {
+        const finalOutput = output.set('result', output.get('result').get(sentence.props.id))
         this.push({
           event: 'data',
-          data: normalizeOutput(output.toJS())
+          data: normalizeOutput(finalOutput.toJS())
         })
-      })
-      .value()
+      }
+    }
   }
 
   _transform(input, encoding, callback) {
@@ -119,8 +119,8 @@ export default class Parser extends stream.Transform {
     //       }
     //     })
     //     return acc
-    //   // sort them numerically and uniquify them (these could be reordered if that would enhance perf)
-    //   }, {}).mapValues((value) => _.sortBy(value))
+    //   // uniquify them (these could be reordered if that would enhance perf)
+    // }, {}) //.mapValues((value) => _.sortBy(value))
     //   .mapValues((value) => _.uniq(value, true))
     //   // return the maximum limitValue caceptable for each phraseParseId
     //   .mapValues((value, key) =>

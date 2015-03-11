@@ -126,43 +126,44 @@ export default class Phrase {
     })
   }
 
-  parse(input, options, data, done) {
+  *parse(input, options, data, done) {
     // if this is already on the stack, and we've made a suggestion, we need to stop
     // we don't want to cause an infinite loop
-    if (
-      !_.isString(this.descriptor.Constructor) && // do not apply this restriction to system classes
-      !input.get('suggestion').isEmpty() &&
-      input.get('stack').find(entry => entry.get('constructor') === this.descriptor.Constructor)
-    ) return []
-
-    let outputs = []
+    if (!_.isString(this.descriptor.Constructor) && !input.get('suggestion').isEmpty() &&
+        input.get('stack').find(entry => entry.get('constructor') === this.descriptor.Constructor)) {
+      return
+    }
 
     // If it is optional, the input is a valid output
     if (this.props.optional) {
-      outputs.push(input)
+      yield input
     }
 
-    this._checkExtensions(options.getExtensions(this.descriptor.Constructor))
-
-    // check overriders, stop if you get any
-    const overrideOutput = _.chain(this.overriders)
-      .map(overrider => overrider.parse(input, options))
-      .flatten()
-      .value()
-    if (overrideOutput.length) return outputs.concat(overrideOutput)
-
-    //if there are no overriders, do extenders and this phrase
-    const supplementOutput = _.chain(this.supplementers)
-      .map(supplementer => supplementer.parse(input, options))
-      .flatten()
-      .value()
-
-    const ownOutput = this.parseElement(input, options)
-      .map(output => output.update('stack', stack => stack.pop()))
-    return outputs.concat(supplementOutput).concat(ownOutput)
+    // this._checkExtensions(options.getExtensions(this.descriptor.Constructor))
+    //
+    // // check overriders, stop if you get any
+    // const overrideOutput = _.chain(this.overriders)
+    //   .map(overrider => overrider.parse(input, options))
+    //   .flatten()
+    //   .value()
+    // if (overrideOutput.length) return outputs.concat(overrideOutput)
+    //
+    // //if there are no overriders, do extenders and this phrase
+    // const supplementOutput = _.chain(this.supplementers)
+    //   .map(supplementer => supplementer.parse(input, options))
+    //   .flatten()
+    //   .value()
+    //
+    // const ownOutput = this.parseElement(input, options)
+    //   .map(output => output.update('stack', stack => stack.pop()))
+    // return outputs.concat(supplementOutput).concat(ownOutput)
+    const iterator = this.parseElement(input, options)
+    for (let output of iterator) {
+      yield output.update('stack', stack => stack.pop())
+    }
   }
 
-  parseElement(input, options) {
+  *parseElement(input, options) {
     // add this to the stack before doing anything
     const inputWithStack = input.update('stack', stack => stack.push(I.Map({
       constructor: this.descriptor.Constructor,
@@ -176,18 +177,19 @@ export default class Phrase {
     if (this.describedElement) {
       const inputWithoutResult = inputWithStack.set('result', I.Map())
 
-      return this.describedElement
-        .parse(inputWithoutResult, options)
-        .map(output => {
+      const iterator = this.describedElement.parse(inputWithoutResult, options)
+      for (let output of iterator) {
+        if (output) {
           const newResult = this.element.getValue ?
             I.fromJS(this.element.getValue(output.get('result').toJS())) :
             output.get('result')
           const cleared = clearTemps(newResult)
 
-          return output.set('result', input.get('result').set(this.props.id, cleared))
-        })
+          yield output.set('result', input.get('result').set(this.props.id, cleared))
+        }
+      }
     } else {
-      return this.element._handleParse(inputWithStack, options, parse)
+      yield* this.element._handleParse(inputWithStack, options, parse)
     }
   }
 
@@ -223,7 +225,7 @@ export default class Phrase {
   }
 }
 
-function parse(element, input, options) {
+function *parse(element, input, options) {
   const phrase = new Phrase(element)
-  return phrase.parse(input, options)
+  yield* phrase.parse(input, options)
 }
