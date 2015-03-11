@@ -71,9 +71,8 @@ describe('state', () => {
       }
 
       describe() {
-        const x = <literal text={this.state} />
         this.setState('second')
-        return x
+        return <literal text={this.state} />
       }
     }
 
@@ -101,9 +100,8 @@ describe('state', () => {
       }
 
       describe() {
-        const x = <literal text={this.state} />
         this.setState('second')
-        return x
+        return <literal text={this.state} />
       }
     }
 
@@ -137,19 +135,18 @@ describe('state', () => {
       static get initialState() { return 'first' }
 
       describe() {
-        const x = <SubTest val={this.state} />
         this.setState('second')
-        return x
+        return <SubTest val={this.state} />
       }
     }
 
     function callback(err, data) {
       expect(err).to.not.exist
       expect(data).to.have.length(6)
-      expect(fulltext.all(data[1].data)).to.equal('first')
-      expect(fulltext.all(data[4].data)).to.equal('second')
       expect(consSpy).to.have.been.calledOnce
       expect(subConsSpy).to.have.been.calledOnce
+      expect(fulltext.all(data[1].data)).to.equal('first')
+      expect(fulltext.all(data[4].data)).to.equal('second')
       done()
     }
 

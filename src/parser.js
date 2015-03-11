@@ -70,7 +70,7 @@ export default class Parser extends stream.Transform {
 
     _.chain(sentence.parse(input, options))
       .filter(output => output.get('text') === '')
-      .map(output => output.set('result', output.get('result').get(sentence.element.props.id)))
+      .map(output => output.set('result', output.get('result').get(sentence.props.id)))
       .forEach(output => {
         this.push({
           event: 'data',

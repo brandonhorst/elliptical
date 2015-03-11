@@ -46,10 +46,7 @@ function getConstructor(constructor) {
 function getElements(Constructor) {
   return _.transform(Constructor.translations, (acc, value) => {
     _.forEach(value.langs, function (lang) {
-      acc[lang] = {
-        describe: value.describe,
-        cache: null
-      }
+      acc[lang] = value.describe
     })
   }, {})
 }
@@ -78,9 +75,14 @@ function clearTemps(result) {
   }
 }
 
+function getRealProps(props, children, defaultProps) {
+  const realProps = props ? _.clone(props) : {}
+  realProps.children = _.flattenDeep(children)
+  return _.defaults(realProps, defaultProps)
+}
+
 export default class Phrase {
   constructor(options) {
-    // store the constructor in case it needs to be cloned (by sequence)
     this.descriptor = options
 
     const {Constructor, props, children} = options
@@ -92,51 +94,23 @@ export default class Phrase {
     this.translations = getElements(TrueConstructor)
 
     //normalize props
-    let realProps = props ? _.clone(props) : {}
-    realProps.children = _.flattenDeep(children)
-    realProps = _.defaults(realProps, TrueConstructor.defaultProps)
+    this.props = getRealProps(props, children, TrueConstructor.defaultProps)
 
     //set up state
     this.state = TrueConstructor.initialState
-    this.stateChanged = false
     TrueConstructor.prototype.setState = this.setState.bind(this)
 
-    //instantiate and validate the constructor
-    this.element = new TrueConstructor(realProps)
-    this.element.props = realProps
-    this.element.state = this.state
+    this.element = new TrueConstructor()
 
-    this.oldAdditions = {}
+    this.oldAdditions = []
 
-    // initialize extenders and overriders
     this.supplementers = []
     this.overriders = []
   }
 
   setState(nextState) {
-    this.stateChanged = true
     this.state = nextState
-
-    //if this.setState is called in the Constructor, this.element will not exist yet
-    if (this.element) this.element.state = nextState
-  }
-
-  applyAdditions() {
-    _.forEach(this.oldAdditions, (value, name) => {
-      delete this.element[name]
-    })
-
-    _.forEach(this.descriptor.Constructor.additions, (value, name) => {
-      this.element[name] = value
-      this.element[`set${_.capitalize(name)}`] = (newValue) => {
-        var arg = {[name]: newValue}
-        if (this.descriptor.Constructor.additionsCallback) {
-          this.descriptor.Constructor.additionsCallback(arg)
-        }
-      }
-    })
-
-    this.oldAdditions = this.descriptor.Constructor.additions
+    this.stateChanged = true
   }
 
   // given all extensions (from the parser), make sure our cache is up-to-date
@@ -153,56 +127,6 @@ export default class Phrase {
   }
 
   parse(input, options, data, done) {
-
-      // oldResultStored.set(this.element.props.id, )
-      // var newInputData = input.getData()
-      // var oldResult = _.clone(oldResultStored)
-      //
-      // let newResult = _.clone(input.result)
-      // if (this.element.getValue) newResult = this.element.getValue.call(this.element, newResult)
-      // newResult = clearTemps(newResult)
-      //
-      // oldResult[this.element.props.id] = newResult
-      // newInputData.result = oldResult
-      //
-      // return sendData(new InputOption(newInputData))
-    // }
-
-    // const phraseDone = () => {
-    //   phraseRunning = false
-    //   checkDoneCondition()
-    // }
-    //
-    // const extendersDone = () => {
-    //   extendersRunning = false
-    //   checkDoneCondition()
-    // }
-    //
-    // const checkDoneCondition = () => {
-    //   if (!extendersRunning && !phraseRunning && !overridersRunning) {
-    //     done()
-    //   }
-    // }
-    //
-    // const sendData = (input) => {
-    //   data(input.update('stack', stack => stack.pop()))
-    // }
-    //
-    // const overriderData = (newOption) => {
-    //   overriderGotData = true
-    //   sendData(newOption)
-    // }
-    //
-    // const overridersDone = () => {
-    //   overridersRunning = false
-    //   if (!overriderGotData) {
-    //     parseElement()
-    //   } else {
-    //     checkDoneCondition()
-    //   }
-    // }
-
-
     // if this is already on the stack, and we've made a suggestion, we need to stop
     // we don't want to cause an infinite loop
     if (
@@ -214,7 +138,7 @@ export default class Phrase {
     let outputs = []
 
     // If it is optional, the input is a valid output
-    if (this.element.props.optional) {
+    if (this.props.optional) {
       outputs.push(input)
     }
 
@@ -242,16 +166,17 @@ export default class Phrase {
     // add this to the stack before doing anything
     const inputWithStack = input.update('stack', stack => stack.push(I.Map({
       constructor: this.descriptor.Constructor,
-      category: this.element.props.category
+      category: this.props.category
     })))
 
     const lang = getBestElementLang(this.translations, options.langs)
-    const cache = this.translations ? this.getDescribeCache(lang) : null
+    this.element.props = this.props
+    this.checkForUpdate(lang)
 
-    if (cache) {
+    if (this.describedElement) {
       const inputWithoutResult = inputWithStack.set('result', I.Map())
 
-      return cache
+      return this.describedElement
         .parse(inputWithoutResult, options)
         .map(output => {
           const newResult = this.element.getValue ?
@@ -259,7 +184,7 @@ export default class Phrase {
             output.get('result')
           const cleared = clearTemps(newResult)
 
-          return output.set('result', input.get('result').set(this.element.props.id, cleared))
+          return output.set('result', input.get('result').set(this.props.id, cleared))
         })
     } else {
       return this.element._handleParse(inputWithStack, options, parse)
@@ -268,26 +193,33 @@ export default class Phrase {
 
 
   // if describe has never been executed, execute it and cache it
-  getDescribeCache(lang) {
-    if (this.oldAdditions !== this.descriptor.Constructor.additions) {
-      this.applyAdditions()
-      this.translations[lang].cache = null
-    }
-    if (this.stateChanged) {
-      this.translations[lang].cache = null
-    }
+  checkForUpdate(lang) {
+    const describe = this.translations[lang]
+    if (describe) {
+      if (this.description == null || this.stateChanged ||
+          lang !== this.oldLang || this.descriptor.Constructor.additionsChanged ||
+          !_.isEqual(this.oldProps, this.props)) {
+        this.element.state = this.state
+        _.forEach(this.oldAdditions, name => delete this.element[name])
+        _.forEach(this.descriptor.Constructor.additions, (value, name) => this.element[name] = value)
 
-    if (!this.translations[lang].cache) {
-      const describe = this.translations[lang].describe
-      let description
-      if (describe) {
-        description = describe.call(this.element)
-      }
-      if (description) {
-        this.translations[lang].cache = new Phrase(description)
+        this.oldLang = lang
+        this.oldProps = this.props
+        this.oldAdditions = Object.keys(this.descriptor.Constructor.additions || {})
+        if (_.isFunction(this.descriptor.Constructor)) this.descriptor.Constructor.additionsChanged = false
+        this.stateChanged = false
+
+        let description = describe.call(this.element)
+        if (description) {
+          if (this.description && description.Constructor === this.description.Constructor) {
+            this.describedElement.props = getRealProps(description.props, description.children, this.description.Constructor.defaultProps)
+          } else {
+            this.describedElement = new Phrase(description)
+          }
+          this.description = description
+        }
       }
     }
-    return this.translations[lang].cache
   }
 }
 
