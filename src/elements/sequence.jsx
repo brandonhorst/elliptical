@@ -45,27 +45,15 @@ export default class Sequence extends Phrase {
     const self = this
 
     function *parseChild (childIndex, input) {
-      const iterator = parse(self.props.children[childIndex], input, options)
-      let lastRun = false
-      while (true) {
-        let {value, done} = iterator.next(lastRun)
-        if (done) break
-
-        if (value) {
-          if (childIndex === self.props.children.length - 1) {
-            lastRun = yield value.update('result', result => result.set(self.props.id, self.props.value))
-          } else {
-            const childIterator = parseChild(childIndex + 1, value)
-            while (true) {
-              let {value, done} = childIterator.next(lastRun)
-              if (done) break
-              lastRun = yield value
-            }
-          }
+      for (let output of parse(self.props.children[childIndex], input, options)) {
+        if (childIndex === self.props.children.length - 1) {
+           yield output.update('result', result => result.set(self.props.id, self.props.value))
+        } else {
+          yield* parseChild(childIndex + 1, output)
         }
       }
     }
 
-  yield* parseChild(0, input)
+    yield* parseChild(0, input)
   }
 }

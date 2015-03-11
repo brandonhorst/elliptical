@@ -5,22 +5,19 @@ import {createElement, Phrase} from 'lacona-phrase'
 
 export default class Choice extends Phrase {
   *_handleParse(input, options, parse) {
-    let successfulChildCount = 0
+    let successes = 0
 
     for (let child of this.props.children) {
-      let childWorked = false
-      let completed = false
-      const iterator = parse(child, input, options)
-      while (true) {
-        let {value, done} = iterator.next(completed)
-        if (done) break
-        if (value) {
-          completed = yield value.update('result', result => result.set(this.props.id, result.get(child.props.id)))
-          if (completed) childWorked = true
-        }
+      let success = false
+
+      for (let output of parse(child, input, options)) {
+        yield output
+          .update('result', result => result.set(this.props.id, result.get(child.props.id)))
+          .update('callbacks', callbacks => callbacks.push(() => success = true))
       }
-      if (childWorked) successfulChildCount++
-      if (this.props.limit && successfulChildCount >= this.props.limit) break
+
+      if (success) successes++
+      if (this.props.limit && this.props.limit <= successes) break
     }
   }
 }

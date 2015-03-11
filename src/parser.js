@@ -68,20 +68,14 @@ export default class Parser extends stream.Transform {
       generatePhraseParseId: () => _.uniqueId
     }
 
-    const iterator = sentence.parse(input, options)
-    let lastRun = false
-    while (true) {
-      let {value, done} = iterator.next(lastRun)
-      if (done || _.isUndefined(value)) break
-      if (value && value.get('text') === '') {
-        lastRun = true
-        const finalOutput = value.set('result', value.get('result').get(sentence.props.id))
+    for (let output of sentence.parse(input, options)) {
+      if (output.get('text') === '') {
+        output.get('callbacks').forEach(callback => callback())
+        const finalOutput = output.set('result', output.get('result').get(sentence.props.id))
         this.push({
           event: 'data',
           data: normalizeOutput(finalOutput.toJS())
         })
-      } else {
-        lastRun = false
       }
     }
   }

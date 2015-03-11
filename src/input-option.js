@@ -15,7 +15,7 @@ const defaults = {
   completion: [],
   result: {},
   stack: [],
-  limit: {}
+  callbacks: []
 }
 
 export function createOption(options) {

@@ -13,7 +13,6 @@ export default class Value extends Phrase {
   *_handleParse(input, options) {
     // if this has a category use that, else the last category on the stack
     let category = this.props.category
-    let successfulDataCount = 0
     if (_.isUndefined(category)) {
       const stackEntry = input.get('stack').findLast(entry => !_.isUndefined(entry.get('category')))
       category = stackEntry ? stackEntry.get('category') : null
@@ -25,16 +24,20 @@ export default class Value extends Phrase {
       category: category
     }
 
-    let iterator = this.props.compute(input.get('text'))
-    for (let suggestion of iterator) {
-      if (suggestion) {
-        const newInput = handleString(input, suggestion.text, handleStringOptions)
-        if (newInput !== null) {
-          let completed = yield newInput.update('result', result => result.set(this.props.id, suggestion.value))
-          if (completed) successfulDataCount++
-          if (this.props.limit && successfulDataCount >= this.props.limit) break
-        }
+    let successes = 0
+
+    for (let suggestion of this.props.compute(input.get('text'))) {
+      let success = false
+
+      const newInput = handleString(input, suggestion.text, handleStringOptions)
+      if (newInput !== null) {
+        yield newInput
+          .update('result', result => result.set(this.props.id, suggestion.value))
+          .update('callbacks', callbacks => callbacks.push(() => success = true))
       }
+
+      if (success) successes++
+      if (this.props.limit && this.props.limit <= successes) break
     }
   }
 }

@@ -79,20 +79,8 @@ export default class Repeat extends Phrase {
 
     function *parseSeparator (input, level) {
       if (separator) {
-        const iterator = parse(separator, input, options)
-        let lastRun = false
-        while (true) {
-          let {value, done} = iterator.next(lastRun)
-          if (done) break
-
-          if (value) {
-            const childIterator = parseChild(value, level + 1)
-            while (true) {
-              let {value, done} = childIterator.next(lastRun)
-              if (done) break
-              lastRun = yield value
-            }
-          }
+        for (let output of parse(separator, input, options)) {
+          yield* parseChild(output, level + 1)
         }
       } else {
         yield* parseChild(input, level + 1)
