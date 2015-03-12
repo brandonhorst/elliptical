@@ -115,16 +115,16 @@ export default class Phrase {
 
   // given all extensions (from the parser), make sure our cache is up-to-date
   // if it is not, update it
-  _checkExtensions(extensions) {
-    _.forEach(['supplementers', 'overriders'], kind => {
-      this[kind] = updateList(
-        extensions[kind],
-        this[kind],
-        instance => instance.descriptor.Constructor,
-        Constructor => new Phrase(<Constructor {...this.element.props} />)
-      )
-    })
-  }
+  // _checkExtensions(extensions) {
+  //   _.forEach(['supplementers', 'overriders'], kind => {
+  //     this[kind] = updateList(
+  //       extensions[kind],
+  //       this[kind],
+  //       instance => instance.descriptor.Constructor,
+  //       Constructor => new Phrase(<Constructor {...this.element.props} />)
+  //     )
+  //   })
+  // }
 
   *parse(input, options, data, done) {
     // if this is already on the stack, and we've made a suggestion, we need to stop
@@ -168,9 +168,10 @@ export default class Phrase {
       category: this.props.category
     })))
 
+    const extensions = options.getExtensions(this.descriptor.Constructor)
     const lang = getBestElementLang(this.translations, options.langs)
     this.element.props = this.props
-    this.checkForUpdate(lang)
+    this.checkForUpdate({lang, extensions})
 
     if (this.describedElement) {
       const inputWithoutResult = inputWithStack.set('result', I.Map())
@@ -193,12 +194,13 @@ export default class Phrase {
 
 
   // if describe has never been executed, execute it and cache it
-  checkForUpdate(lang) {
+  checkForUpdate({lang, extensions}) {
     const describe = this.translations[lang]
     if (describe) {
       if (this.description == null || this.stateChanged ||
           lang !== this.oldLang || this.descriptor.Constructor.additionsChanged ||
-          !_.isEqual(this.oldProps, this.props)) {
+          !_.isEqual(this.oldProps, this.props) ||
+          !_.isEqual(this.oldExtensions, extensions)) {
         this.element.state = this.state
         _.forEach(this.oldAdditions, name => delete this.element[name])
         _.forEach(this.descriptor.Constructor.additions, (value, name) => this.element[name] = value)
@@ -207,9 +209,11 @@ export default class Phrase {
         this.oldProps = this.props
         this.oldAdditions = Object.keys(this.descriptor.Constructor.additions || {})
         if (_.isFunction(this.descriptor.Constructor)) this.descriptor.Constructor.additionsChanged = false
+        this.oldExtensions = extensions
         this.stateChanged = false
 
-        let description = describe.call(this.element)
+        const description = this.getDescription({describe, extensions})
+
         if (description) {
           if (this.description && description.Constructor === this.description.Constructor) {
             this.describedElement.props = getRealProps(description.props, description.children, this.description.Constructor.defaultProps)
@@ -220,6 +224,34 @@ export default class Phrase {
         }
       }
     }
+  }
+
+  getDescription({describe, extensions}) {
+    let description = describe.call(this.element)
+    if (extensions.supplementers.length) {
+      const supplementers = extensions.supplementers.map(Supplementer => <Supplementer {...this.props} />)
+      description = (
+        <choice>
+          {supplementers}
+          {description}
+        </choice>
+      )
+      console.log(JSON.stringify(description, null, 1))
+    }
+
+    if (extensions.overriders.length) {
+      const overriders = extensions.overriders.map(Overrider => <Overrider {...this.props} />)
+      description = (
+        <choice limit={1}>
+          <choice>
+            {overriders}
+          </choice>
+          {description}
+        </choice>
+      )
+    }
+
+    return description
   }
 }
 
