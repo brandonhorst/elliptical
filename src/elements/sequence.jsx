@@ -1,7 +1,8 @@
 /** @jsx createElement */
 import _ from 'lodash'
-import {createElement} from 'lacona-phrase'
-import {Phrase} from 'lacona-phrase'
+import {createElement, Phrase} from 'lacona-phrase'
+import parse from '../parse'
+import reconcile from '../reconcile'
 
 function addSeparator (child, separator) {
   if (child.props.optional) {
@@ -41,11 +42,12 @@ export default class Sequence extends Phrase {
     }
   }
 
-  *_handleParse(input, options, parse) {
+  *_handleParse(input, options) {
     const self = this
+    this.stores = reconcile({descriptor: [self.props.children], store: this.stores, options})
 
     function *parseChild (childIndex, input) {
-      for (let output of parse(self.props.children[childIndex], input, options)) {
+      for (let output of parse({store: self.stores[childIndex], input, options})) {
         if (childIndex === self.props.children.length - 1) {
            yield output.update('result', result => result.set(self.props.id, self.props.value))
         } else {

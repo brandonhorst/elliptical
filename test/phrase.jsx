@@ -206,38 +206,6 @@ describe('Phrase', function () {
       .pipe(es.writeArray(callback))
   })
 
-  it('caches calls to describe', function (done) {
-    var callbackSpy = spy()
-    var describeSpy = spy()
-
-    class Test extends phrase.Phrase {
-      describe() {
-        describeSpy()
-        return <literal text='test' />
-      }
-    }
-
-    var start = new stream.Readable({objectMode: true})
-    var end = new stream.Writable({objectMode: true})
-    start._read = function noop () {}
-    end.write = function (obj) {
-      if (obj.event === 'data') {
-        callbackSpy()
-        if (callbackSpy.calledOnce) {
-          start.push('t')
-          start.push(null)
-        } else {
-          expect(describeSpy).to.have.been.calledOnce
-          done()
-        }
-      }
-    }
-
-    parser.sentences = [<Test />]
-
-    start.pipe(parser).pipe(end)
-    start.push('t')
-  })
 
   it('throws for phrases without a default-lang schema', function () {
     class Test extends phrase.Phrase {

@@ -169,7 +169,7 @@ describe('Parser', function () {
       done()
     }
 
-    parser.langs = ['es_ES']
+    parser.langs = ['es_ES', 'es']
 
     parser.sentences = [<Test />]
     es.readArray(['tr'])

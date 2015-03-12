@@ -19,18 +19,18 @@ describe('state', () => {
   it('allows for initialState', function (done) {
     class Test extends phrase.Phrase {
       static get initialState() {
-        return 'test'
+        return {test: 'testa'}
       }
 
       describe() {
-        return <literal text={this.state} />
+        return <literal text={this.state.test} />
       }
     }
 
     function callback(err, data) {
       expect(err).to.not.exist
       expect(data).to.have.length(3)
-      expect(fulltext.all(data[1].data)).to.equal('test')
+      expect(fulltext.all(data[1].data)).to.equal('testa')
       done()
     }
 
@@ -42,24 +42,23 @@ describe('state', () => {
 
   it('allows Phrases to setState', function (done) {
     class Test extends phrase.Phrase {
-      constructor() {
-        this.setState('test')
-      }
-
+      static get initialState() { return {test: 'testa'} }
       describe() {
-        return <literal text={this.state} />
+        this.setState({test: 'testb'})
+        return <literal text={this.state.test} />
       }
     }
 
     function callback(err, data) {
       expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(fulltext.all(data[1].data)).to.equal('test')
+      expect(data).to.have.length(6)
+      expect(fulltext.all(data[1].data)).to.equal('testa')
+      expect(fulltext.all(data[4].data)).to.equal('testb')
       done()
     }
 
     parser.sentences = [<Test />]
-    es.readArray([''])
+    es.readArray(['test', 'test'])
       .pipe(parser)
       .pipe(es.writeArray(callback))
   })

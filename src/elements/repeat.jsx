@@ -1,7 +1,9 @@
 /** @jsx createElement */
 import _ from 'lodash'
-import I from 'immutable'
 import {createElement, Phrase} from 'lacona-phrase'
+import I from 'immutable'
+import parse from '../parse'
+import reconcile from '../reconcile'
 
 export default class Repeat extends Phrase {
   // constructor(props, Phrase) {
@@ -33,59 +35,51 @@ export default class Repeat extends Phrase {
     }
   }
 
-  *_handleParse(input, options, parse) {
+  *_handleParse(input, options) {
     const child = this.props.children[0]
+    this.childStore = reconcile({descriptor: child, store: this.childStore, options})
     const separator = this.props.children[1]
+    if (separator) this.separatorStore = reconcile({descriptor: separator, store: this.separatorStore, options})
+
     var self = this
 
     function *parseChild (input, level) {
-      const iterator = parse(child, input, options)
-      let lastRun = false
-      while (true) {
-        let {value, done} = iterator.next(lastRun)
-        if (done) break
-
-        var ownResult = value.get('result').get(self.props.id) || I.List()
-        var childResult = value.get('result').get(child.props.id)
+      for (let output of parse({store: self.childStore, input, options})) {
+        var ownResult = output.get('result').get(self.props.id) || I.List()
+        var childResult = output.get('result').get(child.props.id)
 
         // if the repeat is unique and the childResult already exists in the result,
         // just stop - we will not do this branch
         if (self.props.unique && ownResult.contains(childResult)) break
 
         const newOwnResult = ownResult.push(childResult)
-        const newOutput = value.update('result', result => result
+        const newOutput = output.update('result', result => result
           .set(self.props.id, newOwnResult)
           .delete(child.props.id)
         )
 
-        // only call data if we are within the min/max repeat range
+        // only yield this if we are within the min/max repeat range
         if (level >= self.props.min && level <= self.props.max) {
-          lastRun = yield newOutput
+          yield newOutput
         }
 
         // parse the separator, unless we are above max or there is a suggestion
-        if (level < self.props.max && value.get('suggestion').count() === 0) {
-          const sepIterator = parseSeparator(newOutput, level)
-          let lastRun = false
-          while (true) {
-            let {value, done} = sepIterator.next(lastRun)
-            if (done) break
-
-            lastRun = yield value
-          }
+        if (level < self.props.max && output.get('suggestion').count() === 0) {
+          yield* parseSeparator(newOutput, level)
         }
       }
     }
 
     function *parseSeparator (input, level) {
-      if (separator) {
-        for (let output of parse(separator, input, options)) {
+      if (self.separatorStore) {
+        for (let output of parse({store: self.separatorStore, input, options})) {
           yield* parseChild(output, level + 1)
         }
       } else {
         yield* parseChild(input, level + 1)
       }
     }
+
 
     yield* parseChild(input, 1)
   }

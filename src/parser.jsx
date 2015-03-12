@@ -1,7 +1,10 @@
+/** @jsx createElement */
 import _ from 'lodash'
 import asyncEach from 'async-each'
+import {createElement} from 'lacona-phrase'
 import {createOption} from './input-option'
-import Phrase from './phrase'
+import parse from './parse'
+import reconcile from './reconcile'
 import stream from 'stream'
 import updateList from './utils/update-list'
 
@@ -36,8 +39,6 @@ export default class Parser extends stream.Transform {
     this.sentences = sentences
     this.extensions = extensions
     this.fuzzy = fuzzy
-
-    this._sentenceInstances = []
   }
 
   _getExtensions(Constructor) {
@@ -56,27 +57,7 @@ export default class Parser extends stream.Transform {
   }
 
   parseSentence(sentence, input) {
-    const input = createOption({
-      fuzzy: this.fuzzy,
-      text: input,
-      sentence: sentence.element
-    })
-    const options = {
-      langs: this.langs,
-      getExtensions: this._getExtensions.bind(this),
-      generatePhraseParseId: () => _.uniqueId
-    }
 
-    for (let output of sentence.parse(input, options)) {
-      if (output.get('text') === '') {
-        output.get('callbacks').forEach(callback => callback())
-        const finalOutput = output.set('result', output.get('result').get(sentence.props.id))
-        this.push({
-          event: 'data',
-          data: normalizeOutput(finalOutput)
-        })
-      }
-    }
   }
 
   _transform(input, encoding, callback) {
@@ -86,15 +67,44 @@ export default class Parser extends stream.Transform {
     }
 
     this.push({event: 'start'})
+    //
+    // this._sentenceInstances = updateList(
+    //   this.sentences,
+    //   this._sentenceInstances,
+    //   instance => instance.descriptor,
+    //   descriptor => new Phrase(descriptor)
+    // )
 
-    this._sentenceInstances = updateList(
-      this.sentences,
-      this._sentenceInstances,
-      instance => instance.descriptor,
-      descriptor => new Phrase(descriptor)
+    const descriptor = (
+      <choice id='__sentence'>
+        {this.sentences}
+      </choice>
     )
 
-    this._sentenceInstances.forEach(sentence => this.parseSentence(sentence, input))
+    const input = createOption({
+      fuzzy: this.fuzzy,
+      text: input
+      // sentence: sentence.element
+    })
+    const options = {
+      langs: this.langs,
+      getExtensions: this._getExtensions.bind(this)
+    }
+
+    this._store = reconcile({descriptor, store: this._store, options})
+
+    for (let output of parse({store: this._store, input, options})) {
+      if (output.get('text') === '') {
+        output.get('callbacks').forEach(callback => callback())
+        const finalOutput = output.set('result', output.get('result').get('__sentence'))
+        this.push({
+          event: 'data',
+          data: normalizeOutput(finalOutput)
+        })
+      }
+    }
+
+    // this._sentenceInstances.forEach(sentence => this.parseSentence(sentence, input))
 
     this.push({event: 'end'})
 
