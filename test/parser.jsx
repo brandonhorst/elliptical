@@ -98,8 +98,6 @@ describe('Parser', function () {
   // })
 
   it('passes the sentence to the output', function (done) {
-    const lit = <literal text='test' />
-
     function callback (err, data) {
       expect(err).to.not.exist
       expect(data).to.have.length(3)
@@ -107,7 +105,7 @@ describe('Parser', function () {
       done()
     }
 
-    parser.sentences = [lit]
+    parser.sentences = [<literal text='test' />]
     es.readArray(['t'])
       .pipe(parser)
       .pipe(es.writeArray(callback))

@@ -12,11 +12,16 @@ export default function *parse({store, input, options}) {
     return
   }
 
+  let trueInput = input
+  if (store.props.__sentence) {
+    trueInput = trueInput.set('sentence', store.phrase)
+  }
+
   if (store.props.optional) {
     yield input
   }
 
-  for (let output of parseElement({store, input, options})) {
+  for (let output of parseElement({store, input: trueInput, options})) {
     yield output.update('stack', stack => stack.pop())
   }
 }
@@ -31,7 +36,7 @@ function *parseElement({store, input, options}) {
   if (store.describedStore) {
     const inputWithoutResult = inputWithStack.set('result', I.Map())
 
-    const iterator = parse({store: store.describedStore[0], input: inputWithoutResult, options})
+    const iterator = parse({store: store.describedStore, input: inputWithoutResult, options})
     for (let output of iterator) {
       const newResult = store.phrase.getValue ?
         I.fromJS(store.phrase.getValue(output.get('result').toJS())) :

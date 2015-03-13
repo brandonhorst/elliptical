@@ -35,6 +35,22 @@ describe('additions', () => {
     es.readArray(['']).pipe(parser)
   })
 
+  it('allows initialAdditions', function (done) {
+    class Test extends phrase.Phrase {
+      describe() {
+        expect(this.config).to.equal('test')
+        done()
+        return <literal /> // whatever
+      }
+
+      static get initialAdditions() {return {config: 'test'}}
+    }
+
+    parser.sentences = [<Test />]
+
+    es.readArray(['']).pipe(parser)
+  })
+
   it('changing additions clears the describe cache', function (done) {
     var callbackSpy = spy()
     var describeSpy = spy()

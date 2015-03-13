@@ -6,7 +6,6 @@ import {createOption} from './input-option'
 import parse from './parse'
 import reconcile from './reconcile'
 import stream from 'stream'
-import updateList from './utils/update-list'
 
 function normalizeOutput (option) {
   let output = _.pick(option.toJS(), ['match', 'completion', 'result', 'sentence'])
@@ -67,24 +66,18 @@ export default class Parser extends stream.Transform {
     }
 
     this.push({event: 'start'})
-    //
-    // this._sentenceInstances = updateList(
-    //   this.sentences,
-    //   this._sentenceInstances,
-    //   instance => instance.descriptor,
-    //   descriptor => new Phrase(descriptor)
-    // )
+
+    const sentences = _.map(this.sentences, sentence => _.merge({}, sentence, {props: {__sentence: true}}))
 
     const descriptor = (
       <choice id='__sentence'>
-        {this.sentences}
+        {sentences}
       </choice>
     )
 
     const input = createOption({
       fuzzy: this.fuzzy,
       text: input
-      // sentence: sentence.element
     })
     const options = {
       langs: this.langs,
@@ -103,8 +96,6 @@ export default class Parser extends stream.Transform {
         })
       }
     }
-
-    // this._sentenceInstances.forEach(sentence => this.parseSentence(sentence, input))
 
     this.push({event: 'end'})
 

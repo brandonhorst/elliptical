@@ -19,23 +19,27 @@ function reconcileArray({descriptor, store, options}) {
 function reconcileOne({descriptor, store, options}) {
   const Constructor = getConstructor({Constructor: descriptor.Constructor})
   const props = getRealProps({descriptor, Constructor})
-
+  const extensions = options.getExtensions(Constructor)
 
   if (store && store.Constructor === Constructor) {
-    if (props !== store.props || store.stateChanged || Constructor.additionsChanged) {
+    if (props !== store.props || store.phrase._stateChanged ||
+        Constructor.additionsChanged || !_.isEqual(extensions, store.oldExtensions)) {
       const describe = getDescribe({Constructor, langs: options.langs})
+      const phrase = store.phrase
+      const state = phrase._nextState
       const additions = Constructor.additions
-      const state = store.nextState
-      const newStore = _.clone(store)
+      const oldAdditionKeys = store.oldAdditionKeys
 
-      updatePhrase({phrase: store.phrase, props, additions, oldAdditions: {}, state, newStore})
+
+      updatePhrase({phrase: phrase, props, additions, oldAdditionKeys, state})
       const description = getDescription({describe, props, extensions, phrase, additions})
-      const describedStore = description ? reconcile({descriptor: [description], options}) : null
-      newStore.describedStore = describedStore
-      newStore.props = props
-      newStore.stateChanged = false
+      const describedStore = description ?
+        reconcile({descriptor: description, options, store: store.describedStore}) :
+        null
 
-      return newStore
+      return _.assign({}, store, { props, stateChanged: false,
+        oldExtensions: extensions, oldAdditionKeys: _.keys(additions),
+        describedStore})
     } else {
       return store
     }
@@ -43,18 +47,15 @@ function reconcileOne({descriptor, store, options}) {
     const describe = getDescribe({Constructor, langs: options.langs})
     const phrase = new Constructor()
     const state = Constructor.initialState
-    const newStore = {Constructor, phrase, props, nextState: state, stateChanged: false}
+    const additions = _.assign({}, Constructor.initialAdditions, Constructor.additions)
 
-    const additions = Constructor.additions
-    const extensions = options.getExtensions(Constructor)
-
-    updatePhrase({phrase, props, additions, oldAdditions: {}, state, newStore})
+    updatePhrase({phrase, props, additions, state})
     const description = getDescription({describe, props, extensions, phrase, additions})
-    const describedStore = description ? reconcile({descriptor: [description], options}) : null
+    const describedStore = description ? reconcile({descriptor: description, options}) : null
 
-    newStore.describedStore = describedStore
-
-    return newStore
+    return {Constructor, phrase, props, nextState: state,
+      stateChanged: false, oldExtensions: extensions,
+      oldAdditionKeys: _.keys(additions), describedStore}
   }
 }
 
@@ -71,17 +72,16 @@ function getDescribe({Constructor, langs}) {
   }
 }
 
-function updatePhrase({phrase, props, additions, oldAdditions, state, newStore}) {
+function updatePhrase({phrase, props, additions, oldAdditionKeys, state}) {
   phrase.props = props
 
-  phrase.state = state
-  phrase.setState = (nextState) => {
-    _.merge(newStore.nextState, nextState)
-    newStore.stateChanged = true
-  }
-
-  _.forEach(phrase.oldAdditions, name => delete phrase[name])
   _.forEach(additions, (value, name) => phrase[name] = value)
+  _.forEach(oldAdditionKeys, (key) => delete phrase[key])
+  phrase.state = state
+  phrase.setState = function (nextState) {
+    phrase._nextState = _.assign({}, phrase._nextState, nextState)
+    phrase._stateChanged = true
+  }
 }
 
 function getDescription({describe, extensions, phrase, props}) {
@@ -128,18 +128,6 @@ function getConstructor({Constructor}) {
   }
   return Constructor
 }
-//
-// function getTranslations(Constructor) {
-//   if (Constructor.prototype.describe) {
-//     return {default: Constructor.prototype.describe})
-//   } else {
-//     return _.transform(Constructor.translations, (acc, value) => {
-//       _.forEach(value.langs, function (lang) {
-//         acc[lang] = value.describe
-//       })
-//     }, {})
-//   }
-// }
 
 //TODO this is not called
 function validate(Constructor) {

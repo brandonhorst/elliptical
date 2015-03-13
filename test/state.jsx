@@ -66,12 +66,12 @@ describe('state', () => {
   it('allows changes to state to redescribe', function (done) {
     class Test extends phrase.Phrase {
       static get initialState() {
-        return 'first'
+        return {test: 'first'}
       }
 
       describe() {
-        this.setState('second')
-        return <literal text={this.state} />
+        this.setState({test: 'second'})
+        return <literal text={this.state.test} />
       }
     }
 
@@ -95,12 +95,12 @@ describe('state', () => {
       constructor() { consSpy() }
 
       static get initialState() {
-        return 'first'
+        return {test: 'first'}
       }
 
       describe() {
-        this.setState('second')
-        return <literal text={this.state} />
+        this.setState({test: 'second'})
+        return <literal text={this.state.test} />
       }
     }
 
@@ -131,11 +131,11 @@ describe('state', () => {
     class Test extends phrase.Phrase {
       constructor() { consSpy('main') }
 
-      static get initialState() { return 'first' }
+      static get initialState() { return {test: 'first'} }
 
       describe() {
-        this.setState('second')
-        return <SubTest val={this.state} />
+        this.setState({test: 'second'})
+        return <SubTest val={this.state.test} />
       }
     }
 

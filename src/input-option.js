@@ -22,52 +22,6 @@ export function createOption(options) {
   return I.fromJS(_.defaults(options, defaults))
 }
 
-// export default class InputOption {
-//   constructor(options) {
-//     this.fuzzy = options.fuzzy || 'none'
-//     this.text = options.text || ''
-//     this.match = I.Array(options.match || [])
-//     this.suggestion = I.Array(options.suggestion || [])
-//     this.completion = I.Array(options.completion || [])
-//     this.result = I.Map(options.result || {})
-//     this.stack = I.Array(options.stack || [])
-//     this.limit = I.Map(options.limit || {})
-//     this.sentence = options.sentence
-//   }
-//
-//   getData() {
-//     return {
-//       fuzzy: this.fuzzy,
-//       text: this.text,
-//       match: this.match,
-//       suggestion: this.suggestion,
-//       completion: this.completion,
-//       result: this.result,
-//       stack: this.stack,
-//       limit: this.limit,
-//       sentence: this.sentence
-//     }
-//   }
-//
-export function addLimit(option, phraseParseId, number) {
-  option.update('limit', limit => limit.set(phraseParseId, number))
-  // const newLimit = _.clone(option.get('limit'))
-  // newLimit[phraseParseId] = number
-  // return newLimit
-}
-
-// export function stackPush(option, element) {
-//   option.update('stack', stack => stack.push(element))
-//     // return this.stack.concat(element)
-// }
-//
-// export function stackPop(option, element) {
-//   option.update('stack', stack => stack.pop(element))
-// }
-//   // stackPop() {
-//   //   return this.stack.slice(0, -1)
-//   // }
-
 function fuzzyMatch(option, text, string, category) {
   var i, l
   var suggestions = []

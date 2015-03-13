@@ -8,7 +8,7 @@ import reconcile from '../reconcile'
 export default class Choice extends Phrase {
   *_handleParse(input, options) {
     let successes = 0
-    this.stores = reconcile({descriptor: this.props.children, store: this.store, options})
+    this.stores = reconcile({descriptor: this.props.children, store: this.stores, options})
 
     for (let [child, store] of _.zip(this.props.children, this.stores)) {
       let success = false
