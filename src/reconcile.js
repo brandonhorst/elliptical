@@ -91,8 +91,8 @@ function getDescription({describe, extensions, phrase, props}) {
       const supplementers = extensions.supplementers.map(Supplementer => <Supplementer {...props} />)
       description = (
         <choice>
-          {supplementers}
           {description}
+          {supplementers}
         </choice>
       )
     }
@@ -129,17 +129,17 @@ function getConstructor({Constructor}) {
   return Constructor
 }
 
-//TODO this is not called
-function validate(Constructor) {
-  let hasDefault = false
-  if (!_.every(Constructor.translations, _.partial(_.has, _, 'describe'))) {
-    throw new Error('Every translation must have a describe method')
-  }
-  if (!_.every(Constructor.translations, _.partial(_.has, _, 'langs'))) {
-    throw new Error('Every translation must have a langs property')
-  }
-  if (!_.some(Constructor.translations, translation => _.indexOf(translation.langs, 'default') > -1)) {
-    throw new Error('All elements must have a describe method defined for the default language')
-  }
-  return true
-}
+//TODO debug validation would be nice
+// function validate(Constructor) {
+//   let hasDefault = false
+//   if (!_.every(Constructor.translations, _.partial(_.has, _, 'describe'))) {
+//     throw new Error('Every translation must have a describe method')
+//   }
+//   if (!_.every(Constructor.translations, _.partial(_.has, _, 'langs'))) {
+//     throw new Error('Every translation must have a langs property')
+//   }
+//   if (!_.some(Constructor.translations, translation => _.indexOf(translation.langs, 'default') > -1)) {
+//     throw new Error('All elements must have a describe method defined for the default language')
+//   }
+//   return true
+// }

@@ -1,27 +1,20 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
-import es from 'event-stream'
 import {expect} from 'chai'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
 
-describe('choice', function () {
+function from(i) {const a = []; for (let x of i) a.push(x); return a}
+
+describe('choice', () => {
   var parser
 
-  beforeEach(function () {
+  beforeEach(() => {
     parser = new lacona.Parser()
   })
 
-  it('suggests one valid choice', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(fulltext.suggestion(data[1].data)).to.equal('right')
-      expect(data[1].data.result).to.be.empty
-      done()
-    }
-
+  it('suggests one valid choice', () => {
     parser.sentences = [
       <choice>
         <literal text='right' />
@@ -29,88 +22,73 @@ describe('choice', function () {
       </choice>
     ]
 
-    es.readArray(['r'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+    const data = from(parser.parse('r'))
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('right')
+    expect(data[0].result).to.be.empty
   })
 
-  it('suggests multiple valid choices', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(4)
-      expect(fulltext.suggestion(data[1].data)).to.contain('right')
-      expect(data[1].data.result).to.be.empty
-      expect(fulltext.suggestion(data[2].data)).to.contain('right')
-      expect(data[2].data.result).to.be.empty
-      done()
-    }
-
+  it('suggests multiple valid choices', () => {
     parser.sentences = [
       <choice>
         <literal text='right' />
         <literal text='right also' />
       </choice>
     ]
-    es.readArray(['r'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('r'))
+    expect(data).to.have.length(2)
+    expect(fulltext.suggestion(data[0])).to.equal('right')
+    expect(data[0].result).to.be.empty
+    expect(fulltext.suggestion(data[1])).to.equal('right also')
+    expect(data[0].result).to.be.empty
   })
 
-  it('suggests no valid choices', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(2)
-      done()
-    }
-
+  it('suggests no valid choices', () => {
     parser.sentences = [
       <choice>
         <literal text='wrong' />
         <literal text='wrong also' />
       </choice>
     ]
-    es.readArray(['r'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('r'))
+    expect(data).to.have.length(0)
   })
 
-  it('adopts the value of the child', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(fulltext.suggestion(data[1].data)).to.equal('right')
-      expect(data[1].data.result).to.equal('testValue')
-      done()
-    }
-
+  it('adopts the value of the child (even if it has no id)', () => {
     parser.sentences = [
       <choice>
         <literal text='right' value='testValue' />
         <literal text='wrong' />
       </choice>
     ]
-    es.readArray(['r'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('r'))
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('right')
+    expect(data[0].result).to.equal('testValue')
   })
 
-  it('passes on its category', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(4)
-      expect(data[1].data.suggestion[0].category).to.equal('myCat')
-      expect(data[2].data.suggestion[0].category).to.equal('myCat')
-      done()
+  it('adopts the value of the child', () => {
+    class Test extends phrase.Phrase {
+      describe() {
+        return (
+          <choice id='choice'>
+            <literal text='right' value='testValue' id='right' />
+            <literal text='wrong' id='wrong' />
+          </choice>
+        )
+      }
     }
 
-    parser.sentences = [
-      <choice category='myCat'>
-        <literal text='aaa' />
-        <literal text='aab' />
-      </choice>
-    ]
-    es.readArray(['aa'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+    parser.sentences = [<Test />]
+
+    const data = from(parser.parse('r'))
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('right')
+    expect(data[0].result.choice).to.equal('testValue')
+    expect(data[0].result.right).to.equal('testValue')
+    expect(data[0].result.wrong).to.be.undefined
   })
 })

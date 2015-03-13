@@ -1,11 +1,9 @@
 /** @jsx createElement */
 import _ from 'lodash'
-import asyncEach from 'async-each'
 import {createElement} from 'lacona-phrase'
 import {createOption} from './input-option'
 import parse from './parse'
 import reconcile from './reconcile'
-import stream from 'stream'
 
 function normalizeOutput (option) {
   let output = _.pick(option.toJS(), ['match', 'completion', 'result', 'sentence'])
@@ -30,10 +28,8 @@ function normalizeOutput (option) {
   return output
 }
 
-export default class Parser extends stream.Transform {
+export default class Parser {
   constructor({langs = ['default'], sentences = [], extensions = [], fuzzy} = {}) {
-    super({objectMode: true})
-
     this.langs = langs
     this.sentences = sentences
     this.extensions = extensions
@@ -55,50 +51,26 @@ export default class Parser extends stream.Transform {
     })
   }
 
-  parseSentence(sentence, input) {
-
-  }
-
-  _transform(input, encoding, callback) {
-    // Do not accept non-string input
-    if (!_.isString(input)) {
-      return callback(new Error('parse input must be a string'))
+  *parse(inputString) {
+    if (!_.isString(inputString)) {
+      throw new Error('lacona parse input must be a string')
     }
-
-    this.push({event: 'start'})
 
     const sentences = _.map(this.sentences, sentence => _.merge({}, sentence, {props: {__sentence: true}}))
+    const descriptor = <choice id='__sentence'>{sentences}</choice>
 
-    const descriptor = (
-      <choice id='__sentence'>
-        {sentences}
-      </choice>
-    )
-
-    const input = createOption({
-      fuzzy: this.fuzzy,
-      text: input
-    })
-    const options = {
-      langs: this.langs,
-      getExtensions: this._getExtensions.bind(this)
-    }
+    const input = createOption({fuzzy: this.fuzzy, text: inputString})
+    const options = {langs: this.langs, getExtensions: this._getExtensions.bind(this)}
 
     this._store = reconcile({descriptor, store: this._store, options})
 
     for (let output of parse({store: this._store, input, options})) {
       if (output.get('text') === '') {
+        // call each callback (used for limiting)
         output.get('callbacks').forEach(callback => callback())
         const finalOutput = output.set('result', output.get('result').get('__sentence'))
-        this.push({
-          event: 'data',
-          data: normalizeOutput(finalOutput)
-        })
+        yield normalizeOutput(finalOutput)
       }
     }
-
-    this.push({event: 'end'})
-
-    callback()
   }
 }

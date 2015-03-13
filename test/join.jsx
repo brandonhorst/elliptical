@@ -1,25 +1,20 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
-import es from 'event-stream'
 import {expect} from 'chai'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
 
-describe('join', function () {
+function from(i) {const a = []; for (let x of i) a.push(x); return a}
+
+describe('join', () => {
   var parser
-  beforeEach(function () {
+
+  beforeEach(() => {
     parser = new lacona.Parser()
   })
 
-  it('joins literals onto the suggestion', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(fulltext.suggestion(data[1].data)).to.equal('aaabbb')
-      done()
-    }
-
+  it('joins literals onto the suggestion', () => {
     parser.sentences = [
       <sequence>
         <literal text='aaa' />
@@ -27,8 +22,8 @@ describe('join', function () {
       </sequence>
     ]
 
-    es.readArray(['a'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+    const data = from(parser.parse('a'))
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('aaabbb')
   })
 })

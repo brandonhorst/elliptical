@@ -1,31 +1,25 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
-import es from 'event-stream'
 import {expect} from 'chai'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
 
-describe('children', function () {
+function from(i) {const a = []; for (let x of i) a.push(x); return a}
+
+describe('children', () => {
   var parser
 
-  beforeEach(function () {
+  beforeEach(() => {
     parser = new lacona.Parser()
   })
 
-  it('passes children as props', function (done) {
+  it('passes children as props', () => {
     class Test extends phrase.Phrase {
       describe() {
         expect(this.props.children).to.have.length(2)
         return this.props.children[1]
       }
-    }
-
-    function callback(err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(fulltext.suggestion(data[1].data)).to.equal('b')
-      done()
     }
 
     parser.sentences = [
@@ -34,24 +28,18 @@ describe('children', function () {
         <literal text='b' />
       </Test>
     ]
-    es.readArray([''])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse(''))
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('b')
   })
 
-  it('flattens children as props', function (done) {
+  it('flattens children as props', () => {
     class Test extends phrase.Phrase {
       describe() {
         expect(this.props.children).to.have.length(3)
         return this.props.children[1]
       }
-    }
-
-    function callback(err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(fulltext.suggestion(data[1].data)).to.equal('b')
-      done()
     }
 
     const literals = [<literal text='b' />, <literal text='c' />]
@@ -61,12 +49,13 @@ describe('children', function () {
         {literals}
       </Test>
     ]
-    es.readArray([''])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse(''))
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('b')
   })
 
-  it('passes the child id for use in getValue', function (done) {
+  it('passes the child id for use in getValue', () => {
     class Test extends phrase.Phrase {
       describe() {
         return this.props.children[0]
@@ -77,21 +66,15 @@ describe('children', function () {
       }
     }
 
-    function callback(err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(fulltext.suggestion(data[1].data)).to.equal('a')
-      expect(data[1].data.result).to.equal('something')
-      done()
-    }
-
     parser.sentences = [
       <Test>
         <literal text='a' value='b' />
       </Test>
     ]
-    es.readArray([''])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse(''))
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('a')
+    expect(data[0].result).to.equal('something')
   })
 })

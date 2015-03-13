@@ -1,6 +1,5 @@
 /** @jsx createElement */
 import _ from 'lodash'
-import asyncEach from 'async-each'
 import {createElement, Phrase} from 'lacona-phrase'
 import parse from '../parse'
 import reconcile from '../reconcile'

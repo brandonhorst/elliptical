@@ -1,10 +1,11 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
-import es from 'event-stream'
 import {expect} from 'chai'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
+
+function from(i) {const a = []; for (let x of i) a.push(x); return a}
 
 describe('sequence', function () {
   var parser
@@ -13,35 +14,21 @@ describe('sequence', function () {
     parser = new lacona.Parser()
   })
 
-  it('puts two elements in order', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(fulltext.suggestion(data[1].data)).to.equal('man')
-      expect(data[1].data.result).to.be.empty
-      done()
-    }
-
+  it('puts two elements in order', () => {
     parser.sentences = [
       <sequence>
         <literal text='super' />
         <literal text='man' />
       </sequence>
     ]
-    es.readArray(['superm'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('superm'))
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('man')
+    expect(data[0].result).to.be.empty
   })
 
-  it('handles a separator', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(fulltext.suggestion(data[1].data)).to.equal('man')
-      expect(data[1].data.result).to.be.empty
-      done()
-    }
-
+  it('handles a separator', () => {
     parser.sentences = [
       <sequence>
         <content>
@@ -53,21 +40,14 @@ describe('sequence', function () {
         </separator>
       </sequence>
     ]
-    es.readArray(['super m'])
-    .pipe(parser)
-    .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('super m'))
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('man')
+    expect(data[0].result).to.be.empty
   })
 
-  it('handles an optional child with a separator', function (done) {
-
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(4)
-      expect(fulltext.suggestion(data[1].data)).to.equal('man')
-      expect(fulltext.suggestion(data[2].data)).to.equal('maximum')
-      done()
-    }
-
+  it('handles an optional child with a separator', () => {
     parser.sentences = [
       <sequence>
         <literal text='super' />
@@ -75,19 +55,14 @@ describe('sequence', function () {
         <literal text='man' />
       </sequence>
     ]
-    es.readArray(['superm'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('superm'))
+    expect(data).to.have.length(2)
+    expect(fulltext.suggestion(data[0])).to.equal('man')
+    expect(fulltext.suggestion(data[1])).to.equal('maximum')
   })
 
-  it('can set a value to the result', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(data[1].data.result).to.equal('testValue')
-      done()
-    }
-
+  it('can set a value to the result', () => {
     parser.sentences = [
       <sequence value='testValue'>
         <literal text='super' />
@@ -95,28 +70,22 @@ describe('sequence', function () {
       </sequence>
     ]
 
-    es.readArray(['superm'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+    const data = from(parser.parse('superm'))
+    expect(data).to.have.length(1)
+    expect(data[0].result).to.equal('testValue')
   })
 
-  it('passes on its category', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(data[1].data.match[0].category).to.equal('myCat')
-      expect(data[1].data.suggestion[0].category).to.equal('myCat')
-      done()
-    }
-
+  it('passes on its category', () => {
     parser.sentences = [
       <sequence category='myCat'>
         <literal text='super' />
         <literal text='man' />
       </sequence>
     ]
-    es.readArray(['superm'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('superm'))
+    expect(data).to.have.length(1)
+    expect(data[0].match[0].category).to.equal('myCat')
+    expect(data[0].suggestion[0].category).to.equal('myCat')
   })
 })

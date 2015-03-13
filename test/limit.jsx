@@ -1,117 +1,75 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
-import es from 'event-stream'
 import {expect} from 'chai'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
 
-describe('limit', function () {
+function from(i) {const a = []; for (let x of i) a.push(x); return a}
+
+describe('limit', () => {
   var parser
 
-  beforeEach(function () {
+  beforeEach(() => {
     parser = new lacona.Parser()
   })
 
-  describe('value', function () {
-    it('limits calls to data', function (done) {
+  describe('value', () => {
+    it('limits calls to data', () => {
       function compute(input) {
-        return [
-          {text: 'testa'},
-          {text: 'testb'},
-          {text: 'testc'}
-        ]
-      }
-
-      function callback (err, data) {
-        expect(err).to.not.exist
-        expect(data).to.have.length(4)
-        expect(fulltext.all(data[1].data)).to.equal('testa')
-        expect(fulltext.all(data[2].data)).to.equal('testb')
-        done()
+        return [{text: 'testa'}, {text: 'testb'}, {text: 'testc'}]
       }
 
       parser.sentences = [<value limit={2} compute={compute} />]
-      es.readArray(['test'])
-        .pipe(parser)
-        .pipe(es.writeArray(callback))
+
+      const data = from(parser.parse('test'))
+      expect(data).to.have.length(2)
+      expect(fulltext.all(data[0])).to.equal('testa')
+      expect(fulltext.all(data[1])).to.equal('testb')
     })
 
-    it('accepts fewer than limit', function (done) {
-      function compute(input, data, done) {
-        return [
-          {text: 'testa'},
-          {text: 'testb'}
-        ]
-      }
-
-      function callback (err, data) {
-        expect(err).to.not.exist
-        expect(data).to.have.length(4)
-        expect(fulltext.all(data[1].data)).to.equal('testa')
-        expect(fulltext.all(data[2].data)).to.equal('testb')
-        done()
+    it('accepts fewer than limit', () => {
+      function compute(input) {
+        return [{text: 'testa'}, {text: 'testb'}]
       }
 
       parser.sentences = [<value limit={3} compute={compute} />]
-      es.readArray(['test'])
-        .pipe(parser)
-        .pipe(es.writeArray(callback))
+
+      const data = from(parser.parse('test'))
+      expect(data).to.have.length(2)
+      expect(fulltext.all(data[0])).to.equal('testa')
+      expect(fulltext.all(data[1])).to.equal('testb')
     })
 
-    it('ignores invalids', function (done) {
+    it('ignores invalids', () => {
       function compute(input, data, done) {
-        return [
-          {text: 'wrong'},
-          {text: 'testa'},
-          {text: 'testb'}
-        ]
-      }
-
-      function callback (err, data) {
-        expect(err).to.not.exist
-        expect(data).to.have.length(3)
-        expect(fulltext.all(data[1].data)).to.equal('testa')
-        done()
+        return [{text: 'wrong'}, {text: 'testa'}, {text: 'testb'}]
       }
 
       parser.sentences = [<value limit={1} compute={compute} />]
-      es.readArray(['test'])
-        .pipe(parser)
-        .pipe(es.writeArray(callback))
+
+      const data = from(parser.parse('test'))
+      expect(data).to.have.length(1)
+      expect(fulltext.all(data[0])).to.equal('testa')
     })
   })
 
-  describe('choice', function () {
-    it('can be restricted by a limit of 1', function (done) {
-      function callback (err, data) {
-        expect(err).to.not.exist
-        expect(data).to.have.length(3)
-        expect(fulltext.suggestion(data[1].data)).to.equal('right')
-        expect(data[1].data.result).to.equal('testValue')
-        done()
-      }
-
+  describe('choice', () => {
+    it('can be restricted by a limit of 1', () => {
       parser.sentences = [
         <choice limit={1}>
           <literal text='right' value='testValue' />
           <literal text='right also' value='also' />
         </choice>
       ]
-      es.readArray(['r'])
-        .pipe(parser)
-        .pipe(es.writeArray(callback))
+
+      const data = from(parser.parse('r'))
+      expect(data).to.have.length(1)
+      expect(fulltext.suggestion(data[0])).to.equal('right')
+      expect(data[0].result).to.equal('testValue')
     })
 
-    it('can be restricted by a limit of more than 1', function (done) {
-      function callback (err, data) {
-        expect(err).to.not.exist
-        expect(data).to.have.length(4)
-        expect(fulltext.suggestion(data[1].data)).to.equal('right')
-        expect(fulltext.suggestion(data[2].data)).to.equal('right also')
-        done()
-      }
-
+    it('can be restricted by a limit of more than 1', () => {
       parser.sentences = [
         <choice limit={2}>
           <literal text='right' />
@@ -119,21 +77,14 @@ describe('limit', function () {
           <literal text='right but excluded' />
         </choice>
       ]
-      es.readArray(['r'])
-        .pipe(parser)
-        .pipe(es.writeArray(callback))
+
+      const data = from(parser.parse('r'))
+      expect(data).to.have.length(2)
+      expect(fulltext.suggestion(data[0])).to.equal('right')
+      expect(fulltext.suggestion(data[1])).to.equal('right also')
     })
 
-    it('still works when a limited child has multiple options', function (done) {
-      function callback (err, data) {
-        expect(err).to.not.exist
-        expect(data).to.have.length(5)
-        expect(fulltext.suggestion(data[1].data)).to.equal('right')
-        expect(fulltext.suggestion(data[2].data)).to.equal('right also')
-        expect(fulltext.suggestion(data[3].data)).to.equal('right third')
-        done()
-      }
-
+    it('still works when a limited child has multiple options', () => {
       parser.sentences = [
         <choice limit={2}>
           <choice>
@@ -144,22 +95,15 @@ describe('limit', function () {
           <literal text='right third' />
         </choice>
       ]
-      es.readArray(['r'])
-        .pipe(parser)
-        .pipe(es.writeArray(callback))
+
+      const data = from(parser.parse('r'))
+      expect(data).to.have.length(3)
+      expect(fulltext.suggestion(data[0])).to.equal('right')
+      expect(fulltext.suggestion(data[1])).to.equal('right also')
+      expect(fulltext.suggestion(data[2])).to.equal('right third')
     })
 
-    it('allows choices in sequences to be limited', function (done) {
-      function callback (err, data) {
-        expect(err).to.not.exist
-        expect(data).to.have.length(4)
-        expect(fulltext.suggestion(data[1].data)).to.equal('testa')
-        expect(fulltext.completion(data[1].data)).to.equal('also')
-        expect(fulltext.suggestion(data[2].data)).to.equal('testb')
-        expect(fulltext.completion(data[2].data)).to.equal('also')
-        done()
-      }
-
+    it('allows choices in sequences to be limited', () => {
       parser.sentences = [
         <sequence>
           <choice limit={2}>
@@ -171,20 +115,16 @@ describe('limit', function () {
           <literal text='also' />
         </sequence>
       ]
-      es.readArray(['test'])
-        .pipe(parser)
-        .pipe(es.writeArray(callback))
+
+      const data = from(parser.parse('test'))
+      expect(data).to.have.length(2)
+      expect(fulltext.suggestion(data[0])).to.equal('testa')
+      expect(fulltext.completion(data[0])).to.equal('also')
+      expect(fulltext.suggestion(data[1])).to.equal('testb')
+      expect(fulltext.completion(data[1])).to.equal('also')
     })
 
-    it('limits even if valid parses do not parse to completion', function (done) {
-      function callback (err, data) {
-        expect(err).to.not.exist
-        expect(data).to.have.length(3)
-        expect(fulltext.match(data[1].data)).to.equal('right')
-        expect(fulltext.suggestion(data[1].data)).to.equal('also')
-        done()
-      }
-
+    it('limits even if valid parses do not parse to completion', () => {
       parser.sentences = [
         <sequence>
           <choice limit={1}>
@@ -195,20 +135,14 @@ describe('limit', function () {
           <literal text='also' />
         </sequence>
       ]
-      es.readArray(['righta'])
-        .pipe(parser)
-        .pipe(es.writeArray(callback))
+
+      const data = from(parser.parse('righta'))
+      expect(data).to.have.length(1)
+      expect(fulltext.match(data[0])).to.equal('right')
+      expect(fulltext.suggestion(data[0])).to.equal('also')
     })
 
-    it('allows for choices inside of repeats to be limited', function (done) {
-      function callback (err, data) {
-        expect(err).to.not.exist
-        expect(data).to.have.length(3)
-        expect(fulltext.match(data[1].data)).to.equal('ab')
-        expect(fulltext.suggestion(data[1].data)).to.equal('aa')
-        done()
-      }
-
+    it('allows for choices inside of repeats to be limited', () => {
       parser.sentences = [
         <repeat>
           <choice limit={1}>
@@ -218,21 +152,14 @@ describe('limit', function () {
           </choice>
         </repeat>
       ]
-      es.readArray(['aba'])
-        .pipe(parser)
-        .pipe(es.writeArray(callback))
+
+      const data = from(parser.parse('aba'))
+      expect(data).to.have.length(1)
+      expect(fulltext.match(data[0])).to.equal('ab')
+      expect(fulltext.suggestion(data[0])).to.equal('aa')
     })
 
-    it('allows for choices inside of repeat separators to be limited', function (done) {
-      function callback (err, data) {
-        expect(err).to.not.exist
-        expect(data).to.have.length(3)
-        expect(fulltext.match(data[1].data)).to.equal('x')
-        expect(fulltext.suggestion(data[1].data)).to.equal('aa')
-        expect(fulltext.completion(data[1].data)).to.equal('x')
-        done()
-      }
-
+    it('allows for choices inside of repeat separators to be limited', () => {
       parser.sentences = [
         <repeat>
           <content>
@@ -247,9 +174,12 @@ describe('limit', function () {
           </separator>
         </repeat>
       ]
-      es.readArray(['xa'])
-        .pipe(parser)
-        .pipe(es.writeArray(callback))
+
+      const data = from(parser.parse('xa'))
+      expect(data).to.have.length(1)
+      expect(fulltext.match(data[0])).to.equal('x')
+      expect(fulltext.suggestion(data[0])).to.equal('aa')
+      expect(fulltext.completion(data[0])).to.equal('x')
     })
   })
 })

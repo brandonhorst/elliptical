@@ -1,148 +1,106 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
-import es from 'event-stream'
 import {expect} from 'chai'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
 
-describe('repeat', function () {
+function from(i) {const a = []; for (let x of i) a.push(x); return a}
+
+describe('repeat', () => {
   var parser
 
-  beforeEach(function () {
+  beforeEach(() => {
     parser = new lacona.Parser()
   })
 
-  it('does not accept input that does not match the child', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(2)
-      done()
-    }
-
+  it('does not accept input that does not match the child', () => {
     parser.sentences = [
       <repeat>
         <content><literal text='super' /></content>
         <separator><literal text='man' /></separator>
       </repeat>
     ]
-    es.readArray(['wrong'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('wrong'))
+    expect(data).to.have.length(0)
   })
 
-  it('accepts the child on its own', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(fulltext.suggestion(data[1].data)).to.equal('man')
-      done()
-    }
-
+  it('accepts the child on its own', () => {
     parser.sentences = [
       <repeat>
         <content><literal text='super' /></content>
         <separator><literal text='man' /></separator>
       </repeat>
     ]
-    es.readArray(['superm'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('superm'))
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('man')
   })
 
-  it('accepts the child twice, with the separator in the middle', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(fulltext.suggestion(data[1].data)).to.equal('super')
-      done()
-    }
-
+  it('accepts the child twice, with the separator in the middle', () => {
     parser.sentences = [
       <repeat>
         <content><literal text='super' /></content>
         <separator><literal text='man' /></separator>
       </repeat>
     ]
-    es.readArray(['supermans'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('supermans'))
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('super')
   })
 
-  it('does not accept input that does not match the child', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(2)
-      done()
-    }
-
+  it('does not accept input that does not match the child (no separator)', () => {
     parser.sentences = [
       <repeat>
         <literal text='super' />
       </repeat>
     ]
-    es.readArray(['wrong'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+    const data = from(parser.parse('wrong'))
+    expect(data).to.have.length(0)
   })
 
-  it('accepts the child on its own', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(fulltext.suggestion(data[1].data)).to.equal('super')
-      done()
-    }
-
+  it('accepts the child on its own', () => {
     parser.sentences = [
       <repeat>
         <literal text='super' />
       </repeat>
     ]
-    es.readArray(['sup'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('sup'))
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('super')
   })
 
-  it('accepts the child twice', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(fulltext.suggestion(data[1].data)).to.equal('super')
-      expect(fulltext.match(data[1].data)).to.equal('super')
-      done()
-    }
-
+  it('accepts the child twice', () => {
     parser.sentences = [
       <repeat>
         <literal text='super' />
       </repeat>
     ]
-    es.readArray(['supers'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('supers'))
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('super')
+    expect(fulltext.match(data[0])).to.equal('super')
   })
 
-  it('creates an array from the values of the children', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(data[1].data.result).to.deep.equal(['testValue', 'testValue'])
-      expect(data[1].data.result.subElementId).to.be.undefined
-      done()
-    }
-
+  it('creates an array from the values of the children', () => {
     parser.sentences = [
       <repeat>
         <literal text='super' value='testValue' id='subElementId' />
       </repeat>
     ]
-    es.readArray(['supers'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('supers'))
+    expect(data).to.have.length(1)
+    expect(data[0].result).to.deep.equal(['testValue', 'testValue'])
+    expect(data[0].result.subElementId).to.be.undefined
   })
 
-  it('does not pass on child values to phrases', function (done) {
+  it('does not pass on child values to phrases', () => {
     class Test extends phrase.Phrase {
       describe() {
         return (
@@ -153,87 +111,57 @@ describe('repeat', function () {
       }
     }
 
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(data[1].data.result.testId).to.deep.equal(['testValue', 'testValue'])
-      expect(data[1].data.result.subElementId).to.be.undefined
-      done()
-    }
-
     parser.sentences = [<Test />]
-    es.readArray(['supers'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('supers'))
+    expect(data).to.have.length(1)
+    expect(data[0].result.testId).to.deep.equal(['testValue', 'testValue'])
+    expect(data[0].result.subElementId).to.be.undefined
   })
 
-  it('does not accept fewer than min iterations', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(fulltext.match(data[1].data)).to.equal('a')
-      expect(fulltext.suggestion(data[1].data)).to.equal('b')
-      expect(fulltext.completion(data[1].data)).to.equal('a')
-      done()
-    }
-
+  it('does not accept fewer than min iterations', () => {
     parser.sentences = [
       <repeat min={2}>
         <content><literal text='a' /></content>
         <separator><literal text='b' /></separator>
       </repeat>
     ]
-    es.readArray(['a'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('a'))
+    expect(data).to.have.length(1)
+    expect(fulltext.match(data[0])).to.equal('a')
+    expect(fulltext.suggestion(data[0])).to.equal('b')
+    expect(fulltext.completion(data[0])).to.equal('a')
   })
 
-  it('does not accept more than max iterations', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(fulltext.suggestion(data[1].data)).to.equal('')
-      expect(fulltext.match(data[1].data)).to.equal('a')
-      done()
-    }
-
+  it('does not accept more than max iterations', () => {
     parser.sentences = [
       <repeat max={1}>
         <content><literal text='a' /></content>
         <separator><literal text='b' /></separator>
       </repeat>
     ]
-    es.readArray(['a'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('a'))
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('')
+    expect(fulltext.match(data[0])).to.equal('a')
   })
 
-  it('passes on its category', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(4)
-      expect(data[1].data.match[0].category).to.equal('myCat')
-      expect(data[2].data.match[0].category).to.equal('myCat')
-      done()
-    }
-
+  it('passes on its category', () => {
     parser.sentences = [
-    <repeat category='myCat'>
-      <literal text='a' />
-    </repeat>
+      <repeat category='myCat'>
+        <literal text='a' />
+      </repeat>
     ]
-    es.readArray(['a'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('a'))
+    expect(data).to.have.length(2)
+    expect(data[0].match[0].category).to.equal('myCat')
+    expect(data[1].match[0].category).to.equal('myCat')
   })
 
-  it('rejects non-unique repeated elements', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(2)
-      done()
-    }
-
+  it('rejects non-unique repeated elements', () => {
     parser.sentences = [
       <repeat unique={true}>
         <choice>
@@ -242,19 +170,12 @@ describe('repeat', function () {
         </choice>
       </repeat>
     ]
-    es.readArray(['aa'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('aa'))
+    expect(data).to.have.length(0)
   })
 
-  it('accepts unique repeated elements', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(fulltext.match(data[1].data)).to.equal('ab')
-      done()
-    }
-
+  it('accepts unique repeated elements', () => {
     parser.sentences = [
       <repeat unique={true}>
         <choice>
@@ -263,8 +184,9 @@ describe('repeat', function () {
         </choice>
       </repeat>
     ]
-    es.readArray(['ab'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('ab'))
+    expect(data).to.have.length(1)
+    expect(fulltext.match(data[0])).to.equal('ab')
   })
 })

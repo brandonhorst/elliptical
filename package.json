@@ -4,7 +4,7 @@
   "description": "Natural Language Parsing Framework",
   "main": "lib/lacona.js",
   "scripts": {
-    "pretest": "babel test --out-dir tmp",
+    "pretest": "babel test --out-dir tmp -b regenerator",
     "test": "mocha tmp",
     "build": "babel src --out-dir lib -b regenerator",
     "validate": "npm run build && npm test",
@@ -34,7 +34,6 @@
   "devDependencies": {
     "babel": "^4.7.8",
     "chai": "^2.1.1",
-    "event-stream": "^3.3.0",
     "lacona-util-fulltext": "^0.2.0",
     "mocha": "^2.2.1",
     "rimraf": "^2.3.2",
@@ -42,7 +41,6 @@
     "sinon-chai": "^2.7.0"
   },
   "dependencies": {
-    "async-each": "^0.1.6",
     "immutable": "^3.6.4",
     "lacona-phrase": "^0.5.0",
     "lodash": "^3.5.0"

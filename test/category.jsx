@@ -1,69 +1,52 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
-import es from 'event-stream'
 import {expect} from 'chai'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
 
-describe('category', function () {
+function from(i) {const a = []; for (let x of i) a.push(x); return a}
+
+describe('category', () => {
   var parser
 
-  beforeEach(function () {
+  beforeEach(() => {
     parser = new lacona.Parser()
   })
 
-  it('passes a category to the OutputOption', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(data[1].data.suggestion[0].category).to.equal('myCat')
-      done()
-    }
-
+  it('passes a category to the OutputOption', () => {
     parser.sentences = [<literal text='test' category='myCat' />]
-    es.readArray(['t'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('t'))
+    expect(data).to.have.length(1)
+    expect(data[0].suggestion[0].category).to.equal('myCat')
   })
 
-  it('custom phrases can modify the category', function (done) {
+  it('custom phrases can modify the category', () => {
     class Test extends phrase.Phrase {
       describe() {
         return <literal text='test' category={this.props.category + 'Modified'} />
       }
     }
 
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(data[1].data.suggestion[0].category).to.equal('myCatModified')
-      done()
-    }
-
     parser.sentences = [<Test category='myCat' />]
-    es.readArray(['t'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('t'))
+    expect(data).to.have.length(1)
+    expect(data[0].suggestion[0].category).to.equal('myCatModified')
   })
 
-  it('custom phrases will inherit the category if none is specified', function (done) {
+  it('elements will inherit the category if none is specified', () => {
     class Test extends phrase.Phrase {
       describe() {
         return <literal text='test' />
       }
     }
 
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(data[1].data.suggestion[0].category).to.equal('myCat')
-      done()
-    }
-
     parser.sentences = [<Test category='myCat' />]
-    es.readArray(['t'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse('t'))
+    expect(data).to.have.length(1)
+    expect(data[0].suggestion[0].category).to.equal('myCat')
   })
 })

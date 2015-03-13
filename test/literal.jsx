@@ -1,10 +1,11 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
-import es from 'event-stream'
 import {expect} from 'chai'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
+
+function from(i) {const a = []; for (let x of i) a.push(x); return a}
 
 describe('literal', function () {
   var parser
@@ -13,52 +14,33 @@ describe('literal', function () {
     parser = new lacona.Parser()
   })
 
-  it('handles a literal', function (done) {
-
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(data[1].data.suggestion).to.have.length(2)
-      expect(data[1].data.suggestion[0].string).to.equal('l')
-      expect(data[1].data.suggestion[0].input).to.be.true
-      expect(data[1].data.suggestion[1].string).to.equal('iteral test')
-      expect(data[1].data.suggestion[1].input).to.be.false
-      expect(data[1].data.result).to.be.empty
-      done()
-    }
-
+  it('handles a literal', () => {
     parser.sentences = [<literal text='literal test' />]
-    es.readArray(['l'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+    const data = from(parser.parse('l'))
+
+    expect(data).to.have.length(1)
+    expect(data[0].suggestion).to.have.length(2)
+    expect(data[0].suggestion[0].string).to.equal('l')
+    expect(data[0].suggestion[0].input).to.be.true
+    expect(data[0].suggestion[1].string).to.equal('iteral test')
+    expect(data[0].suggestion[1].input).to.be.false
+    expect(data[0].result).to.be.empty
   })
 
-  it('handles a literal with an id', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(fulltext.suggestion(data[1].data)).to.equal('literal test')
-      expect(data[1].data.result).to.equal('test')
-      done()
-    }
-
+  it('handles a literal with an id', () => {
     parser.sentences = [<literal text='literal test' value='test'/>]
-    es.readArray(['l'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+    const data = from(parser.parse('l'))
+
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('literal test')
+    expect(data[0].result).to.equal('test')
   })
 
-  it('maintains case', function (done) {
-    function callback (err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(fulltext.suggestion(data[1].data)).to.equal('Test')
-      done()
-    }
-
+  it('maintains case', () => {
     parser.sentences = [<literal text='Test' />]
-    es.readArray(['t'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+    const data = from(parser.parse('t'))
+
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('Test')
   })
 })

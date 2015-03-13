@@ -1,14 +1,15 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
 import chai, {expect} from 'chai'
-import es from 'event-stream'
 import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
-import sinonChai from 'sinon-chai'
 import {spy} from 'sinon'
+import sinonChai from 'sinon-chai'
 
 chai.use(sinonChai)
+
+function from(i) {const a = []; for (let x of i) a.push(x); return a}
 
 describe('state', () => {
   let parser
@@ -16,31 +17,20 @@ describe('state', () => {
     parser = new lacona.Parser()
   })
 
-  it('allows for initialState', function (done) {
+  it('allows for initialState', () => {
     class Test extends phrase.Phrase {
-      static get initialState() {
-        return {test: 'testa'}
-      }
-
-      describe() {
-        return <literal text={this.state.test} />
-      }
-    }
-
-    function callback(err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(3)
-      expect(fulltext.all(data[1].data)).to.equal('testa')
-      done()
+      static get initialState() {return {test: 'testa'}}
+      describe() {return <literal text={this.state.test} />}
     }
 
     parser.sentences = [<Test />]
-    es.readArray([''])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data = from(parser.parse(''))
+    expect(data).to.have.length(1)
+    expect(fulltext.all(data[0])).to.equal('testa')
   })
 
-  it('allows Phrases to setState', function (done) {
+  it('allows Phrases to call setState', () => {
     class Test extends phrase.Phrase {
       static get initialState() { return {test: 'testa'} }
       describe() {
@@ -49,54 +39,21 @@ describe('state', () => {
       }
     }
 
-    function callback(err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(6)
-      expect(fulltext.all(data[1].data)).to.equal('testa')
-      expect(fulltext.all(data[4].data)).to.equal('testb')
-      done()
-    }
-
     parser.sentences = [<Test />]
-    es.readArray(['test', 'test'])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data1 = from(parser.parse('test'))
+    expect(fulltext.all(data1[0])).to.equal('testa')
+
+    const data2 = from(parser.parse('test'))
+    expect(fulltext.all(data2[0])).to.equal('testb')
   })
 
-  it('allows changes to state to redescribe', function (done) {
-    class Test extends phrase.Phrase {
-      static get initialState() {
-        return {test: 'first'}
-      }
-
-      describe() {
-        this.setState({test: 'second'})
-        return <literal text={this.state.test} />
-      }
-    }
-
-    function callback(err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(6)
-      expect(fulltext.all(data[1].data)).to.equal('first')
-      expect(fulltext.all(data[4].data)).to.equal('second')
-      done()
-    }
-
-    parser.sentences = [<Test />]
-    es.readArray(['', ''])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
-  })
-
-  it('redescriptions do not recreate entire Phrase', function (done) {
+  it('redescriptions do not recreate entire Phrase', () => {
     const consSpy = spy()
     class Test extends phrase.Phrase {
       constructor() { consSpy() }
 
-      static get initialState() {
-        return {test: 'first'}
-      }
+      static get initialState() {return {test: 'first'}}
 
       describe() {
         this.setState({test: 'second'})
@@ -104,27 +61,24 @@ describe('state', () => {
       }
     }
 
-    function callback(err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(6)
-      expect(fulltext.all(data[1].data)).to.equal('first')
-      expect(fulltext.all(data[4].data)).to.equal('second')
-      expect(consSpy).to.have.been.calledOnce
-      done()
-    }
-
     parser.sentences = [<Test />]
-    es.readArray(['', ''])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data1 = from(parser.parse(''))
+    expect(fulltext.all(data1[0])).to.equal('first')
+    expect(consSpy).to.have.been.calledOnce
+
+    const data2 = from(parser.parse(''))
+    expect(fulltext.all(data2[0])).to.equal('second')
+    expect(consSpy).to.have.been.calledOnce
   })
 
-  it('nested redescriptions do not recreate entire Phrase', function (done) {
+  it('nested redescriptions do not recreate entire Phrase', () => {
     const consSpy = spy()
     const subConsSpy = spy()
 
     class SubTest extends phrase.Phrase {
       constructor() { subConsSpy('sub') }
+
       describe() { return <literal text={this.props.val} /> }
     }
 
@@ -139,19 +93,16 @@ describe('state', () => {
       }
     }
 
-    function callback(err, data) {
-      expect(err).to.not.exist
-      expect(data).to.have.length(6)
-      expect(consSpy).to.have.been.calledOnce
-      expect(subConsSpy).to.have.been.calledOnce
-      expect(fulltext.all(data[1].data)).to.equal('first')
-      expect(fulltext.all(data[4].data)).to.equal('second')
-      done()
-    }
-
     parser.sentences = [<Test />]
-    es.readArray(['', ''])
-      .pipe(parser)
-      .pipe(es.writeArray(callback))
+
+    const data1 = from(parser.parse(''))
+    expect(fulltext.all(data1[0])).to.equal('first')
+    expect(consSpy).to.have.been.calledOnce
+    expect(subConsSpy).to.have.been.calledOnce
+
+    const data2 = from(parser.parse(''))
+    expect(fulltext.all(data2[0])).to.equal('second')
+    expect(consSpy).to.have.been.calledOnce
+    expect(subConsSpy).to.have.been.calledOnce
   })
 })
