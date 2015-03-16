@@ -16,14 +16,16 @@ function reconcileArray({descriptor, store, options}) {
     .value()
 }
 
-function reconcileOne({descriptor, store, options}) {
+function reconcileOne({descriptor, store, options, index}) {
   const Constructor = getConstructor({Constructor: descriptor.Constructor})
-  const props = getRealProps({descriptor, Constructor})
+  const props = getRealProps({descriptor, Constructor, index})
   const extensions = options.getExtensions(Constructor)
+  const prototypeObj = _.clone(Constructor.prototype)
 
   if (store && store.Constructor === Constructor) {
     if (store.phrase._stateChanged || !_.isEqual(props, store.props) ||
-        !_.isEqual(extensions, store.oldExtensions)) {
+        !_.isEqual(extensions, store.oldExtensions) ||
+        !_.isEqual(prototypeObj, store.oldPrototype)) {
       const describe = getDescribe({Constructor, langs: options.langs})
       const phrase = store.phrase
       const state = phrase._nextState || store.phrase.state
@@ -33,10 +35,10 @@ function reconcileOne({descriptor, store, options}) {
       const describedStore = description ?
         reconcile({descriptor: description, options, store: store.describedStore}) :
         null
+      const oldPrototype = _.clone(Constructor.prototype)
 
       return _.assign({}, store, { props, stateChanged: false,
-        oldExtensions: extensions,
-        describedStore})
+        oldExtensions: extensions, oldPrototype: prototypeObj, describedStore})
     } else {
       return store
     }
@@ -50,7 +52,8 @@ function reconcileOne({descriptor, store, options}) {
     const describedStore = description ? reconcile({descriptor: description, options}) : null
 
     return {Constructor, phrase, props, nextState: state,
-      stateChanged: false, oldExtensions: extensions, describedStore}
+      stateChanged: false, oldExtensions: extensions, oldPrototype: prototypeObj,
+      describedStore}
   }
 }
 
@@ -107,12 +110,9 @@ function getDescription({describe, extensions, phrase, props}) {
 
 function getRealProps({descriptor, Constructor}) {
   const realProps = _.defaults(descriptor.props || {}, Constructor.defaultProps || {})
-  realProps.children = _.chain(descriptor.children)
-    .flattenDeep()
-    .map(child => (!child.props || child.props.id == null) ?
-      _.merge({}, child, {props: {id: _.uniqueId('_temp')}}) :
-      child)
-    .value()
+  if (descriptor.children && descriptor.children.length > 0) {
+    realProps.children = _.flattenDeep(descriptor.children)
+  }
   return realProps
 }
 

@@ -5,6 +5,11 @@ import parse from '../parse'
 import reconcile from '../reconcile'
 
 export default class Choice extends Phrase {
+
+  getValue(results) {
+
+  }
+
   *_handleParse(input, options) {
     let successes = 0
     this.stores = reconcile({descriptor: this.props.children, store: this.stores, options})
@@ -14,8 +19,8 @@ export default class Choice extends Phrase {
 
       for (let output of parse({store: store, input, options})) {
         yield output
-          .update('result', result => result.set(this.props.id, result.get(child.props.id)))
           .update('callbacks', callbacks => callbacks.push(() => success = true))
+          .update('result', result => this.props.value || result)
       }
 
       if (success) successes++

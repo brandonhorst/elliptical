@@ -9,9 +9,9 @@ function addSeparator (child, separator) {
     newChild = _.clone(child)
     newChild.props = _.clone(child.props)
     newChild.props.optional = false
-    return <Sequence optional={true}>{newChild}{separator}</Sequence>
+    return <Sequence optional={true} merge={true}>{newChild}{separator}</Sequence>
   } else {
-    return <Sequence>{child}{separator}</Sequence>
+    return <Sequence merge={true}>{child}{separator}</Sequence>
   }
 }
 
@@ -43,19 +43,31 @@ export default class Sequence extends Phrase {
   }
 
   *_handleParse(input, options) {
-    const self = this
-    this.stores = reconcile({descriptor: [self.props.children], store: this.stores, options})
+    this.stores = reconcile({descriptor: this.props.children, store: this.stores, options})
 
-    function *parseChild (childIndex, input) {
-      for (let output of parse({store: self.stores[childIndex], input, options})) {
-        if (childIndex === self.props.children.length - 1) {
-           yield output.update('result', result => result.set(self.props.id, self.props.value))
+    yield* this.parseChild(0, input.set('result', {}), options)
+  }
+
+  *parseChild(childIndex, input, options) {
+    for (let output of parse({store: this.stores[childIndex], input, options})) {
+      const resultInput = output.update('result', result => {
+        const child = this.props.children[childIndex]
+        const childId = child.props && child.props.id
+        const childMerge = child.props && child.props.merge
+        if (childId) {
+          return _.merge({}, input.get('result'), {[childId]: result})
+        } else if (childMerge) {
+          return _.merge({}, input.get('result'), result)
         } else {
-          yield* parseChild(childIndex + 1, output)
+          return input.get('result')
         }
+      })
+
+      if (childIndex === this.props.children.length - 1) {
+        yield resultInput.update('result', result => this.props.value || result)
+      } else {
+        yield* this.parseChild(childIndex + 1, resultInput, options)
       }
     }
-
-    yield* parseChild(0, input)
   }
 }

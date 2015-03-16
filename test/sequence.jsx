@@ -75,6 +75,87 @@ describe('sequence', function () {
     expect(data[0].result).to.equal('testValue')
   })
 
+  it('results is an object with id keys', () => {
+    parser.sentences = [
+      <sequence>
+        <literal id='desc' text='super' value='super' />
+        <literal id='noun' text='man' value='man' />
+      </sequence>
+    ]
+
+    const data = from(parser.parse('superm'))
+    expect(data).to.have.length(1)
+    expect(data[0].result).to.eql({
+      desc: 'super',
+      noun: 'man'
+    })
+  })
+
+  it('results is an object with id keys, even with separator', () => {
+    parser.sentences = [
+      <sequence>
+        <content>
+          <literal id='desc' text='super' value='super' />
+          <literal id='noun' text='man' value='man' />
+        </content>
+        <separator><literal text=' ' /></separator>
+      </sequence>
+    ]
+
+    const data = from(parser.parse('super m'))
+    expect(data).to.have.length(1)
+    expect(data[0].result).to.eql({
+      desc: 'super',
+      noun: 'man'
+    })
+  })
+
+  it('will merge results in', () => {
+    parser.sentences = [
+      <sequence>
+        <literal id='desc' text='super' value='super' />
+        <sequence merge='true'>
+          <literal id='noun' text='man' value='man' />
+          <literal id='adj' text='rocks' value='rocks' />
+        </sequence>
+      </sequence>
+    ]
+
+    const data = from(parser.parse('superm'))
+    expect(data).to.have.length(1)
+    expect(data[0].result).to.eql({
+      desc: 'super',
+      noun: 'man',
+      adj: 'rocks'
+    })
+  })
+
+  it('will merge results in, even with separator', () => {
+    parser.sentences = [
+      <sequence>
+        <content>
+          <literal id='desc' text='super' value='super' />
+          <sequence merge='true'>
+            <content>
+              <literal id='noun' text='man' value='man' />
+              <literal id='adj' text='rocks' value='rocks' />
+            </content>
+            <separator><literal text=' ' /></separator>
+          </sequence>
+        </content>
+        <separator><literal text=' ' /></separator>
+      </sequence>
+    ]
+
+    const data = from(parser.parse('super m'))
+    expect(data).to.have.length(1)
+    expect(data[0].result).to.eql({
+      desc: 'super',
+      noun: 'man',
+      adj: 'rocks'
+    })
+  })
+
   it('passes on its category', () => {
     parser.sentences = [
       <sequence category='myCat'>

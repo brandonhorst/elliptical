@@ -4,7 +4,7 @@ import I from 'immutable'
 export default function *parse({store, input, options}) {
   //prevent unbounded recursion. Once we have a completion, do not allow user
   // phrases to continue looping
-  if (!input.get('suggestion').isEmpty() &&
+  if (!input.get('completion').isEmpty() &&
       input.get('stack').find(entry => {
         const Constructor = entry.get('Constructor')
         return Constructor === store.Constructor && !Constructor.prototype._handleParse
@@ -34,28 +34,17 @@ function *parseElement({store, input, options}) {
   })))
 
   if (store.describedStore) {
-    const inputWithoutResult = inputWithStack.set('result', I.Map())
-
-    const iterator = parse({store: store.describedStore, input: inputWithoutResult, options})
+    const iterator = parse({store: store.describedStore, input: inputWithStack, options})
     for (let output of iterator) {
-      const newResult = store.phrase.getValue ?
-        I.fromJS(store.phrase.getValue(output.get('result').toJS())) :
-        output.get('result')
-      const cleared = clearTemps(newResult)
+      if (!store.phrase.filter || store.phrase.filter(output.get('result'))) {
+        const newResult = store.phrase.getValue ?
+          store.phrase.getValue(output.get('result')) :
+          output.get('result')
 
-      yield output.set('result', input.get('result').set(store.props.id, cleared))
+        yield output.set('result', newResult)
+      }
     }
   } else {
     yield* store.phrase._handleParse(inputWithStack, options, parse)
-  }
-}
-
-function clearTemps(result) {
-  if (I.Map.isMap(result)) {
-    return result.filter((value, key) => !_.startsWith(key, '_temp') && !_.isUndefined(value))
-  } else if (I.List.isList(result)) {
-    return result.filter(_.isUndefined)
-  } else {
-    return result
   }
 }

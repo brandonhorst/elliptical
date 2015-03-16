@@ -92,40 +92,20 @@ describe('Phrase', () => {
     parser.sentences = [<Test />]
 
     const data = from(parser.parse('nan'))
-    expect(data).to.have.length(2)
-    expect(fulltext.match(data[0])).to.equal('na')
-    expect(fulltext.suggestion(data[0])).to.equal('nopeman')
-    expect(fulltext.match(data[1])).to.equal('na')
-    expect(fulltext.suggestion(data[1])).to.equal('na')
-  })
-
-  it('allows for nested phrases with the same id', () => {
-    class Test extends phrase.Phrase {
-      describe() { return <Include1 id='test' /> }
-    }
-    class Include1 extends phrase.Phrase {
-      describe() { return <Include2 id='test' /> }
-    }
-    class Include2 extends phrase.Phrase {
-      describe() { return <literal text='disp' value='val' id='test' /> }
-    }
-
-    parser.sentences = [<Test />]
-
-    const data = from(parser.parse('d'))
-    expect(data).to.have.length(1)
-    expect(fulltext.suggestion(data[0])).to.equal('disp')
-    expect(data[0].result.test.test.test).to.equal('val')
+    expect(data).to.have.length(3)
+    expect(fulltext.all(data[0])).to.equal('nanopeman')
+    expect(fulltext.all(data[1])).to.equal('nananopeman')
+    expect(fulltext.all(data[2])).to.equal('nanananopeman')
   })
 
   it('calls getValue in the phrase context', () => {
     class Test extends phrase.Phrase {
       getValue(result) {
         expect(this.props.test).to.equal('myProp')
-        expect(result).to.eql({myId: 'myVal'})
+        expect(result).to.eql('myVal')
         return 'nope'
       }
-      describe() { return <literal id='myId' value='myVal' text='test' /> }
+      describe() { return <literal value='myVal' text='test' /> }
     }
 
     parser.sentences = [<Test test='myProp' />]
@@ -137,13 +117,13 @@ describe('Phrase', () => {
 
   it('sentence passes on result if getValue was not supplied', () => {
     class Test extends phrase.Phrase {
-      describe() { return <literal id='myId' value='myVal' text='test' /> }
+      describe() { return <literal value='myVal' text='test' /> }
     }
 
     parser.sentences = [<Test test='myProp' />]
 
     const data = from(parser.parse('t'))
     expect(data).to.have.length(1)
-    expect(data[0].result).to.eql({myId: 'myVal'})
+    expect(data[0].result).to.eql('myVal')
   })
 })

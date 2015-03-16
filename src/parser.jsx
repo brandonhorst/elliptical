@@ -57,7 +57,7 @@ export default class Parser {
     }
 
     const sentences = _.map(this.sentences, sentence => _.merge({}, sentence, {props: {__sentence: true}}))
-    const descriptor = <choice id='__sentence'>{sentences}</choice>
+    const descriptor = <choice>{sentences}</choice>
 
     const input = createOption({fuzzy: this.fuzzy, text: inputString})
     const options = {langs: this.langs, getExtensions: this._getExtensions.bind(this)}
@@ -68,8 +68,7 @@ export default class Parser {
       if (output.get('text') === '') {
         // call each callback (used for limiting)
         output.get('callbacks').forEach(callback => callback())
-        const finalOutput = output.set('result', output.get('result').get('__sentence'))
-        yield normalizeOutput(finalOutput)
+        yield normalizeOutput(output)
       }
     }
   }

@@ -74,9 +74,9 @@ describe('choice', () => {
     class Test extends phrase.Phrase {
       describe() {
         return (
-          <choice id='choice'>
-            <literal text='right' value='testValue' id='right' />
-            <literal text='wrong' id='wrong' />
+          <choice>
+            <literal text='right' value='testValue' />
+            <literal text='wrong' />
           </choice>
         )
       }
@@ -87,8 +87,26 @@ describe('choice', () => {
     const data = from(parser.parse('r'))
     expect(data).to.have.length(1)
     expect(fulltext.suggestion(data[0])).to.equal('right')
-    expect(data[0].result.choice).to.equal('testValue')
-    expect(data[0].result.right).to.equal('testValue')
-    expect(data[0].result.wrong).to.be.undefined
+    expect(data[0].result).to.equal('testValue')
+  })
+
+  it('can set a value', () => {
+    class Test extends phrase.Phrase {
+      describe() {
+        return (
+          <choice value='override'>
+            <literal text='right' value='testValue' />
+            <literal text='wrong' />
+          </choice>
+        )
+      }
+    }
+
+    parser.sentences = [<Test />]
+
+    const data = from(parser.parse('r'))
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('right')
+    expect(data[0].result).to.equal('override')
   })
 })

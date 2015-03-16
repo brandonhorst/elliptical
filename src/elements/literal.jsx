@@ -10,12 +10,8 @@ export default class Literal extends Phrase {
     }]
   }
 
-  getValue(result) {
-    return result.literal
-  }
-
   describe() {
-    return <value id='literal' compute={this.computeLiteral.bind(this)}
+    return <value compute={this.computeLiteral.bind(this)}
       category={this.props.category} join={this.props.join} />
   }
 }

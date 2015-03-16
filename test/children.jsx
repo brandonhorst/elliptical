@@ -55,14 +55,10 @@ describe('children', () => {
     expect(fulltext.suggestion(data[0])).to.equal('b')
   })
 
-  it('passes the child id for use in getValue', () => {
+  it('passes the child result', () => {
     class Test extends phrase.Phrase {
       describe() {
         return this.props.children[0]
-      }
-      getValue(result) {
-        expect(result[this.props.children[0].props.id]).to.equal('b')
-        return 'something'
       }
     }
 
@@ -75,6 +71,6 @@ describe('children', () => {
     const data = from(parser.parse(''))
     expect(data).to.have.length(1)
     expect(fulltext.suggestion(data[0])).to.equal('a')
-    expect(data[0].result).to.equal('something')
+    expect(data[0].result).to.equal('b')
   })
 })

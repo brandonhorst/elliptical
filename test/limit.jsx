@@ -154,9 +154,9 @@ describe('limit', () => {
       ]
 
       const data = from(parser.parse('aba'))
-      expect(data).to.have.length(1)
-      expect(fulltext.match(data[0])).to.equal('ab')
-      expect(fulltext.suggestion(data[0])).to.equal('aa')
+      expect(data).to.have.length(2)
+      expect(fulltext.all(data[0])).to.equal('abaa')
+      expect(fulltext.all(data[1])).to.equal('abaaaa')
     })
 
     it('allows for choices inside of repeat separators to be limited', () => {

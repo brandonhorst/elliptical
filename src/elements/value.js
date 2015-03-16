@@ -32,7 +32,7 @@ export default class Value extends Phrase {
       const newInput = handleString(input, suggestion.text, handleStringOptions)
       if (newInput !== null) {
         yield newInput
-          .update('result', result => result.set(this.props.id, suggestion.value))
+          .set('result', suggestion.value)
           .update('callbacks', callbacks => callbacks.push(() => success = true))
       }
 

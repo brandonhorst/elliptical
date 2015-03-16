@@ -68,6 +68,20 @@ describe('prototype', () => {
     expect(fulltext.suggestion(data2[0])).to.equal('nothing')
   })
 
+  it('changing prototype forces a redescribe', () => {
+    Test.prototype.config = 'test'
+
+    const data1 = from(parser.parse(''))
+    expect(data1).to.have.length(1)
+    expect(fulltext.suggestion(data1[0])).to.equal('test')
+
+    Test.prototype.config = 'another'
+
+    const data2 = from(parser.parse(''))
+    expect(data2).to.have.length(1)
+    expect(fulltext.suggestion(data2[0])).to.equal('another')
+  })
+
   it('allows extensions to have modified prototypes', () => {
     class Extender extends Phrase {
       describe() {

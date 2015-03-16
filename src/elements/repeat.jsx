@@ -1,81 +1,69 @@
 /** @jsx createElement */
 import _ from 'lodash'
 import {createElement, Phrase} from 'lacona-phrase'
-import I from 'immutable'
-import parse from '../parse'
-import reconcile from '../reconcile'
 
 export default class Repeat extends Phrase {
   static get defaultProps() {
     return {
       max: Number.MAX_SAFE_INTEGER,
-      min: 0,
+      min: 1,
       unique: false
     }
   }
 
-  describe() {
-    if (this.props.children.length <= 2 && this.props.children[0].Constructor !== 'content') {
-      return
+  filter(result) {
+    if (this.props.unique && _.isPlainObject(result) && result.repeat) {
+      return !_.includes(result.repeat, result.child)
     }
+    return true
 
-    let child, separator
-    if (this.props.children.length > 0 && this.props.children[0].Constructor === 'content') {
-      let child = this.props.children[0].children[0]
-      if (this.props.children.length > 1 && this.props.children[1].Constructor === 'separator') {
-        return <repeat {...this.props}>{child}{this.props.children[1].children[0]}</repeat>
+  }
+
+  getValue(result) {
+    if (_.isPlainObject(result) && result.repeat) {
+      if (result.child) {
+        return result.repeat.concat([result.child])
+      } else {
+        return result.repeat
       }
     } else {
-      return <repeat {...this.props}>{this.props.children[0]}</repeat>
+      return [result]
     }
   }
 
-  *_handleParse(input, options) {
-    const child = this.props.children[0]
-    this.childStore = reconcile({descriptor: child, store: this.childStore, options})
-    const separator = this.props.children[1]
-    if (separator) this.separatorStore = reconcile({descriptor: separator, store: this.separatorStore, options})
+  describe() {
+    let child, separator
 
-    var self = this
-
-    function *parseChild (input, level) {
-      for (let output of parse({store: self.childStore, input, options})) {
-        var ownResult = output.get('result').get(self.props.id) || I.List()
-        var childResult = output.get('result').get(child.props.id)
-
-        // if the repeat is unique and the childResult already exists in the result,
-        // just stop - we will not do this branch
-        if (self.props.unique && ownResult.contains(childResult)) break
-
-        const newOwnResult = ownResult.push(childResult)
-        const newOutput = output.update('result', result => result
-          .set(self.props.id, newOwnResult)
-          .delete(child.props.id)
-        )
-
-        // only yield this if we are within the min/max repeat range
-        if (level >= self.props.min && level <= self.props.max) {
-          yield newOutput
-        }
-
-        // parse the separator, unless we are above max or there is a suggestion
-        if (level < self.props.max && output.get('suggestion').count() === 0) {
-          yield* parseSeparator(newOutput, level)
-        }
+    if (this.props.children.length > 0 && this.props.children[0].Constructor === 'content') {
+      child = this.props.children[0].children[0]
+      if (this.props.children.length > 1 && this.props.children[1].Constructor === 'separator') {
+        separator = this.props.children[1].children[0]
       }
+    } else {
+      child = this.props.children[0]
     }
 
-    function *parseSeparator (input, level) {
-      if (self.separatorStore) {
-        for (let output of parse({store: self.separatorStore, input, options})) {
-          yield* parseChild(output, level + 1)
-        }
+    if (this.props.max === 1) {
+      return child
+    } else {
+      const childWithId = _.merge({}, child, {props: {id: 'child'}})
+      const content = separator ? <sequence merge={true}>{childWithId}{separator}</sequence> : childWithId
+
+      const recurse = (
+        <sequence>
+          {content}
+          <repeat id='repeat' unique={this.props.unique} max={this.props.max - 1} min={this.props.min - 1}>
+            {this.props.children}
+          </repeat>
+        </sequence>
+      )
+
+      if (this.props.min <= 1) {
+        return <choice>{child}{recurse}</choice>
       } else {
-        yield* parseChild(input, level + 1)
+        return recurse
       }
     }
-
-
-    yield* parseChild(input, 1)
   }
+
 }

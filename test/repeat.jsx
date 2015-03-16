@@ -14,45 +14,89 @@ describe('repeat', () => {
     parser = new lacona.Parser()
   })
 
+  describe('separator', () => {
+    it('does not accept input that does not match the child', () => {
+      parser.sentences = [
+        <repeat>
+          <content><literal text='super' /></content>
+          <separator><literal text='man' /></separator>
+        </repeat>
+      ]
+
+      const data = from(parser.parse('wrong'))
+      expect(data).to.have.length(0)
+    })
+
+    it('accepts the child on its own', () => {
+      parser.sentences = [
+        <repeat>
+          <content><literal text='super' /></content>
+          <separator><literal text='man' /></separator>
+        </repeat>
+      ]
+
+      const data = from(parser.parse('superm'))
+      expect(data).to.have.length(1)
+      expect(fulltext.match(data[0])).to.equal('super')
+      expect(fulltext.suggestion(data[0])).to.equal('man')
+      expect(fulltext.completion(data[0])).to.equal('super')
+    })
+
+    it('accepts the child twice, with the separator in the middle', () => {
+      parser.sentences = [
+        <repeat>
+          <content><literal text='super' /></content>
+          <separator><literal text='man' /></separator>
+        </repeat>
+      ]
+
+      const data = from(parser.parse('supermans'))
+      expect(data).to.have.length(1)
+      expect(fulltext.suggestion(data[0])).to.equal('super')
+    })
+
+    it('allows for content to have children', () => {
+      parser.sentences = [
+        <repeat>
+          <content>
+            <choice>
+              <literal text='a' />
+              <literal text='b' />
+            </choice>
+          </content>
+          <separator><literal text=' ' /></separator>
+        </repeat>
+      ]
+
+      const data = from(parser.parse('a'))
+      expect(data).to.have.length(3)
+      expect(fulltext.all(data[0])).to.equal('a')
+      expect(fulltext.all(data[1])).to.equal('a a')
+      expect(fulltext.all(data[2])).to.equal('a b')
+    })
+  })
+
+  it('allows for content to have children', () => {
+    parser.sentences = [
+      <repeat>
+        <choice>
+          <literal text='a' />
+          <literal text='b' />
+        </choice>
+      </repeat>
+    ]
+
+    const data = from(parser.parse(''))
+    expect(data).to.have.length(6)
+    expect(fulltext.all(data[0])).to.equal('a')
+    expect(fulltext.all(data[1])).to.equal('b')
+    expect(fulltext.all(data[2])).to.equal('aa')
+    expect(fulltext.all(data[3])).to.equal('ab')
+    expect(fulltext.all(data[4])).to.equal('ba')
+    expect(fulltext.all(data[5])).to.equal('bb')
+  })
+
   it('does not accept input that does not match the child', () => {
-    parser.sentences = [
-      <repeat>
-        <content><literal text='super' /></content>
-        <separator><literal text='man' /></separator>
-      </repeat>
-    ]
-
-    const data = from(parser.parse('wrong'))
-    expect(data).to.have.length(0)
-  })
-
-  it('accepts the child on its own', () => {
-    parser.sentences = [
-      <repeat>
-        <content><literal text='super' /></content>
-        <separator><literal text='man' /></separator>
-      </repeat>
-    ]
-
-    const data = from(parser.parse('superm'))
-    expect(data).to.have.length(1)
-    expect(fulltext.suggestion(data[0])).to.equal('man')
-  })
-
-  it('accepts the child twice, with the separator in the middle', () => {
-    parser.sentences = [
-      <repeat>
-        <content><literal text='super' /></content>
-        <separator><literal text='man' /></separator>
-      </repeat>
-    ]
-
-    const data = from(parser.parse('supermans'))
-    expect(data).to.have.length(1)
-    expect(fulltext.suggestion(data[0])).to.equal('super')
-  })
-
-  it('does not accept input that does not match the child (no separator)', () => {
     parser.sentences = [
       <repeat>
         <literal text='super' />
@@ -70,8 +114,9 @@ describe('repeat', () => {
     ]
 
     const data = from(parser.parse('sup'))
-    expect(data).to.have.length(1)
-    expect(fulltext.suggestion(data[0])).to.equal('super')
+    expect(data).to.have.length(2)
+    expect(fulltext.all(data[0])).to.equal('super')
+    expect(fulltext.all(data[1])).to.equal('supersuper')
   })
 
   it('accepts the child twice', () => {
@@ -82,41 +127,22 @@ describe('repeat', () => {
     ]
 
     const data = from(parser.parse('supers'))
-    expect(data).to.have.length(1)
-    expect(fulltext.suggestion(data[0])).to.equal('super')
-    expect(fulltext.match(data[0])).to.equal('super')
+    expect(data).to.have.length(2)
+    expect(fulltext.all(data[0])).to.equal('supersuper')
+    expect(fulltext.all(data[1])).to.equal('supersupersuper')
   })
 
   it('creates an array from the values of the children', () => {
     parser.sentences = [
       <repeat>
-        <literal text='super' value='testValue' id='subElementId' />
+        <literal text='super' value='testValue' />
       </repeat>
     ]
 
-    const data = from(parser.parse('supers'))
-    expect(data).to.have.length(1)
-    expect(data[0].result).to.deep.equal(['testValue', 'testValue'])
-    expect(data[0].result.subElementId).to.be.undefined
-  })
-
-  it('does not pass on child values to phrases', () => {
-    class Test extends phrase.Phrase {
-      describe() {
-        return (
-          <repeat id='testId'>
-            <literal text='super' value='testValue' id='subElementId' />
-          </repeat>
-        )
-      }
-    }
-
-    parser.sentences = [<Test />]
-
-    const data = from(parser.parse('supers'))
-    expect(data).to.have.length(1)
-    expect(data[0].result.testId).to.deep.equal(['testValue', 'testValue'])
-    expect(data[0].result.subElementId).to.be.undefined
+    const data = from(parser.parse('sup'))
+    expect(data).to.have.length(2)
+    expect(data[0].result).to.eql(['testValue'])
+    expect(data[1].result).to.eql(['testValue', 'testValue'])
   })
 
   it('does not accept fewer than min iterations', () => {
@@ -155,10 +181,11 @@ describe('repeat', () => {
       </repeat>
     ]
 
-    const data = from(parser.parse('a'))
+    const data = from(parser.parse(''))
     expect(data).to.have.length(2)
-    expect(data[0].match[0].category).to.equal('myCat')
-    expect(data[1].match[0].category).to.equal('myCat')
+    expect(data[0].suggestion[0].category).to.equal('myCat')
+    expect(data[1].suggestion[0].category).to.equal('myCat')
+    expect(data[1].completion[0].category).to.equal('myCat')
   })
 
   it('rejects non-unique repeated elements', () => {
@@ -185,8 +212,11 @@ describe('repeat', () => {
       </repeat>
     ]
 
-    const data = from(parser.parse('ab'))
-    expect(data).to.have.length(1)
-    expect(fulltext.match(data[0])).to.equal('ab')
+    const data = from(parser.parse(''))
+    expect(data).to.have.length(4)
+    expect(fulltext.all(data[0])).to.equal('a')
+    expect(fulltext.all(data[1])).to.equal('b')
+    expect(fulltext.all(data[2])).to.equal('ab')
+    expect(fulltext.all(data[3])).to.equal('ba')
   })
 })
