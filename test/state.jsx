@@ -48,6 +48,28 @@ describe('state', () => {
     expect(fulltext.all(data2[0])).to.equal('testb')
   })
 
+  it('parses are not redescribed if state does not change', () => {
+    const descSpy = spy()
+    class Test extends phrase.Phrase {
+      static get initialState() {return {test: 'testa'}}
+
+      describe() {
+        descSpy()
+        return <literal text={this.state.test} />
+      }
+    }
+
+    parser.sentences = [<Test />]
+
+    const data1 = from(parser.parse('test'))
+    expect(fulltext.all(data1[0])).to.equal('testa')
+
+    const data2 = from(parser.parse('test'))
+    expect(fulltext.all(data2[0])).to.equal('testa')
+
+    expect(descSpy).to.have.been.calledOnce
+  })
+
   it('redescriptions do not recreate entire Phrase', () => {
     const consSpy = spy()
     class Test extends phrase.Phrase {

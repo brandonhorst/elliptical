@@ -6,11 +6,6 @@ import parse from '../parse'
 import reconcile from '../reconcile'
 
 export default class Repeat extends Phrase {
-  // constructor(props, Phrase) {
-  //   this.child = new Phrase(child)
-  //   if (separator) this.separator = new Phrase(separator)
-  // }
-
   static get defaultProps() {
     return {
       max: Number.MAX_SAFE_INTEGER,

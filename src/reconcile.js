@@ -22,23 +22,20 @@ function reconcileOne({descriptor, store, options}) {
   const extensions = options.getExtensions(Constructor)
 
   if (store && store.Constructor === Constructor) {
-    if (props !== store.props || store.phrase._stateChanged ||
-        Constructor.additionsChanged || !_.isEqual(extensions, store.oldExtensions)) {
+    if (store.phrase._stateChanged || !_.isEqual(props, store.props) ||
+        !_.isEqual(extensions, store.oldExtensions)) {
       const describe = getDescribe({Constructor, langs: options.langs})
       const phrase = store.phrase
-      const state = phrase._nextState
-      const additions = Constructor.additions
-      const oldAdditionKeys = store.oldAdditionKeys
+      const state = phrase._nextState || store.phrase.state
 
-
-      updatePhrase({phrase: phrase, props, additions, oldAdditionKeys, state})
-      const description = getDescription({describe, props, extensions, phrase, additions})
+      updatePhrase({phrase: phrase, props, state})
+      const description = getDescription({describe, props, extensions, phrase})
       const describedStore = description ?
         reconcile({descriptor: description, options, store: store.describedStore}) :
         null
 
       return _.assign({}, store, { props, stateChanged: false,
-        oldExtensions: extensions, oldAdditionKeys: _.keys(additions),
+        oldExtensions: extensions,
         describedStore})
     } else {
       return store
@@ -47,15 +44,13 @@ function reconcileOne({descriptor, store, options}) {
     const describe = getDescribe({Constructor, langs: options.langs})
     const phrase = new Constructor()
     const state = Constructor.initialState
-    const additions = _.assign({}, Constructor.initialAdditions, Constructor.additions)
 
-    updatePhrase({phrase, props, additions, state})
-    const description = getDescription({describe, props, extensions, phrase, additions})
+    updatePhrase({phrase, props, state})
+    const description = getDescription({describe, props, extensions, phrase})
     const describedStore = description ? reconcile({descriptor: description, options}) : null
 
     return {Constructor, phrase, props, nextState: state,
-      stateChanged: false, oldExtensions: extensions,
-      oldAdditionKeys: _.keys(additions), describedStore}
+      stateChanged: false, oldExtensions: extensions, describedStore}
   }
 }
 
@@ -72,11 +67,9 @@ function getDescribe({Constructor, langs}) {
   }
 }
 
-function updatePhrase({phrase, props, additions, oldAdditionKeys, state}) {
+function updatePhrase({phrase, props, state}) {
   phrase.props = props
 
-  _.forEach(additions, (value, name) => phrase[name] = value)
-  _.forEach(oldAdditionKeys, (key) => delete phrase[key])
   phrase.state = state
   phrase.setState = function (nextState) {
     phrase._nextState = _.assign({}, phrase._nextState, nextState)
@@ -114,7 +107,12 @@ function getDescription({describe, extensions, phrase, props}) {
 
 function getRealProps({descriptor, Constructor}) {
   const realProps = _.defaults(descriptor.props || {}, Constructor.defaultProps || {})
-  realProps.children = _.flattenDeep(descriptor.children)
+  realProps.children = _.chain(descriptor.children)
+    .flattenDeep()
+    .map(child => (!child.props || child.props.id == null) ?
+      _.merge({}, child, {props: {id: _.uniqueId('_temp')}}) :
+      child)
+    .value()
   return realProps
 }
 
