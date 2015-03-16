@@ -6,8 +6,8 @@ import parse from './parse'
 import reconcile from './reconcile'
 
 function normalizeOutput (option) {
-  let output = _.pick(option.toJS(), ['match', 'completion', 'result', 'sentence'])
-  const suggestion = option.get('suggestion').toJS()
+  let output = _.pick(option, ['match', 'completion', 'result', 'sentence'])
+  const suggestion = option.suggestion
   let newSuggestions = []
   let i, l, lastSuggestion, oldSuggestion
 
@@ -65,9 +65,9 @@ export default class Parser {
     this._store = reconcile({descriptor, store: this._store, options})
 
     for (let output of parse({store: this._store, input, options})) {
-      if (output.get('text') === '') {
+      if (output.text === '') {
         // call each callback (used for limiting)
-        output.get('callbacks').forEach(callback => callback())
+        output.callbacks.forEach(callback => callback())
         yield normalizeOutput(output)
       }
     }

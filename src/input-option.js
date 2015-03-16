@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import I from 'immutable'
 
 function regexSplit (str) {
   return str.split('').map(function (char) {
@@ -19,7 +18,7 @@ const defaults = {
 }
 
 export function createOption(options) {
-  return I.fromJS(_.defaults(options, defaults))
+  return _.defaults(options, defaults)
 }
 
 function fuzzyMatch(option, text, string, category) {
@@ -38,15 +37,15 @@ function fuzzyMatch(option, text, string, category) {
         })
       }
     }
-    return I.fromJS({suggestion: suggestions, text: option.get('text').substring(text.length)})
+    return {suggestion: suggestions, text: option.text.substring(text.length)}
   }
   return null
 }
 
 function getActualFuzzy(option, fuzzyOverride) {
-  if (option.get('fuzzy') === 'none' || fuzzyOverride === 'none') {
+  if (option.fuzzy === 'none' || fuzzyOverride === 'none') {
     return 'none'
-  } else if (option.get('fuzzy') === 'phrase' || fuzzyOverride === 'phrase') {
+  } else if (option.fuzzy === 'phrase' || fuzzyOverride === 'phrase') {
     return 'phrase'
   } else {
     return 'all'
@@ -57,7 +56,7 @@ function matchString(option, string, options) {
   var i, substring
   var result
   var actualFuzzy = getActualFuzzy(option, options.fuzzy)
-  var text = option.get('text')
+  var text = option.text
 
   if (actualFuzzy === 'all') {
     for (i = Math.min(text.length, string.length); i > 0; i--) {
@@ -69,21 +68,21 @@ function matchString(option, string, options) {
     }
 
     // if there are no fuzzy matches
-    return I.fromJS({
+    return {
       suggestion: [{string: string, category: options.category, input: false}],
       text: text
-    })
+    }
   } else if (actualFuzzy === 'phrase') {
     return fuzzyMatch(option, text, string, options.category)
   } else {
     if (_.startsWith(string.toLowerCase(), text.toLowerCase())) {
-      return I.fromJS({
+      return {
         suggestion: [
           {string: string.substring(0, text.length), category: options.category, input: true},
           {string: string.substring(text.length), category: options.category, input: false}
         ],
         text: text.substring(string.length)
-      })
+      }
     } else {
       return null
     }
@@ -91,40 +90,43 @@ function matchString(option, string, options) {
 }
 
 export function handleString(option, string, options) {
-  const newWord = I.Map({
+  const newWord = {
     string: string,
     category: options.category
-  })
+  }
 
   // If the text is complete
-  if (option.get('text').length === 0) {
+  if (option.text.length === 0) {
     if (
-      (option.get('suggestion').count() === 0) || // no suggestion
-      (option.get('completion').count() === 0 && options.join) // no completion, and it's a join
+      (_.isEmpty(option.suggestion)) || // no suggestion
+      (_.isEmpty(option.completion) && options.join) // no completion, and it's a join
     ) {
-      return option.update('suggestion', suggestion => suggestion.push(newWord.set('input', false)))
+      newWord.input = false
+      return _.assign({}, option, {suggestion: option.suggestion.concat(newWord)})
 
     // There is a suggestion
     } else {
       // This is part of the completion
-      return option.update('completion', completion => completion.push(newWord))
+      return _.assign({}, option, {completion: option.completion.concat(newWord)})
     }
 
   // The text is not complete - it's a part of the text
   } else {
     // If the provided string is fully consumed by option.text
-    if (option.get('suggestion').count() === 0 && _.startsWith(option.get('text').toLowerCase(), string.toLowerCase())) {
+    if (_.isEmpty(option.suggestion) && _.startsWith(option.text.toLowerCase(), string.toLowerCase())) {
       // it's a match
-      return option
-        .update('match', match => match.push(newWord))
-        .update('text', text => text.substring(string.length))
+      return _.assign({}, option, {
+        match: option.match.concat(newWord),
+        text: option.text.substring(string.length)
+      })
     // the provided string is not fully consumed - it may be a suggestion
     } else {
       const matches = matchString(option, string, options)
       if (matches) {
-        return option
-          .update('suggestion', suggestion => suggestion.concat(matches.get('suggestion')))
-          .set('text', matches.get('text'))
+        return _.assign({}, option, {
+          suggestion: option.suggestion.concat(matches.suggestion),
+          text: matches.text
+        })
       } else {
         return null
       }

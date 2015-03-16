@@ -45,29 +45,38 @@ export default class Sequence extends Phrase {
   *_handleParse(input, options) {
     this.stores = reconcile({descriptor: this.props.children, store: this.stores, options})
 
-    yield* this.parseChild(0, input.set('result', {}), options)
+    yield* this.parseChild(0, _.assign({}, input, {result: {}}), options)
   }
 
   *parseChild(childIndex, input, options) {
     for (let output of parse({store: this.stores[childIndex], input, options})) {
-      const resultInput = output.update('result', result => {
-        const child = this.props.children[childIndex]
-        const childId = child.props && child.props.id
-        const childMerge = child.props && child.props.merge
-        if (childId) {
-          return _.merge({}, input.get('result'), {[childId]: result})
-        } else if (childMerge) {
-          return _.merge({}, input.get('result'), result)
-        } else {
-          return input.get('result')
-        }
-      })
+      let accumulatedResult = this.props.value
+      if (!this.props.value) {
+        accumulatedResult = getAccumulatedResult(input.result,
+          this.props.children[childIndex], output.result)
+      }
+      const nextOutput = _.assign({}, output, {result: accumulatedResult})
 
       if (childIndex === this.props.children.length - 1) {
-        yield resultInput.update('result', result => this.props.value || result)
+        yield nextOutput
       } else {
-        yield* this.parseChild(childIndex + 1, resultInput, options)
+        yield* this.parseChild(childIndex + 1, nextOutput, options)
       }
     }
   }
+
+}
+
+
+function getAccumulatedResult(inputResult, child, childResult) {
+  if (!_.isUndefined(childResult)) {
+    const childId = child.props && child.props.id
+    const childMerge = child.props && child.props.merge
+    if (childId) {
+       return _.merge({}, inputResult, {[childId]: childResult})
+    } else if (childMerge) {
+      return _.merge({}, inputResult, childResult)
+    }
+  }
+  return inputResult
 }

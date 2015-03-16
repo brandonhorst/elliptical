@@ -14,8 +14,8 @@ export default class Value extends Phrase {
     // if this has a category use that, else the last category on the stack
     let category = this.props.category
     if (_.isUndefined(category)) {
-      const stackEntry = input.get('stack').findLast(entry => !_.isUndefined(entry.get('category')))
-      category = stackEntry ? stackEntry.get('category') : null
+      const stackEntry = _.findLast(input.stack, entry => !_.isUndefined(entry.category))
+      category = stackEntry ? stackEntry.category : null
     }
 
     const handleStringOptions = {
@@ -26,14 +26,15 @@ export default class Value extends Phrase {
 
     let successes = 0
 
-    for (let suggestion of this.props.compute(input.get('text'))) {
+    for (let suggestion of this.props.compute(input.text)) {
       let success = false
 
       const newInput = handleString(input, suggestion.text, handleStringOptions)
       if (newInput !== null) {
-        yield newInput
-          .set('result', suggestion.value)
-          .update('callbacks', callbacks => callbacks.push(() => success = true))
+        yield _.assign({}, newInput, {
+          result: suggestion.value,
+          callbacks: newInput.callbacks.concat(() => success = true)
+        })
       }
 
       if (success) successes++
