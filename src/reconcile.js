@@ -23,44 +23,41 @@ function reconcileOne({descriptor, store, options, index}) {
   const prototypeObj = _.clone(Constructor.prototype)
 
   if (store && store.Constructor === Constructor) {
-    if (store.phrase._dataChanged || !_.isEqual(props, store.props) ||
+    if (store.phrase._stateChanged || !_.isEqual(props, store.props) ||
         !_.isEqual(extensions, store.oldExtensions) ||
         !_.isEqual(prototypeObj, store.oldPrototype)) {
       const phrase = store.phrase
-      const data = phrase._nextData || store.phrase.data
 
       const oldPrototype = _.clone(Constructor.prototype)
 
       const {observers, describedStore} = doLifeCycle({Constructor, phrase,
-        props, data, extensions, options, oldStore: store.describedStore})
+        props, extensions, options, oldStore: store.describedStore})
 
-      return _.assign({}, store, {props, dataChanged: false,
-        oldExtensions: extensions, oldPrototype: prototypeObj, describedStore})
+      return _.assign({}, store, {props, oldExtensions: extensions,
+        oldPrototype: prototypeObj, describedStore})
     } else {
       return store
     }
   } else {
     const phrase = createPhrase({Constructor})
-    const data = Constructor.initialData
+    const state = Constructor.initialState
 
     const {describedStore} = doLifeCycle({Constructor, phrase, props,
-      data, extensions, options})
+      state, extensions, options})
 
-    return {Constructor, phrase, props, nextData: data,
-      dataChanged: false, oldExtensions: extensions, oldPrototype: prototypeObj,
-      describedStore}
+    return {Constructor, phrase, props, oldExtensions: extensions,
+      oldPrototype: prototypeObj, describedStore}
   }
 }
 
 function createPhrase({Constructor}) {
   const phrase = new Constructor()
-  phrase._nextData = {}
 
   return phrase
 }
 
-function doLifeCycle({Constructor, phrase, props, data, extensions, options, oldStore}) {
-  setPropsAndData({phrase: phrase, props, data})
+function doLifeCycle({Constructor, phrase, props, state, extensions, options, oldStore, changed}) {
+  setPropsAndstate({phrase: phrase, props, state, changed: options.triggerReparse})
   const describe = getDescribe({Constructor, langs: options.langs})
   const description = getDescription({describe, props, extensions, phrase})
   const describedStore = description ?
@@ -83,13 +80,16 @@ function getDescribe({Constructor, langs}) {
   }
 }
 
-function setPropsAndData({phrase, props, data}) {
+function setPropsAndstate({phrase, props, state, changed}) {
   phrase.props = props
 
-  phrase.data = data
-  phrase.setData = function (nextData) {
-    _.merge(this._nextData, nextData)
-    this._dataChanged = true
+  if (!phrase.setState) {
+    phrase.state = state || {}
+    phrase.setState = function (nextState) {
+      _.merge(this.state, nextState)
+      this._stateChanged = true
+      changed(this)
+    }
   }
 }
 

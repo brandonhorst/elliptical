@@ -2,6 +2,7 @@
 import _ from 'lodash'
 import {createElement} from 'lacona-phrase'
 import {createOption} from './input-option'
+import {EventEmitter} from  'events'
 import parse from './parse'
 import reconcile from './reconcile'
 
@@ -28,8 +29,9 @@ function normalizeOutput (option) {
   return output
 }
 
-export default class Parser {
+export default class Parser extends EventEmitter {
   constructor({langs = ['default'], sentences = [], extensions = [], fuzzy} = {}) {
+    super()
     this.langs = langs
     this.sentences = sentences
     this.extensions = extensions
@@ -45,10 +47,11 @@ export default class Parser {
         acc.overriders.push(Extension)
       }
       return acc
-    }, {
-      supplementers: [],
-      overriders: []
-    })
+    }, {supplementers: [], overriders: []})
+  }
+
+  _triggerReparse() {
+    this.emit('change')
   }
 
   *parse(inputString) {
@@ -60,7 +63,11 @@ export default class Parser {
     const descriptor = <choice>{sentences}</choice>
 
     const input = createOption({fuzzy: this.fuzzy, text: inputString})
-    const options = {langs: this.langs, getExtensions: this._getExtensions.bind(this)}
+    const options = {
+      langs: this.langs,
+      getExtensions: this._getExtensions.bind(this),
+      triggerReparse: this._triggerReparse.bind(this)
+    }
 
     this._store = reconcile({descriptor, store: this._store, options})
 
