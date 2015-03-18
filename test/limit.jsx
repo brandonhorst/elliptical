@@ -141,45 +141,5 @@ describe('limit', () => {
       expect(fulltext.match(data[0])).to.equal('right')
       expect(fulltext.suggestion(data[0])).to.equal('also')
     })
-
-    it('allows for choices inside of repeats to be limited', () => {
-      parser.sentences = [
-        <repeat>
-          <choice limit={1}>
-            <literal text='aa' />
-            <literal text='ab' />
-            <literal text='ac' />
-          </choice>
-        </repeat>
-      ]
-
-      const data = from(parser.parse('aba'))
-      expect(data).to.have.length(2)
-      expect(fulltext.all(data[0])).to.equal('abaa')
-      expect(fulltext.all(data[1])).to.equal('abaaaa')
-    })
-
-    it('allows for choices inside of repeat separators to be limited', () => {
-      parser.sentences = [
-        <repeat>
-          <content>
-            <literal text='x' />
-          </content>
-          <separator>
-            <choice limit={1}>
-              <literal text='aa' />
-              <literal text='ab' />
-              <literal text='ac' />
-            </choice>
-          </separator>
-        </repeat>
-      ]
-
-      const data = from(parser.parse('xa'))
-      expect(data).to.have.length(1)
-      expect(fulltext.match(data[0])).to.equal('x')
-      expect(fulltext.suggestion(data[0])).to.equal('aa')
-      expect(fulltext.completion(data[0])).to.equal('x')
-    })
   })
 })
