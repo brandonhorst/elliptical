@@ -11,16 +11,16 @@ chai.use(sinonChai)
 
 function from(i) {const a = []; for (let x of i) a.push(x); return a}
 
-describe('state', () => {
+describe('data', () => {
   let parser
   beforeEach(function () {
     parser = new lacona.Parser()
   })
 
-  it('allows for initialState', () => {
+  it('allows for initialData', () => {
     class Test extends phrase.Phrase {
-      static get initialState() {return {test: 'testa'}}
-      describe() {return <literal text={this.state.test} />}
+      static get initialData() {return {test: 'testa'}}
+      describe() {return <literal text={this.data.test} />}
     }
 
     parser.sentences = [<Test />]
@@ -30,12 +30,12 @@ describe('state', () => {
     expect(fulltext.all(data[0])).to.equal('testa')
   })
 
-  it('allows Phrases to call setState', () => {
+  it('allows Phrases to call setData', () => {
     class Test extends phrase.Phrase {
-      static get initialState() { return {test: 'testa'} }
+      static get initialData() { return {test: 'testa'} }
       describe() {
-        this.setState({test: 'testb'})
-        return <literal text={this.state.test} />
+        this.setData({test: 'testb'})
+        return <literal text={this.data.test} />
       }
     }
 
@@ -48,14 +48,14 @@ describe('state', () => {
     expect(fulltext.all(data2[0])).to.equal('testb')
   })
 
-  it('parses are not redescribed if state does not change', () => {
+  it('parses are not redescribed if data does not change', () => {
     const descSpy = spy()
     class Test extends phrase.Phrase {
-      static get initialState() {return {test: 'testa'}}
+      static get initialData() {return {test: 'testa'}}
 
       describe() {
         descSpy()
-        return <literal text={this.state.test} />
+        return <literal text={this.data.test} />
       }
     }
 
@@ -75,11 +75,11 @@ describe('state', () => {
     class Test extends phrase.Phrase {
       constructor() { consSpy() }
 
-      static get initialState() {return {test: 'first'}}
+      static get initialData() {return {test: 'first'}}
 
       describe() {
-        this.setState({test: 'second'})
-        return <literal text={this.state.test} />
+        this.setData({test: 'second'})
+        return <literal text={this.data.test} />
       }
     }
 
@@ -107,11 +107,11 @@ describe('state', () => {
     class Test extends phrase.Phrase {
       constructor() { consSpy('main') }
 
-      static get initialState() { return {test: 'first'} }
+      static get initialData() { return {test: 'first'} }
 
       describe() {
-        this.setState({test: 'second'})
-        return <SubTest val={this.state.test} />
+        this.setData({test: 'second'})
+        return <SubTest val={this.data.test} />
       }
     }
 
