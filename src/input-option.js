@@ -42,23 +42,13 @@ function fuzzyMatch(option, text, string, category) {
   return null
 }
 
-function getActualFuzzy(option, fuzzyOverride) {
-  if (option.fuzzy === 'none' || fuzzyOverride === 'none') {
-    return 'none'
-  } else if (option.fuzzy === 'phrase' || fuzzyOverride === 'phrase') {
-    return 'phrase'
-  } else {
-    return 'all'
-  }
-}
-
 function matchString(option, string, options) {
   var i, substring
   var result
-  var actualFuzzy = getActualFuzzy(option, options.fuzzy)
+  var fuzzy = options.fuzzy || option.fuzzy
   var text = option.text
 
-  if (actualFuzzy === 'all') {
+  if (fuzzy === 'all') {
     for (i = Math.min(text.length, string.length); i > 0; i--) {
       substring = text.slice(0, i)
       result = fuzzyMatch(option, substring, string, options.category)
@@ -72,7 +62,7 @@ function matchString(option, string, options) {
       suggestion: [{string: string, category: options.category, input: false}],
       text: text
     }
-  } else if (actualFuzzy === 'phrase') {
+  } else if (fuzzy === 'phrase') {
     return fuzzyMatch(option, text, string, options.category)
   } else {
     if (_.startsWith(string.toLowerCase(), text.toLowerCase())) {
