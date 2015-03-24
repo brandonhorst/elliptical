@@ -96,24 +96,12 @@ function setPropsAndstate({phrase, props, state, changed}) {
 function getDescription({describe, extensions, phrase, props}) {
   if (describe) {
     let description = describe.call(phrase)
-    if (extensions.supplementers.length) {
-      const supplementers = extensions.supplementers.map(Supplementer => <Supplementer {...props} />)
+    if (extensions.length) {
+      const extensionElements = extensions.map(Extension => <Extension {...props} />)
       description = (
         <choice>
           {description}
-          {supplementers}
-        </choice>
-      )
-    }
-
-    if (extensions.overriders.length) {
-      const overriders = extensions.overriders.map(Overrider => <Overrider {...props} />)
-      description = (
-        <choice limit={1}>
-          <choice>
-            {overriders}
-          </choice>
-          {description}
+          {extensionElements}
         </choice>
       )
     }

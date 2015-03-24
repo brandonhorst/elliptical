@@ -54,14 +54,11 @@ export default class Parser extends EventEmitter {
 
   _getExtensions(Constructor) {
     return _.reduce(this.extensions, (acc, Extension) => {
-      if (_.includes(Extension.supplements, Constructor)) {
-        acc.supplementers.push(Extension)
-      }
-      if (_.includes(Extension.overrides, Constructor)) {
-        acc.overriders.push(Extension)
+      if (_.includes(Extension.extends, Constructor)) {
+        acc.push(Extension)
       }
       return acc
-    }, {supplementers: [], overriders: []})
+    }, [])
   }
 
   _triggerReparse() {

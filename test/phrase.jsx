@@ -13,14 +13,14 @@ describe('Phrase', () => {
     parser = new lacona.Parser()
   })
 
-  it('handles phrases with supplements', () => {
+  it('handles phrases with extends', () => {
     class Extended extends phrase.Phrase {
       describe() { return <literal text='test a' /> }
     }
 
     class Extender extends phrase.Phrase {
       describe() { return <literal text='test b' /> }
-      static get supplements() { return [Extended] }
+      static get extends() { return [Extended] }
     }
 
     parser.sentences = [<Extended />]
@@ -32,14 +32,14 @@ describe('Phrase', () => {
     expect(fulltext.suggestion(data[1])).to.equal('test b')
   })
 
-  it('accepts supplements being removed', () => {
+  it('accepts extends being removed', () => {
     class Extended extends phrase.Phrase {
       describe() { return <literal text='test a' /> }
     }
 
     class Extender extends phrase.Phrase {
       describe() { return <literal text='test b' /> }
-      static get supplements() {return [Extended]}
+      static get extends() {return [Extended]}
     }
 
     parser.sentences = [<Extended />]
@@ -55,23 +55,6 @@ describe('Phrase', () => {
     const data2 = from(parser.parse('t'))
     expect(data2).to.have.length(1)
     expect(fulltext.all(data2[0])).to.equal('test a')
-  })
-
-  it('handles phrases with overriding', () => {
-    class Overridden extends phrase.Phrase {
-      describe() { return <literal text='test a' /> }
-    }
-    class Overrider extends phrase.Phrase {
-      describe() { return <literal text='test b' /> }
-      static get overrides() {return [Overridden]}
-    }
-
-    parser.sentences = [<Overridden />]
-    parser.extensions = [Overrider]
-
-    const data = from(parser.parse('t'))
-    expect(data).to.have.length(1)
-    expect(fulltext.suggestion(data[0])).to.equal('test b')
   })
 
   it('allows for recursive phrases without creating an infinite loop', () => {

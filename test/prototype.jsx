@@ -88,7 +88,7 @@ describe('prototype', () => {
         return <literal text={'ext' + this.config} />
       }
     }
-    Extender.supplements = [Test]
+    Extender.extends = [Test]
     Extender.prototype.config = 'test'
 
     parser.extensions = [Extender]
