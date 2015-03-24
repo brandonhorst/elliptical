@@ -29,7 +29,8 @@ function *parseElement({store, input, options}) {
   // add this to the stack before doing anything
   const inputWithStack = _.assign({}, input, {stack: input.stack.concat({
     Constructor: store.Constructor,
-    category: store.props.category
+    category: store.props.category,
+    join: store.props.join
   })})
 
   if (store.describedStore) {

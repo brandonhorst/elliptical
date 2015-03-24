@@ -49,19 +49,30 @@ export default class Sequence extends Phrase {
   }
 
   *parseChild(childIndex, input, options) {
+    // lastText and lastTextSucceeded are a perf optimization.
+    //  It is likely that values will send back multiple outputs with the exact
+    //  same text in a row. If that is the case, and the next child cannot parse that text,
+    //  there is no need to parse the next ones with the same text. It will continue
+    //  until getting a new text
+    let lastText, lastTextSucceeded
+
     for (let output of parse({store: this.stores[childIndex], input, options})) {
-      let accumulatedResult = this.props.value
-      if (!this.props.value) {
-        accumulatedResult = getAccumulatedResult(input.result,
-          this.props.children[childIndex], output.result)
-      }
+      if (!lastTextSucceeded && output.text === lastText) continue
+      let accumulatedResult = this.props.value ||
+        getAccumulatedResult(input.result, this.props.children[childIndex], output.result)
       const nextOutput = _.assign({}, output, {result: accumulatedResult})
 
       if (childIndex === this.props.children.length - 1) {
+        lastTextSucceeded = true
         yield nextOutput
       } else {
-        yield* this.parseChild(childIndex + 1, nextOutput, options)
+        lastTextSucceeded = false
+        for (let childOutput of this.parseChild(childIndex + 1, nextOutput, options)) {
+          lastTextSucceeded = true
+          yield childOutput
+        }
       }
+      lastText = output.text
     }
   }
 

@@ -6,21 +6,6 @@ function regexSplit (str) {
   })
 }
 
-const defaults = {
-  fuzzy: 'none',
-  text: '',
-  match: [],
-  suggestion: [],
-  completion: [],
-  result: {},
-  stack: [],
-  callbacks: []
-}
-
-export function createOption(options) {
-  return _.defaults(options, defaults)
-}
-
 function fuzzyMatch(option, text, string, category) {
   var i, l
   var suggestions = []
@@ -42,16 +27,16 @@ function fuzzyMatch(option, text, string, category) {
   return null
 }
 
-function matchString(option, string, options) {
+function matchString(option, string, {category, join, fuzzy}) {
   var i, substring
   var result
-  var fuzzy = options.fuzzy || option.fuzzy
+  var trueFuzzy = fuzzy || option.fuzzy
   var text = option.text
 
-  if (fuzzy === 'all') {
+  if (trueFuzzy === 'all') {
     for (i = Math.min(text.length, string.length); i > 0; i--) {
       substring = text.slice(0, i)
-      result = fuzzyMatch(option, substring, string, options.category)
+      result = fuzzyMatch(option, substring, string, category)
       if (result) {
         return result
       }
@@ -59,17 +44,17 @@ function matchString(option, string, options) {
 
     // if there are no fuzzy matches
     return {
-      suggestion: [{string: string, category: options.category, input: false}],
+      suggestion: [{string: string, category, input: false}],
       text: text
     }
-  } else if (fuzzy === 'phrase') {
-    return fuzzyMatch(option, text, string, options.category)
+  } else if (trueFuzzy === 'phrase') {
+    return fuzzyMatch(option, text, string, category)
   } else {
     if (_.startsWith(string.toLowerCase(), text.toLowerCase())) {
       return {
         suggestion: [
-          {string: string.substring(0, text.length), category: options.category, input: true},
-          {string: string.substring(text.length), category: options.category, input: false}
+          {string: string.substring(0, text.length), category, input: true},
+          {string: string.substring(text.length), category, input: false}
         ],
         text: text.substring(string.length)
       }
@@ -79,18 +64,15 @@ function matchString(option, string, options) {
   }
 }
 
-export function handleString(option, string, options) {
+function handleString(option, string, {category, join, fuzzy}) {
   const newWord = {
     string: string,
-    category: options.category
+    category: category
   }
 
   // If the text is complete
   if (option.text.length === 0) {
-    if (
-      (_.isEmpty(option.suggestion)) || // no suggestion
-      (_.isEmpty(option.completion) && options.join) // no completion, and it's a join
-    ) {
+    if (_.isEmpty(option.suggestion) || (_.isEmpty(option.completion) && join)) {
       newWord.input = false
       return _.assign({}, option, {suggestion: option.suggestion.concat(newWord)})
 
@@ -111,7 +93,7 @@ export function handleString(option, string, options) {
       })
     // the provided string is not fully consumed - it may be a suggestion
     } else {
-      const matches = matchString(option, string, options)
+      const matches = matchString(option, string, {category, join, fuzzy})
       if (matches) {
         return _.assign({}, option, {
           suggestion: option.suggestion.concat(matches.suggestion),
@@ -122,4 +104,8 @@ export function handleString(option, string, options) {
       }
     }
   }
+}
+
+export default function mutate(option, computed) {
+
 }

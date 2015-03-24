@@ -1,15 +1,10 @@
 import _ from 'lodash'
-import {handleString} from '../input-option'
+// import {handleString} from '../input-option'
 import {Phrase} from 'lacona-phrase'
 
 export default class Value extends Phrase {
-  static getDefaultProps() {
-    return {
-      join: false,
-      fuzzy: 'all'
-    }
-  }
-
+  static get defaultProps() {return {suggest: () => [], compute: () => []}}
+  
   *_handleParse(input, options) {
     // if this has a category use that, else the last category on the stack
     let category = this.props.category
@@ -18,27 +13,52 @@ export default class Value extends Phrase {
       category = stackEntry ? stackEntry.category : null
     }
 
-    const handleStringOptions = {
-      join: this.props.join,
-      fuzzy: this.props.fuzzy,
-      category: category
+    let join = this.props.join
+    if (_.isUndefined(join)) {
+      const stackEntry = _.findLast(input.stack, entry => !_.isUndefined(entry.join))
+      join = stackEntry ? stackEntry.join : false
     }
 
     let successes = 0
 
-    for (let suggestion of this.props.compute(input.text)) {
-      let success = false
+    // TODO this is **super** WET
+    if (input.text === '') {
+      for (let output of this.props.suggest()) {
+        const modification = {}
+        let success = false
+        const word = {string: output.suggestion, category, input: false}
 
-      const newInput = handleString(input, suggestion.text, handleStringOptions)
-      if (newInput !== null) {
-        yield _.assign({}, newInput, {
-          result: suggestion.value,
-          callbacks: newInput.callbacks.concat(() => success = true)
-        })
+        if (_.isEmpty(input.suggestion) || (_.isEmpty(input.completion) && join)) {
+          modification.suggestion = input.suggestion.concat(word)
+        } else {
+          modification.completion = input.completion.concat(word)
+        }
+        modification.result = output.value
+
+        if (this.props.limit) modification.callbacks = input.callbacks.concat(() => success = true)
+        yield _.assign({}, input, modification)
+        if (success) successes++
+        if (this.props.limit && this.props.limit <= successes) break
       }
+    } else {
+      for (let output of this.props.compute(input.text)) {
+        const modification = {}
+        let success = false
+        const trueWords = output.words.map(word => ({string: word.text, category, input: word.input}))
 
-      if (success) successes++
-      if (this.props.limit && this.props.limit <= successes) break
+        if (_.isEmpty(input.suggestion) && _.every(output.words, 'input')) {
+          modification.match = input.match.concat(trueWords)
+        } else {
+          modification.suggestion = input.suggestion.concat(trueWords)
+        }
+        modification.result = output.value
+        modification.text = output.remaining
+
+        if (this.props.limit) modification.callbacks = input.callbacks.concat(() => success = true)
+        yield _.assign({}, input, modification)
+        if (success) successes++
+        if (this.props.limit && this.props.limit <= successes) break
+      }
     }
   }
 }

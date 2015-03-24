@@ -1,10 +1,24 @@
 /** @jsx createElement */
 import _ from 'lodash'
 import {createElement} from 'lacona-phrase'
-import {createOption} from './input-option'
 import {EventEmitter} from  'events'
 import parse from './parse'
 import reconcile from './reconcile'
+
+const optionDefaults = {
+  fuzzy: 'none',
+  text: '',
+  match: [],
+  suggestion: [],
+  completion: [],
+  result: {},
+  stack: [],
+  callbacks: []
+}
+
+export function createOption(options) {
+  return _.defaults(options, optionDefaults)
+}
 
 function normalizeOutput (option) {
   let output = _.pick(option, ['match', 'completion', 'result', 'sentence'])

@@ -26,4 +26,21 @@ describe('join', () => {
     expect(data).to.have.length(1)
     expect(fulltext.suggestion(data[0])).to.equal('aaabbb')
   })
+
+  it('inherits joins', () => {
+    parser.sentences = [
+      <sequence>
+        <literal text='aaa' />
+        <choice join={true}>
+          <literal text='bbb' />
+          <literal text='ccc' />
+        </choice>
+      </sequence>
+    ]
+
+    const data = from(parser.parse('a'))
+    expect(data).to.have.length(2)
+    expect(fulltext.suggestion(data[0])).to.equal('aaabbb')
+    expect(fulltext.suggestion(data[1])).to.equal('aaaccc')
+  })
 })

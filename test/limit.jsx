@@ -15,9 +15,39 @@ describe('limit', () => {
   })
 
   describe('value', () => {
-    it('limits calls to data', () => {
+    it('limits suggestions', () => {
+      function suggest() {
+        return [{suggestion: 'testa'}, {suggestion: 'testb'}, {suggestion: 'testc'}]
+      }
+
+      parser.sentences = [<value limit={2} suggest={suggest} />]
+
+      const data = from(parser.parse(''))
+      expect(data).to.have.length(2)
+      expect(fulltext.all(data[0])).to.equal('testa')
+      expect(fulltext.all(data[1])).to.equal('testb')
+    })
+
+    it('accepts fewer than limit suggestions', () => {
+      function suggest() {
+        return [{suggestion: 'testa'}, {suggestion: 'testb'}]
+      }
+
+      parser.sentences = [<value limit={3} suggest={suggest} />]
+
+      const data = from(parser.parse(''))
+      expect(data).to.have.length(2)
+      expect(fulltext.all(data[0])).to.equal('testa')
+      expect(fulltext.all(data[1])).to.equal('testb')
+    })
+
+    it('limits computations', () => {
       function compute(input) {
-        return [{text: 'testa'}, {text: 'testb'}, {text: 'testc'}]
+        return [
+          {words: [{text: 'testa', input: true}], remaining: ''},
+          {words: [{text: 'testb', input: true}], remaining: ''},
+          {words: [{text: 'testc', input: true}], remaining: ''}
+        ]
       }
 
       parser.sentences = [<value limit={2} compute={compute} />]
@@ -28,9 +58,12 @@ describe('limit', () => {
       expect(fulltext.all(data[1])).to.equal('testb')
     })
 
-    it('accepts fewer than limit', () => {
-      function compute(input) {
-        return [{text: 'testa'}, {text: 'testb'}]
+    it('accepts fewer than limit suggestions', () => {
+      function compute() {
+        return [
+          {words: [{text: 'testa', input: true}], remaining: ''},
+          {words: [{text: 'testb', input: true}], remaining: ''}
+        ]
       }
 
       parser.sentences = [<value limit={3} compute={compute} />]
@@ -39,18 +72,6 @@ describe('limit', () => {
       expect(data).to.have.length(2)
       expect(fulltext.all(data[0])).to.equal('testa')
       expect(fulltext.all(data[1])).to.equal('testb')
-    })
-
-    it('ignores invalids', () => {
-      function compute(input, data, done) {
-        return [{text: 'wrong'}, {text: 'testa'}, {text: 'testb'}]
-      }
-
-      parser.sentences = [<value limit={1} compute={compute} />]
-
-      const data = from(parser.parse('test'))
-      expect(data).to.have.length(1)
-      expect(fulltext.all(data[0])).to.equal('testa')
     })
   })
 
