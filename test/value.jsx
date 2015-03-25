@@ -92,21 +92,4 @@ describe('value', function () {
     expect(fulltext.all(data[0])).to.equal('tex')
     expect(data[0].result).to.equal('val')
   })
-
-  // it('can override fuzzy settings', () => {
-  //   function fun (input, data, done) {
-  //     return [
-  //       {text: 'tst', value: 'non-fuzzy'},
-  //       {text: 'test', value: 'fuzzy'}
-  //     ]
-  //   }
-  //
-  //   parser.sentences = [<value compute={fun} fuzzy='none' />]
-  //   parser.fuzzy = 'all'
-  //
-  //   const data = from(parser.parse('tst'))
-  //   expect(data).to.have.length(1)
-  //   expect(fulltext.match(data[0])).to.equal('tst')
-  //   expect(data[0].result).to.equal('non-fuzzy')
-  // })
 })

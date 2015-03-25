@@ -6,7 +6,6 @@ import parse from './parse'
 import reconcile from './reconcile'
 
 const optionDefaults = {
-  fuzzy: 'none',
   text: '',
   match: [],
   suggestion: [],
@@ -44,12 +43,11 @@ function normalizeOutput (option) {
 }
 
 export default class Parser extends EventEmitter {
-  constructor({langs = ['default'], sentences = [], extensions = [], fuzzy} = {}) {
+  constructor({langs = ['default'], sentences = [], extensions = []} = {}) {
     super()
     this.langs = langs
     this.sentences = sentences
     this.extensions = extensions
-    this.fuzzy = fuzzy
   }
 
   _getExtensions(Constructor) {
@@ -73,7 +71,7 @@ export default class Parser extends EventEmitter {
     const sentences = _.map(this.sentences, sentence => _.merge({}, sentence, {props: {__sentence: true}}))
     const descriptor = <choice>{sentences}</choice>
 
-    const input = createOption({fuzzy: this.fuzzy, text: inputString})
+    const input = createOption({text: inputString})
     const options = {
       langs: this.langs,
       getExtensions: this._getExtensions.bind(this),
