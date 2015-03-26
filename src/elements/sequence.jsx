@@ -5,10 +5,9 @@ import parse from '../parse'
 import reconcile from '../reconcile'
 
 function addSeparator (child, separator) {
-  if (child.props.optional) {
-    newChild = _.clone(child)
-    newChild.props = _.clone(child.props)
-    newChild.props.optional = false
+  if (child.props && child.props.optional) {
+    const newChild = _.merge({}, child, {props: {optional: false}})
+
     return <Sequence optional={true} merge={true}>{newChild}{separator}</Sequence>
   } else {
     return <Sequence merge={true}>{child}{separator}</Sequence>
@@ -18,9 +17,9 @@ function addSeparator (child, separator) {
 export default class Sequence extends Phrase {
   describe() {
     let content, separator
-    if (this.props.children.length > 0 && this.props.children[0].Constructor === 'content') {
+    if (this.props.children[0] && this.props.children[0].Constructor === 'content') {
       content = this.props.children[0].children
-      if (this.props.children.length > 1 && this.props.children[1].Constructor === 'separator') {
+      if (this.props.children[1] && this.props.children[1].Constructor === 'separator') {
         separator = this.props.children[1].children[0]
       }
     } else {
@@ -49,30 +48,23 @@ export default class Sequence extends Phrase {
   }
 
   *parseChild(childIndex, input, options) {
-    // lastText and lastTextSucceeded are a perf optimization.
-    //  It is likely that values will send back multiple outputs with the exact
-    //  same text in a row. If that is the case, and the next child cannot parse that text,
-    //  there is no need to parse the next ones with the same text. It will continue
-    //  until getting a new text
-    let lastText, lastTextSucceeded
+    if (childIndex >= this.props.children.length) {
+      yield input
+      return
+    }
+
+    const child = this.props.children[childIndex]
+
+    if (child.props && child.props.optional) {
+      yield* this.parseChild(childIndex + 1, input, options)
+    }
 
     for (let output of parse({store: this.stores[childIndex], input, options})) {
-      if (!lastTextSucceeded && output.text === lastText) continue
       let accumulatedResult = this.props.value ||
-        getAccumulatedResult(input.result, this.props.children[childIndex], output.result)
+        getAccumulatedResult(input.result, child, output.result)
       const nextOutput = _.assign({}, output, {result: accumulatedResult})
 
-      if (childIndex === this.props.children.length - 1) {
-        lastTextSucceeded = true
-        yield nextOutput
-      } else {
-        lastTextSucceeded = false
-        for (let childOutput of this.parseChild(childIndex + 1, nextOutput, options)) {
-          lastTextSucceeded = true
-          yield childOutput
-        }
-      }
-      lastText = output.text
+      yield* this.parseChild(childIndex + 1, nextOutput, options)
     }
   }
 

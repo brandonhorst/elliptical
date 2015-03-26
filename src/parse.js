@@ -16,10 +16,6 @@ export default function *parse({store, input, options}) {
     trueInput = _.assign({}, input, {sentence: store.phrase})
   }
 
-  if (store.props.optional) {
-    yield input
-  }
-
   for (let output of parseElement({store, input: trueInput, options})) {
     yield _.assign({}, output, {stack: output.stack.slice(0, -1)}) //pop stack
   }
