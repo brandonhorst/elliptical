@@ -4,7 +4,7 @@ import {Phrase} from 'lacona-phrase'
 
 export default class Value extends Phrase {
   static get defaultProps() {return {suggest: () => [], compute: () => []}}
-  
+
   *_handleParse(input, options) {
     // if this has a category use that, else the last category on the stack
     let category = this.props.category
@@ -34,6 +34,7 @@ export default class Value extends Phrase {
           modification.completion = input.completion.concat(word)
         }
         modification.result = output.value
+        modification.score = output.score
 
         if (this.props.limit) modification.callbacks = input.callbacks.concat(() => success = true)
         yield _.assign({}, input, modification)
@@ -52,6 +53,7 @@ export default class Value extends Phrase {
           modification.suggestion = input.suggestion.concat(trueWords)
         }
         modification.result = output.value
+        modification.score = output.score
         modification.text = output.remaining
 
         if (this.props.limit) modification.callbacks = input.callbacks.concat(() => success = true)

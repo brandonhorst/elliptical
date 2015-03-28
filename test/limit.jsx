@@ -162,5 +162,20 @@ describe('limit', () => {
       expect(fulltext.match(data[0])).to.equal('right')
       expect(fulltext.suggestion(data[0])).to.equal('also')
     })
+
+    it('limits even when ordered', () => {
+      parser.sentences = [
+        <choice limit={2} ordered={true}>
+          <literal text='rightSecond' score={2} />
+          <literal text='rightThird' score={3} />
+          <literal text='rightFirst' score={1} />
+        </choice>
+      ]
+
+      const data = from(parser.parse('right'))
+      expect(data).to.have.length(2)
+      expect(fulltext.all(data[0])).to.equal('rightFirst')
+      expect(fulltext.all(data[1])).to.equal('rightSecond')
+    })
   })
 })

@@ -10,7 +10,6 @@ const optionDefaults = {
   match: [],
   suggestion: [],
   completion: [],
-  result: {},
   stack: [],
   callbacks: []
 }

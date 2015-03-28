@@ -2,11 +2,29 @@
 import _ from 'lodash'
 import {createElement, Phrase} from 'lacona-phrase'
 
-function regexSplit (str) {
-  return str.split('').map(function (char) {
-    return char.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')
-  })
+function regexEscape (str) {
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')
 }
+
+function regexSplit (str) {
+  return str.split('').map(regexEscape)
+}
+
+function anywhereMatch(input, thisText) {
+  const fuzzyString = `^(.*?)(${regexEscape(input)})(.*?$)`
+  const fuzzyRegex = new RegExp(fuzzyString, 'i')
+  const fuzzyMatches = thisText.match(fuzzyRegex)
+
+  if (fuzzyMatches) {
+    return [
+      {text: fuzzyMatches[1], input: false},
+      {text: fuzzyMatches[2], input: true},
+      {text: fuzzyMatches[3], input: false}
+    ]
+  }
+  return null
+}
+
 
 function fuzzyMatch(input, thisText) {
   const fuzzyString = `^(.*?)(${regexSplit(input).join(')(.*?)(')})(.*?$)`
@@ -47,17 +65,30 @@ export default class Literal extends Phrase {
       if (this.props.text.length > input.length) {
         words.push({text: this.props.text.substring(input.length), input: false})
       }
-      return [{words, remaining: '', value: this.props.value}]
+      return [{
+        words,
+        remaining: '',
+        value: this.props.value,
+        score: this.props.score || 1
+      }]
     } else if (this.props.fuzzy) {
-      const words = fuzzyMatch(input, this.props.text)
-      if (words) {
-        return [{words, value: this.props.value, remaining: ''}]
-      } else {
-        return []
-      }
-    } else {
-      return []
+      let words = anywhereMatch(input, this.props.text)
+      if (words) return [{
+        words,
+        value: this.props.value,
+        remaining: '',
+        score: this.props.score || 2
+      }]
+
+      words = fuzzyMatch(input, this.props.text)
+      if (words) return [{
+        words,
+        value: this.props.value,
+        remaining: '',
+        score: this.props.score || 3
+      }]
     }
+    return []
   }
 
   describe() {
