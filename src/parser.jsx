@@ -3,7 +3,7 @@ import _ from 'lodash'
 import {createElement} from 'lacona-phrase'
 import {EventEmitter} from  'events'
 import parse from './parse'
-import reconcile from './reconcile'
+import {reconcile} from './reconcile'
 
 const optionDefaults = {
   text: '',
@@ -47,6 +47,8 @@ export default class Parser extends EventEmitter {
     this.langs = langs
     this.sentences = sentences
     this.extensions = extensions
+    this._sources = new Map()
+    this._reparseNeeded = false
   }
 
   _getExtensions(Constructor) {
@@ -59,7 +61,44 @@ export default class Parser extends EventEmitter {
   }
 
   _triggerReparse() {
-    this.emit('change')
+    this._reparseNeeded = true
+    process.nextTick(() => {
+      if (this._reparseNeeded) {
+        this._reparseNeeded = false
+        this.emit('change')
+      }
+    })
+  }
+
+  _getSource(SourceConstructor) {
+    if (this._sources.has(SourceConstructor)) {
+      const instance = this._sources.get(SourceConstructor)
+    } else {
+      const instance = new SourceConstructor()
+
+      instance.data = {}
+      instance.__dataVersion = 0
+      instance.__subscribers = 0
+      instance.setData = newData => {
+        _.merge(instance.data, newData)
+        instance.__dataVersion++
+        this._triggerReparse()
+      }
+      instance.replaceData = newData => {
+        instance.data = newData
+        instance.__dataVersion++
+        this._triggerReparse()
+      }
+
+      if (instance.create) instance.create()
+
+      this._sources.set(SourceConstructor, instance)
+      return instance
+    }
+  }
+
+  _removeSource(SourceConstructor) {
+    this._sources.delete(SourceConstructor)
   }
 
   *parse(inputString) {
@@ -74,17 +113,20 @@ export default class Parser extends EventEmitter {
     const options = {
       langs: this.langs,
       getExtensions: this._getExtensions.bind(this),
-      triggerReparse: this._triggerReparse.bind(this)
+      getSource: this._getSource.bind(this),
+      removeSource: this._removeSource.bind(this)
     }
 
-    this._store = reconcile({descriptor, store: this._store, options})
+    this._phrase = reconcile({descriptor, phrase: this._phrase, options})
 
-    for (let output of parse({store: this._store, input, options})) {
+    for (let output of parse({phrase: this._phrase, input, options})) {
       if (output.text === '') {
         // call each callback (used for limiting)
         output.callbacks.forEach(callback => callback())
         yield normalizeOutput(output)
       }
     }
+
+    this._reparseNeeded = false
   }
 }

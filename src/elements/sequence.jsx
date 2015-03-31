@@ -2,7 +2,7 @@
 import _ from 'lodash'
 import {createElement, Phrase} from 'lacona-phrase'
 import parse from '../parse'
-import reconcile from '../reconcile'
+import {reconcile} from '../reconcile'
 
 function addSeparator (child, separator) {
   if (child.props && child.props.optional) {
@@ -42,7 +42,7 @@ export default class Sequence extends Phrase {
   }
 
   *_handleParse(input, options) {
-    this.stores = reconcile({descriptor: this.props.children, store: this.stores, options})
+    this.childPhrases = reconcile({descriptor: this.props.children, phrase: this.childPhrases, options})
 
     yield* this.parseChild(0, _.assign({}, input, {result: {}}), options)
   }
@@ -59,7 +59,7 @@ export default class Sequence extends Phrase {
       yield* this.parseChild(childIndex + 1, input, options)
     }
 
-    for (let output of parse({store: this.stores[childIndex], input, options})) {
+    for (let output of parse({phrase: this.childPhrases[childIndex], input, options})) {
       let accumulatedResult = this.props.value ||
         getAccumulatedResult(input.result, child, output.result)
       const nextOutput = _.assign({}, output, {result: accumulatedResult})

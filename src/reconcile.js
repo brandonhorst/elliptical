@@ -3,68 +3,60 @@ import _ from 'lodash'
 import * as builtins from './elements'
 import {createElement} from 'lacona-phrase'
 
-export default function reconcile({descriptor, store, options}) {
+export function reconcile({descriptor, phrase, options}) {
   const func = _.isArray(descriptor) ? reconcileArray : reconcileOne
-  return func({descriptor, store, options})
+  return func({descriptor, phrase, options})
 }
 
-function reconcileArray({descriptor, store, options}) {
+function reconcileArray({descriptor, phrase, options}) {
   return _.chain(descriptor)
-    .zip(store)
-    .map(x => reconcile({descriptor: x[0], store: x[1], options}))
-    .flatten()
+    .zip(phrase)
+    .map(([descriptor, phrase]) => reconcile({descriptor, phrase, options}))
     .value()
 }
 
-function reconcileOne({descriptor, store, options, index}) {
+function reconcileOne({descriptor, phrase, options}) {
+  if (descriptor == null && phrase) return destroy({phrase, removeSource: options.removeSource})
+
   const Constructor = getConstructor({Constructor: descriptor.Constructor})
-  const props = getRealProps({descriptor, Constructor, index})
+  const props = getRealProps({descriptor, Constructor})
   const extensions = options.getExtensions(Constructor)
-  const prototypeObj = _.clone(Constructor.prototype)
 
-  if (store && store.Constructor === Constructor) {
-    if (store.phrase._stateChanged || !_.isEqual(props, store.props) ||
-        !_.isEqual(extensions, store.oldExtensions) ||
-        !_.isEqual(prototypeObj, store.oldPrototype)) {
-      const phrase = store.phrase
+  if (phrase && phrase.constructor === Constructor && _.isEqual(props, phrase.props)) {
+    if (_.some(phrase.__sources, obj => obj.lastVersion !== obj.source.__dataVersion) ||
+        !_.isEqual(extensions, phrase.__oldExtensions)) {
+      const describedPhrase = getDescribedPhrase({Constructor, phrase, extensions, options})
 
-      const oldPrototype = _.clone(Constructor.prototype)
+      phrase.__oldExtensions = extensions
+      phrase.__describedPhrase = describedPhrase
 
-      const {observers, describedStore} = doLifeCycle({Constructor, phrase,
-        props, extensions, options, oldStore: store.describedStore})
+      return phrase
 
-      return _.assign({}, store, {props, oldExtensions: extensions,
-        oldPrototype: prototypeObj, describedStore})
     } else {
-      return store
+      return phrase
     }
   } else {
-    const phrase = createPhrase({Constructor})
-    const state = Constructor.initialState
+    if (phrase) destroy({phrase, removeSource: options.removeSource})
 
-    const {describedStore} = doLifeCycle({Constructor, phrase, props,
-      state, extensions, options})
+    const newPhrase = new Constructor()
+    newPhrase.props = props
+    create({phrase: newPhrase, getSource: options.getSource})
 
-    return {Constructor, phrase, props, oldExtensions: extensions,
-      oldPrototype: prototypeObj, describedStore}
+    const describedPhrase = getDescribedPhrase({Constructor, phrase: newPhrase, extensions, options})
+
+    newPhrase.__oldExtensions = extensions
+    newPhrase.__describedPhrase = describedPhrase
+
+    return newPhrase
   }
 }
 
-function createPhrase({Constructor}) {
-  const phrase = new Constructor()
-
-  return phrase
-}
-
-function doLifeCycle({Constructor, phrase, props, state, extensions, options, oldStore, changed}) {
-  setPropsAndstate({phrase: phrase, props, state, changed: options.triggerReparse})
-  const describe = getDescribe({Constructor, langs: options.langs})
-  const description = getDescription({describe, props, extensions, phrase})
-  const describedStore = description ?
-    reconcile({descriptor: description, options, store: oldStore}) :
+function getDescribedPhrase({phrase, extensions, options}) {
+  const describe = getDescribe({Constructor: phrase.constructor, langs: options.langs})
+  const description = getDescription({describe, extensions, phrase})
+  return description ?
+    reconcile({descriptor: description, options, phrase: phrase.__describedPhrase}) :
     null
-
-  return {describedStore}
 }
 
 function getDescribe({Constructor, langs}) {
@@ -74,30 +66,29 @@ function getDescribe({Constructor, langs}) {
     return _.chain(langs.concat('default'))
       .map(lang => _.find(Constructor.translations, translations => {return _.includes(translations.langs, lang)}))
       .filter(_.negate(_.isUndefined))
-      .map(_.property('describe'))
       .first()
-      .value()
+      .value().describe
   }
 }
+//
+// function setPropsAndState({phrase, props, state, changed}) {
+//   phrase.props = props
+//
+//   if (!phrase.setState) {
+//     phrase.state = state || {}
+//     phrase.setState = function (nextState) {
+//       _.merge(this.state, nextState)
+//       this._stateChanged = true
+//       changed(this)
+//     }
+//   }
+// }
 
-function setPropsAndstate({phrase, props, state, changed}) {
-  phrase.props = props
-
-  if (!phrase.setState) {
-    phrase.state = state || {}
-    phrase.setState = function (nextState) {
-      _.merge(this.state, nextState)
-      this._stateChanged = true
-      changed(this)
-    }
-  }
-}
-
-function getDescription({describe, extensions, phrase, props}) {
+function getDescription({describe, extensions, phrase}) {
   if (describe) {
     let description = describe.call(phrase)
     if (extensions.length) {
-      const extensionElements = extensions.map(Extension => <Extension {...props} />)
+      const extensionElements = extensions.map(Extension => <Extension {...phrase.props} />)
       description = (
         <choice>
           {description}
@@ -126,6 +117,36 @@ function getConstructor({Constructor}) {
     }
   }
   return Constructor
+}
+
+export function destroy({phrase, removeSource}) {
+  if ((phrase.constructor === builtins.choice || phrase.constructor === builtins.sequence) && phrase.childPhrases) {
+    phrase.childPhrases.forEach(phrase => destroy({phrase, removeSource}))
+  }
+
+  _.forEach(phrase.__sources, ({source}) => {
+    source.__subscribers--
+    if (source.__subscribers === 0 && source.destroy) {
+      source.destroy()
+      removeSource(source.constructor)
+    }
+  })
+
+  if (phrase.destroy) phrase.destroy()
+}
+
+function create({phrase, getSource}) {
+  if (phrase.constructor.sources) {
+    if (!phrase.__sources) phrase.__sources = {}
+    _.forEach(phrase.constructor.sources, (SourceConstructor, name) => {
+      const source = getSource(SourceConstructor)
+      source.__subscribers++
+      phrase.__sources[name] = {source, lastVersion: 0}
+      Object.defineProperty(phrase, name, {get() {return phrase.__sources[name].source.data}})
+    })
+  }
+
+  if (phrase.create) phrase.create()
 }
 
 //TODO debug validation would be nice
