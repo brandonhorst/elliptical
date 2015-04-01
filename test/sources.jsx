@@ -17,17 +17,31 @@ describe('sources', () => {
     parser = new lacona.Parser()
   })
 
-  it('allows for initialData', () => {
+  it('create() is called, can set data', () => {
     class TestSource extends Source {
-      create() {
-        this.setData({test: 'testa'})
-      }
+      create() {this.setData({test: 'testa'})}
     }
 
     class Test extends Phrase {
-      static get sources() {return {data: TestSource}}
-
       describe() {return <literal text={this.data.test} />}
+      source() {return {data: <TestSource />}}
+    }
+
+    parser.sentences = [<Test />]
+
+    const data = from(parser.parse(''))
+    expect(data).to.have.length(1)
+    expect(fulltext.all(data[0])).to.equal('testa')
+  })
+
+  it('passes props to create', () => {
+    class TestSource extends Source {
+      create() {this.setData({test: this.props.test})}
+    }
+
+    class Test extends Phrase {
+      describe() {return <literal text={this.data.test} />}
+      source() {return {data: <TestSource test='testa' />}}
     }
 
     parser.sentences = [<Test />]
@@ -46,10 +60,8 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      static get sources() {return {data: TestSource}}
-      describe() {
-        return <literal text={this.data.test} />
-      }
+      source() {return {data: <TestSource />}}
+      describe() {return <literal text={this.data.test} />}
     }
 
     parser.sentences = [<Test />]
@@ -64,7 +76,7 @@ describe('sources', () => {
     })
   })
 
-  it('can export functions, which can be called on initialize', () => {
+  it('can export functions, which can be called on create', () => {
     class TestSource extends Source {
       create() {
         this.setData({
@@ -75,15 +87,9 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      static get sources() {return {data: TestSource}}
-
-      create() {
-        this.data.update()
-      }
-
-      describe() {
-        return <literal text={this.data.test} />
-      }
+      create() {this.data.update()}
+      source() {return {data: <TestSource />}}
+      describe() {return <literal text={this.data.test} />}
     }
 
     parser.sentences = [<Test />]
@@ -102,8 +108,7 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      static get sources() {return {data: TestSource}}
-
+      source() {return {data: <TestSource />}}
       describe() {
         descSpy()
         return <literal text={this.data.test} />
@@ -132,13 +137,9 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      static get sources() {return {data: TestSource}}
-
-      create() { consSpy() }
-
-      describe() {
-        return <literal text={this.data.test} />
-      }
+      source() {return {data: <TestSource />}}
+      create() {consSpy()}
+      describe() {return <literal text={this.data.test} />}
     }
 
     parser.sentences = [<Test />]
@@ -167,18 +168,14 @@ describe('sources', () => {
     }
 
     class SubTest extends Phrase {
-      create() { subConsSpy('sub') }
-
-      describe() { return <literal text={this.props.val} /> }
+      create() {subConsSpy('sub')}
+      describe() {return <literal text={this.props.val} />}
     }
 
     class Test extends Phrase {
-      static get sources() {return {data: TestSource}}
-      constructor() { consSpy('main') }
-
-      describe() {
-        return <SubTest val={this.data.test} />
-      }
+      create() { consSpy('main') }
+      source() {return {data: <TestSource />}}
+      describe() {return <SubTest val={this.data.test} />}
     }
 
     parser.sentences = [<Test />]
@@ -200,14 +197,11 @@ describe('sources', () => {
   it('setData does not trigger change event during a parse', (done) => {
     const changeSpy = spy()
     class TestSource extends Source {
-      create() {
-        this.setData({test: 'testb'})
-      }
+      create() {this.setData({test: 'testb'})}
     }
 
     class Test extends Phrase {
-      static get sources() {return {data: TestSource}}
-
+      source() {return {data: <TestSource />}}
       describe() {
         return <literal text='test' />
       }
@@ -235,8 +229,7 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      static get sources() {return {data: TestSource}}
-
+      source() {return {data: <TestSource />}}
       describe() {
         return <literal text='test' />
       }

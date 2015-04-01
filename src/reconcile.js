@@ -40,7 +40,13 @@ function reconcileOne({descriptor, phrase, options}) {
 
     const newPhrase = new Constructor()
     newPhrase.props = props
-    create({phrase: newPhrase, getSource: options.getSource})
+
+    const sourceCall = getCall({prop: 'source', Constructor, langs: options.langs})
+    if (sourceCall) {
+      applySources({sourceCall, phrase: newPhrase, getSource: options.getSource})
+    }
+
+    create({phrase: newPhrase})
 
     const describedPhrase = getDescribedPhrase({Constructor, phrase: newPhrase, extensions, options})
 
@@ -52,23 +58,27 @@ function reconcileOne({descriptor, phrase, options}) {
 }
 
 function getDescribedPhrase({phrase, extensions, options}) {
-  const describe = getDescribe({Constructor: phrase.constructor, langs: options.langs})
+  const describe = getCall({prop: 'describe', Constructor: phrase.constructor, langs: options.langs})
   const description = getDescription({describe, extensions, phrase})
   return description ?
     reconcile({descriptor: description, options, phrase: phrase.__describedPhrase}) :
     null
 }
 
-function getDescribe({Constructor, langs}) {
-  if (Constructor.prototype.describe) {
-    return Constructor.prototype.describe
+function getCall({Constructor, langs, prop}) {
+  if (Constructor.prototype[prop]) {
+    return Constructor.prototype[prop]
   } else if (Constructor.translations) {
-    return _.chain(langs.concat('default'))
-      .map(lang => _.find(Constructor.translations, translations => {return _.includes(translations.langs, lang)}))
-      .filter(_.negate(_.isUndefined))
-      .first()
-      .value().describe
+    return getCallFromTranslations({prop, langs, translations: Constructor.translations})
   }
+}
+
+function getCallFromTranslations({prop, langs, translations}) {
+  return _.chain(langs.concat('default'))
+    .map(lang => _.find(translations, obj => _.includes(obj.langs, lang)))
+    .filter(_.negate(_.isUndefined))
+    .first()
+    .value()[prop]
 }
 //
 // function setPropsAndState({phrase, props, state, changed}) {
@@ -124,29 +134,31 @@ export function destroy({phrase, removeSource}) {
     phrase.childPhrases.forEach(phrase => destroy({phrase, removeSource}))
   }
 
-  _.forEach(phrase.__sources, ({source}) => {
+  _.forEach(phrase.__sources, ({source, descriptor}) => {
     source.__subscribers--
     if (source.__subscribers === 0 && source.destroy) {
       source.destroy()
-      removeSource(source.constructor)
+      removeSource(descriptor)
     }
   })
 
   if (phrase.destroy) phrase.destroy()
 }
 
-function create({phrase, getSource}) {
-  if (phrase.constructor.sources) {
-    if (!phrase.__sources) phrase.__sources = {}
-    _.forEach(phrase.constructor.sources, (SourceConstructor, name) => {
-      const source = getSource(SourceConstructor)
-      source.__subscribers++
-      phrase.__sources[name] = {source, lastVersion: 0}
-      Object.defineProperty(phrase, name, {get() {return phrase.__sources[name].source.data}})
-    })
-  }
-
+function create({phrase}) {
   if (phrase.create) phrase.create()
+}
+
+function applySources({sourceCall, phrase, getSource}) {
+  const sources = sourceCall.call(phrase)
+  phrase.__sources = {}
+
+  _.forEach(sources, (descriptor, name) => {
+    const source = getSource(descriptor)
+    source.__subscribers++
+    phrase.__sources[name] = {source, lastVersion: 0, descriptor}
+    Object.defineProperty(phrase, name, {get() {return phrase.__sources[name].source.data}})
+  })
 }
 
 //TODO debug validation would be nice
