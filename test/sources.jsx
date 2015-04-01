@@ -51,6 +51,64 @@ describe('sources', () => {
     expect(fulltext.all(data[0])).to.equal('testa')
   })
 
+  it('sources with the same props share', () => {
+    class TestSource extends Source {
+      create() {this.setData({
+        test: 'testa',
+        set: input => this.setData({test: input})
+      })}
+    }
+
+    class Test extends Phrase {
+      create() {this.data.set('testb')}
+      source() {return {data: <TestSource />}}
+      describe() {return <literal text={this.data.test} />}
+    }
+    class Test2 extends Phrase {
+      source() {return {data: <TestSource />}}
+      describe() {return <literal text={this.data.test} />}
+    }
+
+    parser.sentences = [<Test />]
+    const data1 = from(parser.parse(''))
+    expect(data1).to.have.length(1)
+    expect(fulltext.all(data1[0])).to.equal('testb')
+
+    parser.sentences = [<Test2 />]
+    const data2 = from(parser.parse(''))
+    expect(data2).to.have.length(1)
+    expect(fulltext.all(data2[0])).to.equal('testb')
+  })
+
+  it('sources with different props do not share', () => {
+    class TestSource extends Source {
+      create() {this.setData({
+        test: 'testa',
+        set: input => this.setData({test: input})
+      })}
+    }
+
+    class Test extends Phrase {
+      create() {this.data.set('testb')}
+      source() {return {data: <TestSource id='something' />}}
+      describe() {return <literal text={this.data.test} />}
+    }
+    class Test2 extends Phrase {
+      source() {return {data: <TestSource />}}
+      describe() {return <literal text={this.data.test} />}
+    }
+
+    parser.sentences = [<Test />]
+    const data1 = from(parser.parse(''))
+    expect(data1).to.have.length(1)
+    expect(fulltext.all(data1[0])).to.equal('testb')
+
+    parser.sentences = [<Test2 />]
+    const data2 = from(parser.parse(''))
+    expect(data2).to.have.length(1)
+    expect(fulltext.all(data2[0])).to.equal('testa')
+  })
+
   it('calls create, which can setData', done => {
     class TestSource extends Source {
       create() {

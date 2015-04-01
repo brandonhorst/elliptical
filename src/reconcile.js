@@ -42,9 +42,9 @@ function reconcileOne({descriptor, phrase, options}) {
     newPhrase.props = props
 
     const sourceCall = getCall({prop: 'source', Constructor, langs: options.langs})
-    if (sourceCall) {
-      applySources({sourceCall, phrase: newPhrase, getSource: options.getSource})
-    }
+    const sources = sourceCall ? sourceCall.call(phrase) : {}
+    const allSources = _.defaults({}, sources, Constructor.__additionalSources)
+    applySources({sources: allSources, phrase: newPhrase, getSource: options.getSource})
 
     create({phrase: newPhrase})
 
@@ -149,8 +149,7 @@ function create({phrase}) {
   if (phrase.create) phrase.create()
 }
 
-function applySources({sourceCall, phrase, getSource}) {
-  const sources = sourceCall.call(phrase)
+function applySources({sources, phrase, getSource}) {
   phrase.__sources = {}
 
   _.forEach(sources, (descriptor, name) => {

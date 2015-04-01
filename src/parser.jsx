@@ -107,6 +107,14 @@ export default class Parser extends EventEmitter {
       throw new Error('lacona parse input must be a string')
     }
 
+    //apply global sources
+    this.sentences.forEach(({Constructor}) => {
+      Constructor.__additionalSources = _.defaults({}, Constructor.__additionalSources, this.__additionalSources)
+    })
+    this.extensions.forEach(Extension => {
+      Extension.__additionalSources = _.defaults({}, Extension.__additionalSources, this.__additionalSources)
+    })
+
     const sentences = _.map(this.sentences, sentence => _.merge({}, sentence, {props: {__sentence: true}}))
     const descriptor = <choice>{sentences}</choice>
 
