@@ -3,8 +3,6 @@ import _ from 'lodash'
 import {Phrase} from 'lacona-phrase'
 
 export default class Value extends Phrase {
-  static get defaultProps() {return {suggest: () => [], compute: () => []}}
-
   *_handleParse(input, options) {
     // if this has a category use that, else the last category on the stack
     let category = this.props.category
@@ -35,11 +33,11 @@ export default class Value extends Phrase {
         }
         modification.result = output.value
         modification.score = output.score
+        modification.callbacks = input.callbacks.concat(() => success = true)
 
-        if (this.props.limit) modification.callbacks = input.callbacks.concat(() => success = true)
         yield _.assign({}, input, modification)
         if (success) successes++
-        if (this.props.limit && this.props.limit <= successes) break
+        if (this.props.limit <= successes) break
       }
     } else {
       for (let output of this.props.compute(input.text)) {
@@ -55,12 +53,18 @@ export default class Value extends Phrase {
         modification.result = output.value
         modification.score = output.score
         modification.text = output.remaining
+        modification.callbacks = input.callbacks.concat(() => success = true)
 
-        if (this.props.limit) modification.callbacks = input.callbacks.concat(() => success = true)
         yield _.assign({}, input, modification)
         if (success) successes++
-        if (this.props.limit && this.props.limit <= successes) break
+        if (this.props.limit <= successes) break
       }
     }
   }
+}
+
+Value.defaultProps = {
+  suggest: () => [],
+  compute: () => [],
+  limit: 100
 }

@@ -19,18 +19,15 @@ export default class Choice extends Phrase {
           const index = _.sortedIndex(scoredOutputs, obj, obj => obj.output.score)
           scoredOutputs.splice(index, 0, obj)
         } else {
-          if (this.props.limit || this.props.value) {
-            output = _.assign({}, output, {
-              callbacks: output.callbacks.concat(() => success = true),
-              result: this.props.value || output.result
-            })
-          }
-          yield output
+          yield _.assign({}, output, {
+            callbacks: output.callbacks.concat(() => success = true),
+            result: this.props.value || output.result
+          })
         }
       }
 
       if (success) successes++
-      if (this.props.limit && this.props.limit <= successes) break
+      if (this.props.limit <= successes) break
     }
 
     if (this.props.ordered) {
@@ -48,8 +45,10 @@ export default class Choice extends Phrase {
         yield output
 
         if (success) childSet.add(childDescription)
-        if (this.props.limit && this.props.limit <= childSet.size) break
+        if (this.props.limit <= childSet.size) break
       }
     }
   }
 }
+
+Choice.defaultProps = {limit: 100}
