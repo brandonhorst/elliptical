@@ -109,6 +109,7 @@ export default class Parser extends EventEmitter {
 
     //apply global sources
     this.sentences.forEach(({Constructor}) => {
+      if (_.isString(Constructor)) return
       Constructor.__additionalSources = _.defaults({}, Constructor.__additionalSources, this.__additionalSources)
     })
     this.extensions.forEach(Extension => {
