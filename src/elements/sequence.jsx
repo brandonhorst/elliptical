@@ -55,16 +55,16 @@ export default class Sequence extends Phrase {
 
     const child = this.props.children[childIndex]
 
-    if (child.props && child.props.optional) {
-      yield* this.parseChild(childIndex + 1, input, options)
-    }
-
     for (let output of parse({phrase: this.childPhrases[childIndex], input, options})) {
       let accumulatedResult = this.props.value ||
         getAccumulatedResult(input.result, child, output.result)
       const nextOutput = _.assign({}, output, {result: accumulatedResult})
 
       yield* this.parseChild(childIndex + 1, nextOutput, options)
+    }
+
+    if (child.props && child.props.optional) {
+      yield* this.parseChild(childIndex + 1, input, options)
     }
   }
 

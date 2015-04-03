@@ -58,8 +58,8 @@ describe('sequence', function () {
 
     const data = from(parser.parse('superm'))
     expect(data).to.have.length(2)
-    expect(fulltext.suggestion(data[0])).to.equal('man')
-    expect(fulltext.suggestion(data[1])).to.equal('maximum')
+    expect(fulltext.suggestion(data[0])).to.equal('maximum')
+    expect(fulltext.suggestion(data[1])).to.equal('man')
   })
 
   it('handles an optional child without a separator', () => {
@@ -73,8 +73,8 @@ describe('sequence', function () {
 
     const data = from(parser.parse('superm'))
     expect(data).to.have.length(2)
-    expect(fulltext.suggestion(data[0])).to.equal('man')
-    expect(fulltext.suggestion(data[1])).to.equal('maximum')
+    expect(fulltext.suggestion(data[0])).to.equal('maximum')
+    expect(fulltext.suggestion(data[1])).to.equal('man')
   })
 
   it('handles an optional child with a separator', () => {
@@ -93,8 +93,8 @@ describe('sequence', function () {
 
     const data = from(parser.parse('super m'))
     expect(data).to.have.length(2)
-    expect(fulltext.suggestion(data[0])).to.equal('man')
-    expect(fulltext.suggestion(data[1])).to.equal('maximum')
+    expect(fulltext.suggestion(data[0])).to.equal('maximum')
+    expect(fulltext.suggestion(data[1])).to.equal('man')
   })
 
   it('does not take an optional childs value', () => {
@@ -108,10 +108,10 @@ describe('sequence', function () {
 
     const data = from(parser.parse('superm'))
     expect(data).to.have.length(2)
-    expect(fulltext.suggestion(data[0])).to.equal('man')
-    expect(fulltext.suggestion(data[1])).to.equal('maximum')
-    expect(data[0].result.opt).to.be.undefined
-    expect(data[1].result.opt).to.equal('someValue')
+    expect(fulltext.suggestion(data[0])).to.equal('maximum')
+    expect(fulltext.suggestion(data[1])).to.equal('man')
+    expect(data[0].result.opt).to.equal('someValue')
+    expect(data[1].result.opt).to.be.undefined
   })
 
   it('can set a value to the result', () => {
