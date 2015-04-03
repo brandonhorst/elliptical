@@ -103,4 +103,18 @@ describe('fuzzy: phrase', () => {
     const data = from(parser.parse('ad'))
     expect(data).to.be.empty
   })
+
+  it('when ordered, orders according to score', () => {
+    parser.sentences = [
+      <choice ordered={true}>
+        <literal text='right' score={0.5} />
+        <literal text='rightFirst' score={1} />
+      </choice>
+    ]
+
+    const data = from(parser.parse('r'))
+    expect(data).to.have.length(2)
+    expect(fulltext.suggestion(data[0])).to.equal('rightFirst')
+    expect(fulltext.suggestion(data[1])).to.equal('right')
+  })
 })

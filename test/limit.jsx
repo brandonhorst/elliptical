@@ -166,8 +166,8 @@ describe('limit', () => {
     it('limits even when ordered', () => {
       parser.sentences = [
         <choice limit={2} ordered={true}>
-          <literal text='rightSecond' score={2} />
-          <literal text='rightThird' score={3} />
+          <literal text='rightSecond' score={.6} />
+          <literal text='rightThird' score={.3} />
           <literal text='rightFirst' score={1} />
         </choice>
       ]

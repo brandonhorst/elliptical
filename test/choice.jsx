@@ -114,7 +114,7 @@ describe('choice', () => {
   it('when ordered, orders according to score', () => {
     parser.sentences = [
       <choice ordered={true}>
-        <literal text='right' score={2} />
+        <literal text='right' score={0.5} />
         <literal text='rightFirst' score={1} />
       </choice>
     ]

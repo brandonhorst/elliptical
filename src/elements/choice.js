@@ -16,7 +16,7 @@ export default class Choice extends Phrase {
       for (let output of parse({phrase: childPhrase, input, options})) {
         if (this.props.ordered) {
           const obj = {output, childDescription}
-          const index = _.sortedIndex(scoredOutputs, obj, obj => obj.output.score)
+          const index = _.sortedIndex(scoredOutputs, obj, obj => -obj.output.score)
           scoredOutputs.splice(index, 0, obj)
         } else {
           yield _.assign({}, output, {
@@ -36,13 +36,10 @@ export default class Choice extends Phrase {
       for (let {output, childDescription} of scoredOutputs) {
         let success = false
 
-        if (this.props.limit || this.props.value) {
-          output = _.assign({}, output, {
-            callbacks: output.callbacks.concat(() => success = true),
-            result: this.props.value || output.result
-          })
-        }
-        yield output
+        yield _.assign({}, output, {
+          callbacks: output.callbacks.concat(() => success = true),
+          result: this.props.value || output.result
+        })
 
         if (success) childSet.add(childDescription)
         if (this.props.limit <= childSet.size) break

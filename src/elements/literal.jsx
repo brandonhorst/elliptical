@@ -1,50 +1,7 @@
 /** @jsx createElement */
 import _ from 'lodash'
+import {match} from '../fuzzy'
 import {createElement, Phrase} from 'lacona-phrase'
-
-function regexEscape (str) {
-  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')
-}
-
-function regexSplit (str) {
-  return str.split('').map(regexEscape)
-}
-
-function anywhereMatch(input, thisText) {
-  const fuzzyString = `^(.*?)(${regexEscape(input)})(.*?$)`
-  const fuzzyRegex = new RegExp(fuzzyString, 'i')
-  const fuzzyMatches = thisText.match(fuzzyRegex)
-
-  if (fuzzyMatches) {
-    return [
-      {text: fuzzyMatches[1], input: false},
-      {text: fuzzyMatches[2], input: true},
-      {text: fuzzyMatches[3], input: false}
-    ]
-  }
-  return null
-}
-
-
-function fuzzyMatch(input, thisText) {
-  const fuzzyString = `^(.*?)(${regexSplit(input).join(')(.*?)(')})(.*?$)`
-  const fuzzyRegex = new RegExp(fuzzyString, 'i')
-  const fuzzyMatches = thisText.match(fuzzyRegex)
-
-  if (fuzzyMatches) {
-    const words = []
-    for (let i = 1, l = fuzzyMatches.length; i < l; i++) {
-      if (fuzzyMatches[i].length > 0) {
-        words.push({
-          text: fuzzyMatches[i],
-          input: i % 2 === 0
-        })
-      }
-    }
-    return words
-  }
-  return null
-}
 
 export default class Literal extends Phrase {
   suggest() {
@@ -63,7 +20,8 @@ export default class Literal extends Phrase {
       return [{
         words: [{text: thisTextLine, input: true}],
         remaining: input.substring(thisTextLine.length),
-        value: this.props.value
+        value: this.props.value,
+        score: 1
       }]
     } else if (_.startsWith(thisTextLower, inputLower)) {
       const words = [{text: thisTextLine.substring(0, input.length), input: true}]
@@ -74,24 +32,15 @@ export default class Literal extends Phrase {
         words,
         remaining: '',
         value: this.props.value,
-        score: this.props.score || 1
+        score: this.props.score || 0.75
       }]
     } else if (this.props.fuzzy) {
-      let words = anywhereMatch(input, thisTextLine)
-      if (words) return [{
-        words,
-        value: this.props.value,
-        remaining: '',
-        score: this.props.score || 2
-      }]
-
-      words = fuzzyMatch(input, thisTextLine)
-      if (words) return [{
-        words,
-        value: this.props.value,
-        remaining: '',
-        score: this.props.score || 3
-      }]
+      const result = match(input, thisTextLine)
+      if (result) {
+        result.remaining = ''
+        result.value = this.props.value
+        return [result]
+      }
     }
     return []
   }
