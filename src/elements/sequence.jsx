@@ -72,11 +72,11 @@ export default class Sequence extends Phrase {
 
 
 function getAccumulatedResult(inputResult, child, childResult) {
-  if (!_.isUndefined(childResult)) {
-    const childId = child.props && child.props.id
-    const childMerge = child.props && child.props.merge
+  if (!_.isUndefined(childResult) && child.props) {
+    const childId = child.props.id
+    const childMerge = child.props.merge
     if (childId) {
-       return _.merge({}, inputResult, {[childId]: childResult})
+       return _.assign({}, inputResult, {[childId]: childResult})
     } else if (childMerge) {
       return _.merge({}, inputResult, childResult)
     }
