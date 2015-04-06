@@ -41,6 +41,7 @@
     "sinon-chai": "^2.7.0"
   },
   "dependencies": {
+    "fuz": "0.0.1",
     "lacona-phrase": "^0.7.0",
     "lodash": "^3.6.0"
   }

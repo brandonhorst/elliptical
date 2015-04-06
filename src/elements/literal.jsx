@@ -1,6 +1,6 @@
 /** @jsx createElement */
 import _ from 'lodash'
-import {match} from '../fuzzy'
+import {match} from 'fuz'
 import {createElement, Phrase} from 'lacona-phrase'
 
 export default class Literal extends Phrase {
