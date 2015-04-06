@@ -43,19 +43,4 @@ describe('literal', function () {
     expect(data).to.have.length(1)
     expect(fulltext.suggestion(data[0])).to.equal('Test')
   })
-
-  it('orders by front, anywhere, fuzzy', () => {
-    parser.sentences = [
-      <choice ordered={true}>
-        <literal text='xaxbxc' fuzzy={true} />
-        <literal text='xxxabc' fuzzy={true} />
-        <literal text='abc' fuzzy={true} />
-      </choice>
-    ]
-    const data = from(parser.parse(''))
-    expect(data).to.have.length(3)
-    expect(fulltext.all(data[0])).to.equal('abc')
-    expect(fulltext.all(data[1])).to.equal('xxxabc')
-    expect(fulltext.all(data[2])).to.equal('xaxbxc')
-  })
 })

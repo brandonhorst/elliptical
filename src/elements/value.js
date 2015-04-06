@@ -32,7 +32,7 @@ export default class Value extends Phrase {
           modification.completion = input.completion.concat(word)
         }
         modification.result = output.value
-        modification.score = output.score
+        modification.score = output.score || 1
         modification.callbacks = input.callbacks.concat(() => success = true)
 
         yield _.assign({}, input, modification)
@@ -51,7 +51,7 @@ export default class Value extends Phrase {
           modification.suggestion = input.suggestion.concat(trueWords)
         }
         modification.result = output.value
-        modification.score = output.score
+        modification.score = output.score || 1
         modification.text = output.remaining
         modification.callbacks = input.callbacks.concat(() => success = true)
 

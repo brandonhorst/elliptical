@@ -44,7 +44,7 @@ export default class Sequence extends Phrase {
   *_handleParse(input, options) {
     this.childPhrases = reconcile({descriptor: this.props.children, phrase: this.childPhrases, options})
 
-    yield* this.parseChild(0, _.assign({}, input, {result: {}}), options)
+    yield* this.parseChild(0, _.assign({}, input, {result: {}, score: 1}), options)
   }
 
   *parseChild(childIndex, input, options) {
@@ -54,11 +54,16 @@ export default class Sequence extends Phrase {
     }
 
     const child = this.props.children[childIndex]
+    let success = false
 
     for (let output of parse({phrase: this.childPhrases[childIndex], input, options})) {
-      let accumulatedResult = this.props.value ||
-        getAccumulatedResult(input.result, child, output.result)
-      const nextOutput = _.assign({}, output, {result: accumulatedResult})
+      const accumulatedResult = this.props.value || getAccumulatedResult(input.result, child, output.result)
+      const newScore = input.score *  output.score
+      const nextOutput = _.assign({}, output, {
+        result: accumulatedResult,
+        score: newScore,
+        callbacks: output.callbacks.concat(() => success = true)
+      })
 
       yield* this.parseChild(childIndex + 1, nextOutput, options)
     }
@@ -67,9 +72,7 @@ export default class Sequence extends Phrase {
       yield* this.parseChild(childIndex + 1, input, options)
     }
   }
-
 }
-
 
 function getAccumulatedResult(inputResult, child, childResult) {
   if (!_.isUndefined(childResult) && child.props) {

@@ -7,7 +7,7 @@ export default class Literal extends Phrase {
   suggest() {
     if (this.props.text == null) return []
 
-    return [{suggestion: this.props.text.replace(/\n/g, ''), value: this.props.value}]
+    return [{suggestion: this.props.text.replace(/\n/g, ''), value: this.props.value, score: 1}]
   }
 
   compute(input) {
@@ -21,7 +21,7 @@ export default class Literal extends Phrase {
         words: [{text: thisTextLine, input: true}],
         remaining: input.substring(thisTextLine.length),
         value: this.props.value,
-        score: 1
+        score: this.props.score || 1
       }]
     } else if (_.startsWith(thisTextLower, inputLower)) {
       const words = [{text: thisTextLine.substring(0, input.length), input: true}]
@@ -32,13 +32,14 @@ export default class Literal extends Phrase {
         words,
         remaining: '',
         value: this.props.value,
-        score: this.props.score || 0.75
+        score: this.props.score || 1
       }]
     } else if (this.props.fuzzy) {
       const result = match(input, thisTextLine)
       if (result) {
         result.remaining = ''
         result.value = this.props.value
+        result.score = this.props.score || result.score
         return [result]
       }
     }

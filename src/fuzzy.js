@@ -27,14 +27,14 @@ function regexSplit (str) {
 }
 
 function anywhereMatch(input, thisText) {
-  const index = input.toLowerCase().indexOf(thisText)
+  const index = thisText.toLowerCase().indexOf(input)
 
   if (index > -1) {
-    const endIndex = index + thisText.length
+    const endIndex = index + input.length
     return [
-      {text: input.slice(0, index), input: false},
-      {text: input.slice(index, endIndex), input: true},
-      {text: input.slice(endIndex), input: false}
+      {text: thisText.slice(0, index), input: false},
+      {text: thisText.slice(index, endIndex), input: true},
+      {text: thisText.slice(endIndex), input: false}
     ]
   }
   return null

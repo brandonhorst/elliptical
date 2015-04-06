@@ -92,4 +92,33 @@ describe('value', function () {
     expect(fulltext.all(data[0])).to.equal('tex')
     expect(data[0].result).to.equal('val')
   })
+
+  it('can set the score (suggest)', () => {
+    function fun() {
+      return [{suggestion: 'tex', value: 'val', score: 0.5}]
+    }
+
+    parser.sentences = [<value suggest={fun} />]
+
+    const data = from(parser.parse(''))
+    expect(data).to.have.length(1)
+    expect(data[0].score).to.equal(0.5)
+  })
+
+  it('can set the score (suggest)', () => {
+    function fun(input) {
+      return [{
+        words: [{text: 'test', input: true}],
+        value: 'val',
+        remaining: '',
+        score: 0.5
+      }]
+    }
+
+    parser.sentences = [<value compute={fun} />]
+
+    const data = from(parser.parse('test'))
+    expect(data).to.have.length(1)
+    expect(data[0].score).to.equal(0.5)
+  })
 })

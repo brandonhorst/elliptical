@@ -14,21 +14,26 @@ export default class Choice extends Phrase {
       let success = false
 
       for (let output of parse({phrase: childPhrase, input, options})) {
-        if (this.props.ordered) {
-          const obj = {output, childDescription}
-          const index = _.sortedIndex(scoredOutputs, obj, obj => -obj.output.score)
-          scoredOutputs.splice(index, 0, obj)
-        } else {
-          yield _.assign({}, output, {
-            callbacks: output.callbacks.concat(() => success = true),
-            result: this.props.value || output.result
-          })
-        }
+        yield _.assign({}, output, {
+          callbacks: output.callbacks.concat(() => success = true),
+          result: this.props.value || output.result
+        })
       }
 
       if (success) successes++
       if (this.props.limit <= successes) break
     }
+  }
+}
+
+Choice.defaultProps = {limit: 100}
+
+        /*if (this.props.ordered) {
+          const obj = {output, childDescription}
+          const index = _.sortedLastIndex(scoredOutputs, obj, obj => -obj.output.score)
+          scoredOutputs.splice(index, 0, obj)
+        } else {
+
 
     if (this.props.ordered) {
       const childSet = new Set()
@@ -44,8 +49,4 @@ export default class Choice extends Phrase {
         if (success) childSet.add(childDescription)
         if (this.props.limit <= childSet.size) break
       }
-    }
-  }
-}
-
-Choice.defaultProps = {limit: 100}
+    }*/

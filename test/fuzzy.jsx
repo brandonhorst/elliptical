@@ -7,7 +7,7 @@ import * as phrase from 'lacona-phrase'
 
 function from(i) {const a = []; for (let x of i) a.push(x); return a}
 
-describe('fuzzy: phrase', () => {
+describe('fuzzy', () => {
   let parser
 
   beforeEach(() => {
@@ -104,17 +104,37 @@ describe('fuzzy: phrase', () => {
     expect(data).to.be.empty
   })
 
-  it('when ordered, orders according to score', () => {
+  it('assigns a score for different match types', () => {
     parser.sentences = [
-      <choice ordered={true}>
-        <literal text='right' score={0.5} />
-        <literal text='rightFirst' score={1} />
+      <choice>
+        <literal text='abc' fuzzy={true} />
+        <literal text='abcdef' fuzzy={true} />
+        <literal text='xxxabc' fuzzy={true} />
+        <literal text='xaxbxc' fuzzy={true} />
       </choice>
     ]
+    const data = from(parser.parse('abc'))
+    expect(data).to.have.length(4)
+    expect(data[0].score).to.equal(1)
+    expect(data[1].score).to.equal(1)
+    expect(data[2].score).to.equal(0.5)
+    expect(data[3].score).to.equal(0.25)
+  })
 
-    const data = from(parser.parse('r'))
-    expect(data).to.have.length(2)
-    expect(fulltext.suggestion(data[0])).to.equal('rightFirst')
-    expect(fulltext.suggestion(data[1])).to.equal('right')
+  it('assigned scores can be overridden', () => {
+    parser.sentences = [
+      <choice>
+        <literal text='abc' fuzzy={true} score={0.1} />
+        <literal text='abcdef' fuzzy={true} score={0.2} />
+        <literal text='xxxabc' fuzzy={true} score={0.3} />
+        <literal text='xaxbxc' fuzzy={true} score={0.4} />
+      </choice>
+    ]
+    const data = from(parser.parse('abc'))
+    expect(data).to.have.length(4)
+    expect(data[0].score).to.equal(0.1)
+    expect(data[1].score).to.equal(0.2)
+    expect(data[2].score).to.equal(0.3)
+    expect(data[3].score).to.equal(0.4)
   })
 })
