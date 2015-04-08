@@ -5,7 +5,7 @@ import stackFind from '../stackfind.js'
 
 export default class Placeholder extends Phrase {
   *_handleParse(input, options) {
-    if (input.text === '' && !_.isEmpty(input.suggestion)) {
+    if (input.text === '' && (!_.isEmpty(input.suggestion) || this.props.suggest)) {
       const category = stackFind(input.stack, 'category', this.props.category, null)
       const join = stackFind(input.stack, 'join', this.props.join, false)
 
