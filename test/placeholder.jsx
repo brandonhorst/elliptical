@@ -18,10 +18,9 @@ describe('placeholder', function () {
     parser.sentences = [
       <sequence>
         <literal text='a ' />
-        <choice limit={1}>
-          <placeholder text='test' />
+        <placeholder text='test'>
           <literal text='literal' />
-        </choice>
+        </placeholder>
       </sequence>
     ]
     const data1 = from(parser.parse(''))
@@ -45,13 +44,23 @@ describe('placeholder', function () {
   })
 
   it('handles a placeholder (suggest=true)', () => {
+    function func(input) {
+      if (input === 'v') {
+        return [{
+          words: [{text: 'value', input: true}],
+          remaining: ''
+        }]
+      } else {
+        return []
+      }
+    }
+
     parser.sentences = [
       <sequence>
         <literal text='a ' />
-        <choice limit={1}>
-          <placeholder text='test' suggest={true} />
-          <literal text='literal' />
-        </choice>
+        <placeholder text='test'>
+          <value compute={func} />
+        </placeholder>
       </sequence>
     ]
     const data1 = from(parser.parse(''))
@@ -66,9 +75,9 @@ describe('placeholder', function () {
     expect(data3).to.have.length(1)
     expect(fulltext.all(data3[0])).to.equal('a test')
 
-    const data4 = from(parser.parse('a l'))
+    const data4 = from(parser.parse('a v'))
     expect(data4).to.have.length(1)
-    expect(fulltext.all(data4[0])).to.equal('a literal')
+    expect(fulltext.all(data4[0])).to.equal('a value')
 
     const data5 = from(parser.parse('a t'))
     expect(data5).to.have.length(0)

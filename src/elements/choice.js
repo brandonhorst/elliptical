@@ -1,8 +1,8 @@
 /** @jsx createElement */
 import _ from 'lodash'
 import {createElement, Phrase} from 'lacona-phrase'
-import {reconcile} from '../reconcile'
 import parse from '../parse'
+import {reconcile} from '../reconcile'
 
 export default class Choice extends Phrase {
   *_handleParse(input, options) {
