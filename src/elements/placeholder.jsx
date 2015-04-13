@@ -26,7 +26,7 @@ export default class Placeholder extends Phrase {
 
         const word = {string: this.props.text, category, input: false, placeholder: true}
 
-        const modification = {score: 1}
+        const modification = {score: 1, result: undefined}
 
         if (_.isEmpty(input.suggestion) || (_.isEmpty(input.completion) && join)) {
           modification.suggestion = input.suggestion.concat(word)
