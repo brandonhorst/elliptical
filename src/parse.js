@@ -11,33 +11,31 @@ export default function *parse({phrase, input, options}) {
     return
   }
 
-  let trueInput = input
-  if (phrase.props.__sentence) {
-    trueInput = _.assign({}, input, {sentence: phrase})
-  }
-
-  for (let output of parseElement({phrase, input: trueInput, options})) {
+  for (let output of parseElement({phrase, input, options})) {
     yield _.assign({}, output, {stack: output.stack.slice(0, -1)}) //pop stack
   }
 }
 
 function *parseElement({phrase, input, options}) {
   // add this to the stack before doing anything
-  const inputWithStack = _.assign({}, input, {stack: input.stack.concat({
-    Constructor: phrase.constructor,
-    category: phrase.props.category,
-    join: phrase.props.join
-  })})
+  const inputWithStack = _.assign({}, input, {
+    stack: input.stack.concat({
+      Constructor: phrase.constructor,
+      category: phrase.props.category,
+      join: phrase.props.join
+    }),
+    path: input.path.concat(phrase)
+  })
 
   if (phrase.__describedPhrase) {
     const iterator = parse({phrase: phrase.__describedPhrase, input: inputWithStack, options})
     for (let output of iterator) {
       if (!phrase.filter || phrase.filter(output.result)) {
-        const newResult = phrase.getValue ?
-          phrase.getValue(output.result) :
-          output.result
+        const newOutput = phrase.getValue ?
+          _.assign({}, output, {result: phrase.getValue(output.result)}) :
+          output
 
-        yield _.assign({}, output, {result: newResult})
+        yield newOutput
       }
     }
   } else {

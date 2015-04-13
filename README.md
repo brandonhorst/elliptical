@@ -204,7 +204,7 @@ var parser = new lacona.Parser(options);
 To teach a `Parser` some phrases, you call set the `sentences` property.
 
 ```javascript
-parser.sentences = [reminder()];
+parser.grammar = reminder()];
 ```
 
 The parser is actually just a standard node `Transform` stream. It accepts strings and outputs objects.

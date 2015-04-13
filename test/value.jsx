@@ -19,7 +19,7 @@ describe('value', function () {
       return [{suggestion: 'tex', value: 'val'}]
     }
 
-    parser.sentences = [<value suggest={fun} />]
+    parser.grammar = <value suggest={fun} />
 
     const data = from(parser.parse(''))
     expect(data).to.have.length(1)
@@ -32,7 +32,7 @@ describe('value', function () {
       yield {suggestion: 'tex', value: 'val'}
     }
 
-    parser.sentences = [<value suggest={fun} />]
+    parser.grammar = <value suggest={fun} />
 
     const data = from(parser.parse(''))
     expect(data).to.have.length(1)
@@ -50,7 +50,7 @@ describe('value', function () {
       }]
     }
 
-    parser.sentences = [<value compute={fun} />]
+    parser.grammar = <value compute={fun} />
 
     const data = from(parser.parse('te'))
     expect(data).to.have.length(1)
@@ -68,7 +68,7 @@ describe('value', function () {
       }
     }
 
-    parser.sentences = [<value compute={fun} />]
+    parser.grammar = <value compute={fun} />
 
     const data = from(parser.parse('te'))
     expect(data).to.have.length(1)
@@ -86,7 +86,7 @@ describe('value', function () {
       describe() { return <value suggest={this.fun.bind(this)} /> }
     }
 
-    parser.sentences = [<Test myVar='myVal' />]
+    parser.grammar = <Test myVar='myVal' />
     const data = from(parser.parse(''))
     expect(data).to.have.length(1)
     expect(fulltext.all(data[0])).to.equal('tex')
@@ -98,7 +98,7 @@ describe('value', function () {
       return [{suggestion: 'tex', value: 'val', score: 0.5}]
     }
 
-    parser.sentences = [<value suggest={fun} />]
+    parser.grammar = <value suggest={fun} />
 
     const data = from(parser.parse(''))
     expect(data).to.have.length(1)
@@ -115,7 +115,7 @@ describe('value', function () {
       }]
     }
 
-    parser.sentences = [<value compute={fun} />]
+    parser.grammar = <value compute={fun} />
 
     const data = from(parser.parse('test'))
     expect(data).to.have.length(1)

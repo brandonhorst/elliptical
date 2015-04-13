@@ -8,20 +8,22 @@ export default class Choice extends Phrase {
   *_handleParse(input, options) {
     let successes = 0
     let scoredOutputs = []
-    this.childPhrases = reconcile({descriptor: this.props.children, phrase: this.childPhrases, options})
+    if (this.props.children && this.props.children.length > 0) {
+      this.childPhrases = reconcile({descriptor: this.props.children, phrase: this.childPhrases, options})
 
-    for (let [childDescription, childPhrase] of _.zip(this.props.children, this.childPhrases)) {
-      let success = false
+      for (let [childDescription, childPhrase] of _.zip(this.props.children, this.childPhrases)) {
+        let success = false
 
-      for (let output of parse({phrase: childPhrase, input, options})) {
-        yield _.assign({}, output, {
-          callbacks: output.callbacks.concat(() => success = true),
-          result: this.props.value || output.result
-        })
+        for (let output of parse({phrase: childPhrase, input, options})) {
+          yield _.assign({}, output, {
+            callbacks: output.callbacks.concat(() => success = true),
+            result: this.props.value || output.result
+          })
+        }
+
+        if (success) successes++
+        if (this.props.limit <= successes) break
       }
-
-      if (success) successes++
-      if (this.props.limit <= successes) break
     }
   }
 }

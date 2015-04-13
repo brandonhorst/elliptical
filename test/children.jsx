@@ -22,12 +22,12 @@ describe('children', () => {
       }
     }
 
-    parser.sentences = [
+    parser.grammar = (
       <Test>
         <literal text='a' />
         <literal text='b' />
       </Test>
-    ]
+    )
 
     const data = from(parser.parse(''))
     expect(data).to.have.length(1)
@@ -43,12 +43,12 @@ describe('children', () => {
     }
 
     const literals = [<literal text='b' />, <literal text='c' />]
-    parser.sentences = [
+    parser.grammar = (
       <Test>
         <literal text='a' />
         {literals}
       </Test>
-    ]
+    )
 
     const data = from(parser.parse(''))
     expect(data).to.have.length(1)
@@ -62,11 +62,11 @@ describe('children', () => {
       }
     }
 
-    parser.sentences = [
+    parser.grammar = (
       <Test>
         <literal text='a' value='b' />
       </Test>
-    ]
+    )
 
     const data = from(parser.parse(''))
     expect(data).to.have.length(1)

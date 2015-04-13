@@ -15,12 +15,12 @@ describe('sequence', function () {
   })
 
   it('puts two elements in order', () => {
-    parser.sentences = [
+    parser.grammar = (
       <sequence>
         <literal text='super' />
         <literal text='man' />
       </sequence>
-    ]
+    )
 
     const data = from(parser.parse('superm'))
     expect(data).to.have.length(1)
@@ -29,7 +29,7 @@ describe('sequence', function () {
   })
 
   it('handles a separator', () => {
-    parser.sentences = [
+    parser.grammar = (
       <sequence>
         <content>
           <literal text='super' />
@@ -39,7 +39,7 @@ describe('sequence', function () {
           <literal text=' ' />
         </separator>
       </sequence>
-    ]
+    )
 
     const data = from(parser.parse('super m'))
     expect(data).to.have.length(1)
@@ -48,13 +48,13 @@ describe('sequence', function () {
   })
 
   it('handles an optional child with a separator', () => {
-    parser.sentences = [
+    parser.grammar = (
       <sequence>
         <literal text='super' />
         <literal text='maximum' optional={true} />
         <literal text='man' />
       </sequence>
-    ]
+    )
 
     const data = from(parser.parse('superm'))
     expect(data).to.have.length(2)
@@ -63,13 +63,13 @@ describe('sequence', function () {
   })
 
   it('handles an optional child without a separator', () => {
-    parser.sentences = [
+    parser.grammar = (
       <sequence>
         <literal text='super' />
         <literal text='maximum' optional={true} />
         <literal text='man' />
       </sequence>
-    ]
+    )
 
     const data = from(parser.parse('superm'))
     expect(data).to.have.length(2)
@@ -78,7 +78,7 @@ describe('sequence', function () {
   })
 
   it('handles an optional child with a separator', () => {
-    parser.sentences = [
+    parser.grammar = (
       <sequence>
         <content>
           <literal text='super' />
@@ -89,7 +89,7 @@ describe('sequence', function () {
           <literal text=' ' />
         </separator>
       </sequence>
-    ]
+    )
 
     const data = from(parser.parse('super m'))
     expect(data).to.have.length(2)
@@ -98,13 +98,13 @@ describe('sequence', function () {
   })
 
   it('does not take an optional childs value', () => {
-    parser.sentences = [
+    parser.grammar = (
       <sequence>
         <literal text='super' />
         <literal text='maximum' value='someValue' id='opt' optional={true} />
         <literal text='man' />
       </sequence>
-    ]
+    )
 
     const data = from(parser.parse('superm'))
     expect(data).to.have.length(2)
@@ -115,12 +115,12 @@ describe('sequence', function () {
   })
 
   it('can set a value to the result', () => {
-    parser.sentences = [
+    parser.grammar = (
       <sequence value='testValue'>
         <literal text='super' />
         <literal text='man' />
       </sequence>
-    ]
+    )
 
     const data = from(parser.parse('superm'))
     expect(data).to.have.length(1)
@@ -128,12 +128,12 @@ describe('sequence', function () {
   })
 
   it('results is an object with id keys', () => {
-    parser.sentences = [
+    parser.grammar = (
       <sequence>
         <literal id='desc' text='super' value='super' />
         <literal id='noun' text='man' value='man' />
       </sequence>
-    ]
+    )
 
     const data = from(parser.parse('superm'))
     expect(data).to.have.length(1)
@@ -144,7 +144,7 @@ describe('sequence', function () {
   })
 
   it('results is an object with id keys, even with separator', () => {
-    parser.sentences = [
+    parser.grammar = (
       <sequence>
         <content>
           <literal id='desc' text='super' value='super' />
@@ -152,7 +152,7 @@ describe('sequence', function () {
         </content>
         <separator><literal text=' ' /></separator>
       </sequence>
-    ]
+    )
 
     const data = from(parser.parse('super m'))
     expect(data).to.have.length(1)
@@ -163,7 +163,7 @@ describe('sequence', function () {
   })
 
   it('will merge results in', () => {
-    parser.sentences = [
+    parser.grammar = (
       <sequence>
         <literal id='desc' text='super' value='super' />
         <sequence merge='true'>
@@ -171,7 +171,7 @@ describe('sequence', function () {
           <literal id='adj' text='rocks' value='rocks' />
         </sequence>
       </sequence>
-    ]
+    )
 
     const data = from(parser.parse('superm'))
     expect(data).to.have.length(1)
@@ -183,7 +183,7 @@ describe('sequence', function () {
   })
 
   it('will merge results in, even with separator', () => {
-    parser.sentences = [
+    parser.grammar = (
       <sequence>
         <content>
           <literal id='desc' text='super' value='super' />
@@ -197,7 +197,7 @@ describe('sequence', function () {
         </content>
         <separator><literal text=' ' /></separator>
       </sequence>
-    ]
+    )
 
     const data = from(parser.parse('super m'))
     expect(data).to.have.length(1)
@@ -209,12 +209,12 @@ describe('sequence', function () {
   })
 
   it('passes on its category', () => {
-    parser.sentences = [
+    parser.grammar = (
       <sequence category='myCat'>
         <literal text='super' />
         <literal text='man' />
       </sequence>
-    ]
+    )
 
     const data = from(parser.parse('superm'))
     expect(data).to.have.length(1)

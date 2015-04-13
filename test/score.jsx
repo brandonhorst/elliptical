@@ -15,7 +15,7 @@ describe('score', () => {
   })
 
   it('every parse output has a numeric score', () => {
-    parser.sentences = [<literal text='test' />]
+    parser.grammar = <literal text='test' />
 
     const data = from(parser.parse('test'))
 
@@ -24,12 +24,12 @@ describe('score', () => {
   })
 
   it('score is passed on from literals through choices', () => {
-    parser.sentences = [
+    parser.grammar = (
       <choice>
         <literal text='right' score={0.5} />
         <literal text='rightFirst' score={1} />
       </choice>
-    ]
+    )
 
     const data = from(parser.parse('r'))
     expect(data).to.have.length(2)
@@ -38,12 +38,12 @@ describe('score', () => {
   })
 
   it('sequence multiplies all scores together', () => {
-    parser.sentences = [
+    parser.grammar = (
       <sequence>
         <literal text='a' score={0.5} />
         <literal text='b' score={0.5} />
       </sequence>
-    ]
+    )
 
     const data = from(parser.parse('ab'))
     expect(data).to.have.length(1)

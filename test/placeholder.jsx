@@ -15,14 +15,15 @@ describe('placeholder', function () {
   })
 
   it('handles a placeholder', () => {
-    parser.sentences = [
+    parser.grammar = (
       <sequence>
         <literal text='a ' />
         <placeholder text='test'>
           <literal text='literal' />
         </placeholder>
       </sequence>
-    ]
+    )
+
     const data1 = from(parser.parse(''))
     expect(data1).to.have.length(1)
     expect(fulltext.all(data1[0])).to.equal('a test')
@@ -55,14 +56,15 @@ describe('placeholder', function () {
       }
     }
 
-    parser.sentences = [
+    parser.grammar = (
       <sequence>
         <literal text='a ' />
         <placeholder text='test'>
           <value compute={func} />
         </placeholder>
       </sequence>
-    ]
+    )
+    
     const data1 = from(parser.parse(''))
     expect(data1).to.have.length(1)
     expect(fulltext.all(data1[0])).to.equal('a test')

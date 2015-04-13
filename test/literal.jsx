@@ -15,7 +15,7 @@ describe('literal', function () {
   })
 
   it('handles a literal', () => {
-    parser.sentences = [<literal text='literal test' />]
+    parser.grammar = <literal text='literal test' />
     const data = from(parser.parse('l'))
 
     expect(data).to.have.length(1)
@@ -28,7 +28,7 @@ describe('literal', function () {
   })
 
   it('handles a literal with an id', () => {
-    parser.sentences = [<literal text='literal test' value='test'/>]
+    parser.grammar = <literal text='literal test' value='test'/>
     const data = from(parser.parse('l'))
 
     expect(data).to.have.length(1)
@@ -37,7 +37,7 @@ describe('literal', function () {
   })
 
   it('maintains case', () => {
-    parser.sentences = [<literal text='Test' />]
+    parser.grammar = <literal text='Test' />
     const data = from(parser.parse('t'))
 
     expect(data).to.have.length(1)

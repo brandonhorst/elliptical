@@ -27,7 +27,7 @@ describe('sources', () => {
       source() {return {data: <TestSource />}}
     }
 
-    parser.sentences = [<Test />]
+    parser.grammar = <Test />
 
     const data = from(parser.parse(''))
     expect(data).to.have.length(1)
@@ -44,7 +44,7 @@ describe('sources', () => {
       source() {return {data: <TestSource test='testa' />}}
     }
 
-    parser.sentences = [<Test />]
+    parser.grammar = <Test />
 
     const data = from(parser.parse(''))
     expect(data).to.have.length(1)
@@ -69,12 +69,12 @@ describe('sources', () => {
       describe() {return <literal text={this.data.test} />}
     }
 
-    parser.sentences = [<Test />]
+    parser.grammar = <Test />
     const data1 = from(parser.parse(''))
     expect(data1).to.have.length(1)
     expect(fulltext.all(data1[0])).to.equal('testb')
 
-    parser.sentences = [<Test2 />]
+    parser.grammar = <Test2 />
     const data2 = from(parser.parse(''))
     expect(data2).to.have.length(1)
     expect(fulltext.all(data2[0])).to.equal('testb')
@@ -98,12 +98,12 @@ describe('sources', () => {
       describe() {return <literal text={this.data.test} />}
     }
 
-    parser.sentences = [<Test />]
+    parser.grammar = <Test />
     const data1 = from(parser.parse(''))
     expect(data1).to.have.length(1)
     expect(fulltext.all(data1[0])).to.equal('testb')
 
-    parser.sentences = [<Test2 />]
+    parser.grammar = <Test2 />
     const data2 = from(parser.parse(''))
     expect(data2).to.have.length(1)
     expect(fulltext.all(data2[0])).to.equal('testa')
@@ -122,7 +122,7 @@ describe('sources', () => {
       describe() {return <literal text={this.data.test} />}
     }
 
-    parser.sentences = [<Test />]
+    parser.grammar = <Test />
 
     const data1 = from(parser.parse('test'))
     expect(fulltext.all(data1[0])).to.equal('testa')
@@ -150,7 +150,7 @@ describe('sources', () => {
       describe() {return <literal text={this.data.test} />}
     }
 
-    parser.sentences = [<Test />]
+    parser.grammar = <Test />
 
     const data = from(parser.parse('test'))
     expect(fulltext.all(data[0])).to.equal('testb')
@@ -173,7 +173,7 @@ describe('sources', () => {
       }
     }
 
-    parser.sentences = [<Test />]
+    parser.grammar = <Test />
 
     const data1 = from(parser.parse('test'))
     expect(fulltext.all(data1[0])).to.equal('testa')
@@ -200,7 +200,7 @@ describe('sources', () => {
       describe() {return <literal text={this.data.test} />}
     }
 
-    parser.sentences = [<Test />]
+    parser.grammar = <Test />
 
     const data1 = from(parser.parse(''))
     expect(fulltext.all(data1[0])).to.equal('testa')
@@ -236,7 +236,7 @@ describe('sources', () => {
       describe() {return <SubTest val={this.data.test} />}
     }
 
-    parser.sentences = [<Test />]
+    parser.grammar = <Test />
 
     const data1 = from(parser.parse(''))
     expect(fulltext.all(data1[0])).to.equal('testa')
@@ -266,7 +266,7 @@ describe('sources', () => {
     }
 
     parser.on('change', changeSpy)
-    parser.sentences = [<Test />]
+    parser.grammar = <Test />
 
     const data = from(parser.parse(''))
     expect(data).to.have.length(1)
@@ -294,7 +294,7 @@ describe('sources', () => {
     }
 
     parser.on('change', changeSpy)
-    parser.sentences = [<Test />]
+    parser.grammar = <Test />
 
     const data = from(parser.parse(''))
     expect(data).to.have.length(1)

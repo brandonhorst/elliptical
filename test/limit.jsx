@@ -20,7 +20,7 @@ describe('limit', () => {
         return [{suggestion: 'testa'}, {suggestion: 'testb'}, {suggestion: 'testc'}]
       }
 
-      parser.sentences = [<value limit={2} suggest={suggest} />]
+      parser.grammar = <value limit={2} suggest={suggest} />
 
       const data = from(parser.parse(''))
       expect(data).to.have.length(2)
@@ -33,7 +33,7 @@ describe('limit', () => {
         return [{suggestion: 'testa'}, {suggestion: 'testb'}]
       }
 
-      parser.sentences = [<value limit={3} suggest={suggest} />]
+      parser.grammar = <value limit={3} suggest={suggest} />
 
       const data = from(parser.parse(''))
       expect(data).to.have.length(2)
@@ -50,7 +50,7 @@ describe('limit', () => {
         ]
       }
 
-      parser.sentences = [<value limit={2} compute={compute} />]
+      parser.grammar = <value limit={2} compute={compute} />
 
       const data = from(parser.parse('test'))
       expect(data).to.have.length(2)
@@ -66,7 +66,7 @@ describe('limit', () => {
         ]
       }
 
-      parser.sentences = [<value limit={3} compute={compute} />]
+      parser.grammar = <value limit={3} compute={compute} />
 
       const data = from(parser.parse('test'))
       expect(data).to.have.length(2)
@@ -77,12 +77,12 @@ describe('limit', () => {
 
   describe('choice', () => {
     it('can be restricted by a limit of 1', () => {
-      parser.sentences = [
+      parser.grammar = (
         <choice limit={1}>
           <literal text='right' value='testValue' />
           <literal text='right also' value='also' />
         </choice>
-      ]
+      )
 
       const data = from(parser.parse('r'))
       expect(data).to.have.length(1)
@@ -91,13 +91,13 @@ describe('limit', () => {
     })
 
     it('can be restricted by a limit of more than 1', () => {
-      parser.sentences = [
+      parser.grammar = (
         <choice limit={2}>
           <literal text='right' />
           <literal text='right also' />
           <literal text='right but excluded' />
         </choice>
-      ]
+      )
 
       const data = from(parser.parse('r'))
       expect(data).to.have.length(2)
@@ -106,7 +106,7 @@ describe('limit', () => {
     })
 
     it('still works when a limited child has multiple options', () => {
-      parser.sentences = [
+      parser.grammar = (
         <choice limit={2}>
           <choice>
             <literal text='right' />
@@ -115,7 +115,7 @@ describe('limit', () => {
           <literal text='wrong' />
           <literal text='right third' />
         </choice>
-      ]
+      )
 
       const data = from(parser.parse('r'))
       expect(data).to.have.length(3)
@@ -125,7 +125,7 @@ describe('limit', () => {
     })
 
     it('allows choices in sequences to be limited', () => {
-      parser.sentences = [
+      parser.grammar = (
         <sequence>
           <choice limit={2}>
             <literal text='testa' />
@@ -135,7 +135,7 @@ describe('limit', () => {
           </choice>
           <literal text='also' />
         </sequence>
-      ]
+      )
 
       const data = from(parser.parse('test'))
       expect(data).to.have.length(2)
@@ -146,7 +146,7 @@ describe('limit', () => {
     })
 
     it('limits even if valid parses do not parse to completion', () => {
-      parser.sentences = [
+      parser.grammar = (
         <sequence>
           <choice limit={1}>
             <literal text='righ' />
@@ -155,7 +155,7 @@ describe('limit', () => {
           </choice>
           <literal text='also' />
         </sequence>
-      ]
+      )
 
       const data = from(parser.parse('righta'))
       expect(data).to.have.length(1)

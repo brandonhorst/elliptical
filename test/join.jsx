@@ -15,12 +15,12 @@ describe('join', () => {
   })
 
   it('joins literals onto the suggestion', () => {
-    parser.sentences = [
+    parser.grammar = (
       <sequence>
         <literal text='aaa' />
         <literal text='bbb' join={true} />
       </sequence>
-    ]
+    )
 
     const data = from(parser.parse('a'))
     expect(data).to.have.length(1)
@@ -28,7 +28,7 @@ describe('join', () => {
   })
 
   it('inherits joins', () => {
-    parser.sentences = [
+    parser.grammar = (
       <sequence>
         <literal text='aaa' />
         <choice join={true}>
@@ -36,7 +36,7 @@ describe('join', () => {
           <literal text='ccc' />
         </choice>
       </sequence>
-    ]
+    )
 
     const data = from(parser.parse('a'))
     expect(data).to.have.length(2)

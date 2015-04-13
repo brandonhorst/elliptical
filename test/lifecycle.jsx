@@ -29,7 +29,7 @@ describe('lifecycle', () => {
       describe() {return <literal text='test' />}
     }
 
-    parser.sentences = [<Test />]
+    parser.grammar = <Test />
 
     const data1 = from(parser.parse(''))
     expect(data1).to.have.length(1)
@@ -37,7 +37,7 @@ describe('lifecycle', () => {
     expect(createSpy).to.have.been.calledOnce
     expect(destSpy).to.not.have.been.called
 
-    parser.sentences = []
+    parser.grammar = <choice />
 
     const data2 = from(parser.parse(''))
     expect(data2).to.have.length(0)
@@ -60,7 +60,7 @@ describe('lifecycle', () => {
     }
 
 
-    parser.sentences = [<Test />]
+    parser.grammar = <Test />
 
     const data1 = from(parser.parse(''))
     expect(data1).to.have.length(1)
@@ -68,7 +68,7 @@ describe('lifecycle', () => {
     expect(createSpy).to.have.been.calledOnce
     expect(destSpy).to.not.have.been.called
 
-    parser.sentences = []
+    parser.grammar = <choice />
 
     const data2 = from(parser.parse(''))
     expect(data2).to.have.length(0)

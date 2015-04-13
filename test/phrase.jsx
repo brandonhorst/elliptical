@@ -23,7 +23,7 @@ describe('Phrase', () => {
       static get extends() { return [Extended] }
     }
 
-    parser.sentences = [<Extended />]
+    parser.grammar = <Extended />
     parser.extensions = [Extender]
 
     const data = from(parser.parse('t'))
@@ -42,7 +42,7 @@ describe('Phrase', () => {
       static get extends() {return [Extended]}
     }
 
-    parser.sentences = [<Extended />]
+    parser.grammar = <Extended />
     parser.extensions = [Extender]
 
     const data1 = from(parser.parse('t'))
@@ -72,7 +72,7 @@ describe('Phrase', () => {
       }
     }
 
-    parser.sentences = [<Test />]
+    parser.grammar = <Test />
 
     const data = from(parser.parse('nan'))
     expect(data).to.have.length(3)
@@ -91,7 +91,7 @@ describe('Phrase', () => {
       describe() { return <literal value='myVal' text='test' /> }
     }
 
-    parser.sentences = [<Test test='myProp' />]
+    parser.grammar = <Test test='myProp' />
 
     const data = from(parser.parse('t'))
     expect(data).to.have.length(1)
@@ -103,7 +103,7 @@ describe('Phrase', () => {
       describe() { return <literal value='myVal' text='test' /> }
     }
 
-    parser.sentences = [<Test test='myProp' />]
+    parser.grammar = <Test test='myProp' />
 
     const data = from(parser.parse('t'))
     expect(data).to.have.length(1)

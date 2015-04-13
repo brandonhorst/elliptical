@@ -15,12 +15,12 @@ describe('choice', () => {
   })
 
   it('suggests one valid choice', () => {
-    parser.sentences = [
+    parser.grammar = (
       <choice>
         <literal text='right' />
         <literal text='wrong' />
       </choice>
-    ]
+    )
 
     const data = from(parser.parse('r'))
     expect(data).to.have.length(1)
@@ -29,12 +29,12 @@ describe('choice', () => {
   })
 
   it('suggests multiple valid choices', () => {
-    parser.sentences = [
+    parser.grammar = (
       <choice>
         <literal text='right' />
         <literal text='right also' />
       </choice>
-    ]
+    )
 
     const data = from(parser.parse('r'))
     expect(data).to.have.length(2)
@@ -45,24 +45,24 @@ describe('choice', () => {
   })
 
   it('suggests no valid choices', () => {
-    parser.sentences = [
+    parser.grammar = (
       <choice>
         <literal text='wrong' />
         <literal text='wrong also' />
       </choice>
-    ]
+    )
 
     const data = from(parser.parse('r'))
     expect(data).to.have.length(0)
   })
 
   it('adopts the value of the child (even if it has no id)', () => {
-    parser.sentences = [
+    parser.grammar = (
       <choice>
         <literal text='right' value='testValue' />
         <literal text='wrong' />
       </choice>
-    ]
+    )
 
     const data = from(parser.parse('r'))
     expect(data).to.have.length(1)
@@ -82,7 +82,7 @@ describe('choice', () => {
       }
     }
 
-    parser.sentences = [<Test />]
+    parser.grammar = <Test />
 
     const data = from(parser.parse('r'))
     expect(data).to.have.length(1)
@@ -102,7 +102,7 @@ describe('choice', () => {
       }
     }
 
-    parser.sentences = [<Test />]
+    parser.grammar = <Test />
 
     const data = from(parser.parse('r'))
     expect(data).to.have.length(1)

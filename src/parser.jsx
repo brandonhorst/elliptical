@@ -11,7 +11,8 @@ const optionDefaults = {
   suggestion: [],
   completion: [],
   stack: [],
-  callbacks: []
+  callbacks: [],
+  path: []
 }
 
 export function createOption(options) {
@@ -19,7 +20,7 @@ export function createOption(options) {
 }
 
 function normalizeOutput (option) {
-  let output = _.pick(option, ['match', 'completion', 'result', 'sentence', 'score'])
+  let output = _.pick(option, ['match', 'completion', 'result', 'path', 'score'])
   const suggestion = option.suggestion
   let newSuggestions = []
   let i, l, lastSuggestion, oldSuggestion
@@ -42,10 +43,11 @@ function normalizeOutput (option) {
 }
 
 export default class Parser extends EventEmitter {
-  constructor({langs = ['default'], sentences = [], extensions = []} = {}) {
+  constructor({langs = ['default'], grammar, extensions = []} = {}) {
     super()
+
     this.langs = langs
-    this.sentences = sentences
+    this.grammar = grammar
     this.extensions = extensions
     this._sources = []
     this._reparseNeeded = false
@@ -107,18 +109,6 @@ export default class Parser extends EventEmitter {
       throw new Error('lacona parse input must be a string')
     }
 
-    //apply global sources
-    this.sentences.forEach(({Constructor}) => {
-      if (_.isString(Constructor)) return
-      Constructor.__additionalSources = _.defaults({}, Constructor.__additionalSources, this.__additionalSources)
-    })
-    this.extensions.forEach(Extension => {
-      Extension.__additionalSources = _.defaults({}, Extension.__additionalSources, this.__additionalSources)
-    })
-
-    const sentences = _.map(this.sentences, sentence => _.merge({}, sentence, {props: {__sentence: true}}))
-    const descriptor = <choice>{sentences}</choice>
-
     const input = createOption({text: inputString})
     const options = {
       langs: this.langs,
@@ -127,7 +117,7 @@ export default class Parser extends EventEmitter {
       removeSource: this._removeSource.bind(this)
     }
 
-    this._phrase = reconcile({descriptor, phrase: this._phrase, options})
+    this._phrase = reconcile({descriptor: this.grammar, phrase: this._phrase, options})
 
     for (let output of parse({phrase: this._phrase, input, options})) {
       if (output.text === '') {

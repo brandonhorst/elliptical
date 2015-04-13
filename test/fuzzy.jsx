@@ -15,7 +15,7 @@ describe('fuzzy', () => {
   })
 
   it('supports fuzzy matching within a phrase', () => {
-    parser.sentences = [<literal text='a simple test' fuzzy={true} />]
+    parser.grammar = <literal text='a simple test' fuzzy={true} />
 
     const data = from(parser.parse('asmlte'))
     expect(data).to.have.length(1)
@@ -43,14 +43,14 @@ describe('fuzzy', () => {
   })
 
   it('rejects misses properly with fuzzy matching', () => {
-    parser.sentences = [<literal text='a simple test' fuzzy={true} />]
+    parser.grammar = <literal text='a simple test' fuzzy={true} />
 
     const data = from(parser.parse('fff'))
     expect(data).to.have.length(0)
   })
 
   it('suggests properly when fuzzy matching is enabled', () => {
-    parser.sentences = [<literal text='a simple test' fuzzy={true} />]
+    parser.grammar = <literal text='a simple test' fuzzy={true} />
 
     const data = from(parser.parse(''))
     expect(data).to.have.length(1)
@@ -60,7 +60,7 @@ describe('fuzzy', () => {
   })
 
   it('can do fuzzy matching with regex special characters', () => {
-    parser.sentences = [<literal text='[whatever]' fuzzy={true} />]
+    parser.grammar = <literal text='[whatever]' fuzzy={true} />
 
     const data = from(parser.parse('[]'))
     expect(data).to.have.length(1)
@@ -74,12 +74,12 @@ describe('fuzzy', () => {
   })
 
   it('supports sequence when fuzzy is enabled', () => {
-    parser.sentences = [
+    parser.grammar = (
       <sequence>
         <literal text='abc' fuzzy={true} />
         <literal text='def' fuzzy={true} />
       </sequence>
-    ]
+    )
 
     const data = from(parser.parse('abce'))
     expect(data).to.have.length(1)
@@ -94,25 +94,27 @@ describe('fuzzy', () => {
   })
 
   it('rejects when the word itself does not complete the match', () => {
-    parser.sentences = [
+    parser.grammar = (
       <sequence>
         <literal text='abc' fuzzy={true} />
         <literal text='def' fuzzy={true} />
       </sequence>
-    ]
+    )
+    
     const data = from(parser.parse('ad'))
     expect(data).to.be.empty
   })
 
   it('assigns a score for different match types', () => {
-    parser.sentences = [
+    parser.grammar = (
       <choice>
         <literal text='abc' fuzzy={true} />
         <literal text='abcdef' fuzzy={true} />
         <literal text='xxxabc' fuzzy={true} />
         <literal text='xaxbxc' fuzzy={true} />
       </choice>
-    ]
+    )
+
     const data = from(parser.parse('abc'))
     expect(data).to.have.length(4)
     expect(data[0].score).to.equal(1)
@@ -122,14 +124,15 @@ describe('fuzzy', () => {
   })
 
   it('assigned scores can be overridden', () => {
-    parser.sentences = [
+    parser.grammar = (
       <choice>
         <literal text='abc' fuzzy={true} score={0.1} />
         <literal text='abcdef' fuzzy={true} score={0.2} />
         <literal text='xxxabc' fuzzy={true} score={0.3} />
         <literal text='xaxbxc' fuzzy={true} score={0.4} />
       </choice>
-    ]
+    )
+
     const data = from(parser.parse('abc'))
     expect(data).to.have.length(4)
     expect(data[0].score).to.equal(0.1)
