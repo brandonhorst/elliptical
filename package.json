@@ -4,9 +4,9 @@
   "description": "Natural Language Parsing Framework",
   "main": "lib/lacona.js",
   "scripts": {
-    "pretest": "babel --optional runtime test --out-dir tmp",
+    "pretest": "babel --optional runtime test --out-dir tmp --loose all",
     "test": "mocha tmp",
-    "build": "babel --optional runtime src --out-dir lib",
+    "build": "babel --optional runtime src --out-dir lib --loose all",
     "validate": "npm run build && npm test",
     "clean": "rimraf lib tmp",
     "prepublish": "npm run clean && npm run build"
@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/lacona/lacona",
   "devDependencies": {
-    "babel": "^4.7.16",
+    "babel": "^5.1.9",
     "chai": "^2.2.0",
     "lacona-util-fulltext": "^0.2.0",
     "mocha": "^2.2.4",
@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "fuz": "0.0.1",
-    "babel-runtime": "^4.7.16",
+    "babel-runtime": "^5.1.9",
     "lacona-phrase": "^0.7.0",
     "lodash": "^3.6.0"
   }

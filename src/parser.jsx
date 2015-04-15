@@ -5,6 +5,8 @@ import {EventEmitter} from  'events'
 import parse from './parse'
 import {reconcile} from './reconcile'
 
+function from(i) {const a = []; for (let x of i) a.push(x); return a}
+
 const optionDefaults = {
   text: '',
   match: [],
@@ -128,5 +130,9 @@ export default class Parser extends EventEmitter {
     }
 
     this._reparseNeeded = false
+  }
+
+  parseArray(inputString) {
+    return from(this.parse(inputString))
   }
 }
