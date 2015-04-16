@@ -7,7 +7,6 @@ export default class Value extends Phrase {
   *_handleParse(input, options) {
     // if this has a category use that, else the last category on the stack
     const category = stackFind(input.stack, 'category', this.props.category, null)
-    const join = stackFind(input.stack, 'join', this.props.join, false)
 
     let successes = 0
 
@@ -24,14 +23,14 @@ export default class Value extends Phrase {
 
         const word = {string: output.suggestion, category, input: false}
 
-        if (_.isEmpty(input.suggestion) || (_.isEmpty(input.completion) && join)) {
+        if (_.isEmpty(input.suggestion)) {
           modification.suggestion = input.suggestion.concat(word)
         } else {
           modification.completion = input.completion.concat(word)
         }
 
         yield _.assign({}, input, modification)
-        
+
         if (success) successes++
         if (this.props.limit <= successes) break
       }

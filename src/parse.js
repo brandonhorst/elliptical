@@ -21,8 +21,7 @@ function *parseElement({phrase, input, options}) {
   const inputWithStack = _.assign({}, input, {
     stack: input.stack.concat({
       Constructor: phrase.constructor,
-      category: phrase.props.category,
-      join: phrase.props.join
+      category: phrase.props.category
     }),
     path: input.path.concat(phrase)
   })

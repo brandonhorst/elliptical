@@ -22,13 +22,12 @@ export default class Placeholder extends Phrase {
 
       if (!success) {
         const category = stackFind(input.stack, 'category', this.props.category, null)
-        const join = stackFind(input.stack, 'join', this.props.join, false)
 
         const word = {string: this.props.text, category, input: false, placeholder: true}
 
         const modification = {score: 1, result: undefined}
 
-        if (_.isEmpty(input.suggestion) || (_.isEmpty(input.completion) && join)) {
+        if (_.isEmpty(input.suggestion)) {
           modification.suggestion = input.suggestion.concat(word)
         } else {
           modification.completion = input.completion.concat(word)
