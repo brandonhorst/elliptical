@@ -109,4 +109,24 @@ describe('choice', () => {
     expect(fulltext.suggestion(data[0])).to.equal('right')
     expect(data[0].result).to.equal('override')
   })
+
+  it('can set a value in an object with a key', () => {
+    class Test extends phrase.Phrase {
+      describe() {
+        return (
+          <choice>
+            <literal text='right' value='testValue' id='key' />
+            <literal text='wrong' />
+          </choice>
+        )
+      }
+    }
+
+    parser.grammar = <Test />
+
+    const data = from(parser.parse('r'))
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('right')
+    expect(data[0].result).to.eql({key: 'testValue'})
+  })
 })

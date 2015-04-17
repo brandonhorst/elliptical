@@ -15,9 +15,14 @@ export default class Choice extends Phrase {
         let success = false
 
         for (let output of parse({phrase: childPhrase, input, options})) {
+          const newResult = this.props.value || (
+            (childDescription.props && childDescription.props.id) ?
+            {[childDescription.props.id]: output.result} :
+            output.result
+          )
           yield _.assign({}, output, {
             callbacks: output.callbacks.concat(() => success = true),
-            result: this.props.value || output.result
+            result: newResult
           })
         }
 
