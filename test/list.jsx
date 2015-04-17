@@ -77,4 +77,15 @@ describe('list', () => {
     expect(fulltext.all(data[0])).to.equal('testb')
     expect(data[0].result).to.equal('b')
   })
+
+  it('allows for value override', () => {
+    const items = ['testa', {text: 'testb', value: 'b'}, {text: 'testc'}]
+    parser.grammar = <list items={items} value='override' />
+
+    const data = from(parser.parse('t'))
+    expect(data).to.have.length(3)
+    expect(data[0].result).to.equal('override')
+    expect(data[1].result).to.equal('override')
+    expect(data[2].result).to.equal('override')
+  })
 })

@@ -3,14 +3,17 @@ import _ from 'lodash'
 import {sort} from '../fuzzy'
 import {createElement, Phrase} from 'lacona-phrase'
 
-function itemify (item) {
-  return _.isString(item) ? {text: item} : item
-}
 
 export default class List extends Phrase {
+  itemify (item) {
+    const trueItem = _.isString(item) ? {text: item} : item
+    if (!_.isUndefined(this.props.value)) trueItem.value = this.props.value
+    return trueItem
+  }
+
   *compute (input) {
     // first check for exact matches
-    const trueItems = _.map(this.props.items, itemify)
+    const trueItems = _.map(this.props.items, this.itemify.bind(this))
 
     for (let {text, value} of trueItems) {
       if (_.startsWith(input.toLowerCase(), text.toLowerCase())) {
@@ -30,7 +33,7 @@ export default class List extends Phrase {
 
   *suggest (input) {
     for (let item of this.props.items) {
-      const {text, value} = itemify(item)
+      const {text, value} = this.itemify(item)
       yield {suggestion: text, value}
     }
   }
@@ -40,12 +43,12 @@ export default class List extends Phrase {
       return <value compute={this.compute.bind(this)} suggest={this.suggest.bind(this)} limit={this.props.limit} />
     } else {
       const literals = _.chain(this.props.items)
-        .map(itemify)
+        .map(this.itemify.bind(this))
         .map(item => <literal text={item.text} value={item.value} />)
         .value()
 
       return (
-        <choice limit={this.props.limit}>
+        <choice limit={this.props.limit} value={this.props.value}>
           {literals}
         </choice>
       )
