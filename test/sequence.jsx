@@ -58,8 +58,8 @@ describe('sequence', function () {
 
     const data = from(parser.parse('superm'))
     expect(data).to.have.length(2)
-    expect(fulltext.suggestion(data[0])).to.equal('maximum')
-    expect(fulltext.suggestion(data[1])).to.equal('man')
+    expect(fulltext.suggestion(data[0])).to.equal('man')
+    expect(fulltext.suggestion(data[1])).to.equal('maximum')
   })
 
   it('handles an optional child without a separator', () => {
@@ -73,8 +73,51 @@ describe('sequence', function () {
 
     const data = from(parser.parse('superm'))
     expect(data).to.have.length(2)
+    expect(fulltext.suggestion(data[0])).to.equal('man')
+    expect(fulltext.suggestion(data[1])).to.equal('maximum')
+  })
+
+  it('handles an optional child that is preferred', () => {
+    parser.grammar = (
+      <sequence>
+        <literal text='super' />
+        <literal text='maximum' optional={true} preferred={true} />
+        <literal text='man' />
+      </sequence>
+    )
+
+    const data = from(parser.parse('superm'))
+    expect(data).to.have.length(2)
     expect(fulltext.suggestion(data[0])).to.equal('maximum')
     expect(fulltext.suggestion(data[1])).to.equal('man')
+  })
+
+  it('handles an optional child that is limited', () => {
+    parser.grammar = (
+      <sequence>
+        <literal text='super' />
+        <literal text='maximum' optional={true} limited={true} />
+        <literal text='man' />
+      </sequence>
+    )
+
+    const data = from(parser.parse('superm'))
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('man')
+  })
+
+  it('handles an optional child that is preferred and limited', () => {
+    parser.grammar = (
+      <sequence>
+        <literal text='super' />
+        <literal text='maximum' optional={true} preferred={true} limited={true} />
+        <literal text='man' />
+      </sequence>
+    )
+
+    const data = from(parser.parse('superm'))
+    expect(data).to.have.length(1)
+    expect(fulltext.suggestion(data[0])).to.equal('maximum')
   })
 
   it('handles an optional child with a separator', () => {
@@ -93,8 +136,8 @@ describe('sequence', function () {
 
     const data = from(parser.parse('super m'))
     expect(data).to.have.length(2)
-    expect(fulltext.suggestion(data[0])).to.equal('maximum')
-    expect(fulltext.suggestion(data[1])).to.equal('man')
+    expect(fulltext.suggestion(data[0])).to.equal('man')
+    expect(fulltext.suggestion(data[1])).to.equal('maximum')
   })
 
   it('does not take an optional childs value', () => {
@@ -108,10 +151,10 @@ describe('sequence', function () {
 
     const data = from(parser.parse('superm'))
     expect(data).to.have.length(2)
-    expect(fulltext.suggestion(data[0])).to.equal('maximum')
-    expect(fulltext.suggestion(data[1])).to.equal('man')
-    expect(data[0].result.opt).to.equal('someValue')
-    expect(data[1].result.opt).to.be.undefined
+    expect(fulltext.suggestion(data[0])).to.equal('man')
+    expect(fulltext.suggestion(data[1])).to.equal('maximum')
+    expect(data[0].result.opt).to.be.undefined
+    expect(data[1].result.opt).to.equal('someValue')
   })
 
   it('can set a value to the result', () => {

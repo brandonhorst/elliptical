@@ -8,7 +8,6 @@ import {spy} from 'sinon'
 import sinonChai from 'sinon-chai'
 
 chai.use(sinonChai)
-chai.config.includeStack = true
 
 function from(i) {const a = []; for (let x of i) a.push(x); return a}
 
