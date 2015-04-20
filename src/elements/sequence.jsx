@@ -48,12 +48,12 @@ export default class Sequence extends Phrase {
   }
 
   *parseChild(childIndex, input, options) {
-    if (childIndex >= this.props.children.length) {
+    if (childIndex >= this.childPhrases.length) {
       yield input
       return
     }
 
-    const child = this.props.children[childIndex]
+    const child = this.childPhrases[childIndex]
     let success = false
 
     for (let output of parse({phrase: this.childPhrases[childIndex], input, options})) {
@@ -75,7 +75,7 @@ export default class Sequence extends Phrase {
 }
 
 function getAccumulatedResult(inputResult, child, childResult) {
-  if (!_.isUndefined(childResult) && child.props) {
+  if (!_.isUndefined(childResult)) {
     const childId = child.props.id
     const childMerge = child.props.merge
     if (childId) {

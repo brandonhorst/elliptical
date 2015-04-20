@@ -221,4 +221,23 @@ describe('sequence', function () {
     expect(data[0].match[0].category).to.equal('myCat')
     expect(data[0].suggestion[0].category).to.equal('myCat')
   })
+
+  it('ignores strings and nulls for reconciliation', () => {
+    class Test extends phrase.Phrase {
+      describe() {
+        return (
+          <sequence>
+            {null}
+            <literal text='test' />
+            someString
+          </sequence>
+        )
+      }
+    }
+
+    parser.grammar = <Test />
+    const data = parser.parseArray('test')
+    expect(data).to.have.length(1)
+    expect(fulltext.all(data[0])).to.equal('test')
+  })
 })

@@ -129,4 +129,23 @@ describe('choice', () => {
     expect(fulltext.suggestion(data[0])).to.equal('right')
     expect(data[0].result).to.eql({key: 'testValue'})
   })
+
+  it('ignores strings and nulls for reconciliation', () => {
+    class Test extends phrase.Phrase {
+      describe() {
+        return (
+          <choice>
+            {null}
+            <literal text='test' />
+            someString
+          </choice>
+        )
+      }
+    }
+
+    parser.grammar = <Test />
+    const data = parser.parseArray('test')
+    expect(data).to.have.length(1)
+    expect(fulltext.all(data[0])).to.equal('test')
+  })
 })

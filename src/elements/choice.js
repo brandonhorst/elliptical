@@ -11,13 +11,13 @@ export default class Choice extends Phrase {
     if (this.props.children && this.props.children.length > 0) {
       this.childPhrases = reconcile({descriptor: this.props.children, phrase: this.childPhrases, options})
 
-      for (let [childDescription, childPhrase] of _.zip(this.props.children, this.childPhrases)) {
+      for (let childPhrase of this.childPhrases) {
         let success = false
 
         for (let output of parse({phrase: childPhrase, input, options})) {
           const newResult = this.props.value || (
-            (childDescription.props && childDescription.props.id) ?
-            {[childDescription.props.id]: output.result} :
+            childPhrase.props.id ?
+            {[childPhrase.props.id]: output.result} :
             output.result
           )
           yield _.assign({}, output, {
@@ -34,26 +34,3 @@ export default class Choice extends Phrase {
 }
 
 Choice.defaultProps = {limit: 100}
-
-        /*if (this.props.ordered) {
-          const obj = {output, childDescription}
-          const index = _.sortedLastIndex(scoredOutputs, obj, obj => -obj.output.score)
-          scoredOutputs.splice(index, 0, obj)
-        } else {
-
-
-    if (this.props.ordered) {
-      const childSet = new Set()
-
-      for (let {output, childDescription} of scoredOutputs) {
-        let success = false
-
-        yield _.assign({}, output, {
-          callbacks: output.callbacks.concat(() => success = true),
-          result: this.props.value || output.result
-        })
-
-        if (success) childSet.add(childDescription)
-        if (this.props.limit <= childSet.size) break
-      }
-    }*/

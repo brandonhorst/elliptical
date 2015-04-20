@@ -1,43 +1,36 @@
-/** @jsx phrase.createElement */
+/** @jsx createElement */
 /* eslint-env mocha */
 import chai, {expect} from 'chai'
+import {createElement, Phrase} from 'lacona-phrase'
 import fulltext from 'lacona-util-fulltext'
-import * as lacona from '..'
-import * as phrase from 'lacona-phrase'
 import reconcile from '../lib/reconcile'
 
 describe('reconcile', () => {
   it('throws for phrases without a default-lang schema', () => {
-    class Test extends phrase.Phrase {
-      getTranslations() {
-        return [{
-          langs: ['en-US'],
-          describe: () => {
-            return lacona.literal({text: 'whatever'})
-          }
-        }]
+    class Test extends Phrase {}
+    Test.translations = [{
+      langs: ['en-US'],
+      describe() {
+        return <literal text='whatever' />
       }
-    }
+    }]
 
     expect(() => reconcile(<Test />)).to.throw(Error)
   })
 
   it('throws for translations without a lang', () => {
-    class Test extends phrase.Phrase {
-      getTranslations() {
-        return [{
-          describe: () => {
-            return lacona.literal({text: 'whatever'})
-          }
-        }]
+    class Test extends Phrase {}
+    Test.translations = [{
+      describe () {
+        return <literal text='whatever' />
       }
-    }
+    }]
 
     expect(() => reconcile(<Test />)).to.throw(Error)
   })
 
   it('throws for phrases without a describe', () => {
-    class Test extends phrase.Phrase {}
+    class Test extends Phrase {}
 
     expect(() => reconcile(<Test />)).to.throw(Error)
   })
