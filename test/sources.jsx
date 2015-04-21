@@ -34,6 +34,36 @@ describe('sources', () => {
     expect(fulltext.all(data[0])).to.equal('testa')
   })
 
+  it('destroy() is called, on destroy', () => {
+    const destSpy = spy()
+    class TestSource extends Source {
+      destroy () {destSpy()}
+    }
+
+    class Test extends Phrase {
+      describe() {return <literal text='test' />}
+      source() {
+        if (this.props.useSource) {
+          return {data: <TestSource />}
+        } else {
+          return {}
+        }
+      }
+    }
+
+    parser.grammar = <Test useSource={true}/>
+    const data1 = from(parser.parse(''))
+    expect(destSpy).to.not.have.been.called
+    expect(data1).to.have.length(1)
+    expect(fulltext.all(data1[0])).to.equal('test')
+
+    parser.grammar = <Test useSource={false}/>
+    const data2 = from(parser.parse(''))
+    expect(destSpy).to.have.been.called
+    expect(data2).to.have.length(1)
+    expect(fulltext.all(data2[0])).to.equal('test')
+  })
+
   it('passes props to create', () => {
     class TestSource extends Source {
       create() {this.setData({test: this.props.test})}

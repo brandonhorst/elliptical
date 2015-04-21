@@ -44,7 +44,7 @@ function reconcileOne({descriptor, phrase, options}) {
     newPhrase.props = props
 
     const sourceCall = getCall({prop: 'source', Constructor, langs: options.langs})
-    const sources = sourceCall ? sourceCall.call(phrase) : {}
+    const sources = sourceCall ? sourceCall.call(newPhrase) : {}
     const allSources = _.defaults({}, sources, Constructor.__additionalSources)
     applySources({sources: allSources, phrase: newPhrase, getSource: options.getSource})
 
