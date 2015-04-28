@@ -18,10 +18,12 @@ export default function *parse({phrase, input, options}) {
 
 function *parseElement({phrase, input, options}) {
   // add this to the stack before doing anything
+  // console.log(phrase.constructor instanceof Placeholder)
   const inputWithStack = _.assign({}, input, {
     stack: input.stack.concat({
       Constructor: phrase.constructor,
-      category: phrase.props.category
+      category: phrase.props.category,
+      descriptor: phrase.props.descriptor
     }),
     path: input.path.concat(phrase)
   })

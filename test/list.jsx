@@ -88,4 +88,13 @@ describe('list', () => {
     expect(data[1].result).to.equal('override')
     expect(data[2].result).to.equal('override')
   })
+
+  it('does not output items twice', () => {
+    const items = ['testa', 'testb']
+    parser.grammar = <list items={items} />
+
+    const data = from(parser.parse('testa'))
+    expect(data).to.have.length(1)
+    expect(fulltext.all(data[0])).to.equal('testa')
+  })
 })

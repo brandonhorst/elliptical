@@ -7,6 +7,7 @@ export default class Value extends Phrase {
   *_handleParse(input, options) {
     // if this has a category use that, else the last category on the stack
     const category = stackFind(input.stack, 'category', this.props.category, null)
+    const descriptor = stackFind(input.stack, 'descriptor', this.props.descriptor, null)
 
     let successes = 0
 
@@ -21,7 +22,12 @@ export default class Value extends Phrase {
           callbacks: input.callbacks.concat(() => success = true)
         }
 
-        const word = {string: output.suggestion, category, input: false}
+        const word = {
+          string: output.suggestion,
+          category,
+          input: false,
+          descriptor
+        }
 
         if (_.isEmpty(input.suggestion)) {
           modification.suggestion = input.suggestion.concat(word)
@@ -42,10 +48,15 @@ export default class Value extends Phrase {
           result: output.value,
           score: output.score || 1,
           text: output.remaining,
-          callbacks: input.callbacks.concat(() => success = true)
+          callbacks: input.callbacks.concat(() => success = true),
         }
 
-        const trueWords = output.words.map(word => ({string: word.text, category, input: word.input}))
+        const trueWords = output.words.map(word => ({
+          string: word.text,
+          category,
+          input: word.input,
+          descriptor
+        }))
 
         if (_.isEmpty(input.suggestion) && _.every(output.words, 'input')) {
           modification.match = input.match.concat(trueWords)
