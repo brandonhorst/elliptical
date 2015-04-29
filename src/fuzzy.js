@@ -26,6 +26,7 @@ function* sortFunction({input, itemSet, func}) {
       const words = func({input, text: obj.item.text})
       if (words) {
         obj.matched = true
+        _.forEach(words, word => word.descriptor = obj.item.descriptor)
         yield {words, value: obj.item.value}
       }
     }

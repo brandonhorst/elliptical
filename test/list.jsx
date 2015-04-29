@@ -107,4 +107,14 @@ describe('list', () => {
     expect(fulltext.all(data[0])).to.equal('testa')
     expect(data[0].match[0].descriptor).to.equal('desca')
   })
+
+  it('outputs a descriptor (fuzzy)', () => {
+    const items = [{text: 'testa', descriptor: 'desca'}, 'testb']
+    parser.grammar = <list items={items} fuzzy='true' />
+
+    const data = from(parser.parse('a'))
+    expect(data).to.have.length(1)
+    expect(fulltext.all(data[0])).to.equal('testa')
+    expect(data[0].suggestion[0].descriptor).to.equal('desca')
+  })
 })

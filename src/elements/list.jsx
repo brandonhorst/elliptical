@@ -20,9 +20,8 @@ export default class List extends Phrase {
       if (_.startsWith(input.toLowerCase(), item.text.toLowerCase())) {
         yield {
           remaining: input.slice(item.text.length),
-          words: [{text: item.text, input: true}],
-          value: item.value,
-          descriptor: item.descriptor
+          words: [{text: item.text, input: true, descriptor: item.descriptor}],
+          value: item.value
         }
         item.handled = true
       }
@@ -32,6 +31,7 @@ export default class List extends Phrase {
 
     for (let result of sort(input, newItems)) {
       result.remaining = ''
+
       yield result
     }
   }
