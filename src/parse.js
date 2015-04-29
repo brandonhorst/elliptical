@@ -39,8 +39,10 @@ function *parseElement({phrase, input, options}) {
         yield newOutput
       }
     }
-  } else {
+  } else if (phrase._handleParse) {
     yield* phrase._handleParse(inputWithStack, options, parse)
+  } else {
+    //noop
   }
 
   _.forEach(phrase.__sources, obj => {

@@ -3,7 +3,7 @@
 import chai, {expect} from 'chai'
 import {createElement, Phrase} from 'lacona-phrase'
 import fulltext from 'lacona-util-fulltext'
-import reconcile from '../lib/reconcile'
+import {reconcile} from '../lib/reconcile'
 
 describe('reconcile', () => {
   it('throws for phrases without a default-lang schema', () => {
@@ -25,12 +25,6 @@ describe('reconcile', () => {
         return <literal text='whatever' />
       }
     }]
-
-    expect(() => reconcile(<Test />)).to.throw(Error)
-  })
-
-  it('throws for phrases without a describe', () => {
-    class Test extends Phrase {}
 
     expect(() => reconcile(<Test />)).to.throw(Error)
   })
