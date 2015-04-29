@@ -97,4 +97,14 @@ describe('list', () => {
     expect(data).to.have.length(1)
     expect(fulltext.all(data[0])).to.equal('testa')
   })
+
+  it('outputs a descriptor', () => {
+    const items = [{text: 'testa', descriptor: 'desca'}, 'testb']
+    parser.grammar = <list items={items} />
+
+    const data = from(parser.parse('testa'))
+    expect(data).to.have.length(1)
+    expect(fulltext.all(data[0])).to.equal('testa')
+    expect(data[0].match[0].descriptor).to.equal('desca')
+  })
 })

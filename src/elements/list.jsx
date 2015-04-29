@@ -8,6 +8,7 @@ export default class List extends Phrase {
   itemify (item) {
     const trueItem = _.isString(item) ? {text: item} : item
     if (!_.isUndefined(this.props.value)) trueItem.value = this.props.value
+    if (!_.isUndefined(this.props.descriptor)) trueItem.descriptor = this.props.descriptor
     return trueItem
   }
 
@@ -20,7 +21,8 @@ export default class List extends Phrase {
         yield {
           remaining: input.slice(item.text.length),
           words: [{text: item.text, input: true}],
-          value: item.value
+          value: item.value,
+          descriptor: item.descriptor
         }
         item.handled = true
       }
@@ -47,7 +49,7 @@ export default class List extends Phrase {
     } else {
       const literals = _.chain(this.props.items)
         .map(this.itemify.bind(this))
-        .map(item => <literal text={item.text} value={item.value} />)
+        .map(item => <literal text={item.text} value={item.value} descriptor={item.descriptor} />)
         .value()
 
       return (

@@ -55,7 +55,7 @@ export default class Value extends Phrase {
           string: word.text,
           category,
           input: word.input,
-          descriptor
+          descriptor: word.descriptor || descriptor
         }))
 
         if (_.isEmpty(input.suggestion) && _.every(output.words, 'input')) {

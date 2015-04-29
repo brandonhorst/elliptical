@@ -13,13 +13,39 @@ describe('Phrase', () => {
     parser = new lacona.Parser()
   })
 
-  it('handles phrases with no definition (so classes to be extended)', () => {
-    class Noop extends phrase.Phrase {}
+  it('allows phrases that return null (for classes to be extended)', () => {
+    class Noop extends phrase.Phrase {
+      describe() {
+        return null
+      }
+    }
 
     parser.grammar = <Noop />
 
     const data = from(parser.parse('t'))
     expect(data).to.have.length(0)
+  })
+
+  it('handles phrases that return null to be extended', () => {
+    class Noop extends phrase.Phrase {
+      describe() {
+        return null
+      }
+    }
+
+    class Extender extends phrase.Phrase {
+      describe() {
+        return <literal text='test' />
+      }
+    }
+    Extender.extends = [Noop]
+
+    parser.grammar = <Noop />
+    parser.extensions = [Extender]
+
+    const data = from(parser.parse('t'))
+    expect(data).to.have.length(1)
+    expect(fulltext.all(data[0])).to.equal('test')
   })
 
   it('handles phrases with extends', () => {
