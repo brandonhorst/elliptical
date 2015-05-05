@@ -16,6 +16,8 @@ export default class List extends Phrase {
     // first check for exact matches
     const trueItems = _.map(this.props.items, this.itemify.bind(this))
 
+    const itemsForFuzzy = []
+
     for (let item of trueItems) {
       if (_.startsWith(input.toLowerCase(), item.text.toLowerCase())) {
         yield {
@@ -23,13 +25,12 @@ export default class List extends Phrase {
           words: [{text: item.text, input: true, descriptor: item.descriptor}],
           value: item.value
         }
-        item.handled = true
+      } else {
+        itemsForFuzzy.push(item)
       }
     }
 
-    const newItems = _.reject(trueItems, 'handled')
-
-    for (let result of sort(input, newItems)) {
+    for (let result of sort(input, itemsForFuzzy)) {
       result.remaining = ''
 
       yield result
