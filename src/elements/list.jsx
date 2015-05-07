@@ -8,7 +8,7 @@ export default class List extends Phrase {
   itemify (item) {
     const trueItem = _.isString(item) ? {text: item} : item
     if (!_.isUndefined(this.props.value)) trueItem.value = this.props.value
-    if (!_.isUndefined(this.props.descriptor)) trueItem.descriptor = this.props.descriptor
+    if (!_.isUndefined(this.props.qualifier)) trueItem.qualifier = this.props.qualifier
     return trueItem
   }
 
@@ -22,7 +22,7 @@ export default class List extends Phrase {
       if (_.startsWith(input.toLowerCase(), item.text.toLowerCase())) {
         yield {
           remaining: input.slice(item.text.length),
-          words: [{text: item.text, input: true, descriptor: item.descriptor}],
+          words: [{text: item.text, input: true, qualifier: item.qualifier}],
           value: item.value
         }
       } else {
@@ -50,7 +50,7 @@ export default class List extends Phrase {
     } else {
       const literals = _.chain(this.props.items)
         .map(this.itemify.bind(this))
-        .map(item => <literal text={item.text} value={item.value} descriptor={item.descriptor} />)
+        .map(item => <literal text={item.text} value={item.value} qualifier={item.qualifier} />)
         .value()
 
       return (

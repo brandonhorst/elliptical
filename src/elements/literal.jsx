@@ -47,6 +47,6 @@ export default class Literal extends Phrase {
   }
 
   describe() {
-    return <value compute={this.compute.bind(this)} suggest={this.suggest.bind(this)} />
+    return <value compute={this.compute.bind(this)} suggest={this.suggest.bind(this)} qualifier={this.props.qualifier} />
   }
 }

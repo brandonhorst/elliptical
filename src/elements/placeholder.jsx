@@ -17,7 +17,7 @@ export default class Placeholder extends Phrase {
       let success = false
       if (_.isEmpty(input.suggestion)) {
         if (this.props.trigger) this.props.trigger()
-        
+
         for (let output of parse({phrase: this.childPhrase, input, options})) {
           success = true
           yield output
@@ -26,9 +26,10 @@ export default class Placeholder extends Phrase {
 
       if (!success) {
         const category = stackFind(input.stack, 'category', this.props.category, null)
+        const descriptors = _.chain(input.stack).map('descriptor').filter().value()
 
         const word = {
-          descriptor: this.props.descriptor,
+          descriptors,
           category,
           input: false,
           placeholder: true

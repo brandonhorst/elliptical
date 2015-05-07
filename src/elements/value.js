@@ -7,7 +7,8 @@ export default class Value extends Phrase {
   *_handleParse(input, options) {
     // if this has a category use that, else the last category on the stack
     const category = stackFind(input.stack, 'category', this.props.category, null)
-    const descriptor = stackFind(input.stack, 'descriptor', this.props.descriptor, null)
+    const qualifier = stackFind(input.stack, 'qualifier', this.props.qualifier, null)
+    const descriptors = _.chain(input.stack).map('descriptor').filter().value()
 
     let successes = 0
 
@@ -26,7 +27,8 @@ export default class Value extends Phrase {
           string: output.suggestion,
           category,
           input: false,
-          descriptor
+          qualifier,
+          descriptors
         }
 
         if (_.isEmpty(input.suggestion)) {
@@ -55,7 +57,8 @@ export default class Value extends Phrase {
           string: word.text,
           category,
           input: word.input,
-          descriptor: word.descriptor || descriptor
+          qualifier: word.qualifier || qualifier,
+          descriptors
         }))
 
         if (_.isEmpty(input.suggestion) && _.every(output.words, 'input')) {

@@ -98,23 +98,23 @@ describe('list', () => {
     expect(fulltext.all(data[0])).to.equal('testa')
   })
 
-  it('outputs a descriptor', () => {
-    const items = [{text: 'testa', descriptor: 'desca'}, 'testb']
+  it('outputs a qualifier', () => {
+    const items = [{text: 'testa', qualifier: 'desca'}, 'testb']
     parser.grammar = <list items={items} />
 
     const data = from(parser.parse('testa'))
     expect(data).to.have.length(1)
     expect(fulltext.all(data[0])).to.equal('testa')
-    expect(data[0].match[0].descriptor).to.equal('desca')
+    expect(data[0].match[0].qualifier).to.equal('desca')
   })
 
-  it('outputs a descriptor (fuzzy)', () => {
-    const items = [{text: 'testa', descriptor: 'desca'}, 'testb']
+  it('outputs a qualifier (fuzzy)', () => {
+    const items = [{text: 'testa', qualifier: 'desca'}, 'testb']
     parser.grammar = <list items={items} fuzzy='true' />
 
     const data = from(parser.parse('a'))
     expect(data).to.have.length(1)
     expect(fulltext.all(data[0])).to.equal('testa')
-    expect(data[0].suggestion[0].descriptor).to.equal('desca')
+    expect(data[0].suggestion[0].qualifier).to.equal('desca')
   })
 })
