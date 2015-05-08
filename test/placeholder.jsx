@@ -124,4 +124,57 @@ describe('placeholder', function () {
     expect(func).to.have.been.calledTwice
     expect(data3).to.have.length(1)
   })
+
+  it('can utilize showForEmpty', () => {
+    parser.grammar = (
+      <sequence>
+        <literal text='a ' id='a' value='a' />
+        <placeholder descriptor='test' showForEmpty={true} id='place'>
+          <literal text='literal' />
+        </placeholder>
+      </sequence>
+    )
+
+    const data1 = from(parser.parse(''))
+    expect(data1).to.have.length(1)
+    expect(data1[0].completion[0].descriptors[0]).to.equal('test')
+
+    const data2 = from(parser.parse('a'))
+    expect(data2).to.have.length(1)
+    expect(data2[0].completion[0].descriptors[0]).to.equal('test')
+
+    const data3 = from(parser.parse('a '))
+    expect(data3).to.have.length(1)
+    expect(data3[0].suggestion[0].descriptors[0]).to.equal('test')
+
+    const data4 = from(parser.parse('a l'))
+    expect(data4).to.have.length(1)
+    expect(fulltext.suggestion(data4[0])).to.equal('literal')
+  })
+
+  it('can utilize displayWhen', () => {
+    function displayWhen (input) {
+      return !input.includes(' ')
+    }
+
+    parser.grammar = (
+      <sequence>
+        <literal text='a ' id='a' value='a' />
+        <placeholder descriptor='test' displayWhen={displayWhen} id='place'>
+          <literal text='literal' />
+        </placeholder>
+      </sequence>
+    )
+
+    const data1 = from(parser.parse(''))
+    expect(data1).to.have.length(1)
+    expect(data1[0].completion[0].descriptors[0]).to.equal('test')
+
+    const data2 = from(parser.parse('a test'))
+    expect(data2).to.have.length(1)
+    expect(data2[0].suggestion[0].descriptors[0]).to.equal('test')
+
+    const data3 = from(parser.parse('a test test'))
+    expect(data3).to.have.length(0)
+  })
 })

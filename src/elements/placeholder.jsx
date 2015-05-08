@@ -6,48 +6,67 @@ import {reconcile} from '../reconcile'
 import stackFind from '../stackfind'
 
 export default class Placeholder extends Phrase {
+  *parseChild (input, options) {
+    if (this.props.trigger) this.props.trigger()
+
+    if (this.props.showForEmpty && input.text === '') return true
+
+    let showPlaceholder = true
+    for (let output of parse({phrase: this.childPhrase, input, options})) {
+      showPlaceholder = false
+      yield output
+    }
+    if (!showPlaceholder) return false
+
+    if (this.props.displayWhen && this.props.displayWhen(input.text)) {
+      return true
+    }
+
+    return false
+  }
+
+  *yieldSelf(input, options) {
+    const category = stackFind(input.stack, 'category', this.props.category, null)
+    const descriptors = _.chain(input.stack).map('descriptor').filter().value()
+
+    const word = {
+      descriptors,
+      category,
+      input: false,
+      placeholder: true
+    }
+
+    const modification = {
+      score: 1,
+      result: undefined,
+      text: ''
+    }
+
+    if (_.isEmpty(input.suggestion)) {
+      modification.suggestion = input.suggestion.concat(word)
+    } else {
+      modification.completion = input.completion.concat(word)
+    }
+
+    yield _.assign({}, input, modification)
+  }
+
   *_handleParse(input, options) {
     this.childPhrase = reconcile({descriptor: this.props.children[0], phrase: this.childPhrase, options})
 
-    if (input.text !== '') {
-      if (this.props.trigger) this.props.trigger()
-
-      yield* parse({phrase: this.childPhrase, input, options})
+    if (_.isEmpty(input.suggestion)) {
+      const showPlaceholder = yield* this.parseChild(input, options)
+      if (showPlaceholder) {
+        yield* this.yieldSelf(input, options)
+      }
     } else {
-      let success = false
-      if (_.isEmpty(input.suggestion)) {
-        if (this.props.trigger) this.props.trigger()
-
-        for (let output of parse({phrase: this.childPhrase, input, options})) {
-          success = true
-          yield output
-        }
-      }
-
-      if (!success) {
-        const category = stackFind(input.stack, 'category', this.props.category, null)
-        const descriptors = _.chain(input.stack).map('descriptor').filter().value()
-
-        const word = {
-          descriptors,
-          category,
-          input: false,
-          placeholder: true
-        }
-
-        const modification = {
-          score: 1,
-          result: undefined
-        }
-
-        if (_.isEmpty(input.suggestion)) {
-          modification.suggestion = input.suggestion.concat(word)
-        } else {
-          modification.completion = input.completion.concat(word)
-        }
-
-        yield _.assign({}, input, modification)
-      }
+      yield* this.yieldSelf(input, options)
     }
+  }
+}
+Placeholder.defaultProps = {
+  showForEmpty: false,
+  displayWhen(input) {
+    return input === ''
   }
 }
