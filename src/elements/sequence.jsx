@@ -44,12 +44,14 @@ export default class Sequence extends Phrase {
 
           const newChild = _.merge({}, child, {props: {optional: false}})
           delete newChild.props.id
+          delete newChild.props.merge
+          
           const choiceChildren = [<literal text='' />, newChild]
 
           if (child.props.preferred) choiceChildren.reverse()
 
           return (
-            <choice limit={child.props.limited ? 1 : undefined} id={child.props.id}>
+            <choice limit={child.props.limited ? 1 : undefined} id={child.props.id} merge={child.props.merge}>
               {choiceChildren}
             </choice>
           )
@@ -102,7 +104,11 @@ function getAccumulatedResult(inputResult, child, childResult) {
     if (childId) {
        return _.assign({}, inputResult, {[childId]: childResult})
     } else if (childMerge) {
-      return _.merge({}, inputResult, childResult)
+      if (_.isPlainObject(childResult)) {
+        return _.merge({}, inputResult, childResult)
+      } else {
+        return childResult
+      }
     }
   }
   return inputResult

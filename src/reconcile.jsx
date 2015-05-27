@@ -100,7 +100,7 @@ function getDescription({describe, extensions, phrase}) {
   if (describe) {
     let description = describe.call(phrase)
     if (extensions.length) {
-      const extensionElements = extensions.map(Extension => <Extension {...phrase.props} />)
+      const extensionElements = extensions.map(Extension => <Extension {...phrase.props} id={null} />)
       description = (
         <choice>
           {description}

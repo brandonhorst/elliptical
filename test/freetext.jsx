@@ -1,9 +1,13 @@
 /** @jsx createElement */
 /* eslint-env mocha */
 import {createElement, Phrase} from 'lacona-phrase'
-import {expect} from 'chai'
+import chai, {expect} from 'chai'
 import {Parser} from '..'
 import fulltext from 'lacona-util-fulltext'
+import {spy} from 'sinon'
+import sinonChai from 'sinon-chai'
+
+chai.use(sinonChai)
 
 describe('freetext', () => {
 	var parser
@@ -35,6 +39,22 @@ describe('freetext', () => {
 		expect(data).to.have.length(1)
 		expect(fulltext.match(data[0])).to.equal('anything')
 		expect(data[0].result).to.equal('anything')
+	})
+
+	it('allows consumeAll', () => {
+		const valSpy = spy()
+
+		function validate (input) {
+			valSpy()
+			return input === 'validValue'
+		}
+
+		parser.grammar = <freetext validate={validate} consumeAll={true} />
+
+		const data = parser.parseArray('validValue')
+		expect(data).to.have.length(1)
+		expect(fulltext.match(data[0])).to.equal('validValue')
+		expect(valSpy).to.have.been.calledOnce
 	})
 
 	it('allows splits on strings', () => {

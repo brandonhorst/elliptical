@@ -22,7 +22,7 @@ export function createOption(options) {
 }
 
 function normalizeOutput (option) {
-  let output = _.pick(option, ['match', 'completion', 'result', 'score'])
+  let output = _.pick(option, ['match', 'completion', 'result', 'score', 'path'])
   const suggestion = option.suggestion
   let newSuggestions = []
   let i, l, lastSuggestion, oldSuggestion

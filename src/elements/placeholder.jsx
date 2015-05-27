@@ -7,7 +7,7 @@ import stackFind from '../stackfind'
 
 export default class Placeholder extends Phrase {
   *parseChild (input, options) {
-    if (this.props.trigger) this.props.trigger()
+    if (this.props.trigger) this.props.trigger(input.text)
 
     if (this.props.showForEmpty && input.text === '') return true
 
@@ -31,6 +31,7 @@ export default class Placeholder extends Phrase {
 
     const word = {
       descriptors,
+      // descriptor: this.props.descriptor,
       category,
       input: false,
       placeholder: true

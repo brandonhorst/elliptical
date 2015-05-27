@@ -31,23 +31,25 @@ describe('placeholder', function () {
     const data1 = from(parser.parse(''))
     expect(data1).to.have.length(1)
     expect(data1[0].result).to.eql({a: 'a'})
+    // expect(fulltext.all(data1[0])).to.equal('a test')
     expect(data1[0].completion[0].descriptors[0]).to.equal('test')
 
     const data2 = from(parser.parse('a'))
     expect(data2).to.have.length(1)
     expect(data2[0].result).to.eql({a: 'a'})
+    // expect(fulltext.all(data2[0])).to.equal('a test')
     expect(data2[0].completion[0].descriptors[0]).to.equal('test')
 
     const data3 = from(parser.parse('a '))
     expect(data3).to.have.length(1)
     expect(data3[0].result).to.eql({a: 'a', place: 'test'})
-    expect(fulltext.all(data3[0])).to.equal('a literal')
+    // expect(fulltext.all(data3[0])).to.equal('a literal')
     expect(data3[0].suggestion[0].descriptors[0]).to.equal('test')
 
     const data4 = from(parser.parse('a l'))
     expect(data4).to.have.length(1)
     expect(data4[0].result).to.eql({a: 'a', place: 'test'})
-    expect(fulltext.all(data4[0])).to.equal('a literal')
+    // expect(fulltext.all(data4[0])).to.equal('a literal')
     expect(data4[0].suggestion[0].descriptors[0]).to.equal('test')
 
     const data5 = from(parser.parse('a t'))
@@ -79,22 +81,22 @@ describe('placeholder', function () {
     const data1 = from(parser.parse(''))
     expect(data1).to.have.length(1)
     expect(data1[0].result).to.eql({a: 'a'})
-    expect(data1[0].completion[0].descriptors[0]).to.equal('test')
+    // expect(fulltext.all(data1[0])).to.equal('a test')
 
     const data2 = from(parser.parse('a'))
     expect(data2).to.have.length(1)
     expect(data2[0].result).to.eql({a: 'a'})
-    expect(data2[0].completion[0].descriptors[0]).to.equal('test')
+    // expect(fulltext.all(data2[0])).to.equal('a test')
 
     const data3 = from(parser.parse('a '))
     expect(data3).to.have.length(1)
     expect(data3[0].result).to.eql({a: 'a'})
-    expect(data3[0].suggestion[0].descriptors[0]).to.equal('test')
+    // expect(fulltext.all(data3[0])).to.equal('a test')
 
     const data4 = from(parser.parse('a v'))
     expect(data4).to.have.length(1)
     expect(data4[0].result).to.eql({a: 'a', place: 'test'})
-    expect(data4[0].match[1].string).to.equal('value')
+    // expect(fulltext.all(data4[0])).to.equal('a value')
 
     const data5 = from(parser.parse('a t'))
     expect(data5).to.have.length(0)
@@ -118,63 +120,12 @@ describe('placeholder', function () {
 
     const data2 = from(parser.parse('a '))
     expect(func).to.have.been.calledOnce
+    expect(func).to.have.been.calledWith('')
     expect(data2).to.have.length(1)
 
     const data3 = from(parser.parse('a l'))
     expect(func).to.have.been.calledTwice
+    expect(func).to.have.been.calledWith('l')
     expect(data3).to.have.length(1)
-  })
-
-  it('can utilize showForEmpty', () => {
-    parser.grammar = (
-      <sequence>
-        <literal text='a ' id='a' value='a' />
-        <placeholder descriptor='test' showForEmpty={true} id='place'>
-          <literal text='literal' />
-        </placeholder>
-      </sequence>
-    )
-
-    const data1 = from(parser.parse(''))
-    expect(data1).to.have.length(1)
-    expect(data1[0].completion[0].descriptors[0]).to.equal('test')
-
-    const data2 = from(parser.parse('a'))
-    expect(data2).to.have.length(1)
-    expect(data2[0].completion[0].descriptors[0]).to.equal('test')
-
-    const data3 = from(parser.parse('a '))
-    expect(data3).to.have.length(1)
-    expect(data3[0].suggestion[0].descriptors[0]).to.equal('test')
-
-    const data4 = from(parser.parse('a l'))
-    expect(data4).to.have.length(1)
-    expect(fulltext.suggestion(data4[0])).to.equal('literal')
-  })
-
-  it('can utilize displayWhen', () => {
-    function displayWhen (input) {
-      return !input.includes(' ')
-    }
-
-    parser.grammar = (
-      <sequence>
-        <literal text='a ' id='a' value='a' />
-        <placeholder descriptor='test' displayWhen={displayWhen} id='place'>
-          <literal text='literal' />
-        </placeholder>
-      </sequence>
-    )
-
-    const data1 = from(parser.parse(''))
-    expect(data1).to.have.length(1)
-    expect(data1[0].completion[0].descriptors[0]).to.equal('test')
-
-    const data2 = from(parser.parse('a test'))
-    expect(data2).to.have.length(1)
-    expect(data2[0].suggestion[0].descriptors[0]).to.equal('test')
-
-    const data3 = from(parser.parse('a test test'))
-    expect(data3).to.have.length(0)
   })
 })

@@ -49,14 +49,23 @@ describe('list', () => {
   })
 
   it('sorts with fuzzy, and limits before it', () => {
-    parser.grammar = <list items={['ztest', 'tezst', 'testz', 'tzest']} fuzzy={true} limit={3} />
+    parser.grammar = <list items={['ztest', 'testz', 'tzest']} fuzzy={true} limit={3} />
 
     const data = from(parser.parse('test'))
-    expect(data).to.have.length(3)
+    expect(data).to.have.length(2)
     expect(fulltext.all(data[0])).to.equal('testz')
     expect(fulltext.all(data[1])).to.equal('ztest')
-    expect(fulltext.all(data[2])).to.equal('tezst')
   })
+
+  // it('sorts with fuzzy, and limits before it', () => {
+  //   parser.grammar = <list items={['ztest', 'tezst', 'testz', 'tzest']} fuzzy={true} limit={3} />
+  //
+  //   const data = from(parser.parse('test'))
+  //   expect(data).to.have.length(3)
+  //   expect(fulltext.all(data[0])).to.equal('testz')
+  //   expect(fulltext.all(data[1])).to.equal('ztest')
+  //   expect(fulltext.all(data[2])).to.equal('tezst')
+  // })
 
   it('allows for value without fuzzy', () => {
     const items = [{text: 'testa', value: 'a'}, {text: 'testb', value: 'b'}]
@@ -115,6 +124,22 @@ describe('list', () => {
     const data = from(parser.parse('a'))
     expect(data).to.have.length(1)
     expect(fulltext.all(data[0])).to.equal('testa')
+    console.log(data[0])
     expect(data[0].suggestion[0].qualifier).to.equal('desca')
+  })
+
+
+  it('outputs score', () => {
+    const items = ['ztest', 'testz', 'tezst']
+    parser.grammar = <list items={items} fuzzy={true} />
+
+    const data = from(parser.parse('test'))
+    expect(data).to.have.length(2)
+    expect(fulltext.all(data[0])).to.equal('testz')
+    expect(data[0].score).to.equal(1)
+    expect(fulltext.all(data[1])).to.equal('ztest')
+    expect(data[1].score).to.equal(0.5)
+    // expect(fulltext.all(data[2])).to.equal('tezst')
+    // expect(data[2].score).to.equal(0.25)
   })
 })

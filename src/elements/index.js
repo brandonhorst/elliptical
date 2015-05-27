@@ -1,4 +1,5 @@
 export {default as choice} from './choice'
+export {default as decorator} from './decorator'
 export {default as freetext} from './freetext'
 export {default as list} from './list'
 export {default as literal} from './literal'

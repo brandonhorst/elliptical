@@ -50,13 +50,13 @@ describe('Phrase', () => {
 
   it('handles phrases with extends', () => {
     class Extended extends phrase.Phrase {
-      describe() { return <literal text='test a' /> }
+      describe() { return <literal text='test a' value='a' /> }
     }
 
     class Extender extends phrase.Phrase {
-      describe() { return <literal text='test b' /> }
-      static get extends() { return [Extended] }
+      describe() { return <literal text='test b' value='b' /> }
     }
+    Extender.extends = [Extended]
 
     parser.grammar = <Extended />
     parser.extensions = [Extender]
@@ -64,7 +64,38 @@ describe('Phrase', () => {
     const data = from(parser.parse('t'))
     expect(data).to.have.length(2)
     expect(fulltext.suggestion(data[0])).to.equal('test a')
-    expect(fulltext.suggestion(data[1])).to.equal('test b')
+    expect(data[0].result).to.equal('a')
+    expect(data[1].result).to.equal('b')
+  })
+
+  it('handles phrases with extends in sequence', () => {
+    class Test extends phrase.Phrase {
+      describe() { return (
+        <sequence>
+          <literal text='test ' />
+          <Extended id='test' />
+        </sequence>
+      )}
+    }
+
+    class Extended extends phrase.Phrase {
+      describe() { return <literal text='a' value='a' /> }
+    }
+
+    class Extender extends phrase.Phrase {
+      describe() { return <literal text='b' value='b' /> }
+    }
+    Extender.extends = [Extended]
+
+    parser.grammar = <Test />
+    parser.extensions = [Extender]
+
+    const data = from(parser.parse('t'))
+    expect(data).to.have.length(2)
+    expect(fulltext.all(data[0])).to.equal('test a')
+    expect(data[0].result.test).to.equal('a')
+    expect(fulltext.all(data[1])).to.equal('test b')
+    expect(data[1].result.test).to.equal('b')
   })
 
   it('accepts extends being removed', () => {

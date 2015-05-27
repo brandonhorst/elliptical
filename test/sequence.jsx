@@ -225,6 +225,37 @@ describe('sequence', function () {
     })
   })
 
+  it('will merge non-object results in', () => {
+    parser.grammar = (
+      <sequence>
+        <literal text='super' />
+        <literal text='man' value='man' merge={true} />
+      </sequence>
+    )
+
+    const data = from(parser.parse('superm'))
+    expect(data).to.have.length(1)
+    expect(data[0].result).to.eql('man')
+  })
+
+
+  it('will merge results in for optionals', () => {
+    parser.grammar = (
+      <sequence>
+        <literal text='super' />
+        <literal text='man' value='man' optional={true} merge={true} />
+      </sequence>
+    )
+
+    const data = from(parser.parse('sup'))
+    expect(data).to.have.length(2)
+    expect(fulltext.all(data[0])).to.eql('super')
+    expect(data[0].result).to.eql({})
+
+    expect(fulltext.all(data[1])).to.eql('superman')
+    expect(data[1].result).to.eql('man')
+  })
+
   it('will merge results in, even with separator', () => {
     parser.grammar = (
       <sequence>
