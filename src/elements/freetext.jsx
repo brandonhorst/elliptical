@@ -23,7 +23,7 @@ export default class Freetext extends Phrase {
           words: [{text: stringPart, input: true}],
           value: stringPart,
           remaining: input.substring(stringPart.length),
-          score: 0.1 + (1 / (stringPart.length + 2))
+          score: this.props.score || (0.1 + (1 / (stringPart.length + 2)))
         }
       }
     }

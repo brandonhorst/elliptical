@@ -45,7 +45,7 @@ export default class Sequence extends Phrase {
           const newChild = _.merge({}, child, {props: {optional: false}})
           delete newChild.props.id
           delete newChild.props.merge
-          
+
           const choiceChildren = [<literal text='' />, newChild]
 
           if (child.props.preferred) choiceChildren.reverse()
@@ -60,7 +60,7 @@ export default class Sequence extends Phrase {
         return child
       })
 
-      return <sequence {...this.props}>{newChildren}</sequence>
+      return <sequence {...this.props} children={undefined}>{newChildren}</sequence>
     }
   }
 

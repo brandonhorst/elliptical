@@ -38,7 +38,7 @@ export default class Placeholder extends Phrase {
     }
 
     const modification = {
-      score: 1,
+      score: 0.01,
       result: undefined,
       text: ''
     }
