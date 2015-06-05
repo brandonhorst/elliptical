@@ -124,7 +124,6 @@ describe('list', () => {
     const data = from(parser.parse('a'))
     expect(data).to.have.length(1)
     expect(fulltext.all(data[0])).to.equal('testa')
-    console.log(data[0])
     expect(data[0].suggestion[0].qualifier).to.equal('desca')
   })
 

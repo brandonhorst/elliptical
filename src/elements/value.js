@@ -61,7 +61,7 @@ export default class Value extends Phrase {
           descriptors
         }))
 
-        if (_.isEmpty(input.suggestion) && _.every(output.words, 'input')) {
+        if (_.isEmpty(input.suggestion) && (_.every(output.words, 'input') || output.decorator)) {
           modification.match = input.match.concat(trueWords)
         } else {
           modification.suggestion = input.suggestion.concat(trueWords)

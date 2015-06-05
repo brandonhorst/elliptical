@@ -50,4 +50,35 @@ describe('decorator', () => {
     expect(data).to.have.length(1)
     expect(fulltext.all(data[0])).to.equal('ba')
   })
+
+  it('decorates an freetext', () => {
+    parser.grammar = (
+      <sequence>
+        <decorator text='x ' />
+        <freetext id='test' />
+      </sequence>
+    )
+
+    const data = parser.parseArray('x superman')
+    expect(data).to.have.length(1)
+    expect(fulltext.all(data[0])).to.equal('x superman')
+    expect(data[0].result.test).to.equal('superman')
+  })
+
+  it('decorates an placeholder', () => {
+    parser.grammar = (
+      <sequence>
+        <literal text='s' />
+        <decorator text='x ' />
+        <placeholder descriptor='test' id='test'>
+          <freetext />
+        </placeholder>
+      </sequence>
+    )
+
+    const data = parser.parseArray('ssuperman')
+    expect(data).to.have.length(1)
+    expect(fulltext.all(data[0])).to.equal('sx superman')
+    expect(data[0].result.test).to.equal('superman')
+  })
 })

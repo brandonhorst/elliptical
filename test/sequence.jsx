@@ -120,6 +120,22 @@ describe('sequence', function () {
     expect(fulltext.suggestion(data[0])).to.equal('maximum')
   })
 
+  it('handles an optional child that is a sequence', () => {
+    parser.grammar = (
+      <sequence>
+        <literal text='super' />
+        <sequence optional={true}>
+          <literal text='man' />
+          <literal text='again' />
+        </sequence>
+      </sequence>
+    )
+
+    const data = from(parser.parse('supermanaga'))
+    expect(data).to.have.length(1)
+    expect(fulltext.all(data[0])).to.equal('supermanagain')
+  })
+
   it('handles an optional child with a separator', () => {
     parser.grammar = (
       <sequence>

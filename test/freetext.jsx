@@ -25,7 +25,7 @@ describe('freetext', () => {
 
 		const data1 = parser.parseArray('validValue')
 		expect(data1).to.have.length(1)
-		expect(fulltext.match(data1[0])).to.equal('validValue')
+		expect(fulltext.all(data1[0])).to.equal('validValue')
 		expect(data1[0].result).to.equal('validValue')
 
 		const data2 = parser.parseArray('invalidValue')
@@ -37,7 +37,7 @@ describe('freetext', () => {
 
 		const data = parser.parseArray('anything')
 		expect(data).to.have.length(1)
-		expect(fulltext.match(data[0])).to.equal('anything')
+		expect(fulltext.all(data[0])).to.equal('anything')
 		expect(data[0].result).to.equal('anything')
 	})
 
@@ -53,7 +53,7 @@ describe('freetext', () => {
 
 		const data = parser.parseArray('validValue')
 		expect(data).to.have.length(1)
-		expect(fulltext.match(data[0])).to.equal('validValue')
+		expect(fulltext.all(data[0])).to.equal('validValue')
 		expect(valSpy).to.have.been.calledOnce
 	})
 
