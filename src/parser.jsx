@@ -9,12 +9,13 @@ function from(i) {const a = []; for (let x of i) a.push(x); return a}
 
 const optionDefaults = {
   text: '',
-  match: [],
-  suggestion: [],
-  completion: [],
-  stack: [],
+  words: [],
+  // match: [],
+  // suggestion: [],
+  // completion: [],
+  // stack: [],
   callbacks: [],
-  path: []
+  // path: []
 }
 
 export function createOption(options) {
@@ -22,25 +23,25 @@ export function createOption(options) {
 }
 
 function normalizeOutput (option) {
-  let output = _.pick(option, ['match', 'completion', 'result', 'score', 'path'])
-  const suggestion = option.suggestion
-  let newSuggestions = []
-  let i, l, lastSuggestion, oldSuggestion
+  let output = _.pick(option, ['words', 'score', 'result'])
+  // const suggestion = option.suggestion
+  // let newSuggestions = []
+  // let i, l, lastSuggestion, oldSuggestion
 
-  if (suggestion.length > 0) {
-    newSuggestions.push(_.clone(suggestion[0]))
-    for (i = 1, l = suggestion.length; i < l; i++) {
-      lastSuggestion = newSuggestions[newSuggestions.length - 1]
-      oldSuggestion = _.clone(suggestion[i])
-      if (lastSuggestion.input === oldSuggestion.input && lastSuggestion.category === oldSuggestion.category) {
-        lastSuggestion.string = lastSuggestion.string + oldSuggestion.string
-      } else {
-        newSuggestions.push(oldSuggestion)
-      }
-    }
-  }
-  output.suggestion = newSuggestions
-
+  // if (suggestion.length > 0) {
+  //   newSuggestions.push(_.clone(suggestion[0]))
+  //   for (i = 1, l = suggestion.length; i < l; i++) {
+  //     lastSuggestion = newSuggestions[newSuggestions.length - 1]
+  //     oldSuggestion = _.clone(suggestion[i])
+  //     if (lastSuggestion.input === oldSuggestion.input && lastSuggestion.category === oldSuggestion.category) {
+  //       lastSuggestion.string = lastSuggestion.string + oldSuggestion.string
+  //     } else {
+  //       newSuggestions.push(oldSuggestion)
+  //     }
+  //   }
+  // }
+  // output.suggestion = newSuggestions
+  //
   return output
 }
 

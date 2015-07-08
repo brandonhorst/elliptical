@@ -1,7 +1,7 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
 import {expect} from 'chai'
-import fulltext from 'lacona-util-fulltext'
+import {text} from './_util'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
 
@@ -22,7 +22,7 @@ describe('decorator', () => {
 
     const data = parser.parseArray('a')
     expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('ab')
+    expect(text(data[0])).to.equal('ab')
   })
 
   it('decorates an input', () => {
@@ -35,20 +35,7 @@ describe('decorator', () => {
 
     const data = parser.parseArray('a')
     expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('ba')
-  })
-
-  it('decorates an input', () => {
-    parser.grammar = (
-      <sequence>
-        <decorator text='b' />
-        <literal text='a' />
-      </sequence>
-    )
-
-    const data = parser.parseArray('a')
-    expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('ba')
+    expect(text(data[0])).to.equal('ba')
   })
 
   it('decorates an freetext', () => {
@@ -61,7 +48,7 @@ describe('decorator', () => {
 
     const data = parser.parseArray('x superman')
     expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('x superman')
+    expect(text(data[0])).to.equal('x superman')
     expect(data[0].result.test).to.equal('superman')
   })
 
@@ -70,7 +57,7 @@ describe('decorator', () => {
       <sequence>
         <literal text='s' />
         <decorator text='x ' />
-        <placeholder descriptor='test' id='test'>
+        <placeholder text='test' id='test'>
           <freetext />
         </placeholder>
       </sequence>
@@ -78,7 +65,7 @@ describe('decorator', () => {
 
     const data = parser.parseArray('ssuperman')
     expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('sx superman')
+    expect(text(data[0])).to.equal('sx superman')
     expect(data[0].result.test).to.equal('superman')
   })
 })

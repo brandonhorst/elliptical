@@ -39,18 +39,17 @@ export default class List extends Phrase {
 
   *suggest (input) {
     for (let item of this.props.items) {
-      const {text, value} = this.itemify(item)
-      yield {suggestion: text, value}
+      yield this.itemify(item)
     }
   }
 
   describe () {
     if (this.props.fuzzy) {
-      return <value compute={this.compute.bind(this)} suggest={this.suggest.bind(this)} limit={this.props.limit} />
+      return <value compute={this.compute.bind(this)} suggest={this.suggest.bind(this)} limit={this.props.limit} category={this.props.category} />
     } else {
       const literals = _.chain(this.props.items)
         .map(this.itemify.bind(this))
-        .map(item => <literal text={item.text} value={item.value} qualifier={item.qualifier} />)
+        .map(item => <literal text={item.text} value={item.value} qualifier={item.qualifier} category={this.props.category} />)
         .value()
 
       return (

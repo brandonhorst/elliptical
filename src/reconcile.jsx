@@ -125,7 +125,7 @@ function getConstructor({Constructor}) {
     if (_.has(builtins, Constructor)) {
       return builtins[Constructor]
     } else {
-      throw new Error('Invalid phrase. Note: non-builtin phrases must be uppercase')
+      throw new Error(`${Constructor} is an invalid phrase. Note: non-builtin phrases must be uppercase`)
     }
   }
   return Constructor

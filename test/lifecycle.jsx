@@ -1,7 +1,7 @@
 /** @jsx createElement */
 /* eslint-env mocha */
 import chai, {expect} from 'chai'
-import fulltext from 'lacona-util-fulltext'
+import {text} from './_util'
 import * as lacona from '..'
 import {createElement, Phrase, Source} from 'lacona-phrase'
 import {spy} from 'sinon'
@@ -30,15 +30,15 @@ describe('lifecycle', () => {
 
     parser.grammar = <Test />
 
-    const data1 = from(parser.parse(''))
+    const data1 = parser.parseArray('')
     expect(data1).to.have.length(1)
-    expect(fulltext.all(data1[0])).to.equal('test')
+    expect(text(data1[0])).to.equal('test')
     expect(createSpy).to.have.been.calledOnce
     expect(destSpy).to.not.have.been.called
 
     parser.grammar = <choice />
 
-    const data2 = from(parser.parse(''))
+    const data2 = parser.parseArray('')
     expect(data2).to.have.length(0)
     expect(createSpy).to.have.been.calledOnce
     expect(destSpy).to.have.been.calledOnce
@@ -61,15 +61,15 @@ describe('lifecycle', () => {
 
     parser.grammar = <Test />
 
-    const data1 = from(parser.parse(''))
+    const data1 = parser.parseArray('')
     expect(data1).to.have.length(1)
-    expect(fulltext.all(data1[0])).to.equal('test')
+    expect(text(data1[0])).to.equal('test')
     expect(createSpy).to.have.been.calledOnce
     expect(destSpy).to.not.have.been.called
 
     parser.grammar = <choice />
 
-    const data2 = from(parser.parse(''))
+    const data2 = parser.parseArray('')
     expect(data2).to.have.length(0)
     expect(createSpy).to.have.been.calledOnce
     expect(destSpy).to.have.been.calledOnce

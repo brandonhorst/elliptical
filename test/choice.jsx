@@ -1,7 +1,7 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
 import {expect} from 'chai'
-import fulltext from 'lacona-util-fulltext'
+import {text} from './_util'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
 
@@ -22,9 +22,9 @@ describe('choice', () => {
       </choice>
     )
 
-    const data = from(parser.parse('r'))
+    const data = parser.parseArray('r')
     expect(data).to.have.length(1)
-    expect(fulltext.suggestion(data[0])).to.equal('right')
+    expect(text(data[0])).to.equal('right')
     expect(data[0].result).to.be.empty
   })
 
@@ -36,11 +36,11 @@ describe('choice', () => {
       </choice>
     )
 
-    const data = from(parser.parse('r'))
+    const data = parser.parseArray('r')
     expect(data).to.have.length(2)
-    expect(fulltext.suggestion(data[0])).to.equal('right')
+    expect(text(data[0])).to.equal('right')
     expect(data[0].result).to.be.empty
-    expect(fulltext.suggestion(data[1])).to.equal('right also')
+    expect(text(data[1])).to.equal('right also')
     expect(data[0].result).to.be.empty
   })
 
@@ -52,7 +52,7 @@ describe('choice', () => {
       </choice>
     )
 
-    const data = from(parser.parse('r'))
+    const data = parser.parseArray('r')
     expect(data).to.have.length(0)
   })
 
@@ -64,9 +64,9 @@ describe('choice', () => {
       </choice>
     )
 
-    const data = from(parser.parse('r'))
+    const data = parser.parseArray('r')
     expect(data).to.have.length(1)
-    expect(fulltext.suggestion(data[0])).to.equal('right')
+    expect(text(data[0])).to.equal('right')
     expect(data[0].result).to.equal('testValue')
   })
 
@@ -84,9 +84,9 @@ describe('choice', () => {
 
     parser.grammar = <Test />
 
-    const data = from(parser.parse('r'))
+    const data = parser.parseArray('r')
     expect(data).to.have.length(1)
-    expect(fulltext.suggestion(data[0])).to.equal('right')
+    expect(text(data[0])).to.equal('right')
     expect(data[0].result).to.equal('testValue')
   })
 
@@ -104,9 +104,9 @@ describe('choice', () => {
 
     parser.grammar = <Test />
 
-    const data = from(parser.parse('r'))
+    const data = parser.parseArray('r')
     expect(data).to.have.length(1)
-    expect(fulltext.suggestion(data[0])).to.equal('right')
+    expect(text(data[0])).to.equal('right')
     expect(data[0].result).to.equal('override')
   })
 
@@ -124,9 +124,9 @@ describe('choice', () => {
 
     parser.grammar = <Test />
 
-    const data = from(parser.parse('r'))
+    const data = parser.parseArray('r')
     expect(data).to.have.length(1)
-    expect(fulltext.suggestion(data[0])).to.equal('right')
+    expect(text(data[0])).to.equal('right')
     expect(data[0].result).to.eql({key: 'testValue'})
   })
 
@@ -146,6 +146,6 @@ describe('choice', () => {
     parser.grammar = <Test />
     const data = parser.parseArray('test')
     expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('test')
+    expect(text(data[0])).to.equal('test')
   })
 })

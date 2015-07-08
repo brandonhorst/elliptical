@@ -1,7 +1,7 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
 import chai, {expect} from 'chai'
-import fulltext from 'lacona-util-fulltext'
+import {text} from './_util'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
 
@@ -16,28 +16,28 @@ describe('value', function () {
 
   it('suggests a value', () => {
     function fun() {
-      return [{suggestion: 'tex', value: 'val'}]
+      return [{text: 'tex', value: 'val'}]
     }
 
     parser.grammar = <value suggest={fun} />
 
-    const data = from(parser.parse(''))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
     expect(data[0].result).to.equal('val')
-    expect(fulltext.suggestion(data[0])).to.equal('tex')
+    expect(text(data[0])).to.equal('tex')
   })
 
   it('suggests a value (generator)', () => {
     function *fun() {
-      yield {suggestion: 'tex', value: 'val'}
+      yield {text: 'tex', value: 'val'}
     }
 
     parser.grammar = <value suggest={fun} />
 
-    const data = from(parser.parse(''))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
     expect(data[0].result).to.equal('val')
-    expect(fulltext.suggestion(data[0])).to.equal('tex')
+    expect(text(data[0])).to.equal('tex')
   })
 
   it('computes a value', () => {
@@ -52,10 +52,10 @@ describe('value', function () {
 
     parser.grammar = <value compute={fun} />
 
-    const data = from(parser.parse('te'))
+    const data = parser.parseArray('te')
     expect(data).to.have.length(1)
     expect(data[0].result).to.equal('val')
-    expect(fulltext.suggestion(data[0])).to.equal('tex')
+    expect(text(data[0])).to.equal('tex')
   })
 
   it('computes a value (generator)', () => {
@@ -70,42 +70,58 @@ describe('value', function () {
 
     parser.grammar = <value compute={fun} />
 
-    const data = from(parser.parse('te'))
+    const data = parser.parseArray('te')
     expect(data).to.have.length(1)
     expect(data[0].result).to.equal('val')
-    expect(fulltext.suggestion(data[0])).to.equal('tex')
+    expect(text(data[0])).to.equal('tex')
   })
 
   it('can access props its function (if bound)', () => {
     class Test extends phrase.Phrase {
       fun() {
         expect(this.props.myVar).to.equal('myVal')
-        return [{suggestion: 'tex', value: 'val'}]
+        return [{text: 'tex', value: 'val'}]
       }
 
       describe() { return <value suggest={this.fun.bind(this)} /> }
     }
 
     parser.grammar = <Test myVar='myVal' />
-    const data = from(parser.parse(''))
+
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('tex')
+    expect(text(data[0])).to.equal('tex')
     expect(data[0].result).to.equal('val')
   })
 
   it('can set the score (suggest)', () => {
     function fun() {
-      return [{suggestion: 'tex', value: 'val', score: 0.5}]
+      return [{text: 'tex', value: 'val', score: 0.5}]
     }
 
     parser.grammar = <value suggest={fun} />
 
-    const data = from(parser.parse(''))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
     expect(data[0].score).to.equal(0.5)
   })
 
   it('can set the score (suggest)', () => {
+    function fun(input) {
+      return [{
+        text: 'test',
+        score: 0.5
+      }]
+    }
+
+    parser.grammar = <value suggest={fun} />
+
+    const data = parser.parseArray('')
+    expect(data).to.have.length(1)
+    expect(data[0].score).to.equal(0.5)
+  })
+
+  it('can set the score (compute)', () => {
     function fun(input) {
       return [{
         words: [{text: 'test', input: true}],
@@ -117,7 +133,7 @@ describe('value', function () {
 
     parser.grammar = <value compute={fun} />
 
-    const data = from(parser.parse('test'))
+    const data = parser.parseArray('te')
     expect(data).to.have.length(1)
     expect(data[0].score).to.equal(0.5)
   })

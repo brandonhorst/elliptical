@@ -67,7 +67,12 @@ export default class Sequence extends Phrase {
   *_handleParse(input, options) {
     this.childPhrases = reconcile({descriptor: this.props.children, phrase: this.childPhrases, options})
 
-    yield* this.parseChild(0, _.assign({}, input, {result: {}, score: 1}), options)
+    const modifications = {
+      result: {},
+      score: 1
+    }
+
+    yield* this.parseChild(0, _.assign({}, input, modifications), options)
   }
 
   *parseChild(childIndex, input, options) {

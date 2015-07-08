@@ -2,7 +2,7 @@
 /* eslint-env mocha */
 import chai, {expect} from 'chai'
 import {createElement, Phrase} from 'lacona-phrase'
-import fulltext from 'lacona-util-fulltext'
+import {text} from './_util'
 import {reconcile} from '../lib/reconcile'
 
 describe('reconcile', () => {

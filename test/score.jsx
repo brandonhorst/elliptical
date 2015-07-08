@@ -1,7 +1,7 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
 import chai, {expect} from 'chai'
-import fulltext from 'lacona-util-fulltext'
+import {text} from './_util'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
 
@@ -17,7 +17,7 @@ describe('score', () => {
   it('every parse output has a numeric score', () => {
     parser.grammar = <literal text='test' />
 
-    const data = from(parser.parse('test'))
+    const data = parser.parseArray('')
 
     expect(data).to.have.length(1)
     expect(data[0].score).to.equal(1)
@@ -31,7 +31,7 @@ describe('score', () => {
       </choice>
     )
 
-    const data = from(parser.parse('r'))
+    const data = parser.parseArray('right')
     expect(data).to.have.length(2)
     expect(data[0].score).to.equal(0.5)
     expect(data[1].score).to.equal(1)
@@ -45,7 +45,7 @@ describe('score', () => {
       </sequence>
     )
 
-    const data = from(parser.parse('ab'))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
     expect(data[0].score).to.equal(0.25)
   })

@@ -43,7 +43,7 @@ function regexSplit (str) {
 }
 
 function beginningMatch({input, text, qualifier}) {
-  if (_.startsWith(text.toLowerCase(), input)) {
+  if (_.startsWith(text.toLowerCase(), input.toLowerCase())) {
     const matches = [{text: text.slice(0, input.length), input: true, qualifier}]
     if (input.length < text.length) {
       matches.push({text: text.slice(input.length), input: false, qualifier})
@@ -54,7 +54,7 @@ function beginningMatch({input, text, qualifier}) {
 }
 
 function anywhereMatch({input, text, qualifier}) {
-  const index = text.toLowerCase().indexOf(input)
+  const index = text.toLowerCase().indexOf(input.toLowerCase())
 
   if (index > -1) {
     const matches = []

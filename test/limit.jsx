@@ -1,7 +1,7 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
 import {expect} from 'chai'
-import fulltext from 'lacona-util-fulltext'
+import {text} from './_util'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
 
@@ -17,28 +17,28 @@ describe('limit', () => {
   describe('value', () => {
     it('limits suggestions', () => {
       function suggest() {
-        return [{suggestion: 'testa'}, {suggestion: 'testb'}, {suggestion: 'testc'}]
+        return [{text: 'testa'}, {text: 'testb'}, {text: 'testc'}]
       }
 
       parser.grammar = <value limit={2} suggest={suggest} />
 
-      const data = from(parser.parse(''))
+      const data = parser.parseArray('')
       expect(data).to.have.length(2)
-      expect(fulltext.all(data[0])).to.equal('testa')
-      expect(fulltext.all(data[1])).to.equal('testb')
+      expect(text(data[0])).to.equal('testa')
+      expect(text(data[1])).to.equal('testb')
     })
 
     it('accepts fewer than limit suggestions', () => {
       function suggest() {
-        return [{suggestion: 'testa'}, {suggestion: 'testb'}]
+        return [{text: 'testa'}, {text: 'testb'}]
       }
 
       parser.grammar = <value limit={3} suggest={suggest} />
 
-      const data = from(parser.parse(''))
+      const data = parser.parseArray('')
       expect(data).to.have.length(2)
-      expect(fulltext.all(data[0])).to.equal('testa')
-      expect(fulltext.all(data[1])).to.equal('testb')
+      expect(text(data[0])).to.equal('testa')
+      expect(text(data[1])).to.equal('testb')
     })
 
     it('limits computations', () => {
@@ -52,10 +52,10 @@ describe('limit', () => {
 
       parser.grammar = <value limit={2} compute={compute} />
 
-      const data = from(parser.parse('test'))
+      const data = parser.parseArray('t')
       expect(data).to.have.length(2)
-      expect(fulltext.all(data[0])).to.equal('testa')
-      expect(fulltext.all(data[1])).to.equal('testb')
+      expect(text(data[0])).to.equal('testa')
+      expect(text(data[1])).to.equal('testb')
     })
 
     it('accepts fewer than limit suggestions', () => {
@@ -68,10 +68,10 @@ describe('limit', () => {
 
       parser.grammar = <value limit={3} compute={compute} />
 
-      const data = from(parser.parse('test'))
+      const data = parser.parseArray('t')
       expect(data).to.have.length(2)
-      expect(fulltext.all(data[0])).to.equal('testa')
-      expect(fulltext.all(data[1])).to.equal('testb')
+      expect(text(data[0])).to.equal('testa')
+      expect(text(data[1])).to.equal('testb')
     })
   })
 
@@ -84,9 +84,9 @@ describe('limit', () => {
         </choice>
       )
 
-      const data = from(parser.parse('r'))
+      const data = parser.parseArray('')
       expect(data).to.have.length(1)
-      expect(fulltext.suggestion(data[0])).to.equal('right')
+      expect(text(data[0])).to.equal('right')
       expect(data[0].result).to.equal('testValue')
     })
 
@@ -99,10 +99,10 @@ describe('limit', () => {
         </choice>
       )
 
-      const data = from(parser.parse('r'))
+      const data = parser.parseArray('')
       expect(data).to.have.length(2)
-      expect(fulltext.suggestion(data[0])).to.equal('right')
-      expect(fulltext.suggestion(data[1])).to.equal('right also')
+      expect(text(data[0])).to.equal('right')
+      expect(text(data[1])).to.equal('right also')
     })
 
     it('still works when a limited child has multiple options', () => {
@@ -117,11 +117,11 @@ describe('limit', () => {
         </choice>
       )
 
-      const data = from(parser.parse('r'))
+      const data = parser.parseArray('ri')
       expect(data).to.have.length(3)
-      expect(fulltext.suggestion(data[0])).to.equal('right')
-      expect(fulltext.suggestion(data[1])).to.equal('right also')
-      expect(fulltext.suggestion(data[2])).to.equal('right third')
+      expect(text(data[0])).to.equal('right')
+      expect(text(data[1])).to.equal('right also')
+      expect(text(data[2])).to.equal('right third')
     })
 
     it('allows choices in sequences to be limited', () => {
@@ -137,12 +137,10 @@ describe('limit', () => {
         </sequence>
       )
 
-      const data = from(parser.parse('test'))
+      const data = parser.parseArray('test')
       expect(data).to.have.length(2)
-      expect(fulltext.suggestion(data[0])).to.equal('testa')
-      expect(fulltext.completion(data[0])).to.equal('also')
-      expect(fulltext.suggestion(data[1])).to.equal('testb')
-      expect(fulltext.completion(data[1])).to.equal('also')
+      expect(text(data[0])).to.equal('testaalso')
+      expect(text(data[1])).to.equal('testbalso')
     })
 
     it('limits even if valid parses do not parse to completion', () => {
@@ -157,10 +155,9 @@ describe('limit', () => {
         </sequence>
       )
 
-      const data = from(parser.parse('righta'))
+      const data = parser.parseArray('righta')
       expect(data).to.have.length(1)
-      expect(fulltext.match(data[0])).to.equal('right')
-      expect(fulltext.suggestion(data[0])).to.equal('also')
+      expect(text(data[0])).to.equal('rightalso')
     })
   })
 })

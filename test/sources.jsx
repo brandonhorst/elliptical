@@ -1,7 +1,7 @@
 /** @jsx createElement */
 /* eslint-env mocha */
 import chai, {expect} from 'chai'
-import fulltext from 'lacona-util-fulltext'
+import {text} from './_util'
 import * as lacona from '..'
 import {createElement, Phrase, Source} from 'lacona-phrase'
 import {spy} from 'sinon'
@@ -29,9 +29,9 @@ describe('sources', () => {
 
     parser.grammar = <Test />
 
-    const data = from(parser.parse(''))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('testa')
+    expect(text(data[0])).to.equal('testa')
   })
 
   it('destroy() is called, on destroy', () => {
@@ -52,16 +52,16 @@ describe('sources', () => {
     }
 
     parser.grammar = <Test useSource={true}/>
-    const data1 = from(parser.parse(''))
+    const data1 = parser.parseArray('')
     expect(destSpy).to.not.have.been.called
     expect(data1).to.have.length(1)
-    expect(fulltext.all(data1[0])).to.equal('test')
+    expect(text(data1[0])).to.equal('test')
 
     parser.grammar = <Test useSource={false}/>
-    const data2 = from(parser.parse(''))
+    const data2 = parser.parseArray('')
     expect(destSpy).to.have.been.called
     expect(data2).to.have.length(1)
-    expect(fulltext.all(data2[0])).to.equal('test')
+    expect(text(data2[0])).to.equal('test')
   })
 
   it('passes props to create', () => {
@@ -76,9 +76,9 @@ describe('sources', () => {
 
     parser.grammar = <Test />
 
-    const data = from(parser.parse(''))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('testa')
+    expect(text(data[0])).to.equal('testa')
   })
 
   it('sources with the same props share', () => {
@@ -100,14 +100,14 @@ describe('sources', () => {
     }
 
     parser.grammar = <Test />
-    const data1 = from(parser.parse(''))
+    const data1 = parser.parseArray('')
     expect(data1).to.have.length(1)
-    expect(fulltext.all(data1[0])).to.equal('testb')
+    expect(text(data1[0])).to.equal('testb')
 
     parser.grammar = <Test2 />
-    const data2 = from(parser.parse(''))
+    const data2 = parser.parseArray('')
     expect(data2).to.have.length(1)
-    expect(fulltext.all(data2[0])).to.equal('testb')
+    expect(text(data2[0])).to.equal('testb')
   })
 
   it('sources with different props do not share', () => {
@@ -129,14 +129,14 @@ describe('sources', () => {
     }
 
     parser.grammar = <Test />
-    const data1 = from(parser.parse(''))
+    const data1 = parser.parseArray('')
     expect(data1).to.have.length(1)
-    expect(fulltext.all(data1[0])).to.equal('testb')
+    expect(text(data1[0])).to.equal('testb')
 
     parser.grammar = <Test2 />
-    const data2 = from(parser.parse(''))
+    const data2 = parser.parseArray('')
     expect(data2).to.have.length(1)
-    expect(fulltext.all(data2[0])).to.equal('testa')
+    expect(text(data2[0])).to.equal('testa')
   })
 
   it('calls create, which can setData', done => {
@@ -154,12 +154,12 @@ describe('sources', () => {
 
     parser.grammar = <Test />
 
-    const data1 = from(parser.parse('test'))
-    expect(fulltext.all(data1[0])).to.equal('testa')
+    const data1 = parser.parseArray('')
+    expect(text(data1[0])).to.equal('testa')
 
     process.nextTick(() => {
-      const data2 = from(parser.parse('test'))
-      expect(fulltext.all(data2[0])).to.equal('testb')
+      const data2 = parser.parseArray('')
+      expect(text(data2[0])).to.equal('testb')
       done()
     })
   })
@@ -182,8 +182,8 @@ describe('sources', () => {
 
     parser.grammar = <Test />
 
-    const data = from(parser.parse('test'))
-    expect(fulltext.all(data[0])).to.equal('testb')
+    const data = parser.parseArray('')
+    expect(text(data[0])).to.equal('testb')
   })
 
   it('parses are not redescribed if data does not change', () => {
@@ -205,11 +205,11 @@ describe('sources', () => {
 
     parser.grammar = <Test />
 
-    const data1 = from(parser.parse('test'))
-    expect(fulltext.all(data1[0])).to.equal('testa')
+    const data1 = parser.parseArray('')
+    expect(text(data1[0])).to.equal('testa')
 
-    const data2 = from(parser.parse('test'))
-    expect(fulltext.all(data2[0])).to.equal('testa')
+    const data2 = parser.parseArray('')
+    expect(text(data2[0])).to.equal('testa')
 
     expect(descSpy).to.have.been.calledOnce
   })
@@ -232,13 +232,13 @@ describe('sources', () => {
 
     parser.grammar = <Test />
 
-    const data1 = from(parser.parse(''))
-    expect(fulltext.all(data1[0])).to.equal('testa')
+    const data1 = parser.parseArray('')
+    expect(text(data1[0])).to.equal('testa')
     expect(consSpy).to.have.been.calledOnce
 
     process.nextTick(() => {
-      const data2 = from(parser.parse(''))
-      expect(fulltext.all(data2[0])).to.equal('testb')
+      const data2 = parser.parseArray('')
+      expect(text(data2[0])).to.equal('testb')
       expect(consSpy).to.have.been.calledOnce
       done()
     })
@@ -268,14 +268,14 @@ describe('sources', () => {
 
     parser.grammar = <Test />
 
-    const data1 = from(parser.parse(''))
-    expect(fulltext.all(data1[0])).to.equal('testa')
+    const data1 = parser.parseArray('')
+    expect(text(data1[0])).to.equal('testa')
     expect(consSpy).to.have.been.calledOnce
     expect(subConsSpy).to.have.been.calledOnce
 
     process.nextTick(() => {
-      const data2 = from(parser.parse(''))
-      expect(fulltext.all(data2[0])).to.equal('testb')
+      const data2 = parser.parseArray('')
+      expect(text(data2[0])).to.equal('testb')
       expect(consSpy).to.have.been.calledOnce
       expect(subConsSpy).to.have.been.calledTwice
       done()
@@ -298,9 +298,9 @@ describe('sources', () => {
     parser.on('change', changeSpy)
     parser.grammar = <Test />
 
-    const data = from(parser.parse(''))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('test')
+    expect(text(data[0])).to.equal('test')
 
     process.nextTick(() => {
       expect(changeSpy).to.not.have.been.called
@@ -326,9 +326,9 @@ describe('sources', () => {
     parser.on('change', changeSpy)
     parser.grammar = <Test />
 
-    const data = from(parser.parse(''))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('test')
+    expect(text(data[0])).to.equal('test')
 
     process.nextTick(() => {
       process.nextTick(() => {

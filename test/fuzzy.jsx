@@ -1,7 +1,7 @@
 // /** @jsx phrase.createElement */
 // /* eslint-env mocha */
 // import {expect} from 'chai'
-// import fulltext from 'lacona-util-fulltext'
+// import {text} from './_util'
 // import * as lacona from '..'
 // import * as phrase from 'lacona-phrase'
 //
@@ -17,9 +17,9 @@
 //   it('supports fuzzy matching within a phrase', () => {
 //     parser.grammar = <literal text='a simple test' fuzzy={true} />
 //
-//     const data = from(parser.parse('asmlte'))
+//     const data = parser.parseArray($1)
 //     expect(data).to.have.length(1)
-//     expect(fulltext.suggestion(data[0])).to.equal('a simple test')
+//     expect(text(data[0])).to.equal('a simple test')
 //     expect(data[0].suggestion[0].string).to.equal('a')
 //     expect(data[0].suggestion[0].input).to.be.true
 //     expect(data[0].suggestion[1].string).to.equal(' ')
@@ -45,26 +45,26 @@
 //   it('rejects misses properly with fuzzy matching', () => {
 //     parser.grammar = <literal text='a simple test' fuzzy={true} />
 //
-//     const data = from(parser.parse('fff'))
+//     const data = parser.parseArray($1)
 //     expect(data).to.have.length(0)
 //   })
 //
 //   it('suggests properly when fuzzy matching is enabled', () => {
 //     parser.grammar = <literal text='a simple test' fuzzy={true} />
 //
-//     const data = from(parser.parse(''))
+//     const data = parser.parseArray($1)
 //     expect(data).to.have.length(1)
 //     expect(data[0].suggestion[0].string).to.equal('a simple test')
 //     expect(data[0].suggestion[0].input).to.be.false
-//     expect(fulltext.suggestion(data[0])).to.equal('a simple test')
+//     expect(text(data[0])).to.equal('a simple test')
 //   })
 //
 //   it('can do fuzzy matching with regex special characters', () => {
 //     parser.grammar = <literal text='[whatever]' fuzzy={true} />
 //
-//     const data = from(parser.parse('[]'))
+//     const data = parser.parseArray($1)
 //     expect(data).to.have.length(1)
-//     expect(fulltext.suggestion(data[0])).to.equal('[whatever]')
+//     expect(text(data[0])).to.equal('[whatever]')
 //     expect(data[0].suggestion[0].string).to.equal('[')
 //     expect(data[0].suggestion[0].input).to.be.true
 //     expect(data[0].suggestion[1].string).to.equal('whatever')
@@ -81,10 +81,10 @@
 //       </sequence>
 //     )
 //
-//     const data = from(parser.parse('abce'))
+//     const data = parser.parseArray($1)
 //     expect(data).to.have.length(1)
-//     expect(fulltext.suggestion(data[0])).to.equal('def')
-//     expect(fulltext.match(data[0])).to.equal('abc')
+//     expect(text(data[0])).to.equal('def')
+//     expect(text(data[0])).to.equal('abc')
 //     expect(data[0].suggestion[0].string).to.equal('d')
 //     expect(data[0].suggestion[0].input).to.be.false
 //     expect(data[0].suggestion[1].string).to.equal('e')
@@ -101,7 +101,7 @@
 //       </sequence>
 //     )
 //
-//     const data = from(parser.parse('ad'))
+//     const data = parser.parseArray($1)
 //     expect(data).to.be.empty
 //   })
 //
@@ -115,7 +115,7 @@
 //       </choice>
 //     )
 //
-//     const data = from(parser.parse('abc'))
+//     const data = parser.parseArray($1)
 //     expect(data).to.have.length(4)
 //     expect(data[0].score).to.equal(1)
 //     expect(data[1].score).to.equal(1)
@@ -133,7 +133,7 @@
 //       </choice>
 //     )
 //
-//     const data = from(parser.parse('abc'))
+//     const data = parser.parseArray($1)
 //     expect(data).to.have.length(4)
 //     expect(data[0].score).to.equal(0.1)
 //     expect(data[1].score).to.equal(0.2)

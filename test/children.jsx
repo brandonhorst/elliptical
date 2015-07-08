@@ -1,11 +1,9 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
 import {expect} from 'chai'
-import fulltext from 'lacona-util-fulltext'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
-
-function from(i) {const a = []; for (let x of i) a.push(x); return a}
+import {text} from './_util'
 
 describe('children', () => {
   var parser
@@ -29,9 +27,9 @@ describe('children', () => {
       </Test>
     )
 
-    const data = from(parser.parse(''))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
-    expect(fulltext.suggestion(data[0])).to.equal('b')
+    expect(text(data[0])).to.equal('b')
   })
 
   it('flattens children as props', () => {
@@ -50,9 +48,9 @@ describe('children', () => {
       </Test>
     )
 
-    const data = from(parser.parse(''))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
-    expect(fulltext.suggestion(data[0])).to.equal('b')
+    expect(text(data[0])).to.equal('b')
   })
 
   it('passes the child result', () => {
@@ -68,9 +66,9 @@ describe('children', () => {
       </Test>
     )
 
-    const data = from(parser.parse(''))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
-    expect(fulltext.suggestion(data[0])).to.equal('a')
+    expect(text(data[0])).to.equal('a')
     expect(data[0].result).to.equal('b')
   })
 })

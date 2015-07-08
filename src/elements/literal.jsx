@@ -7,7 +7,7 @@ export default class Literal extends Phrase {
   suggest() {
     if (this.props.text == null) return []
 
-    return [{suggestion: this.props.text.replace(/\n/g, ''), value: this.props.value, score: 1}]
+    return [{text: this.props.text.replace(/\n/g, ''), value: this.props.value, score: this.props.score || 1}]
   }
 
   compute(input) {
@@ -47,6 +47,10 @@ export default class Literal extends Phrase {
   }
 
   describe() {
-    return <value compute={this.compute.bind(this)} suggest={this.suggest.bind(this)} qualifier={this.props.qualifier} />
+    return <value
+      compute={this.compute.bind(this)}
+      suggest={this.suggest.bind(this)}
+      qualifier={this.props.qualifier}
+      category={this.props.category} />
   }
 }

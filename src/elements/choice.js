@@ -20,17 +20,18 @@ export default class Choice extends Phrase {
             {[childPhrase.props.id]: output.result} :
             output.result
           )
-          yield _.assign({}, output, {
-            callbacks: output.callbacks.concat(() => success = true),
-            result: newResult
-          })
+
+          const modifications = {result: newResult}
+          if (this.props.limit) modifications.callbacks = output.callbacks.concat(() => success = true)
+
+          yield _.assign({}, output, modifications)
         }
 
-        if (success) successes++
-        if (this.props.limit <= successes) break
+        if (this.props.limit) {
+          if (success) successes++
+          if (this.props.limit <= successes) break
+        }
       }
     }
   }
 }
-
-Choice.defaultProps = {limit: 100}

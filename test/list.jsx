@@ -1,7 +1,7 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
 import {expect} from 'chai'
-import fulltext from 'lacona-util-fulltext'
+import {text} from './_util'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
 
@@ -17,63 +17,63 @@ describe('list', () => {
   it('suggests normally without fuzzy', () => {
     parser.grammar = <list items={['testa', 'testb']} />
 
-    const data = from(parser.parse(''))
+    const data = parser.parseArray('')
     expect(data).to.have.length(2)
-    expect(fulltext.all(data[0])).to.equal('testa')
-    expect(fulltext.all(data[1])).to.equal('testb')
+    expect(text(data[0])).to.equal('testa')
+    expect(text(data[1])).to.equal('testb')
   })
 
   it('suggests normally with fuzzy', () => {
     parser.grammar = <list items={['testa', 'testb']} fuzzy={true} />
 
-    const data = from(parser.parse(''))
+    const data = parser.parseArray('')
     expect(data).to.have.length(2)
-    expect(fulltext.all(data[0])).to.equal('testa')
-    expect(fulltext.all(data[1])).to.equal('testb')
+    expect(text(data[0])).to.equal('testa')
+    expect(text(data[1])).to.equal('testb')
   })
 
   it('matches without fuzzy', () => {
     parser.grammar = <list items={['testa', 'testb']} />
 
-    const data = from(parser.parse('testb'))
+    const data = parser.parseArray('testb')
     expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('testb')
+    expect(text(data[0])).to.equal('testb')
   })
 
   it('matches with fuzzy', () => {
     parser.grammar = <list items={['testa', 'testb']} fuzzy={true} />
 
-    const data = from(parser.parse('tb'))
+    const data = parser.parseArray('b')
     expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('testb')
+    expect(text(data[0])).to.equal('testb')
   })
 
   it('sorts with fuzzy, and limits before it', () => {
-    parser.grammar = <list items={['ztest', 'testz', 'tzest']} fuzzy={true} limit={3} />
+    parser.grammar = <list items={['ztest', 'testz', 'zztest']} fuzzy={true} limit={2} />
 
-    const data = from(parser.parse('test'))
+    const data = parser.parseArray('test')
     expect(data).to.have.length(2)
-    expect(fulltext.all(data[0])).to.equal('testz')
-    expect(fulltext.all(data[1])).to.equal('ztest')
+    expect(text(data[0])).to.equal('testz')
+    expect(text(data[1])).to.equal('ztest')
   })
 
   // it('sorts with fuzzy, and limits before it', () => {
   //   parser.grammar = <list items={['ztest', 'tezst', 'testz', 'tzest']} fuzzy={true} limit={3} />
   //
-  //   const data = from(parser.parse('test'))
+  //   const data = parser.parseArray($1)
   //   expect(data).to.have.length(3)
-  //   expect(fulltext.all(data[0])).to.equal('testz')
-  //   expect(fulltext.all(data[1])).to.equal('ztest')
-  //   expect(fulltext.all(data[2])).to.equal('tezst')
+  //   expect(text(data[0])).to.equal('testz')
+  //   expect(text(data[1])).to.equal('ztest')
+  //   expect(text(data[2])).to.equal('tezst')
   // })
 
   it('allows for value without fuzzy', () => {
     const items = [{text: 'testa', value: 'a'}, {text: 'testb', value: 'b'}]
     parser.grammar = <list items={items} />
 
-    const data = from(parser.parse('testb'))
+    const data = parser.parseArray('testb')
     expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('testb')
+    expect(text(data[0])).to.equal('testb')
     expect(data[0].result).to.equal('b')
   })
 
@@ -81,9 +81,9 @@ describe('list', () => {
     const items = [{text: 'testa', value: 'a'}, {text: 'testb', value: 'b'}]
     parser.grammar = <list items={items} fuzzy={true} />
 
-    const data = from(parser.parse('b'))
+    const data = parser.parseArray('b')
     expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('testb')
+    expect(text(data[0])).to.equal('testb')
     expect(data[0].result).to.equal('b')
   })
 
@@ -91,54 +91,45 @@ describe('list', () => {
     const items = ['testa', {text: 'testb', value: 'b'}, {text: 'testc'}]
     parser.grammar = <list items={items} value='override' />
 
-    const data = from(parser.parse('t'))
+    const data = parser.parseArray('')
     expect(data).to.have.length(3)
     expect(data[0].result).to.equal('override')
     expect(data[1].result).to.equal('override')
     expect(data[2].result).to.equal('override')
   })
 
-  it('does not output items twice', () => {
-    const items = ['testa', 'testb']
-    parser.grammar = <list items={items} />
-
-    const data = from(parser.parse('testa'))
-    expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('testa')
-  })
-
-  it('outputs a qualifier', () => {
-    const items = [{text: 'testa', qualifier: 'desca'}, 'testb']
-    parser.grammar = <list items={items} />
-
-    const data = from(parser.parse('testa'))
-    expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('testa')
-    expect(data[0].match[0].qualifier).to.equal('desca')
-  })
-
-  it('outputs a qualifier (fuzzy)', () => {
-    const items = [{text: 'testa', qualifier: 'desca'}, 'testb']
-    parser.grammar = <list items={items} fuzzy='true' />
-
-    const data = from(parser.parse('a'))
-    expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('testa')
-    expect(data[0].suggestion[0].qualifier).to.equal('desca')
-  })
-
+  // it('outputs a qualifier', () => {
+  //   const items = [{text: 'testa', qualifier: 'desca'}, 'testb']
+  //   parser.grammar = <list items={items} />
+  //
+  //   const data = parser.parseArray('')
+  //   expect(data).to.have.length(1)
+  //   expect(text(data[0])).to.equal('testa')
+  //   expect(data[0].match[0].qualifier).to.equal('desca')
+  // })
+  //
+  // it('outputs a qualifier (fuzzy)', () => {
+  //   const items = [{text: 'testa', qualifier: 'desca'}, 'testb']
+  //   parser.grammar = <list items={items} fuzzy='true' />
+  //
+  //   const data = parser.parseArray('')
+  //   expect(data).to.have.length(1)
+  //   expect(text(data[0])).to.equal('testa')
+  //   expect(data[0].suggestion[0].qualifier).to.equal('desca')
+  // })
+  //
 
   it('outputs score', () => {
     const items = ['ztest', 'testz', 'tezst']
     parser.grammar = <list items={items} fuzzy={true} />
 
-    const data = from(parser.parse('test'))
+    const data = parser.parseArray('test')
     expect(data).to.have.length(2)
-    expect(fulltext.all(data[0])).to.equal('testz')
+    expect(text(data[0])).to.equal('testz')
     expect(data[0].score).to.equal(1)
-    expect(fulltext.all(data[1])).to.equal('ztest')
+    expect(text(data[1])).to.equal('ztest')
     expect(data[1].score).to.equal(0.5)
-    // expect(fulltext.all(data[2])).to.equal('tezst')
+    // expect(text(data[2])).to.equal('tezst')
     // expect(data[2].score).to.equal(0.25)
   })
 })

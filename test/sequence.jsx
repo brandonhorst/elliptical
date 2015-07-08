@@ -1,7 +1,7 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
 import {expect} from 'chai'
-import fulltext from 'lacona-util-fulltext'
+import {text} from './_util'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
 
@@ -22,9 +22,9 @@ describe('sequence', function () {
       </sequence>
     )
 
-    const data = from(parser.parse('superm'))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
-    expect(fulltext.suggestion(data[0])).to.equal('man')
+    expect(text(data[0])).to.equal('superman')
     expect(data[0].result).to.be.empty
   })
 
@@ -41,9 +41,9 @@ describe('sequence', function () {
       </sequence>
     )
 
-    const data = from(parser.parse('super m'))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
-    expect(fulltext.suggestion(data[0])).to.equal('man')
+    expect(text(data[0])).to.equal('super man')
     expect(data[0].result).to.be.empty
   })
 
@@ -56,25 +56,10 @@ describe('sequence', function () {
       </sequence>
     )
 
-    const data = from(parser.parse('superm'))
+    const data = parser.parseArray('')
     expect(data).to.have.length(2)
-    expect(fulltext.suggestion(data[0])).to.equal('man')
-    expect(fulltext.suggestion(data[1])).to.equal('maximum')
-  })
-
-  it('handles an optional child without a separator', () => {
-    parser.grammar = (
-      <sequence>
-        <literal text='super' />
-        <literal text='maximum' optional={true} />
-        <literal text='man' />
-      </sequence>
-    )
-
-    const data = from(parser.parse('superm'))
-    expect(data).to.have.length(2)
-    expect(fulltext.suggestion(data[0])).to.equal('man')
-    expect(fulltext.suggestion(data[1])).to.equal('maximum')
+    expect(text(data[0])).to.equal('superman')
+    expect(text(data[1])).to.equal('supermaximumman')
   })
 
   it('handles an optional child that is preferred', () => {
@@ -86,10 +71,10 @@ describe('sequence', function () {
       </sequence>
     )
 
-    const data = from(parser.parse('superm'))
+    const data = parser.parseArray('')
     expect(data).to.have.length(2)
-    expect(fulltext.suggestion(data[0])).to.equal('maximum')
-    expect(fulltext.suggestion(data[1])).to.equal('man')
+    expect(text(data[0])).to.equal('supermaximumman')
+    expect(text(data[1])).to.equal('superman')
   })
 
   it('handles an optional child that is limited', () => {
@@ -101,9 +86,9 @@ describe('sequence', function () {
       </sequence>
     )
 
-    const data = from(parser.parse('superm'))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
-    expect(fulltext.suggestion(data[0])).to.equal('man')
+    expect(text(data[0])).to.equal('superman')
   })
 
   it('handles an optional child that is preferred and limited', () => {
@@ -115,9 +100,9 @@ describe('sequence', function () {
       </sequence>
     )
 
-    const data = from(parser.parse('superm'))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
-    expect(fulltext.suggestion(data[0])).to.equal('maximum')
+    expect(text(data[0])).to.equal('supermaximumman')
   })
 
   it('handles an optional child that is a sequence', () => {
@@ -131,9 +116,26 @@ describe('sequence', function () {
       </sequence>
     )
 
-    const data = from(parser.parse('supermanaga'))
+    const data = parser.parseArray('superm')
     expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('supermanagain')
+    expect(text(data[0])).to.equal('supermanagain')
+  })
+
+  it('handles an optional child that is a sequence with freetexts', () => {
+    parser.grammar = (
+      <sequence>
+        <freetext limit={1} />
+        <sequence optional={true}>
+          <literal text='man' />
+          <freetext limit={1} />
+          <literal text='returns' />
+        </sequence>
+      </sequence>
+    )
+
+    const data = parser.parseArray('supermanagainret')
+    expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('supermanagainreturns')
   })
 
   it('handles an optional child with a separator', () => {
@@ -150,10 +152,10 @@ describe('sequence', function () {
       </sequence>
     )
 
-    const data = from(parser.parse('super m'))
+    const data = parser.parseArray('')
     expect(data).to.have.length(2)
-    expect(fulltext.suggestion(data[0])).to.equal('man')
-    expect(fulltext.suggestion(data[1])).to.equal('maximum')
+    expect(text(data[0])).to.equal('super man')
+    expect(text(data[1])).to.equal('super maximum man')
   })
 
   it('does not take an optional childs value', () => {
@@ -165,11 +167,11 @@ describe('sequence', function () {
       </sequence>
     )
 
-    const data = from(parser.parse('superm'))
+    const data = parser.parseArray('')
     expect(data).to.have.length(2)
-    expect(fulltext.suggestion(data[0])).to.equal('man')
-    expect(fulltext.suggestion(data[1])).to.equal('maximum')
+    expect(text(data[0])).to.equal('superman')
     expect(data[0].result.opt).to.be.undefined
+    expect(text(data[1])).to.equal('supermaximumman')
     expect(data[1].result.opt).to.equal('someValue')
   })
 
@@ -181,8 +183,9 @@ describe('sequence', function () {
       </sequence>
     )
 
-    const data = from(parser.parse('superm'))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('superman')
     expect(data[0].result).to.equal('testValue')
   })
 
@@ -194,8 +197,9 @@ describe('sequence', function () {
       </sequence>
     )
 
-    const data = from(parser.parse('superm'))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('superman')
     expect(data[0].result).to.eql({
       desc: 'super',
       noun: 'man'
@@ -209,12 +213,15 @@ describe('sequence', function () {
           <literal id='desc' text='super' value='super' />
           <literal id='noun' text='man' value='man' />
         </content>
-        <separator><literal text=' ' /></separator>
+        <separator>
+          <literal text=' ' />
+        </separator>
       </sequence>
     )
 
-    const data = from(parser.parse('super m'))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('super man')
     expect(data[0].result).to.eql({
       desc: 'super',
       noun: 'man'
@@ -232,8 +239,9 @@ describe('sequence', function () {
       </sequence>
     )
 
-    const data = from(parser.parse('superm'))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('supermanrocks')
     expect(data[0].result).to.eql({
       desc: 'super',
       noun: 'man',
@@ -249,8 +257,9 @@ describe('sequence', function () {
       </sequence>
     )
 
-    const data = from(parser.parse('superm'))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('superman')
     expect(data[0].result).to.eql('man')
   })
 
@@ -263,12 +272,12 @@ describe('sequence', function () {
       </sequence>
     )
 
-    const data = from(parser.parse('sup'))
+    const data = parser.parseArray('')
     expect(data).to.have.length(2)
-    expect(fulltext.all(data[0])).to.eql('super')
+    expect(text(data[0])).to.eql('super')
     expect(data[0].result).to.eql({})
 
-    expect(fulltext.all(data[1])).to.eql('superman')
+    expect(text(data[1])).to.eql('superman')
     expect(data[1].result).to.eql('man')
   })
 
@@ -282,15 +291,20 @@ describe('sequence', function () {
               <literal id='noun' text='man' value='man' />
               <literal id='adj' text='rocks' value='rocks' />
             </content>
-            <separator><literal text=' ' /></separator>
+            <separator>
+              <literal text=' ' />
+            </separator>
           </sequence>
         </content>
-        <separator><literal text=' ' /></separator>
+        <separator>
+          <literal text=' ' />
+        </separator>
       </sequence>
     )
 
-    const data = from(parser.parse('super m'))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('super man rocks')
     expect(data[0].result).to.eql({
       desc: 'super',
       noun: 'man',
@@ -298,19 +312,19 @@ describe('sequence', function () {
     })
   })
 
-  it('passes on its category', () => {
-    parser.grammar = (
-      <sequence category='myCat'>
-        <literal text='super' />
-        <literal text='man' />
-      </sequence>
-    )
-
-    const data = from(parser.parse('superm'))
-    expect(data).to.have.length(1)
-    expect(data[0].match[0].category).to.equal('myCat')
-    expect(data[0].suggestion[0].category).to.equal('myCat')
-  })
+  // it('passes on its category', () => {
+  //   parser.grammar = (
+  //     <sequence category='myCat'>
+  //       <literal text='super' />
+  //       <literal text='man' />
+  //     </sequence>
+  //   )
+  //
+  //   const data = parser.parseArray('')
+  //   expect(data).to.have.length(1)
+  //   expect(data[0].match[0].category).to.equal('myCat')
+  //   expect(data[0].suggestion[0].category).to.equal('myCat')
+  // })
 
   it('ignores strings and nulls for reconciliation', () => {
     class Test extends phrase.Phrase {
@@ -319,7 +333,7 @@ describe('sequence', function () {
           <sequence>
             {null}
             <literal text='test' />
-            someString
+            some string
           </sequence>
         )
       }
@@ -328,6 +342,6 @@ describe('sequence', function () {
     parser.grammar = <Test />
     const data = parser.parseArray('test')
     expect(data).to.have.length(1)
-    expect(fulltext.all(data[0])).to.equal('test')
+    expect(text(data[0])).to.equal('test')
   })
 })
