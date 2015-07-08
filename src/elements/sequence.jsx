@@ -61,23 +61,20 @@ export default class Sequence extends Phrase {
     }
 
     const child = this.childPhrases[childIndex]
-    let success = false
 
     for (let output of parse({phrase: this.childPhrases[childIndex], input, options})) {
+      if (this.props.unique && output.result != null && child.props.id && input.result[child.props.id] != null) {
+        continue
+      }
       const accumulatedResult = this.props.value || getAccumulatedResult(input.result, child, output.result)
       const newScore = input.score *  output.score
       const nextOutput = _.assign({}, output, {
         result: accumulatedResult,
-        score: newScore,
-        callbacks: output.callbacks.concat(() => success = true)
+        score: newScore
       })
 
       yield* this.parseChild(childIndex + 1, nextOutput, options)
     }
-
-    // if (child.props && child.props.optional) {
-    //   yield* this.parseChild(childIndex + 1, input, options)
-    // }
   }
 }
 

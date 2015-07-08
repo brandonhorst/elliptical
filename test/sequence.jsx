@@ -238,4 +238,32 @@ describe('sequence', function () {
     expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('test')
   })
+
+  it('allows for uniqueness', () => {
+    class Test extends phrase.Phrase {
+      describe() {
+        return (
+          <sequence unique={true}>
+            <literal text='test' optional={true} id='test' value={1} />
+            <literal text='a' />
+            <literal text='test' optional={true} id='test' value={2} />
+          </sequence>
+        )
+      }
+    }
+
+    parser.grammar = <Test />
+    const data1 = parser.parseArray('testa')
+    expect(data1).to.have.length(1)
+    expect(text(data1[0])).to.equal('testa')
+    expect(data1[0].result.test).to.equal(1)
+
+    const data2 = parser.parseArray('atest')
+    expect(data2).to.have.length(1)
+    expect(text(data2[0])).to.equal('atest')
+    expect(data2[0].result.test).to.equal(2)
+
+    const data3 = parser.parseArray('testatest')
+    expect(data3).to.have.length(0)
+  })
 })
