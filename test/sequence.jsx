@@ -28,25 +28,6 @@ describe('sequence', function () {
     expect(data[0].result).to.be.empty
   })
 
-  it('handles a separator', () => {
-    parser.grammar = (
-      <sequence>
-        <content>
-          <literal text='super' />
-          <literal text='man' />
-        </content>
-        <separator>
-          <literal text=' ' />
-        </separator>
-      </sequence>
-    )
-
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('super man')
-    expect(data[0].result).to.be.empty
-  })
-
   it('handles an optional child with a separator', () => {
     parser.grammar = (
       <sequence>
@@ -138,26 +119,6 @@ describe('sequence', function () {
     expect(text(data[0])).to.equal('supermanagainreturns')
   })
 
-  it('handles an optional child with a separator', () => {
-    parser.grammar = (
-      <sequence>
-        <content>
-          <literal text='super' />
-          <literal text='maximum' optional={true} />
-          <literal text='man' />
-        </content>
-        <separator>
-          <literal text=' ' />
-        </separator>
-      </sequence>
-    )
-
-    const data = parser.parseArray('')
-    expect(data).to.have.length(2)
-    expect(text(data[0])).to.equal('super man')
-    expect(text(data[1])).to.equal('super maximum man')
-  })
-
   it('does not take an optional childs value', () => {
     parser.grammar = (
       <sequence>
@@ -200,28 +161,6 @@ describe('sequence', function () {
     const data = parser.parseArray('')
     expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('superman')
-    expect(data[0].result).to.eql({
-      desc: 'super',
-      noun: 'man'
-    })
-  })
-
-  it('results is an object with id keys, even with separator', () => {
-    parser.grammar = (
-      <sequence>
-        <content>
-          <literal id='desc' text='super' value='super' />
-          <literal id='noun' text='man' value='man' />
-        </content>
-        <separator>
-          <literal text=' ' />
-        </separator>
-      </sequence>
-    )
-
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('super man')
     expect(data[0].result).to.eql({
       desc: 'super',
       noun: 'man'
@@ -280,51 +219,6 @@ describe('sequence', function () {
     expect(text(data[1])).to.eql('superman')
     expect(data[1].result).to.eql('man')
   })
-
-  it('will merge results in, even with separator', () => {
-    parser.grammar = (
-      <sequence>
-        <content>
-          <literal id='desc' text='super' value='super' />
-          <sequence merge='true'>
-            <content>
-              <literal id='noun' text='man' value='man' />
-              <literal id='adj' text='rocks' value='rocks' />
-            </content>
-            <separator>
-              <literal text=' ' />
-            </separator>
-          </sequence>
-        </content>
-        <separator>
-          <literal text=' ' />
-        </separator>
-      </sequence>
-    )
-
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('super man rocks')
-    expect(data[0].result).to.eql({
-      desc: 'super',
-      noun: 'man',
-      adj: 'rocks'
-    })
-  })
-
-  // it('passes on its category', () => {
-  //   parser.grammar = (
-  //     <sequence category='myCat'>
-  //       <literal text='super' />
-  //       <literal text='man' />
-  //     </sequence>
-  //   )
-  //
-  //   const data = parser.parseArray('')
-  //   expect(data).to.have.length(1)
-  //   expect(data[0].match[0].category).to.equal('myCat')
-  //   expect(data[0].suggestion[0].category).to.equal('myCat')
-  // })
 
   it('ignores strings and nulls for reconciliation', () => {
     class Test extends phrase.Phrase {

@@ -4,39 +4,18 @@ import {createElement, Phrase} from 'lacona-phrase'
 import parse from '../parse'
 import {reconcile} from '../reconcile'
 
-function addSeparator (child, separator) {
-  if (child.props && child.props.optional) {
-    const newChild = _.merge({}, child, {props: {optional: false}})
-    //TODO there are likely some problems with separators and optional
-    return <Sequence optional={true} merge={true}>{newChild}{separator}</Sequence>
-  } else {
-    return <Sequence merge={true}>{child}{separator}</Sequence>
-  }
-}
+// function addSeparator (child, separator) {
+//   if (child.props && child.props.optional) {
+//     const newChild = _.merge({}, child, {props: {optional: false}})
+//     //TODO there are likely some problems with separators and optional
+//     return <Sequence optional={true} merge={true}>{newChild}{separator}</Sequence>
+//   } else {
+//     return <Sequence merge={true}>{child}{separator}</Sequence>
+//   }
+// }
 
 export default class Sequence extends Phrase {
   describe() {
-    //get the content and the separator
-    let content, separator
-    if (this.props.children[0] && this.props.children[0].Constructor === 'content') {
-      content = this.props.children[0].children
-      if (this.props.children[1] && this.props.children[1].Constructor === 'separator') {
-        //apply separators
-        separator = this.props.children[1].children[0]
-        return (
-          <sequence {...this.props}>
-            {_.chain(content.slice(0, -1))
-              .map(_.partial(addSeparator, _, separator))
-              .concat(_.last(content))
-              .value()
-            }
-          </sequence>
-        )
-      } else {
-        return <sequence {...this.props}>{content}</sequence>
-      }
-    }
-
     //replace optionals with replacements
     if (_.some(this.props.children, _.property('props.optional'))) {
       const newChildren = _.map(this.props.children, child => {
