@@ -1,35 +1,10 @@
 import _ from 'lodash'
 
 export default function *parse({phrase, input, options}) {
-  //prevent unbounded recursion. Once we have a completion, do not allow user
-  // phrases to continue looping
-  // if (!_.isEmpty(input.completion) &&
-  //     _.find(input.stack, entry => {
-  //       return entry.Constructor === phrase.constructor &&
-  //         !entry.Constructor.prototype._handleParse
-  //     })) {
-  //   return
-  // }
-
   yield* parseElement({phrase, input, options})
-
-  // for (let output of parseElement({phrase, input, options})) {
-  //   yield _.assign({}, output, {stack: output.stack.slice(0, -1)}) //pop stack
-  // }
 }
 
 function *parseElement({phrase, input, options}) {
-  // add this to the stack before doing anything
-  // const inputWithStack = _.assign({}, input, {
-  //   stack: input.stack.concat({
-  //     // Constructor: phrase.constructor,
-  //     // category: phrase.props.category,
-  //     // qualifier: phrase.props.qualifier
-  //   // })
-  //   // path: input.path.concat(phrase)
-  // })
-  // const inputWithStack = input //just testing to see how this works
-
   if (phrase.__describedPhrase) {
     const iterator = parse({phrase: phrase.__describedPhrase, input, options})
     for (let output of iterator) {
