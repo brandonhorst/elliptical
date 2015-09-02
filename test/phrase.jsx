@@ -68,6 +68,34 @@ describe('Phrase', () => {
     expect(data[1].result).to.equal('b')
   })
 
+  it('handles recursive phrases with extends', () => {
+    class Extended extends phrase.Phrase {
+      describe() {
+        return (
+          <sequence>
+            <literal text='a' value='a' id='a' />
+            {this.props.allowRecurse ? <Extended allowRecurse={false} id='b' /> : null}
+          </sequence>
+        )
+      }
+    }
+
+    class Extender extends phrase.Phrase {
+      describe() {
+        return <literal text='b' value='b' />
+      }
+    }
+    Extender.extends = [Extended]
+
+    parser.grammar = <Extended allowRecurse={true} />
+    parser.extensions = [Extender]
+
+    const data = parser.parseArray('ab')
+    expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('ab')
+    expect(data[0].result).to.eql({a: 'a', b: 'b'})
+  })
+
   it('handles phrases with extends in sequence', () => {
     class Test extends phrase.Phrase {
       describe() { return (
