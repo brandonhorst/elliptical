@@ -32,16 +32,16 @@
   },
   "homepage": "https://github.com/lacona/lacona",
   "devDependencies": {
-    "babel": "^5.5.8",
-    "chai": "^3.0.0",
+    "babel": "^5.8.21",
+    "chai": "^3.2.0",
     "mocha": "^2.2.5",
-    "rimraf": "^2.4.0",
-    "sinon": "^1.15.3",
+    "rimraf": "^2.4.2",
+    "sinon": "^1.16.1",
     "sinon-chai": "^2.8.0"
   },
   "dependencies": {
-    "babel-runtime": "^5.5.8",
+    "babel-runtime": "^5.8.20",
     "lacona-phrase": "^0.7.0",
-    "lodash": "^3.9.3"
+    "lodash": "^3.10.1"
   }
 }
