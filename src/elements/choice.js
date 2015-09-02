@@ -16,7 +16,7 @@ export default class Choice extends Phrase {
 
         for (let output of parse({phrase: childPhrase, input, options})) {
           const newResult = this.props.value || (
-            childPhrase.props.id ?
+            childPhrase.props.id != null ?
             {[childPhrase.props.id]: output.result} :
             output.result
           )
