@@ -1,7 +1,6 @@
 /** @jsx createElement */
 import _ from 'lodash'
 import {createElement} from 'lacona-phrase'
-import {EventEmitter} from  'events'
 import parse from './parse'
 import {reconcile} from './reconcile'
 
@@ -45,15 +44,14 @@ function normalizeOutput (option) {
   return output
 }
 
-export default class Parser extends EventEmitter {
-  constructor({langs = ['default'], grammar, extensions = []} = {}) {
-    super()
-
+export default class Parser {
+  constructor({langs = ['default'], grammar, extensions = [], reparse = () => {}} = {}) {
     this.langs = langs
     this.grammar = grammar
     this.extensions = extensions
+    this.reparse = reparse
     this._sources = []
-    this._reparseNeeded = false
+    // this._reparseNeeded = false
   }
 
   _getExtensions(Constructor) {
@@ -66,13 +64,15 @@ export default class Parser extends EventEmitter {
   }
 
   _triggerReparse() {
-    this._reparseNeeded = true
-    process.nextTick(() => {
-      if (this._reparseNeeded) {
-        this._reparseNeeded = false
-        this.emit('change')
-      }
-    })
+    this.reparse()
+    // this._reparseNeeded = true
+    // process.nextTick(() => {
+    //   if (this._reparseNeeded) {
+    //     this._reparseNeeded = false
+    //     this.reparse()
+    //     // this.emit('change')
+    //   }
+    // })
   }
 
   _getSource(sourceDescriptor) {
@@ -130,7 +130,7 @@ export default class Parser extends EventEmitter {
       }
     }
 
-    this._reparseNeeded = false
+    // this._reparseNeeded = false
   }
 
   parseArray(inputString) {
