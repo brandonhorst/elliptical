@@ -12,7 +12,12 @@ function *parseElement({phrase, input, options}) {
 
       if (phrase.__oldExtensions.length) {
         const key = _.keys(output.result)[0]
-        const child = phrase.__describedPhrase.childPhrases[key]
+        let child
+        if (key === '0') {
+          child = phrase
+        } else {
+          child = phrase.__describedPhrase.childPhrases[key]
+        }
         result = output.result[key]
         if (child && child.getValue) {
           getValue = child.getValue.bind(child)

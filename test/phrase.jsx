@@ -192,6 +192,26 @@ describe('Phrase', () => {
     expect(data[0].result).to.equal('nope')
   })
 
+  it('calls getValue even if the phrase is extended', () => {
+    class Test extends phrase.Phrase {
+      getValue(result) {
+        return 'gotVal'
+      }
+      describe() { return <literal value='myVal' text='test' /> }
+    }
+    class Extender extends phrase.Phrase {
+      describe () { return <literal value='extVal' text='nope' /> }
+    }
+    Extender.extends = [Test]
+
+    parser.grammar = <Test />
+    parser.extensions = [Extender]
+
+    const data = parser.parseArray('test')
+    expect(data).to.have.length(1)
+    expect(data[0].result).to.equal('gotVal')
+  })
+
   it('sentence passes on result if getValue was not supplied', () => {
     class Test extends phrase.Phrase {
       describe() { return <literal value='myVal' text='test' /> }
