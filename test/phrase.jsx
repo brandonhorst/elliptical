@@ -197,10 +197,49 @@ describe('Phrase', () => {
       describe() { return <literal value='myVal' text='test' /> }
     }
 
-    parser.grammar = <Test test='myProp' />
+    parser.grammar = <Test />
 
     const data = parser.parseArray('')
     expect(data).to.have.length(1)
     expect(data[0].result).to.eql('myVal')
+  })
+
+  it('does not call initial getValue for extensions', () => {
+    class Test extends phrase.Phrase {
+      getValue() { return 'gotValue' }
+      describe() { return <literal value='myVal' text='test' /> }
+    }
+
+    class Extension extends phrase.Phrase {
+      describe () { return <literal value='extVal' text='ext' /> }
+    }
+    Extension.extends = [Test]
+
+    parser.grammar = <Test />
+    parser.extensions = [Extension]
+
+    const data = parser.parseArray('ext')
+    expect(data).to.have.length(1)
+    expect(data[0].result).to.eql('extVal')
+  })
+
+  it('does call extensions getValue', () => {
+    class Test extends phrase.Phrase {
+      getValue() { return 'gotValue' }
+      describe() { return <literal value='myVal' text='test' /> }
+    }
+
+    class Extension extends phrase.Phrase {
+      getValue() { return 'extGotValue' }
+      describe () { return <literal value='extVal' text='ext' /> }
+    }
+    Extension.extends = [Test]
+
+    parser.grammar = <Test />
+    parser.extensions = [Extension]
+
+    const data = parser.parseArray('ext')
+    expect(data).to.have.length(1)
+    expect(data[0].result).to.eql('extGotValue')
   })
 })

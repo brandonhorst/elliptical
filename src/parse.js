@@ -8,10 +8,25 @@ function *parseElement({phrase, input, options}) {
   if (phrase.__describedPhrase) {
     const iterator = parse({phrase: phrase.__describedPhrase, input, options})
     for (let output of iterator) {
-      if (!phrase.filter || phrase.filter(output.result)) {
-        const newOutput = phrase.getValue ?
-          _.assign({}, output, {result: phrase.getValue(output.result)}) :
-          output
+      let result, getValue
+
+      if (phrase.__oldExtensions.length) {
+        const key = _.keys(output.result)[0]
+        const child = phrase.__describedPhrase.childPhrases[key]
+        result = output.result[key]
+        if (child && child.getValue) {
+          getValue = child.getValue.bind(child)
+        }
+      } else {
+        result = output.result
+        if (phrase.getValue) {
+          getValue = phrase.getValue.bind(phrase)
+        }
+      }
+
+      if (!phrase.filter || phrase.filter(result)) {
+        const trueResult = getValue ? getValue(result) : result
+        const newOutput = _.assign({}, output, {result: trueResult})
 
         yield newOutput
       }

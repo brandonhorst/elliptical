@@ -100,10 +100,12 @@ function getDescription({describe, extensions, phrase}) {
   if (describe) {
     let description = describe.call(phrase)
     if (extensions.length) {
-      const extensionElements = extensions.map(Extension => <Extension {...phrase.props} id={null} />)
+
+      const modifiedDescription = description && _.merge({}, description, {props: {id: 0}})
+      const extensionElements = _.map(extensions, (Extension, index) => <Extension {...phrase.props} id={index + 1} />)
       description = (
         <choice>
-          {description}
+          {modifiedDescription}
           {extensionElements}
         </choice>
       )
