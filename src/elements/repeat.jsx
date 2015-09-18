@@ -41,7 +41,7 @@ export default class Repeat extends Phrase {
 
   *callParseChild (childIndex, input, options) {
     for (let output of parse({phrase: this.child, input, options})) {
-      if (this.props.unique && _.includes(input.result, output.result)) {
+      if (this.props.unique && _.some(input.result, _.partial(_.isEqual, _, output.result))) {
         return
       }
       const trueInput = _.assign({}, output, {result: input.result.concat(output.result)})

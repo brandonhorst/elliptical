@@ -212,6 +212,22 @@ describe('repeat', () => {
     expect(data).to.have.length(0)
   })
 
+  it('rejects non-unique repeated elements (deep)', () => {
+    parser.grammar = (
+      <repeat unique={true}>
+        <argument text='test'>
+          <choice>
+            <literal text='a' value={{a: 1}} />
+            <literal text='b' value={{a: 1}} />
+          </choice>
+        </argument>
+      </repeat>
+    )
+
+    const data = from(parser.parse('ab'))
+    expect(data).to.have.length(0)
+  })
+
   it('accepts unique repeated elements', () => {
     parser.grammar = (
       <repeat unique={true} max={2}>
@@ -219,6 +235,23 @@ describe('repeat', () => {
           <choice>
             <literal text='a' value='a' />
             <literal text='b' value='b' />
+          </choice>
+        </argument>
+      </repeat>
+    )
+
+    const data = from(parser.parse('ab'))
+    expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('ab')
+  })
+
+  it('accepts non-unique repeated elements (deep)', () => {
+    parser.grammar = (
+      <repeat unique={true}>
+        <argument text='test'>
+          <choice>
+            <literal text='a' value={{a: 1}} />
+            <literal text='b' value={{a: 2}} />
           </choice>
         </argument>
       </repeat>
