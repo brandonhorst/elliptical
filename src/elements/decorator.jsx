@@ -1,6 +1,4 @@
 /** @jsx createElement */
-import _ from 'lodash'
-import {match} from '../fuzzy'
 import {createElement, Phrase} from 'lacona-phrase'
 //
 // class TrueDecorator extends Phrase {
@@ -13,7 +11,7 @@ import {createElement, Phrase} from 'lacona-phrase'
 // }
 
 export default class Decorator extends Phrase {
-  compute(input) {
+  compute (input) {
     return [{
       words: [{text: this.props.text, input: false, decorator: true}],
       value: this.props.value,
@@ -22,12 +20,20 @@ export default class Decorator extends Phrase {
     }]
   }
 
-  describe() {
-    return (
-      <choice limit={1}>
-        <literal text={this.props.text} value={this.props.value} />
-        <value compute={this.compute.bind(this)} />
-      </choice>
-    )
+  describe () {
+    if (!this.props.allowInput) {
+      return <value compute={this.compute.bind(this)} />
+    } else {
+      return (
+        <choice limit={1}>
+          <literal text={this.props.text} value={this.props.value} />
+          <value compute={this.compute.bind(this)} />
+        </choice>
+      )
+    }
   }
+}
+
+Decorator.defaultProps = {
+  allowInput: true
 }
