@@ -1,10 +1,9 @@
 /** @jsx createElement */
 import _ from 'lodash'
-import {createElement} from 'lacona-phrase'
 import parse from './parse'
 import {reconcile} from './reconcile'
 
-function from(i) {const a = []; for (let x of i) a.push(x); return a}
+function from (i) {const a = []; for (let x of i) a.push(x); return a}
 
 const optionDefaults = {
   text: '',
@@ -13,11 +12,11 @@ const optionDefaults = {
   // suggestion: [],
   // completion: [],
   // stack: [],
-  callbacks: [],
+  callbacks: []
   // path: []
 }
 
-export function createOption(options) {
+export function createOption (options) {
   return _.defaults(options, optionDefaults)
 }
 
@@ -45,16 +44,16 @@ function normalizeOutput (option) {
 }
 
 export default class Parser {
-  constructor({langs = ['default'], grammar, extensions = [], reparse = () => {}} = {}) {
+  constructor ({langs = ['default'], grammar, extensions = [], reparse = () => {}} = {}) {
     this.langs = langs
     this.grammar = grammar
     this.extensions = extensions
     this.reparse = reparse
+    this._currentlyParsing = false
     this._sources = []
-    // this._reparseNeeded = false
   }
 
-  _getExtensions(Constructor) {
+  _getExtensions (Constructor) {
     return _.reduce(this.extensions, (acc, Extension) => {
       if (_.includes(Extension.extends, Constructor)) {
         acc.push(Extension)
@@ -63,19 +62,7 @@ export default class Parser {
     }, [])
   }
 
-  _triggerReparse() {
-    this.reparse()
-    // this._reparseNeeded = true
-    // process.nextTick(() => {
-    //   if (this._reparseNeeded) {
-    //     this._reparseNeeded = false
-    //     this.reparse()
-    //     // this.emit('change')
-    //   }
-    // })
-  }
-
-  _getSource(sourceDescriptor) {
+  _getSource (sourceDescriptor) {
     const possibleSource = _.find(this._sources, ({descriptor}) => _.isEqual(descriptor, sourceDescriptor))
     if (possibleSource) return possibleSource.instance
 
@@ -88,12 +75,12 @@ export default class Parser {
     instance.setData = newData => {
       _.merge(instance.data, newData)
       instance.__dataVersion++
-      this._triggerReparse()
+      if (!this._currentlyParsing) this.reparse()
     }
     instance.replaceData = newData => {
       instance.data = newData
       instance.__dataVersion++
-      this._triggerReparse()
+      if (!this._currentlyParsing) this.reparse()
     }
 
     if (instance.create) instance.create()
@@ -102,12 +89,13 @@ export default class Parser {
     return instance
   }
 
-  _removeSource(sourceDescriptor) {
+  _removeSource (sourceDescriptor) {
     const index = _.findIndex(this._sources, ({descriptor}) => _.isEqual(descriptor, sourceDescriptor))
     this._sources.splice(index, 1)
   }
 
-  *parse(inputString) {
+  * parse (inputString) {
+    this._currentlyParsing = true
     if (!_.isString(inputString)) {
       throw new Error('lacona parse input must be a string')
     }
@@ -130,10 +118,10 @@ export default class Parser {
       }
     }
 
-    // this._reparseNeeded = false
+    this._currentlyParsing = false
   }
 
-  parseArray(inputString) {
+  parseArray (inputString) {
     return from(this.parse(inputString))
   }
 }

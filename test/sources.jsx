@@ -297,7 +297,7 @@ describe('sources', () => {
       }
     }
 
-    parser.on('change', changeSpy)
+    parser.reparse = changeSpy
     parser.grammar = <Test />
 
     const data = parser.parseArray('')
@@ -325,7 +325,7 @@ describe('sources', () => {
       }
     }
 
-    parser.on('change', changeSpy)
+    parser.reparse = changeSpy
     parser.grammar = <Test />
 
     const data = parser.parseArray('')
