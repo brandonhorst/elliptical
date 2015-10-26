@@ -68,6 +68,85 @@ describe('Phrase', () => {
     expect(data[1].result).to.equal('b')
   })
 
+  it('handles phrases extended multiple times', () => {
+    class Extended extends phrase.Phrase {
+      describe() { return <literal text='test a' value='a' /> }
+    }
+
+    class Extender1 extends phrase.Phrase {
+      describe() { return <literal text='test b' value='b' /> }
+    }
+    Extender1.extends = [Extended]
+
+    class Extender2 extends phrase.Phrase {
+      describe() { return <literal text='test c' value='c' /> }
+    }
+    Extender2.extends = [Extended]
+
+    parser.grammar = <Extended />
+    parser.extensions = [Extender1, Extender2]
+
+    const data = parser.parseArray('')
+    expect(data).to.have.length(3)
+    expect(text(data[0])).to.equal('test a')
+    expect(data[0].result).to.equal('a')
+    expect(text(data[1])).to.equal('test b')
+    expect(data[1].result).to.equal('b')
+    expect(text(data[2])).to.equal('test c')
+    expect(data[2].result).to.equal('c')
+  })
+
+  it('handles phrases extended multiple times and one has a getValue()', () => {
+    class Extended extends phrase.Phrase {
+      describe() { return null }
+    }
+
+    class Extender1 extends phrase.Phrase {
+      describe() { return <literal text='test b' value='b' /> }
+    }
+    Extender1.extends = [Extended]
+
+    class Extender2 extends phrase.Phrase {
+      getValue() { return 'c' }
+      describe() { return <literal text='test c' /> }
+    }
+    Extender2.extends = [Extended]
+
+    parser.grammar = <Extended />
+    parser.extensions = [Extender1, Extender2]
+
+    const data = parser.parseArray('test b')
+    expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('test b')
+    expect(data[0].result).to.equal('b')
+  })
+
+  it('handles phrases extended multiple times and both have a getValue()', () => {
+    class Extended extends phrase.Phrase {
+      describe() { return null }
+    }
+
+    class Extender1 extends phrase.Phrase {
+      getValue() { return 'b' }
+      describe() { return <literal text='test b' /> }
+    }
+    Extender1.extends = [Extended]
+
+    class Extender2 extends phrase.Phrase {
+      getValue() { return 'c' }
+      describe() { return <literal text='test c' /> }
+    }
+    Extender2.extends = [Extended]
+
+    parser.grammar = <Extended />
+    parser.extensions = [Extender1, Extender2]
+
+    const data = parser.parseArray('test b')
+    expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('test b')
+    expect(data[0].result).to.equal('b')
+  })
+
   it('handles recursive phrases with extends', () => {
     class Extended extends phrase.Phrase {
       describe() {

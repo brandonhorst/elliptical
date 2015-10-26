@@ -98,19 +98,27 @@ function getCallFromTranslations({prop, langs, translations}) {
 
 function getDescription({describe, extensions, phrase}) {
   if (describe) {
-    let description = describe.call(phrase)
+    const tempDescription = describe.call(phrase)
     if (extensions.length) {
 
-      const modifiedDescription = description && _.merge({}, description, {props: {id: 0}})
-      const extensionElements = _.map(extensions, (Extension, index) => <Extension {...phrase.props} id={index + 1} />)
-      description = (
-        <choice>
-          {modifiedDescription}
-          {extensionElements}
-        </choice>
-      )
+      if (tempDescription) {
+        const modifiedDescription = _.merge({}, tempDescription, {props: {id: 0}})
+        const extensionElements = _.map(extensions, (Extension, index) => <Extension {...phrase.props} id={index + 1} />)
+
+        return (
+          <choice>
+            {modifiedDescription}
+            {extensionElements}
+          </choice>
+        )
+      } else {
+        const extensionElements = _.map(extensions, (Extension, index) => <Extension {...phrase.props} id={index} />)
+
+        return <choice>{extensionElements}</choice>
+      }
+    } else {
+      return tempDescription
     }
-    return description
   }
 }
 

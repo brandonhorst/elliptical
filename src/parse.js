@@ -13,7 +13,7 @@ function *parseElement({phrase, input, options}) {
       if (phrase.__oldExtensions.length) {
         const key = _.keys(output.result)[0]
         let child
-        if (key === '0') {
+        if (key === '0') { // this is because extensions are mapped as a choice
           child = phrase
         } else {
           child = phrase.__describedPhrase.childPhrases[key]
