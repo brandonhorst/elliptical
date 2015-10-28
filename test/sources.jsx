@@ -32,6 +32,25 @@ describe('sources', () => {
     expect(fetchSpy).to.have.been.calledOnce
   })
 
+  it('calling deactivate on the parser calls onDeactivate on all sources', () => {
+    const fetchSpy = spy()
+    class TestSource extends Source {
+       onDeactivate() {fetchSpy()}
+    }
+
+    class Test extends Phrase {
+      source () {return {data: <TestSource />}}
+      describe () {return null}
+    }
+
+    parser.grammar = <Test />
+    parser.reconcile()
+    parser.activate()
+    expect(fetchSpy).to.not.have.been.called
+    parser.deactivate()
+    expect(fetchSpy).to.have.been.calledOnce
+  })
+
   it('onCreate () is called, can set data', () => {
     class TestSource extends Source {
       onCreate () {this.setData({test: 'testa'})}

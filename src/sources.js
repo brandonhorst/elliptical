@@ -50,4 +50,11 @@ export default class SourceManager {
       .forEach(source => source.instance.onActivate())
       .value()
   }
+
+  deactivate () {
+    _.chain(this._sources)
+      .filter(source => source.instance.onDeactivate)
+      .forEach(source => source.instance.onDeactivate())
+      .value()
+  }
 }

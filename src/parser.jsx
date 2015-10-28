@@ -95,6 +95,10 @@ export default class Parser {
     this._sourceManager.activate()
   }
 
+  deactivate () {
+    this._sourceManager.deactivate()
+  }
+
   * parse (inputString) {
     this._currentlyParsing = true
     if (!_.isString(inputString)) {
