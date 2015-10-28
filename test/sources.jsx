@@ -146,6 +146,39 @@ describe('sources', () => {
     expect(text(data2[0])).to.equal('testb')
   })
 
+
+  it('sources with the same props do not share if preventSharing is set', () => {
+    class TestSource extends Source {
+      onCreate () {
+        this.replaceData('testa')
+      }
+      set (input) {
+        this.replaceData(input)
+      }
+    }
+    TestSource.preventSharing = true
+
+    class Test extends Phrase {
+      create () {this.sources.data.set('testb')}
+      source () {return {data: <TestSource />}}
+      describe () {return <literal text={this.sources.data.data} />}
+    }
+    class Test2 extends Phrase {
+      source () {return {data: <TestSource />}}
+      describe () {return <literal text={this.sources.data.data} />}
+    }
+
+    parser.grammar = <Test />
+    const data1 = parser.parseArray('')
+    expect(data1).to.have.length(1)
+    expect(text(data1[0])).to.equal('testb')
+
+    parser.grammar = <Test2 />
+    const data2 = parser.parseArray('')
+    expect(data2).to.have.length(1)
+    expect(text(data2[0])).to.equal('testa')
+  })
+
   it('sources with different props do not share', () => {
     class TestSource extends Source {
       set (input) {

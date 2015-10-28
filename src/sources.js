@@ -6,9 +6,9 @@ export default class SourceManager {
     this.update = update
   }
 
-  _createSource (sourceDescriptor) {
-    const instance = new sourceDescriptor.Constructor()
-    instance.props = _.defaults(sourceDescriptor.props || {}, sourceDescriptor.Constructor.defaultProps || {})
+  _createSource (descriptor) {
+    const instance = new descriptor.Constructor()
+    instance.props = _.defaults(descriptor.props || {}, descriptor.Constructor.defaultProps || {})
 
     instance.data = {}
     instance.__dataVersion = 0
@@ -26,21 +26,25 @@ export default class SourceManager {
 
     if (instance.onCreate) instance.onCreate()
 
-    this._sources.push({instance, descriptor: sourceDescriptor})
+    this._sources.push({instance, descriptor: descriptor})
     return instance
   }
 
-  getSource (sourceDescriptor) {
-    const possibleSource = _.find(this._sources, ({descriptor}) => _.isEqual(descriptor, sourceDescriptor))
+  getSource (descriptor) {
+    let possibleSource
+    if (!descriptor.Constructor.preventSharing) {
+      possibleSource = _.find(this._sources, (source) => _.isEqual(descriptor, source.descriptor))
+    }
+
     if (possibleSource) {
       return possibleSource.instance
     } else {
-      return this._createSource(sourceDescriptor)
+      return this._createSource(descriptor)
     }
   }
 
-  removeSource (sourceDescriptor) {
-    const index = _.findIndex(this._sources, ({descriptor}) => _.isEqual(descriptor, sourceDescriptor))
+  removeSource (descriptor) {
+    const index = _.findIndex(this._sources, (source) => _.isEqual(descriptor, source.descriptor))
     this._sources.splice(index, 1)
   }
 
