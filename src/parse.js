@@ -12,16 +12,9 @@ function *parseElement({phrase, input, options}) {
 
       if (phrase.__oldExtensions.length) {
         const key = _.keys(output.result)[0]
-        let child
-        if (key === '0') { // this is because extensions are mapped as a choice
-          child = phrase
-        } else {
-          child = phrase.__describedPhrase.childPhrases[key]
-        }
         result = output.result[key]
-        if (child && child.getValue) {
-          getValue = child.getValue.bind(child)
-        }
+        getValue = key === '0' && phrase.getValue ? phrase.getValue.bind(phrase) : null
+
       } else {
         result = output.result
         if (phrase.getValue) {

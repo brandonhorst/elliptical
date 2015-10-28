@@ -44,13 +44,13 @@ describe('lifecycle', () => {
     expect(destSpy).to.have.been.calledOnce
   })
 
-  it('calls create and destroy on Sources', () => {
+  it('calls onCreate and onDestroy on Sources', () => {
     const createSpy = spy()
     const destSpy = spy()
 
     class TestSource extends Source {
-      create() {createSpy()}
-      destroy() {destSpy()}
+      onCreate() {createSpy()}
+      onDestroy() {destSpy()}
     }
 
     class Test extends Phrase {

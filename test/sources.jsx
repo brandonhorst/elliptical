@@ -15,13 +15,30 @@ describe('sources', () => {
     parser = new lacona.Parser()
   })
 
-  it('create () is called, can set data', () => {
+  it('calling activate on the parser calls onActivate on all sources', () => {
+    const fetchSpy = spy()
     class TestSource extends Source {
-      create () {this.setData({test: 'testa'})}
+       onActivate() {fetchSpy()}
     }
 
     class Test extends Phrase {
-      describe () {return <literal text={this.data.test} />}
+      source () {return {data: <TestSource />}}
+      describe () {return null}
+    }
+
+    parser.grammar = <Test />
+    parser.reconcile()
+    parser.activate()
+    expect(fetchSpy).to.have.been.calledOnce
+  })
+
+  it('onCreate () is called, can set data', () => {
+    class TestSource extends Source {
+      onCreate () {this.setData({test: 'testa'})}
+    }
+
+    class Test extends Phrase {
+      describe () {return <literal text={this.sources.data.data.test} />}
       source () {return {data: <TestSource />}}
     }
 
@@ -32,10 +49,10 @@ describe('sources', () => {
     expect(text(data[0])).to.equal('testa')
   })
 
-  it('destroy() is called, on destroy', () => {
+  it('onDestroy() is called, on destroy', () => {
     const destSpy = spy()
     class TestSource extends Source {
-      destroy () {destSpy()}
+      onDestroy () {destSpy()}
     }
 
     class Test extends Phrase {
@@ -64,11 +81,11 @@ describe('sources', () => {
 
   it('passes props to create', () => {
     class TestSource extends Source {
-      create () {this.setData({test: this.props.test})}
+      onCreate () {this.setData({test: this.props.test})}
     }
 
     class Test extends Phrase {
-      describe () {return <literal text={this.data.test} />}
+      describe () {return <literal text={this.sources.data.data.test} />}
       source () {return {data: <TestSource test='testa' />}}
     }
 
@@ -81,22 +98,22 @@ describe('sources', () => {
 
   it('sources with the same props share', () => {
     class TestSource extends Source {
-      create () {
-        this.setData({
-          test: 'testa',
-          set: input => this.setData({test: input})
-        })
+      onCreate () {
+        this.setData('testa')
+      }
+      set (input) {
+        this.setData({test: input})
       }
     }
 
     class Test extends Phrase {
-      create () {this.data.set('testb')}
+      create () {this.sources.data.set('testb')}
       source () {return {data: <TestSource />}}
-      describe () {return <literal text={this.data.test} />}
+      describe () {return <literal text={this.sources.data.data.test} />}
     }
     class Test2 extends Phrase {
       source () {return {data: <TestSource />}}
-      describe () {return <literal text={this.data.test} />}
+      describe () {return <literal text={this.sources.data.data.test} />}
     }
 
     parser.grammar = <Test />
@@ -112,22 +129,23 @@ describe('sources', () => {
 
   it('sources with different props do not share', () => {
     class TestSource extends Source {
-      create () {
-        this.setData({
-          test: 'testa',
-          set: input => this.setData({test: input})
-        })
+      set (input) {
+        this.replaceData(input)
+      }
+
+      onCreate () {
+        this.replaceData('testa')
       }
     }
 
     class Test extends Phrase {
-      create () {this.data.set('testb')}
+      create () {this.sources.data.set('testb')}
       source () {return {data: <TestSource id='something' />}}
-      describe () {return <literal text={this.data.test} />}
+      describe () {return <literal text={this.sources.data.data} />}
     }
     class Test2 extends Phrase {
       source () {return {data: <TestSource />}}
-      describe () {return <literal text={this.data.test} />}
+      describe () {return <literal text={this.sources.data.data} />}
     }
 
     parser.grammar = <Test />
@@ -141,17 +159,17 @@ describe('sources', () => {
     expect(text(data2[0])).to.equal('testa')
   })
 
-  it('calls create, which can setData', done => {
+  it('calls onCreate, which can setData', done => {
     class TestSource extends Source {
-      create () {
-        this.setData({test: 'testa'})
-        process.nextTick(() => this.setData({test: 'testb'}))
+      onCreate () {
+        this.replaceData('testa')
+        process.nextTick(() => this.replaceData('testb'))
       }
     }
 
     class Test extends Phrase {
       source () {return {data: <TestSource />}}
-      describe () {return <literal text={this.data.test} />}
+      describe () {return <literal text={this.sources.data.data} />}
     }
 
     parser.grammar = <Test />
@@ -168,18 +186,18 @@ describe('sources', () => {
 
   it('can export functions, which can be called on create', () => {
     class TestSource extends Source {
-      create () {
-        this.setData({
-          test: 'testa',
-          update: () => this.setData({'test': 'testb'})
-        })
+      update () {
+        this.replaceData('testb')
+      }
+      onCreate () {
+        this.replaceData('testa')
       }
     }
 
     class Test extends Phrase {
-      create () {this.data.update()}
       source () {return {data: <TestSource />}}
-      describe () {return <literal text={this.data.test} />}
+      create () {this.sources.data.update()}
+      describe () {return <literal text={this.sources.data.data} />}
     }
 
     parser.grammar = <Test />
@@ -192,8 +210,8 @@ describe('sources', () => {
     const descSpy = spy()
 
     class TestSource extends Source {
-      create () {
-        this.setData({test: 'testa'})
+      onCreate () {
+        this.replaceData('testa')
       }
     }
 
@@ -201,7 +219,7 @@ describe('sources', () => {
       source () {return {data: <TestSource />}}
       describe () {
         descSpy()
-        return <literal text={this.data.test} />
+        return <literal text={this.sources.data.data} />
       }
     }
 
@@ -220,16 +238,16 @@ describe('sources', () => {
     const consSpy = spy()
 
     class TestSource extends Source {
-      create () {
-        this.setData({test: 'testa'})
-        process.nextTick(() => this.setData({test: 'testb'}))
+      onCreate () {
+        this.replaceData('testa')
+        process.nextTick(() => this.replaceData('testb'))
       }
     }
 
     class Test extends Phrase {
       source () {return {data: <TestSource />}}
       create () {consSpy()}
-      describe () {return <literal text={this.data.test} />}
+      describe () {return <literal text={this.sources.data.data} />}
     }
 
     parser.grammar = <Test />
@@ -251,9 +269,9 @@ describe('sources', () => {
     const subConsSpy = spy()
 
     class TestSource extends Source {
-      create () {
-        this.setData({test: 'testa'})
-        process.nextTick(() => this.setData({test: 'testb'}))
+      onCreate () {
+        this.replaceData('testa')
+        process.nextTick(() => this.replaceData('testb'))
       }
     }
 
@@ -265,7 +283,7 @@ describe('sources', () => {
     class Test extends Phrase {
       create () { consSpy('main') }
       source () {return {data: <TestSource />}}
-      describe () {return <SubTest val={this.data.test} />}
+      describe () {return <SubTest val={this.sources.data.data} />}
     }
 
     parser.grammar = <Test />
@@ -287,7 +305,7 @@ describe('sources', () => {
   it('setData does not trigger change event during a parse', (done) => {
     const changeSpy = spy()
     class TestSource extends Source {
-      create () {this.setData({test: 'testb'})}
+      onCreate () {this.setData({test: 'testb'})}
     }
 
     class Test extends Phrase {
@@ -313,7 +331,7 @@ describe('sources', () => {
   it('setData causes change on nextTick when it occurs after a parse', (done) => {
     const changeSpy = spy()
     class TestSource extends Source {
-      create () {
+      onCreate () {
         process.nextTick(() => this.setData({test: 'testb'}))
       }
     }

@@ -46,7 +46,7 @@ function reconcileOne({descriptor, phrase, options}) {
     const sourceCall = getCall({prop: 'source', Constructor, langs: options.langs})
     const sources = sourceCall ? sourceCall.call(newPhrase) : {}
     const allSources = _.defaults({}, sources, Constructor.__additionalSources)
-    applySources({sources: allSources, phrase: newPhrase, getSource: options.getSource})
+    applySources({sourceDescriptors: allSources, phrase: newPhrase, getSource: options.getSource})
 
     create({phrase: newPhrase})
 
@@ -148,8 +148,8 @@ export function destroy({phrase, removeSource}) {
 
   _.forEach(phrase.__sources, ({source, descriptor}) => {
     source.__subscribers--
-    if (source.__subscribers === 0 && source.destroy) {
-      source.destroy()
+    if (source.__subscribers === 0 && source.onDestroy) {
+      source.onDestroy()
       removeSource(descriptor)
     }
   })
@@ -161,15 +161,17 @@ function create({phrase}) {
   if (phrase.create) phrase.create()
 }
 
-function applySources({sources, phrase, getSource}) {
+function applySources({sourceDescriptors, phrase, getSource}) {
   phrase.__sources = {}
 
-  _.forEach(sources, (descriptor, name) => {
+  const sources = _.mapValues(sourceDescriptors, (descriptor, name) => {
     const source = getSource(descriptor)
     source.__subscribers++
     phrase.__sources[name] = {source, lastVersion: 0, descriptor}
-    Object.defineProperty(phrase, name, {get() {return phrase.__sources[name].source.data}})
+    return source
   })
+
+  phrase.sources = sources
 }
 
 //TODO debug validation would be nice
