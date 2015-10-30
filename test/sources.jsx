@@ -464,4 +464,25 @@ describe('sources', () => {
       done()
     })
   })
+  // 
+  // it("Can set global sources on the parser", done => {
+  //   class TestSource1 extends Source {
+  //     onCreate () {
+  //       this.replaceData('test')
+  //     }
+  //   }
+  //
+  //   class Test extends Phrase {
+  //     describe () { return <literal text={this.globalSources.data.data} /> }
+  //   }
+  //
+  //   parser.grammar = <Test />
+  //   parser.globalSources = {
+  //     data: <TestSource1 />
+  //   }
+  //
+  //   const data = parser.parseArray('')
+  //   expect(data).to.have.length(1)
+  //   expect(text(data[0])).to.equal('test')
+  // })
 })
