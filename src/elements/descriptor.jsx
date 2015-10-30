@@ -7,7 +7,7 @@ import stackFind from '../stackfind'
 
 export default class Descriptor extends Phrase {
   *parseChild (input, options) {
-    if (this.props.trigger) this.props.trigger(input.text)
+    if (!options.isReparse && this.props.trigger) this.props.trigger(input.text)
 
     if (this.props.showForEmpty && input.text === '') return true
 

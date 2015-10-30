@@ -395,7 +395,7 @@ describe('sources', () => {
       }
     }
 
-    parser.reparse = changeSpy
+    parser.onReparse = changeSpy
     parser.grammar = <Test />
 
     const data = parser.parseArray('')
@@ -407,6 +407,61 @@ describe('sources', () => {
         expect(changeSpy).to.have.been.calledOnce
         done()
       })
+    })
+  })
+
+  it('sources can contain other sources', () => {
+    class TestSource1 extends Source {
+      onCreate () { this.replaceData('test') }
+    }
+    class TestSource2 extends Source {
+      source () { return {data: <TestSource1 />} }
+      onCreate () { this.replaceData(this.sources.data.data) }
+    }
+
+    class Test extends Phrase {
+      source () {return {data: <TestSource2 />}}
+      describe () { return <literal text={this.sources.data.data} /> }
+    }
+
+    parser.grammar = <Test />
+
+    const data = parser.parseArray('')
+    expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('test')
+  })
+
+  it("onUpdate is called when a source's source updates", done => {
+    class TestSource1 extends Source {
+      onCreate () {
+        this.replaceData('test')
+        process.nextTick(() => {
+          this.replaceData('another test')
+        })
+      }
+    }
+    class TestSource2 extends Source {
+      source () { return {data: <TestSource1 />} }
+      onCreate () { this.replaceData('wrong') }
+      onUpdate () { this.replaceData(this.sources.data.data) }
+    }
+
+    class Test extends Phrase {
+      source () {return {data: <TestSource2 />}}
+      describe () { return <literal text={this.sources.data.data} /> }
+    }
+
+    parser.grammar = <Test />
+
+    const data = parser.parseArray('')
+    expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('wrong')
+
+    process.nextTick(() => {
+      const data = parser.parseArray('')
+      expect(data).to.have.length(1)
+      expect(text(data[0])).to.equal('another test')
+      done()
     })
   })
 })

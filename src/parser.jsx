@@ -17,34 +17,16 @@ export function createOption (options) {
 }
 
 function normalizeOutput (option) {
-  let output = _.pick(option, ['words', 'score', 'result'])
-  // const suggestion = option.suggestion
-  // let newSuggestions = []
-  // let i, l, lastSuggestion, oldSuggestion
-
-  // if (suggestion.length > 0) {
-  //   newSuggestions.push(_.clone(suggestion[0]))
-  //   for (i = 1, l = suggestion.length; i < l; i++) {
-  //     lastSuggestion = newSuggestions[newSuggestions.length - 1]
-  //     oldSuggestion = _.clone(suggestion[i])
-  //     if (lastSuggestion.input === oldSuggestion.input && lastSuggestion.category === oldSuggestion.category) {
-  //       lastSuggestion.string = lastSuggestion.string + oldSuggestion.string
-  //     } else {
-  //       newSuggestions.push(oldSuggestion)
-  //     }
-  //   }
-  // }
-  // output.suggestion = newSuggestions
-  //
+  const output = _.pick(option, ['words', 'score', 'result'])
   return output
 }
 
 export default class Parser {
-  constructor ({langs = ['default'], grammar, extensions = [], reparse = () => {}} = {}) {
+  constructor ({langs = ['default'], grammar, extensions = [], onReparse = () => {}} = {}) {
     this.langs = langs
     this.grammar = grammar
     this.extensions = extensions
-    this.reparse = reparse
+    this.onReparse = onReparse
     this._currentlyParsing = false
     this._sourceManager = new SourceManager({
       update: this._maybeReparse.bind(this)
@@ -53,7 +35,7 @@ export default class Parser {
 
   _maybeReparse () {
     if (!this._currentlyParsing) {
-      this.reparse()
+      this.onReparse()
     }
   }
 
@@ -74,12 +56,12 @@ export default class Parser {
     this._sourceManager.removeSource(descriptor)
   }
 
-  _getReconcileParseOptions () {
+  _getReconcileParseOptions ({isReparse = false} = {}) {
     return {
       langs: this.langs,
       getExtensions: this._getExtensions.bind(this),
-      getSource: this._getSource.bind(this),
-      removeSource: this._removeSource.bind(this)
+      sourceManager: this._sourceManager,
+      isReparse
     }
   }
 
@@ -99,7 +81,7 @@ export default class Parser {
     this._sourceManager.deactivate()
   }
 
-  * parse (inputString) {
+  * parse (inputString, isReparse = false) {
     this._currentlyParsing = true
     if (!_.isString(inputString)) {
       throw new Error('lacona parse input must be a string')
@@ -108,7 +90,7 @@ export default class Parser {
     const input = createOption({text: inputString})
     this.reconcile()
 
-    const options = this._getReconcileParseOptions()
+    const options = this._getReconcileParseOptions({isReparse})
     for (let output of parse({phrase: this._phrase, input, options})) {
       if (output.text === '') {
         // call each callback (used for limiting)
@@ -120,7 +102,7 @@ export default class Parser {
     this._currentlyParsing = false
   }
 
-  parseArray (inputString) {
-    return from(this.parse(inputString))
+  parseArray (inputString, isReparse = false) {
+    return from(this.parse(inputString, isReparse))
   }
 }

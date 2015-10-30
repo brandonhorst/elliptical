@@ -35,7 +35,5 @@ function *parseElement({phrase, input, options}) {
     //noop
   }
 
-  _.forEach(phrase.__sources, obj => {
-    obj.lastVersion = obj.source.__dataVersion
-  })
+  options.sourceManager.markSourceUpToDate(phrase)
 }

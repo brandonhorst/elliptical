@@ -127,6 +127,28 @@ describe('descriptor', () => {
       expect(func).to.have.been.calledWith('l')
       expect(data3).to.have.length(1)
     })
+
+    it('does not call trigger for reparses', () => {
+      const func = spy()
+
+      parser.grammar = (
+        <sequence>
+          <literal text='a ' id='a' value='a' />
+          <placeholder descriptor='test' trigger={func} id='place'>
+            <literal text='literal' />
+          </placeholder>
+        </sequence>
+      )
+
+      const data2 = parser.parseArray('a ')
+      expect(func).to.have.been.calledOnce
+      expect(func).to.have.been.calledWith('')
+      expect(data2).to.have.length(1)
+
+      const data3 = parser.parseArray('a ', true)
+      expect(func).to.have.been.calledOnce
+      expect(data3).to.have.length(1)
+    })
   })
 
   describe('argument', () => {

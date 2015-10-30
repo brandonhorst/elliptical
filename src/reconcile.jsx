@@ -18,14 +18,14 @@ function reconcileArray({descriptor, phrase, options}) {
 }
 
 function reconcileOne({descriptor, phrase, options}) {
-  if (descriptor == null && phrase) return destroy({phrase, removeSource: options.removeSource})
+  if (descriptor == null && phrase) return destroy({phrase, sourceManager: options.sourceManager})
 
   const Constructor = getConstructor({Constructor: descriptor.Constructor})
   const props = getRealProps({descriptor, Constructor})
   const extensions = options.getExtensions(Constructor)
 
   if (phrase && phrase.constructor === Constructor && _.isEqual(props, phrase.props)) {
-    if (_.some(phrase.__sources, obj => obj.lastVersion !== obj.source.__dataVersion) ||
+    if (options.sourceManager.sourceChanged(phrase) ||
         !_.isEqual(extensions, phrase.__oldExtensions)) {
       const describedPhrase = getDescribedPhrase({Constructor, phrase, extensions, options})
 
@@ -38,15 +38,12 @@ function reconcileOne({descriptor, phrase, options}) {
       return phrase
     }
   } else {
-    if (phrase) destroy({phrase, removeSource: options.removeSource})
+    if (phrase) destroy({phrase, sourceManager: options.sourceManager})
 
     const newPhrase = new Constructor()
     newPhrase.props = props
 
-    const sourceCall = getCall({prop: 'source', Constructor, langs: options.langs})
-    const sources = sourceCall ? sourceCall.call(newPhrase) : {}
-    const allSources = _.defaults({}, sources, Constructor.__additionalSources)
-    applySources({sourceDescriptors: allSources, phrase: newPhrase, getSource: options.getSource})
+    options.sourceManager.sourceInstance(newPhrase)
 
     create({phrase: newPhrase})
 
@@ -141,37 +138,18 @@ function getConstructor({Constructor}) {
   return Constructor
 }
 
-export function destroy({phrase, removeSource}) {
+export function destroy({phrase, sourceManager}) {
   if ((phrase.constructor === builtins.choice || phrase.constructor === builtins.sequence) && phrase.childPhrases) {
-    phrase.childPhrases.forEach(phrase => destroy({phrase, removeSource}))
+    phrase.childPhrases.forEach(phrase => destroy({phrase, sourceManager}))
   }
 
-  _.forEach(phrase.__sources, ({source, descriptor}) => {
-    source.__subscribers--
-    if (source.__subscribers === 0 && source.onDestroy) {
-      source.onDestroy()
-      removeSource(descriptor)
-    }
-  })
+  sourceManager.unsourceInstance(phrase)
 
   if (phrase.destroy) phrase.destroy()
 }
 
 function create({phrase}) {
   if (phrase.create) phrase.create()
-}
-
-function applySources({sourceDescriptors, phrase, getSource}) {
-  phrase.__sources = {}
-
-  const sources = _.mapValues(sourceDescriptors, (descriptor, name) => {
-    const source = getSource(descriptor)
-    source.__subscribers++
-    phrase.__sources[name] = {source, lastVersion: 0, descriptor}
-    return source
-  })
-
-  phrase.sources = sources
 }
 
 //TODO debug validation would be nice
