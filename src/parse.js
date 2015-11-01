@@ -1,10 +1,6 @@
 import _ from 'lodash'
 
 export default function *parse({phrase, input, options}) {
-  yield* parseElement({phrase, input, options})
-}
-
-function *parseElement({phrase, input, options}) {
   if (phrase.__describedPhrase) {
     const iterator = parse({phrase: phrase.__describedPhrase, input, options})
     for (let output of iterator) {
