@@ -5,11 +5,6 @@ import stackFind from '../stackfind.js'
 
 export default class Value extends Phrase {
   *_handleParse(input, options) {
-    // if this has a category use that, else the last category on the stack
-    // const category = stackFind(input.stack, 'category', this.props.category, null)
-    // const qualifier = stackFind(input.stack, 'qualifier', this.props.qualifier, null)
-    // const descriptors = _.chain(input.stack).map('descriptor').filter().value()
-
     let successes = 0
 
     // TODO this is **super** WET
@@ -26,22 +21,13 @@ export default class Value extends Phrase {
 
         const word = {
           text: output.text,
-          // category,
           input: false,
           argument: input.currentArgument,
           category: this.props.category
-          // qualifier,
-          // descriptors
         }
 
         modification.words = input.words.concat(word)
 
-        // if (_.isEmpty(input.suggestion)) {
-        //   modification.suggestion = input.suggestion.concat(word)
-        // } else {
-        //   modification.completion = input.completion.concat(word)
-        // }
-        //
         yield _.assign({}, input, modification)
 
         if (this.props.limit) {
