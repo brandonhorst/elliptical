@@ -464,7 +464,7 @@ describe('sources', () => {
       done()
     })
   })
-  // 
+  //
   // it("Can set global sources on the parser", done => {
   //   class TestSource1 extends Source {
   //     onCreate () {
@@ -485,4 +485,55 @@ describe('sources', () => {
   //   expect(data).to.have.length(1)
   //   expect(text(data[0])).to.equal('test')
   // })
+
+  it("sources can have other sources as their children", () => {
+    class TestSource1 extends Source {
+      onCreate () {
+        this.replaceData('test')
+      }
+    }
+    class TestSource2 extends Source {
+      source () { return {data: this.props.children[0]} }
+      onCreate () {
+        this.replaceData(this.sources.data.data)
+      }
+    }
+
+    class Test extends Phrase {
+      source () {return {data: <TestSource2><TestSource1 /></TestSource2>}}
+      describe () { return <literal text={this.sources.data.data} /> }
+    }
+
+    parser.grammar = <Test />
+
+    const data = parser.parseArray('')
+    expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('test')
+  })
+
+  it("sources can have Source definitions as their props", () => {
+    class TestSource1 extends Source {
+      onCreate () {
+        this.replaceData('test')
+      }
+    }
+    class TestSource2 extends Source {
+      source () { return {data: <this.props.Source />} }
+      onCreate () {
+        this.replaceData(this.sources.data.data)
+      }
+    }
+
+    class Test extends Phrase {
+      source () {return {data: <TestSource2 Source={TestSource1} />}}
+      describe () { return <literal text={this.sources.data.data} /> }
+    }
+
+    parser.grammar = <Test />
+
+    const data = parser.parseArray('')
+    expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('test')
+  })
+
 })

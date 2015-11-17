@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import {getRealProps} from './descriptor'
 
 export default class SourceManager {
   constructor ({update = () => {}}) {
@@ -18,7 +19,8 @@ export default class SourceManager {
 
   _createSource (descriptor) {
     const instance = new descriptor.Constructor()
-    instance.props = _.defaults(descriptor.props || {}, descriptor.Constructor.defaultProps || {})
+    const props = getRealProps({descriptor, Constructor: descriptor.Constructor})
+    instance.props = props
 
     instance.data = {}
     instance.__dataVersion = 0

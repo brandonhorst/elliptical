@@ -2,6 +2,7 @@
 import _ from 'lodash'
 import * as builtins from './elements'
 import {createElement} from 'lacona-phrase'
+import {getRealProps} from './descriptor'
 
 export function reconcile({descriptor, phrase, options}) {
   const func = _.isArray(descriptor) ? reconcileArray : reconcileOne
@@ -117,14 +118,6 @@ function getDescription({describe, extensions, phrase}) {
       return tempDescription
     }
   }
-}
-
-function getRealProps({descriptor, Constructor}) {
-  const realProps = _.defaults(descriptor.props || {}, Constructor.defaultProps || {})
-  if (descriptor.children && descriptor.children.length > 0) {
-    realProps.children = _.flattenDeep(descriptor.children)
-  }
-  return realProps
 }
 
 function getConstructor({Constructor}) {
