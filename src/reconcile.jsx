@@ -2,7 +2,7 @@
 import _ from 'lodash'
 import * as builtins from './elements'
 import {createElement} from 'lacona-phrase'
-import {getRealProps} from './descriptor'
+import {getRealProps, getConstructor} from './descriptor'
 
 export function reconcile({descriptor, phrase, options}) {
   const func = _.isArray(descriptor) ? reconcileArray : reconcileOne
@@ -21,7 +21,7 @@ function reconcileArray({descriptor, phrase, options}) {
 function reconcileOne({descriptor, phrase, options}) {
   if (descriptor == null && phrase) return destroy({phrase, sourceManager: options.sourceManager})
 
-  const Constructor = getConstructor({Constructor: descriptor.Constructor})
+  const Constructor = getConstructor({Constructor: descriptor.Constructor, type: 'phrase'})
   const props = getRealProps({descriptor, Constructor})
   const extensions = options.getExtensions(Constructor)
 
@@ -118,17 +118,6 @@ function getDescription({describe, extensions, phrase}) {
       return tempDescription
     }
   }
-}
-
-function getConstructor({Constructor}) {
-  if (_.isString(Constructor)) {
-    if (_.has(builtins, Constructor)) {
-      return builtins[Constructor]
-    } else {
-      throw new Error(`${Constructor} is an invalid phrase. Note: non-builtin phrases must be uppercase`)
-    }
-  }
-  return Constructor
 }
 
 export function destroy({phrase, sourceManager}) {

@@ -2,7 +2,7 @@
 import _ from 'lodash'
 import parse from './parse'
 import {reconcile} from './reconcile'
-import SourceManager from './sources'
+import SourceManager from './source-manager'
 
 function from (i) {const a = []; for (let x of i) a.push(x); return a}
 
