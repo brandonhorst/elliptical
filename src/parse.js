@@ -18,8 +18,8 @@ export default function *parse({phrase, input, options}) {
         }
       }
 
-      if (!phrase.filter || phrase.filter(result)) {
-        const trueResult = getValue ? getValue(result) : result
+      const trueResult = getValue ? getValue(result) : result
+      if (!phrase.validate || phrase.validate(trueResult)) {
         const newOutput = _.assign({}, output, {result: trueResult})
 
         yield newOutput
