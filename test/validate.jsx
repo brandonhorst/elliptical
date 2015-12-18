@@ -35,33 +35,6 @@ describe('validate', () => {
     expect(data[0].result).to.equal('b')
   })
 
-  it('validates after getValue', () => {
-    function filter (result) {
-      return result === 'b'
-    }
-
-    class Test extends Phrase {
-      validate (result) {
-        return result === 'b'
-      }
-
-      getValue (result) {
-        return result[1]
-      }
-
-      describe () {
-        return <list items={[{text: 'a', value: 'xa'}, {text: 'b', value: 'xb'}]} />
-      }
-    }
-
-    parser.grammar = <Test />
-
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('b')
-    expect(data[0].result).to.equal('b')
-  })
-
   it('validates extensions as well', () => {
     function filter (result) {
       return result === 'b'

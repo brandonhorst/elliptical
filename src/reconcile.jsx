@@ -99,22 +99,14 @@ function getDescription({describe, extensions, phrase}) {
   if (describe) {
     const tempDescription = describe.call(phrase)
     if (extensions.length) {
+      const extensionElements = _.map(extensions, Extension => <Extension {...phrase.props} id={undefined} />)
 
-      if (tempDescription) {
-        const modifiedDescription = _.merge({}, tempDescription, {props: {id: 0}})
-        const extensionElements = _.map(extensions, (Extension, index) => <Extension {...phrase.props} id={index + 1} />)
-
-        return (
-          <choice>
-            {modifiedDescription}
-            {extensionElements}
-          </choice>
-        )
-      } else {
-        const extensionElements = _.map(extensions, (Extension, index) => <Extension {...phrase.props} id={index} />)
-
-        return <choice>{extensionElements}</choice>
-      }
+      return (
+        <choice>
+          {tempDescription}
+          {extensionElements}
+        </choice>
+      )
     } else {
       return tempDescription
     }

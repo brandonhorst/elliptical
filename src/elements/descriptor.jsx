@@ -3,7 +3,6 @@ import _ from 'lodash'
 import {createElement, Phrase} from 'lacona-phrase'
 import parse from '../parse'
 import {reconcile} from '../reconcile'
-import stackFind from '../stackfind'
 
 export default class Descriptor extends Phrase {
   *parseChild (input, options) {

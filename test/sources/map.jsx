@@ -6,7 +6,7 @@ import {text} from './_util'
 import * as lacona from '..'
 import {createElement, Phrase, Source} from 'lacona-phrase'
 
-describe('map', () => {
+describe('sources/map', () => {
   let parser
   beforeEach(function () {
     parser = new lacona.Parser()
