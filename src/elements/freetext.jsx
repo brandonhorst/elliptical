@@ -16,9 +16,9 @@ function* substrings (input, {splitOn, noSplit}) {
 
 export default class Freetext extends Phrase {
 
-  *validate (input) {
+  *filter (input) {
     for (let stringPart of substrings(input, {splitOn: this.props.splitOn, noSplit: this.props.consumeAll})) {
-      if (this.props.validate(stringPart)) {
+      if (this.props.filter(stringPart)) {
         yield {
           words: [{text: stringPart, input: true}],
           value: stringPart,
@@ -30,11 +30,11 @@ export default class Freetext extends Phrase {
   }
 
   describe() {
-    return <value compute={this.validate.bind(this)} limit={this.props.limit} />
+    return <value compute={this.filter.bind(this)} limit={this.props.limit} />
   }
 }
 Freetext.defaultProps = {
-  validate() {return true},
+  filter() {return true},
   splitOn: '',
   consumeAll: false
 }

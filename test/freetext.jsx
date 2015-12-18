@@ -16,12 +16,12 @@ describe('freetext', () => {
     parser = new Parser()
   })
 
-  it('validates input', () => {
-    function validate (input) {
+  it('filters input', () => {
+    function filter (input) {
       return input === 'validValue'
     }
 
-    parser.grammar = <freetext validate={validate} />
+    parser.grammar = <freetext filter={filter} />
 
     const data1 = parser.parseArray('validValue')
     expect(data1).to.have.length(1)
@@ -32,7 +32,7 @@ describe('freetext', () => {
     expect(data2).to.have.length(0)
   })
 
-  it('no validate always accepts', () => {
+  it('no filter always accepts', () => {
     parser.grammar = <freetext id='test' />
 
     const data = parser.parseArray('anything')
@@ -42,19 +42,19 @@ describe('freetext', () => {
   })
 
   it('allows consumeAll', () => {
-    const valSpy = spy()
+    const filterSpy = spy()
 
-    function validate (input) {
-      valSpy()
+    function filter (input) {
+      filterSpy()
       return input === 'validValue'
     }
 
-    parser.grammar = <freetext validate={validate} consumeAll={true} />
+    parser.grammar = <freetext filter={filter} consumeAll={true} />
 
     const data = parser.parseArray('validValue')
     expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('validValue')
-    expect(valSpy).to.have.been.calledOnce
+    expect(filterSpy).to.have.been.calledOnce
   })
 
   it('allows splits on strings', () => {
@@ -62,7 +62,7 @@ describe('freetext', () => {
       describe () {
         return (
           <sequence>
-            <freetext splitOn=' ' id='validator' />
+            <freetext splitOn=' ' id='freetext' />
             <choice>
               <literal text=' test' />
               <literal text='thing' />
@@ -77,11 +77,11 @@ describe('freetext', () => {
     const data = parser.parseArray('anything goes test')
     expect(data).to.have.length(3)
     expect(text(data[0])).to.equal('anything goes test')
-    expect(data[0].result.validator).to.equal('anything goes')
+    expect(data[0].result.freetext).to.equal('anything goes')
     expect(text(data[1])).to.equal('anything goes test test')
-    expect(data[1].result.validator).to.equal('anything goes test')
+    expect(data[1].result.freetext).to.equal('anything goes test')
     expect(text(data[2])).to.equal('anything goes testthing')
-    expect(data[2].result.validator).to.equal('anything goes test')
+    expect(data[2].result.freetext).to.equal('anything goes test')
   })
 
   it('allows splits on regex (with weird parens)', () => {
@@ -89,7 +89,7 @@ describe('freetext', () => {
       describe () {
         return (
           <sequence>
-            <freetext splitOn={/(( )())/} id='validator' />
+            <freetext splitOn={/(( )())/} id='freetext' />
             <choice>
               <literal text=' test' />
               <literal text='thing' />
@@ -104,10 +104,10 @@ describe('freetext', () => {
     const data = parser.parseArray('anything goes test')
     expect(data).to.have.length(3)
     expect(text(data[0])).to.equal('anything goes test')
-    expect(data[0].result.validator).to.equal('anything goes')
+    expect(data[0].result.freetext).to.equal('anything goes')
     expect(text(data[1])).to.equal('anything goes test test')
-    expect(data[1].result.validator).to.equal('anything goes test')
+    expect(data[1].result.freetext).to.equal('anything goes test')
     expect(text(data[2])).to.equal('anything goes testthing')
-    expect(data[2].result.validator).to.equal('anything goes test')
+    expect(data[2].result.freetext).to.equal('anything goes test')
   })
 })
