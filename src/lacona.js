@@ -1,1 +1,2 @@
-export {default as Parser} from './parser'
+export { Parser } from './parser'
+export { LaconaError as Error } from './error'

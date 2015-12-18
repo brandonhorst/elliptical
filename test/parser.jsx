@@ -21,27 +21,6 @@ describe('Parser', () => {
     expect(() => parser.parseArray(123)).to.throw(Error)
   })
 
-  // it('passes the path to the output', () => {
-  //   parser.grammar = <literal text='test' />
-  //
-  //   const data = parser.parseArray($1)
-  //   expect(data).to.have.length(1)
-  //   expect(data[0].path).to.have.length(2)
-  //   expect(data[0].path[0]).to.be.an.instanceof(Literal)
-  //   expect(data[0].path[1]).to.be.an.instanceof(Value)
-  // })
-  //
-  // it('path contains every element passed through', () => {
-  //   parser.grammar = <choice><literal text='test' /></choice>
-  //
-  //   const data = parser.parseArray($1)
-  //   expect(data).to.have.length(1)
-  //   expect(data[0].path).to.have.length(3)
-  //   expect(data[0].path[0]).to.be.an.instanceof(Choice)
-  //   expect(data[0].path[1]).to.be.an.instanceof(Literal)
-  //   expect(data[0].path[2]).to.be.an.instanceof(Value)
-  // })
-
   it('can parse in a specified language', () => {
     class Test extends phrase.Phrase {
       static get translations() {

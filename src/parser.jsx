@@ -1,7 +1,8 @@
 /** @jsx createElement */
 import _ from 'lodash'
 import parse from './parse'
-import {reconcile} from './reconcile'
+import { reconcile } from './reconcile'
+import { LaconaError } from './error'
 import SourceManager from './source-manager'
 
 function from (i) {const a = []; for (let x of i) a.push(x); return a}
@@ -21,7 +22,7 @@ function normalizeOutput (option) {
   return output
 }
 
-export default class Parser {
+export class Parser {
   constructor ({langs = ['default'], grammar, extensions = [], onReparse = () => {}} = {}) {
     this.langs = langs
     this.grammar = grammar
@@ -84,7 +85,7 @@ export default class Parser {
   * parse (inputString, isReparse = false) {
     this._currentlyParsing = true
     if (!_.isString(inputString)) {
-      throw new Error('lacona parse input must be a string')
+      throw new LaconaError('lacona parse input must be a string')
     }
 
     const input = createOption({text: inputString})
