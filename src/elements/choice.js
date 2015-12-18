@@ -7,7 +7,6 @@ import {reconcile} from '../reconcile'
 export default class Choice extends Phrase {
   *_handleParse(input, options) {
     let successes = 0
-    let scoredOutputs = []
     if (this.props.children && this.props.children.length > 0) {
       this.childPhrases = reconcile({descriptor: this.props.children, phrase: this.childPhrases, options})
 

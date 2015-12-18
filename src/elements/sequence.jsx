@@ -4,16 +4,6 @@ import {createElement, Phrase} from 'lacona-phrase'
 import parse from '../parse'
 import {reconcile} from '../reconcile'
 
-// function addSeparator (child, separator) {
-//   if (child.props && child.props.optional) {
-//     const newChild = _.merge({}, child, {props: {optional: false}})
-//     //TODO there are likely some problems with separators and optional
-//     return <Sequence optional={true} merge={true}>{newChild}{separator}</Sequence>
-//   } else {
-//     return <Sequence merge={true}>{child}{separator}</Sequence>
-//   }
-// }
-
 export default class Sequence extends Phrase {
   describe() {
     //replace optionals with replacements
