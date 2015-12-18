@@ -1,7 +1,6 @@
 import _ from 'lodash'
 // import {handleString} from '../input-option'
 import {Phrase} from 'lacona-phrase'
-import stackFind from '../stackfind.js'
 
 export default class Value extends Phrase {
   *_handleParse(input, options) {
