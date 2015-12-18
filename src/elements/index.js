@@ -1,6 +1,5 @@
 export {default as argument} from './argument'
 export {default as choice} from './choice'
-export {default as decorator} from './decorator'
 export {default as descriptor} from './descriptor'
 export {default as filter} from './filter'
 export {default as freetext} from './freetext'

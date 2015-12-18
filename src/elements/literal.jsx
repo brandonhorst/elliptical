@@ -46,11 +46,29 @@ export default class Literal extends Phrase {
     return []
   }
 
+  decorate (input) {
+    return [{
+      words: [{text: this.props.text, input: false, decorator: true}],
+      value: this.props.value,
+      remaining: input,
+      score: 1
+    }]
+  }
+
   describe() {
-    return <value
-      compute={this.compute.bind(this)}
-      suggest={this.suggest.bind(this)}
-      qualifier={this.props.qualifier}
-      category={this.props.category} />
+    if (this.props.decorate) {
+      return (
+        <choice limit={1}>
+          <literal {...this.props} decorate={false} />
+          <value compute={this.decorate.bind(this)} />
+        </choice>
+      )
+    } else {
+      return <value
+        compute={this.compute.bind(this)}
+        suggest={this.suggest.bind(this)}
+        qualifier={this.props.qualifier}
+        category={this.props.category} />
+    }
   }
 }
