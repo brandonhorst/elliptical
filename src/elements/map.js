@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { Phrase } from 'lacona-phrase'
-import parse from '../parse'
+import { reconcile } from '../reconcile'
+import { parse } from '../parse'
 
 export default class Map extends Phrase {
   *_handleParse (input, options) {

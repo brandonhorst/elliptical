@@ -1,11 +1,16 @@
-/** @jsx phrase.createElement */
+/** @jsx createElement */
 /* eslint-env mocha */
-import chai, {expect} from 'chai'
-import {text} from './_util'
-import * as lacona from '..'
-import * as phrase from 'lacona-phrase'
+import { expect } from 'chai'
+import { text } from './_util'
+import { Parser } from '..'
+import { createElement } from 'lacona-phrase'
 
 describe('elements/map', () => {
+  let parser
+
+  beforeEach(() => {
+    parser = new Parser()
+  })
   it('maps an element\'s result', () => {
     function addIng (result) {
       return `${result}ing`

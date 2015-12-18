@@ -1,6 +1,6 @@
 /** @jsx createElement */
 import _ from 'lodash'
-import parse from './parse'
+import { parse } from './parse'
 import { reconcile } from './reconcile'
 import { LaconaError } from './error'
 import SourceManager from './source-manager'

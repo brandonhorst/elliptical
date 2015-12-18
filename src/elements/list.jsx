@@ -3,7 +3,6 @@ import _ from 'lodash'
 import {sort} from '../fuzzy'
 import {createElement, Phrase} from 'lacona-phrase'
 
-
 export default class List extends Phrase {
   itemify (item) {
     const trueItem = _.isString(item) ? {text: item} : item

@@ -6,13 +6,13 @@ import {text} from './_util'
 import * as lacona from '..'
 import {createElement, Phrase, Source} from 'lacona-phrase'
 
-describe('map', () => {
+describe('sources/thru', () => {
   let parser
   beforeEach(function () {
     parser = new lacona.Parser()
   })
 
-  it('Allows mapping of a source', () => {
+  it('Allows thruing of a source', () => {
     class TestSource extends Source {
       onCreate () {
         this.replaceData(['a', 'b', 'c'])

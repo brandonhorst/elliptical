@@ -1,7 +1,7 @@
 import _ from 'lodash'
-import {createElement, Phrase} from 'lacona-phrase'
-import parse from '../parse'
-import {reconcile} from '../reconcile'
+import { createElement, Phrase } from 'lacona-phrase'
+import { parse } from '../parse'
+import { reconcile } from '../reconcile'
 
 export default class Repeat extends Phrase {
   *_handleParse (input, options) {
