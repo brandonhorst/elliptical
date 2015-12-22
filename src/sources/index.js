@@ -1,2 +1,1 @@
-export {default as map} from './map'
-export {default as thru} from './thru'
+export { MapPhrase as map } from './map'

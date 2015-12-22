@@ -22,7 +22,7 @@ describe('sources/map', () => {
     class Test extends Phrase {
       observe () {
         return (
-          <map function={x => `test${x}`}>
+          <map function={_.partial(_.map, _, x => `test${x}`)}>
             <TestSource />
           </map>
         )

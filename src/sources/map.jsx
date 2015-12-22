@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import {Source} from 'lacona-phrase'
 
-export default class Map extends Source {
+export class MapPhrase extends Source {
   observe () {
     return this.props.children[0]
   }
@@ -15,7 +15,7 @@ export default class Map extends Source {
   }
 
   onUpdate () {
-    const data = _.map(this.source.data, this.props.function)
+    const data = this.props.function(this.source.data)
     this.setData(data)
   }
 }
