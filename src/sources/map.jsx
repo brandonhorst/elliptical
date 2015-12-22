@@ -16,6 +16,6 @@ export default class Map extends Source {
 
   onUpdate () {
     const data = _.map(this.source.data, this.props.function)
-    this.replaceData(data)
+    this.setData(data)
   }
 }

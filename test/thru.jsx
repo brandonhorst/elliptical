@@ -15,7 +15,7 @@ describe('sources/thru', () => {
   it('Allows thruing of a source', () => {
     class TestSource extends Source {
       onCreate () {
-        this.replaceData(['a', 'b', 'c'])
+        this.setData(['a', 'b', 'c'])
       }
     }
 

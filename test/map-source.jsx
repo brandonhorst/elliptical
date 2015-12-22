@@ -15,7 +15,7 @@ describe('sources/map', () => {
   it('Allows mapping of a source', () => {
     class TestSource extends Source {
       onCreate () {
-        this.replaceData(['a', 'b', 'c'])
+        this.setData(['a', 'b', 'c'])
       }
     }
 

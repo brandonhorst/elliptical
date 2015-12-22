@@ -23,14 +23,10 @@ export default class SourceManager {
     const props = getRealProps({descriptor, Constructor: descriptor.Constructor})
     instance.props = props
 
-    instance.data = {}
     instance.__dataVersion = 0
     instance.__subscribers = 0
+
     instance.setData = newData => {
-      _.merge(instance.data, newData)
-      this._triggerSourceUpdate(instance)
-    }
-    instance.replaceData = newData => {
       instance.data = newData
       this._triggerSourceUpdate(instance)
     }
