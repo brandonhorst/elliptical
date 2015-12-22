@@ -5,6 +5,10 @@ import { parse } from '../parse'
 import { reconcile } from '../reconcile'
 
 export class Tap extends Phrase {
+  static defaultProps = {
+    function() {}
+  };
+
   *_handleParse(input, options) {
     this.childPhrase = reconcile({descriptor: this.props.children[0], phrase: this.childPhrase, options})
 
@@ -14,8 +18,4 @@ export class Tap extends Phrase {
 
     yield* parse({phrase: this.childPhrase, input, options})
   }
-}
-
-Tap.defaultProps = {
-  function() {}
 }

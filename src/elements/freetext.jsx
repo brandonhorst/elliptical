@@ -14,7 +14,14 @@ function* substrings (input, {splitOn, noSplit}) {
   }
 }
 
-export default class Freetext extends Phrase {
+export class Freetext extends Phrase {
+  static defaultProps = {
+    filter() {
+      return true
+    },
+    splitOn: '',
+    consumeAll: false
+  };
 
   *filter (input) {
     for (let stringPart of substrings(input, {splitOn: this.props.splitOn, noSplit: this.props.consumeAll})) {
@@ -32,9 +39,4 @@ export default class Freetext extends Phrase {
   describe() {
     return <raw function={this.filter.bind(this)} limit={this.props.limit} />
   }
-}
-Freetext.defaultProps = {
-  filter() {return true},
-  splitOn: '',
-  consumeAll: false
 }

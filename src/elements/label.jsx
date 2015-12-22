@@ -5,6 +5,15 @@ import { parse } from '../parse'
 import { reconcile } from '../reconcile'
 
 export class Label extends Phrase {
+  static defaultProps = {
+    suppress: true,
+    argument: true,
+    showForEmpty: false,
+    displayWhen(input) {
+      return input === ''
+    }
+  };
+  
   *parseChild (input, options) {
     if (this.props.showForEmpty && input.text === '') return true
 
@@ -65,14 +74,5 @@ export class Label extends Phrase {
     } else {
       yield* this.parseChild(inputWithArgument, options)
     }
-  }
-}
-
-Label.defaultProps = {
-  suppress: true,
-  argument: true,
-  showForEmpty: false,
-  displayWhen(input) {
-    return input === ''
   }
 }

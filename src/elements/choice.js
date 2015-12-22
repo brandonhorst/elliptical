@@ -4,7 +4,7 @@ import { createElement, Phrase } from 'lacona-phrase'
 import { parse } from '../parse'
 import { reconcile } from '../reconcile'
 
-export default class Choice extends Phrase {
+export class Choice extends Phrase {
   *_handleParse(input, options) {
     let successes = 0
     if (this.props.children && this.props.children.length > 0) {

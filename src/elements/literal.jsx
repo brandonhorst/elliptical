@@ -3,7 +3,7 @@ import _ from 'lodash'
 import {match} from '../fuzzy'
 import {createElement, Phrase} from 'lacona-phrase'
 
-export default class Literal extends Phrase {
+export class Literal extends Phrase {
   compute(input) {
     if (this.props.text == null) return []
 

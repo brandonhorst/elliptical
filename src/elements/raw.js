@@ -3,6 +3,10 @@ import _ from 'lodash'
 import {Phrase} from 'lacona-phrase'
 
 export class Raw extends Phrase {
+  static defaultProps = {
+    compute() {return []}
+  };
+
   *_handleParse(input, options) {
     let successes = 0
 
@@ -31,8 +35,4 @@ export class Raw extends Phrase {
       }
     }
   }
-}
-
-Raw.defaultProps = {
-  compute: () => []
 }

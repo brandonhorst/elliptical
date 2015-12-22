@@ -4,7 +4,7 @@ import { createElement, Phrase } from 'lacona-phrase'
 import { parse } from '../parse'
 import { reconcile } from '../reconcile'
 
-export default class Sequence extends Phrase {
+export class Sequence extends Phrase {
   describe() {
     //replace optionals with replacements
     if (_.some(this.props.children, _.property('props.optional'))) {
