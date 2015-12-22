@@ -64,7 +64,7 @@ describe('label', () => {
         return [{
           words: [{text: 'value', input: true}],
           remaining: '',
-          value: 'test'
+          result: 'test'
         }]
       } else {
         return []

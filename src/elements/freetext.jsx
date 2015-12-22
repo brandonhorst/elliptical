@@ -21,7 +21,7 @@ export default class Freetext extends Phrase {
       if (this.props.filter(stringPart)) {
         yield {
           words: [{text: stringPart, input: true}],
-          value: stringPart,
+          result: stringPart,
           remaining: input.substring(stringPart.length),
           score: this.props.score || (0.1 + (1 / (stringPart.length + 2)))
         }

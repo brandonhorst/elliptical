@@ -22,7 +22,7 @@ export default class List extends Phrase {
         yield {
           remaining: input.slice(item.text.length),
           words: [{text: item.text, input: true, qualifier: item.qualifier}],
-          value: item.value
+          result: item.value
         }
       } else {
         itemsForFuzzy.push(item)

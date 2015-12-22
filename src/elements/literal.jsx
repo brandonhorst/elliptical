@@ -11,7 +11,7 @@ export default class Literal extends Phrase {
       return [{
         words: [{text: this.props.text, input: false}],
         remaining: null,
-        value: this.props.value,
+        result: this.props.value,
         score: this.props.score || 1
       }]
     }
@@ -23,7 +23,7 @@ export default class Literal extends Phrase {
       return [{
         words: [{text: this.props.text, input: true}],
         remaining: input.substring(this.props.text.length),
-        value: this.props.value,
+        result: this.props.value,
         score: this.props.score || 1
       }]
     }
@@ -40,7 +40,7 @@ export default class Literal extends Phrase {
       return [{
         words,
         remaining: null,
-        value: this.props.value,
+        result: this.props.value,
         score: this.props.score || 1
       }]
     }
@@ -49,7 +49,7 @@ export default class Literal extends Phrase {
       const result = match(input, this.props.text)
       if (result) {
         result.remaining = ''
-        result.value = this.props.value
+        result.result = this.props.value
         result.score = this.props.score || result.score
         return [result]
       }
@@ -61,7 +61,7 @@ export default class Literal extends Phrase {
   decorate (input) {
     return [{
       words: [{text: this.props.text, input: false}],
-      value: this.props.value,
+      result: this.props.value,
       remaining: input,
       score: 1
     }]

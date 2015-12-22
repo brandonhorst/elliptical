@@ -18,7 +18,7 @@ describe('value', function () {
     function fun() {
       return [{
         remaining: null,
-        value: 'val',
+        result: 'val',
         words: [{text: 'tex', input: false}]
       }]
     }
@@ -35,7 +35,7 @@ describe('value', function () {
     function *fun() {
       yield {
         remaining: null,
-        value: 'val',
+        result: 'val',
         words: [{text: 'tex', input: false}]
       }
     }
@@ -53,7 +53,7 @@ describe('value', function () {
       expect(input).to.equal('te')
       return [{
         remaining: '',
-        value: 'val',
+        result: 'val',
         words: [{text: 'te', input: true}, {text: 'x', input: false}]
       }]
     }
@@ -71,7 +71,7 @@ describe('value', function () {
       expect(input).to.equal('te')
       yield {
         remaining: '',
-        value: 'val',
+        result: 'val',
         words: [{text: 'te', input: true}, {text: 'x', input: false}]
       }
     }
@@ -90,7 +90,7 @@ describe('value', function () {
         expect(this.props.myVar).to.equal('myVal')
         return [{
           remaining: '',
-          value: 'val',
+          result: 'val',
           words: [{text: 'tex', input: true}]
         }]
       }
@@ -110,7 +110,7 @@ describe('value', function () {
     function fun(input) {
       return [{
         words: [{text: 'test', input: true}],
-        value: 'val',
+        result: 'val',
         remaining: '',
         score: 0.5
       }]

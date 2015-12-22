@@ -27,7 +27,7 @@ function* sortFunction({input, itemSet, func, score}) {
       if (words) {
         obj.matched = true
         _.forEach(words, word => word.descriptor = obj.item.descriptor)
-        yield {words, value: obj.item.value, score}
+        yield {words, result: obj.item.value, score}
       }
     }
   }
