@@ -8,14 +8,14 @@ export class Label extends Phrase {
   static defaultProps = {
     suppress: true,
     argument: true,
-    showForEmpty: false,
-    displayWhen (input) {
+    suppressEmpty: false,
+    suppressWhen (input) {
       return input === ''
     }
   };
 
   * parseChild (input, options) {
-    if (this.props.showForEmpty && input.text === '') return true
+    if (this.props.suppressEmpty && input.text === '') return true
 
     let showPlaceholder = true
     for (let output of parse({phrase: this.childPhrase, input, options})) {
@@ -28,7 +28,7 @@ export class Label extends Phrase {
     }
     if (!showPlaceholder) return false
 
-    if (this.props.displayWhen && this.props.displayWhen(input.text)) {
+    if (this.props.suppressWhen(input.text)) {
       return true
     }
 

@@ -108,6 +108,55 @@ describe('label', () => {
     expect(data5).to.have.length(0)
   })
 
+  it('handles suppressWhen', () => {
+    parser.grammar = (
+      <sequence>
+        <literal text='a ' id='a' value='a' />
+        <label text='test' id='place' suppressWhen={input => input === 'x'}>
+          <literal text='literal' value='test' />
+        </label>
+      </sequence>
+    )
+
+    const data1 = parser.parseArray('')
+    expect(data1).to.have.length(1)
+    expect(text(data1[0])).to.equal('a test')
+    expect(data1[0].words[1].placeholder).to.be.true
+    expect(data1[0].words[1].argument).to.equal('test')
+    expect(data1[0].result).to.eql({a: 'a'})
+
+    const data2 = parser.parseArray('a')
+    expect(data2).to.have.length(1)
+    expect(text(data2[0])).to.equal('a test')
+    expect(data2[0].words[2].placeholder).to.be.true
+    expect(data2[0].words[2].argument).to.equal('test')
+    expect(data2[0].result).to.eql({a: 'a'})
+
+    const data3 = parser.parseArray('a ')
+    expect(data3).to.have.length(1)
+    expect(text(data3[0])).to.equal('a literal')
+    expect(data3[0].result).to.eql({a: 'a', place: 'test'})
+    expect(data3[0].words[1].placeholder).to.be.undefined
+    expect(data3[0].words[1].argument).to.equal('test')
+
+    const data4 = parser.parseArray('a l')
+    expect(data4).to.have.length(1)
+    expect(text(data4[0])).to.equal('a literal')
+    expect(data4[0].result).to.eql({a: 'a', place: 'test'})
+    expect(data4[0].words[1].placeholder).to.be.undefined
+    expect(data4[0].words[1].argument).to.equal('test')
+
+    const data5 = parser.parseArray('a x')
+    expect(data5).to.have.length(1)
+    expect(text(data5[0])).to.equal('a test')
+    expect(data5[0].result).to.eql({a: 'a'})
+    expect(data5[0].words[1].placeholder).to.be.true
+    expect(data5[0].words[1].argument).to.equal('test')
+
+    const data6 = parser.parseArray('a t')
+    expect(data6).to.have.length(0)
+  })
+
   it('exports an argument', () => {
     parser.grammar = (
       <sequence>
