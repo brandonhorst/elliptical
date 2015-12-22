@@ -5,8 +5,6 @@ import {text} from './_util'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
 
-function from(i) {const a = []; for (let x of i) a.push(x); return a}
-
 describe('list', () => {
   let parser
 

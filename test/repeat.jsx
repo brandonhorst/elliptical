@@ -5,8 +5,6 @@ import {Parser} from '..'
 import {createElement} from 'lacona-phrase'
 import {text} from './_util'
 
-function from (i) {const a = []; for (let x of i) a.push(x); return a}
-
 describe('repeat', () => {
   let parser
 
@@ -24,7 +22,7 @@ describe('repeat', () => {
         </repeat>
       )
 
-      const data = from(parser.parse('wrong'))
+      const data = parser.parseArray('wrong')
       expect(data).to.have.length(0)
     })
 
@@ -37,7 +35,7 @@ describe('repeat', () => {
         </repeat>
       )
 
-      const data = from(parser.parse('superm'))
+      const data = parser.parseArray('superm')
       expect(data).to.have.length(1)
       expect(text(data[0])).to.equal('supermantest')
     })
@@ -51,7 +49,7 @@ describe('repeat', () => {
         </repeat>
       )
 
-      const data = from(parser.parse('supermans'))
+      const data = parser.parseArray('supermans')
       expect(data).to.have.length(1)
       expect(text(data[0])).to.equal('supermansuper')
     })
@@ -68,7 +66,7 @@ describe('repeat', () => {
         </repeat>
       )
 
-      const data = from(parser.parse('a'))
+      const data = parser.parseArray('a')
       expect(data).to.have.length(2)
       expect(text(data[0])).to.equal('a')
       expect(text(data[1])).to.equal('a test')
@@ -87,7 +85,7 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const data = from(parser.parse(''))
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('test')
     expect(data[0].words[0].placeholder).to.be.true
@@ -101,7 +99,7 @@ describe('repeat', () => {
         </label>
       </repeat>
     )
-    const data = from(parser.parse('wrong'))
+    const data = parser.parseArray('wrong')
     expect(data).to.have.length(0)
   })
 
@@ -114,7 +112,7 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const data = from(parser.parse('sup'))
+    const data = parser.parseArray('sup')
     expect(data).to.have.length(2)
     expect(text(data[0])).to.equal('super')
     expect(text(data[1])).to.equal('supertest')
@@ -130,7 +128,7 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const data = from(parser.parse('supers'))
+    const data = parser.parseArray('supers')
     expect(data).to.have.length(2)
     expect(text(data[0])).to.equal('supersuper')
     expect(text(data[1])).to.equal('supersupertest')
@@ -148,7 +146,7 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const data = from(parser.parse('superm'))
+    const data = parser.parseArray('superm')
     expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('superman')
     expect(data[0].result).to.eql(['super', 'man'])
@@ -163,7 +161,7 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const data = from(parser.parse('a'))
+    const data = parser.parseArray('a')
     expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('atest')
   })
@@ -177,7 +175,7 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const data = from(parser.parse('a'))
+    const data = parser.parseArray('a')
     expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('a')
   })
@@ -189,7 +187,7 @@ describe('repeat', () => {
   //     </repeat>
   //   ]
   //
-  //   const data = from(parser.parse(''))
+  //   const data = parser.parseArray('')
   //   expect(data).to.have.length(2)
   //   expect(data[0].suggestion[0].category).to.equal('myCat')
   //   expect(data[1].suggestion[0].category).to.equal('myCat')
@@ -208,7 +206,7 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const data = from(parser.parse('aa'))
+    const data = parser.parseArray('aa')
     expect(data).to.have.length(0)
   })
 
@@ -224,7 +222,7 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const data = from(parser.parse('ab'))
+    const data = parser.parseArray('ab')
     expect(data).to.have.length(0)
   })
 
@@ -240,7 +238,7 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const data = from(parser.parse('ab'))
+    const data = parser.parseArray('ab')
     expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('ab')
   })
@@ -257,7 +255,7 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const data = from(parser.parse('ab'))
+    const data = parser.parseArray('ab')
     expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('ab')
   })
@@ -275,7 +273,7 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const data = from(parser.parse('aba'))
+    const data = parser.parseArray('aba')
     expect(data).to.have.length(2)
     expect(text(data[0])).to.equal('abaa')
     expect(text(data[1])).to.equal('abaatest')
@@ -296,7 +294,7 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const data = from(parser.parse('xa'))
+    const data = parser.parseArray('xa')
     expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('xaatest')
   })
