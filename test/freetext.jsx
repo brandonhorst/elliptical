@@ -49,7 +49,7 @@ describe('freetext', () => {
       return input === 'validValue'
     }
 
-    parser.grammar = <freetext filter={filter} consumeAll={true} />
+    parser.grammar = <freetext filter={filter} consumeAll />
 
     const data = parser.parseArray('validValue')
     expect(data).to.have.length(1)

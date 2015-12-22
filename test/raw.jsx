@@ -1,19 +1,19 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
-import chai, {expect} from 'chai'
-import {text} from './_util'
+import { expect } from 'chai'
+import { text } from './_util'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
 
-describe('raw', function () {
+describe('raw', () => {
   var parser
 
-  beforeEach(function () {
+  beforeEach(() => {
     parser = new lacona.Parser()
   })
 
   it('suggests a item', () => {
-    function fun() {
+    function fun () {
       return [{
         remaining: null,
         result: 'val',
@@ -30,7 +30,7 @@ describe('raw', function () {
   })
 
   it('suggests a item (generator)', () => {
-    function *fun() {
+    function * fun () {
       yield {
         remaining: null,
         result: 'val',
@@ -47,7 +47,7 @@ describe('raw', function () {
   })
 
   it('computes a value', () => {
-    function fun(input) {
+    function fun (input) {
       expect(input).to.equal('te')
       return [{
         remaining: '',
@@ -65,7 +65,7 @@ describe('raw', function () {
   })
 
   it('computes a value (generator)', () => {
-    function *fun(input) {
+    function * fun (input) {
       expect(input).to.equal('te')
       yield {
         remaining: '',
@@ -84,7 +84,7 @@ describe('raw', function () {
 
   it('can access props its function (if bound)', () => {
     class Test extends phrase.Phrase {
-      fun() {
+      fun () {
         expect(this.props.myVar).to.equal('myVal')
         return [{
           remaining: '',
@@ -93,7 +93,7 @@ describe('raw', function () {
         }]
       }
 
-      describe() { return <raw function={this.fun.bind(this)} /> }
+      describe () { return <raw function={this.fun.bind(this)} /> }
     }
 
     parser.grammar = <Test myVar='myVal' />
@@ -105,7 +105,7 @@ describe('raw', function () {
   })
 
   it('can set the score', () => {
-    function fun(input) {
+    function fun (input) {
       return [{
         words: [{text: 'test', input: true}],
         result: 'val',

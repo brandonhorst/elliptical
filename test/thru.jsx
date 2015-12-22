@@ -8,7 +8,7 @@ import {createElement, Phrase, Source} from 'lacona-phrase'
 
 describe('sources/thru', () => {
   let parser
-  beforeEach(function () {
+  beforeEach(() => {
     parser = new lacona.Parser()
   })
 

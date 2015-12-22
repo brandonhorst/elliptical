@@ -11,19 +11,19 @@ chai.use(sinonChai)
 
 describe('sources', () => {
   let parser
-  beforeEach(function () {
+  beforeEach(() => {
     parser = new lacona.Parser()
   })
 
   it('calling activate on the parser calls onActivate on all sources', () => {
     const fetchSpy = spy()
     class TestSource extends Source {
-       onActivate() {fetchSpy()}
+       onActivate () { fetchSpy() }
     }
 
     class Test extends Phrase {
-      observe () {return <TestSource />}
-      describe () {return null}
+      observe () { return <TestSource /> }
+      describe () { return null }
     }
 
     parser.grammar = <Test />
@@ -35,12 +35,12 @@ describe('sources', () => {
   it('calling deactivate on the parser calls onDeactivate on all sources', () => {
     const fetchSpy = spy()
     class TestSource extends Source {
-       onDeactivate() {fetchSpy()}
+       onDeactivate () { fetchSpy() }
     }
 
     class Test extends Phrase {
-      observe () {return <TestSource />}
-      describe () {return null}
+      observe () { return <TestSource /> }
+      describe () { return null }
     }
 
     parser.grammar = <Test />
@@ -57,8 +57,8 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      describe () {return <literal text={this.source.data} />}
-      observe () {return <TestSource />}
+      describe () { return <literal text={this.source.data} /> }
+      observe () { return <TestSource /> }
     }
 
     parser.grammar = <Test />
@@ -71,11 +71,11 @@ describe('sources', () => {
   it('onDestroy() is called, on destroy', () => {
     const destSpy = spy()
     class TestSource extends Source {
-      onDestroy () {destSpy()}
+      onDestroy () { destSpy() }
     }
 
     class Test extends Phrase {
-      describe () {return <literal text='test' />}
+      describe () { return <literal text='test' /> }
       observe () {
         if (this.props.useSource) {
           return <TestSource />
@@ -83,7 +83,7 @@ describe('sources', () => {
       }
     }
 
-    parser.grammar = <Test useSource={true}/>
+    parser.grammar = <Test useSource/>
     const data1 = parser.parseArray('')
     expect(destSpy).to.not.have.been.called
     expect(data1).to.have.length(1)
@@ -102,8 +102,8 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      describe () {return <literal text={this.source.data} />}
-      observe () {return <TestSource test='testa' />}
+      describe () { return <literal text={this.source.data} /> }
+      observe () { return <TestSource test='testa' /> }
     }
 
     parser.grammar = <Test />
@@ -122,13 +122,13 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      create () {this.source.set('testb')}
-      observe () {return <TestSource />}
-      describe () {return <literal text={this.source.data} />}
+      create () { this.source.set('testb') }
+      observe () { return <TestSource /> }
+      describe () { return <literal text={this.source.data} /> }
     }
     class Test2 extends Phrase {
-      observe () {return <TestSource />}
-      describe () {return <literal text={this.source.data} />}
+      observe () { return <TestSource /> }
+      describe () { return <literal text={this.source.data} /> }
     }
 
     parser.grammar = <Test />
@@ -142,7 +142,6 @@ describe('sources', () => {
     expect(text(data2[0])).to.equal('testb')
   })
 
-
   it('sources with the same props do not share if preventSharing is set', () => {
     class TestSource extends Source {
       data = 'testa'
@@ -155,13 +154,13 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      create () {this.source.set('testb')}
-      observe () {return <TestSource />}
-      describe () {return <literal text={this.source.data} />}
+      create () { this.source.set('testb') }
+      observe () { return <TestSource /> }
+      describe () { return <literal text={this.source.data} /> }
     }
     class Test2 extends Phrase {
-      observe () {return <TestSource />}
-      describe () {return <literal text={this.source.data} />}
+      observe () { return <TestSource /> }
+      describe () { return <literal text={this.source.data} /> }
     }
 
     parser.grammar = <Test />
@@ -185,13 +184,13 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      create () {this.source.set('testb')}
-      observe () {return <TestSource id='something' />}
-      describe () {return <literal text={this.source.data} />}
+      create () { this.source.set('testb') }
+      observe () { return <TestSource id='something' /> }
+      describe () { return <literal text={this.source.data} /> }
     }
     class Test2 extends Phrase {
-      observe () {return <TestSource />}
-      describe () {return <literal text={this.source.data} />}
+      observe () { return <TestSource /> }
+      describe () { return <literal text={this.source.data} /> }
     }
 
     parser.grammar = <Test />
@@ -215,9 +214,9 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      observe () {return <TestSource />}
-      create () {this.source.update()}
-      describe () {return <literal text={this.source.data} />}
+      observe () { return <TestSource /> }
+      create () { this.source.update() }
+      describe () { return <literal text={this.source.data} /> }
     }
 
     parser.grammar = <Test />
@@ -234,7 +233,7 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      observe () {return <TestSource />}
+      observe () { return <TestSource /> }
       describe () {
         descSpy()
         return <literal text={this.source.data} />
@@ -264,9 +263,9 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      observe () {return <TestSource />}
-      create () {consSpy()}
-      describe () {return <literal text={this.source.data} />}
+      observe () { return <TestSource /> }
+      create () { consSpy() }
+      describe () { return <literal text={this.source.data} /> }
     }
 
     parser.grammar = <Test />
@@ -296,14 +295,14 @@ describe('sources', () => {
     }
 
     class SubTest extends Phrase {
-      create () {subConsSpy('sub')}
-      describe () {return <literal text={this.props.val} />}
+      create () { subConsSpy('sub') }
+      describe () { return <literal text={this.props.val} /> }
     }
 
     class Test extends Phrase {
       create () { consSpy('main') }
-      observe () {return <TestSource />}
-      describe () {return <SubTest val={this.source.data} />}
+      observe () { return <TestSource /> }
+      describe () { return <SubTest val={this.source.data} /> }
     }
 
     parser.grammar = <Test />
@@ -322,7 +321,7 @@ describe('sources', () => {
     })
   })
 
-  it("update is not emitted for setData() during onCreate", () => {
+  it('update is not emitted for setData() during onCreate', () => {
     const changeSpy = spy()
 
     class TestSource extends Source {
@@ -334,7 +333,7 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      observe () {return <TestSource /> }
+      observe () { return <TestSource /> }
 
       describe () { return <literal text={this.source.data} /> }
     }
@@ -358,13 +357,13 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      observe () {return <TestSource />}
+      observe () { return <TestSource /> }
       describe () {
         return <literal text={this.source.data} />
       }
     }
 
-    parser.on('update',  () => {
+    parser.on('update', () => {
       const data = parser.parseArray('')
       expect(data).to.have.length(1)
       expect(text(data[0])).to.equal('testb')
@@ -393,7 +392,7 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      observe () {return <TestSource2 />}
+      observe () { return <TestSource2 /> }
       describe () { return <literal text={this.source.data} /> }
     }
 
@@ -404,7 +403,7 @@ describe('sources', () => {
     expect(text(data[0])).to.equal('test')
   })
 
-  it("onUpdate is called when a source's source updates", done => {
+  it('onUpdate is called when a source\'s source updates', done => {
     class TestSource1 extends Source {
       data = 'test'
 
@@ -423,7 +422,7 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      observe () {return <TestSource2 /> }
+      observe () { return <TestSource2 /> }
 
       describe () { return <literal text={this.source.data} /> }
     }
@@ -442,7 +441,7 @@ describe('sources', () => {
     })
   })
 
-  it("can have other sources as their children, data is available at onCreate", () => {
+  it('can have other sources as their children, data is available at onCreate', () => {
     class TestSource1 extends Source {
       data = 'test'
     }
@@ -457,7 +456,7 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      observe () { return  <TestSource2><TestSource1 /></TestSource2> }
+      observe () { return <TestSource2><TestSource1 /></TestSource2> }
       describe () { return <literal text={this.source.data} /> }
     }
 
@@ -468,7 +467,7 @@ describe('sources', () => {
     expect(text(data[0])).to.equal('test')
   })
 
-  it("can have Source definitions as their props, data is available at onCreate", () => {
+  it('can have Source definitions as their props, data is available at onCreate', () => {
     class TestSource1 extends Source {
       data = 'test'
     }
@@ -484,7 +483,7 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      observe () {return <TestSource2 Source={TestSource1} /> }
+      observe () { return <TestSource2 Source={TestSource1} /> }
       describe () { return <literal text={this.source.data} /> }
     }
 
@@ -494,5 +493,4 @@ describe('sources', () => {
     expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('test')
   })
-
 })

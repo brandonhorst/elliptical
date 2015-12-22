@@ -14,7 +14,7 @@ describe('children', () => {
 
   it('passes children as props', () => {
     class Test extends phrase.Phrase {
-      describe() {
+      describe () {
         expect(this.props.children).to.have.length(2)
         return this.props.children[1]
       }
@@ -34,7 +34,7 @@ describe('children', () => {
 
   it('flattens children as props', () => {
     class Test extends phrase.Phrase {
-      describe() {
+      describe () {
         expect(this.props.children).to.have.length(3)
         return this.props.children[1]
       }
@@ -55,7 +55,7 @@ describe('children', () => {
 
   it('passes the child result', () => {
     class Test extends phrase.Phrase {
-      describe() {
+      describe () {
         return this.props.children[0]
       }
     }

@@ -76,7 +76,7 @@ describe('repeat', () => {
   it('allows for content to have children', () => {
     parser.grammar = (
       <repeat>
-        <label text='test' showForEmpty={true}>
+        <label text='test' showForEmpty>
           <choice>
             <literal text='a' />
             <literal text='b' />
@@ -155,7 +155,7 @@ describe('repeat', () => {
   it('does not accept fewer than min iterations', () => {
     parser.grammar = (
       <repeat min={2}>
-        <label text='test' showForEmpty={true}>
+        <label text='test' showForEmpty>
           <literal text='a' />
         </label>
       </repeat>
@@ -196,7 +196,7 @@ describe('repeat', () => {
 
   it('rejects non-unique repeated elements', () => {
     parser.grammar = (
-      <repeat unique={true}>
+      <repeat unique>
         <label text='test'>
           <choice>
             <literal text='a' value='a' />
@@ -212,7 +212,7 @@ describe('repeat', () => {
 
   it('rejects non-unique repeated elements (deep)', () => {
     parser.grammar = (
-      <repeat unique={true}>
+      <repeat unique>
         <label text='test'>
           <choice>
             <literal text='a' value={{a: 1}} />
@@ -228,7 +228,7 @@ describe('repeat', () => {
 
   it('accepts unique repeated elements', () => {
     parser.grammar = (
-      <repeat unique={true} max={2}>
+      <repeat unique max={2}>
         <label text='test'>
           <choice>
             <literal text='a' value='a' />
@@ -245,7 +245,7 @@ describe('repeat', () => {
 
   it('accepts non-unique repeated elements (deep)', () => {
     parser.grammar = (
-      <repeat unique={true}>
+      <repeat unique>
         <label text='test'>
           <choice>
             <literal text='a' value={{a: 1}} />

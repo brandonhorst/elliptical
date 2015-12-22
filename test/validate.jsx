@@ -13,10 +13,6 @@ describe('validate', () => {
   })
 
   it('validates an output', () => {
-    function filter (result) {
-      return result === 'b'
-    }
-
     class Test extends Phrase {
       validate (result) {
         return result === 'b'
@@ -36,10 +32,6 @@ describe('validate', () => {
   })
 
   it('validates extensions as well', () => {
-    function filter (result) {
-      return result === 'b'
-    }
-
     class Test extends Phrase {
       validate (result) {
         return result === 'c'

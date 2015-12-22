@@ -1,10 +1,8 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
-import chai, {expect} from 'chai'
-import Choice from '../lib/elements/choice'
+import {expect} from 'chai'
 import {text} from './_util'
 import * as lacona from '..'
-import Literal from '../lib/elements/literal'
 import * as phrase from 'lacona-phrase'
 
 describe('Parser', () => {
@@ -20,15 +18,13 @@ describe('Parser', () => {
 
   it('can parse in a specified language', () => {
     class Test extends phrase.Phrase {
-      static get translations() {
-        return [{
-          langs: ['en', 'default'],
-          describe() {return <literal text='test' />}
-        }, {
-          langs: ['es'],
-          describe() {return <literal text='prueba' />}
-        }]
-      }
+      static translations = [{
+        langs: ['en', 'default'],
+        describe () { return <literal text='test' /> }
+      }, {
+        langs: ['es'],
+        describe () { return <literal text='prueba' /> }
+      }]
     }
 
     parser.langs = ['es']
@@ -41,19 +37,17 @@ describe('Parser', () => {
 
   it('falls back on a less specific language if the most specific is not provided', () => {
     class Test extends phrase.Phrase {
-      static get translations() {
-        return [{
-          langs: ['en', 'default'],
-          describe() {
-            return <literal text='train' />
-          }
-        }, {
-          langs: ['es'],
-          describe() {
-            return <literal text='tren' />
-          }
-        }]
-      }
+      static translations = [{
+        langs: ['en', 'default'],
+        describe () {
+          return <literal text='train' />
+        }
+      }, {
+        langs: ['es'],
+        describe () {
+          return <literal text='tren' />
+        }
+      }]
     }
 
     parser.langs = ['es_ES', 'es']

@@ -70,7 +70,7 @@ describe('choice', () => {
 
   it('adopts the value of the child', () => {
     class Test extends phrase.Phrase {
-      describe() {
+      describe () {
         return (
           <choice>
             <literal text='right' value='testValue' />
@@ -90,7 +90,7 @@ describe('choice', () => {
 
   it('can set a value', () => {
     class Test extends phrase.Phrase {
-      describe() {
+      describe () {
         return (
           <choice value='override'>
             <literal text='right' value='testValue' />
@@ -110,7 +110,7 @@ describe('choice', () => {
 
   it('can set a value in an object with a key', () => {
     class Test extends phrase.Phrase {
-      describe() {
+      describe () {
         return (
           <choice>
             <literal text='right' value='testValue' id='key' />
@@ -130,7 +130,7 @@ describe('choice', () => {
 
   it('ignores strings and nulls for reconciliation', () => {
     class Test extends phrase.Phrase {
-      describe() {
+      describe () {
         return (
           <choice>
             {null}

@@ -14,7 +14,7 @@ describe('limit', () => {
 
   describe('value', () => {
     it('limits computations', () => {
-      function compute(input) {
+      function compute (input) {
         return [
           {words: [{text: 'testa', input: true}], remaining: ''},
           {words: [{text: 'testb', input: true}], remaining: ''},
@@ -31,7 +31,7 @@ describe('limit', () => {
     })
 
     it('accepts fewer than limit computations', () => {
-      function compute() {
+      function compute () {
         return [
           {words: [{text: 'testa', input: true}], remaining: ''},
           {words: [{text: 'testb', input: true}], remaining: ''}

@@ -1,6 +1,6 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
-import chai, {expect} from 'chai'
+import {expect} from 'chai'
 import {text} from './_util'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
@@ -13,7 +13,7 @@ describe('extends', () => {
 
   it('allows phrases that return null (for classes to be extended)', () => {
     class Noop extends phrase.Phrase {
-      describe() {
+      describe () {
         return null
       }
     }
@@ -26,13 +26,13 @@ describe('extends', () => {
 
   it('handles phrases that return null to be extended', () => {
     class Noop extends phrase.Phrase {
-      describe() {
+      describe () {
         return null
       }
     }
 
     class Extender extends phrase.Phrase {
-      describe() {
+      describe () {
         return <literal text='test' />
       }
     }
@@ -48,11 +48,11 @@ describe('extends', () => {
 
   it('handles phrases with extends', () => {
     class Extended extends phrase.Phrase {
-      describe() { return <literal text='test a' value='a' /> }
+      describe () { return <literal text='test a' value='a' /> }
     }
 
     class Extender extends phrase.Phrase {
-      describe() { return <literal text='test b' value='b' /> }
+      describe () { return <literal text='test b' value='b' /> }
     }
     Extender.extends = [Extended]
 
@@ -68,16 +68,16 @@ describe('extends', () => {
 
   it('handles phrases extended multiple times', () => {
     class Extended extends phrase.Phrase {
-      describe() { return <literal text='test a' value='a' /> }
+      describe () { return <literal text='test a' value='a' /> }
     }
 
     class Extender1 extends phrase.Phrase {
-      describe() { return <literal text='test b' value='b' /> }
+      describe () { return <literal text='test b' value='b' /> }
     }
     Extender1.extends = [Extended]
 
     class Extender2 extends phrase.Phrase {
-      describe() { return <literal text='test c' value='c' /> }
+      describe () { return <literal text='test c' value='c' /> }
     }
     Extender2.extends = [Extended]
 
@@ -96,7 +96,7 @@ describe('extends', () => {
 
   it('handles recursive phrases with extends', () => {
     class Extended extends phrase.Phrase {
-      describe() {
+      describe () {
         return (
           <sequence>
             <literal text='a' value='a' id='a' />
@@ -107,7 +107,7 @@ describe('extends', () => {
     }
 
     class Extender extends phrase.Phrase {
-      describe() {
+      describe () {
         return <literal text='b' value='b' />
       }
     }
@@ -124,20 +124,22 @@ describe('extends', () => {
 
   it('handles phrases with extends in sequence', () => {
     class Test extends phrase.Phrase {
-      describe() { return (
-        <sequence>
-          <literal text='test ' />
-          <Extended id='test' />
-        </sequence>
-      )}
+      describe () {
+        return (
+          <sequence>
+            <literal text='test ' />
+            <Extended id='test' />
+          </sequence>
+        )
+      }
     }
 
     class Extended extends phrase.Phrase {
-      describe() { return <literal text='a' value='a' /> }
+      describe () { return <literal text='a' value='a' /> }
     }
 
     class Extender extends phrase.Phrase {
-      describe() { return <literal text='b' value='b' /> }
+      describe () { return <literal text='b' value='b' /> }
     }
     Extender.extends = [Extended]
 
@@ -154,12 +156,12 @@ describe('extends', () => {
 
   it('accepts extends being removed', () => {
     class Extended extends phrase.Phrase {
-      describe() { return <literal text='test a' /> }
+      describe () { return <literal text='test a' /> }
     }
 
     class Extender extends phrase.Phrase {
-      describe() { return <literal text='test b' /> }
-      static get extends() {return [Extended]}
+      describe () { return <literal text='test b' /> }
+      static extends = [Extended]
     }
 
     parser.grammar = <Extended />

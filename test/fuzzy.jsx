@@ -15,7 +15,7 @@
 //   })
 //
 //   it('supports fuzzy matching within a phrase', () => {
-//     parser.grammar = <literal text='a simple test' fuzzy={true} />
+//     parser.grammar = <literal text='a simple test' fuzzy />
 //
 //     const data = parser.parseArray($1)
 //     expect(data).to.have.length(1)
@@ -43,14 +43,14 @@
 //   })
 //
 //   it('rejects misses properly with fuzzy matching', () => {
-//     parser.grammar = <literal text='a simple test' fuzzy={true} />
+//     parser.grammar = <literal text='a simple test' fuzzy />
 //
 //     const data = parser.parseArray($1)
 //     expect(data).to.have.length(0)
 //   })
 //
 //   it('suggests properly when fuzzy matching is enabled', () => {
-//     parser.grammar = <literal text='a simple test' fuzzy={true} />
+//     parser.grammar = <literal text='a simple test' fuzzy />
 //
 //     const data = parser.parseArray($1)
 //     expect(data).to.have.length(1)
@@ -60,7 +60,7 @@
 //   })
 //
 //   it('can do fuzzy matching with regex special characters', () => {
-//     parser.grammar = <literal text='[whatever]' fuzzy={true} />
+//     parser.grammar = <literal text='[whatever]' fuzzy />
 //
 //     const data = parser.parseArray($1)
 //     expect(data).to.have.length(1)
@@ -76,8 +76,8 @@
 //   it('supports sequence when fuzzy is enabled', () => {
 //     parser.grammar = (
 //       <sequence>
-//         <literal text='abc' fuzzy={true} />
-//         <literal text='def' fuzzy={true} />
+//         <literal text='abc' fuzzy />
+//         <literal text='def' fuzzy />
 //       </sequence>
 //     )
 //
@@ -96,8 +96,8 @@
 //   it('rejects when the word itself does not complete the match', () => {
 //     parser.grammar = (
 //       <sequence>
-//         <literal text='abc' fuzzy={true} />
-//         <literal text='def' fuzzy={true} />
+//         <literal text='abc' fuzzy />
+//         <literal text='def' fuzzy />
 //       </sequence>
 //     )
 //
@@ -108,10 +108,10 @@
 //   it('assigns a score for different match types', () => {
 //     parser.grammar = (
 //       <choice>
-//         <literal text='abc' fuzzy={true} />
-//         <literal text='abcdef' fuzzy={true} />
-//         <literal text='xxxabc' fuzzy={true} />
-//         <literal text='xaxbxc' fuzzy={true} />
+//         <literal text='abc' fuzzy />
+//         <literal text='abcdef' fuzzy />
+//         <literal text='xxxabc' fuzzy />
+//         <literal text='xaxbxc' fuzzy />
 //       </choice>
 //     )
 //
@@ -126,10 +126,10 @@
 //   it('assigned scores can be overridden', () => {
 //     parser.grammar = (
 //       <choice>
-//         <literal text='abc' fuzzy={true} score={0.1} />
-//         <literal text='abcdef' fuzzy={true} score={0.2} />
-//         <literal text='xxxabc' fuzzy={true} score={0.3} />
-//         <literal text='xaxbxc' fuzzy={true} score={0.4} />
+//         <literal text='abc' fuzzy score={0.1} />
+//         <literal text='abcdef' fuzzy score={0.2} />
+//         <literal text='xxxabc' fuzzy score={0.3} />
+//         <literal text='xaxbxc' fuzzy score={0.4} />
 //       </choice>
 //     )
 //

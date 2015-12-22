@@ -22,7 +22,7 @@ describe('list', () => {
   })
 
   it('suggests normally with fuzzy', () => {
-    parser.grammar = <list items={['testa', 'testb']} fuzzy={true} />
+    parser.grammar = <list items={['testa', 'testb']} fuzzy />
 
     const data = parser.parseArray('')
     expect(data).to.have.length(2)
@@ -39,7 +39,7 @@ describe('list', () => {
   })
 
   it('matches with fuzzy', () => {
-    parser.grammar = <list items={['testa', 'testb']} fuzzy={true} />
+    parser.grammar = <list items={['testa', 'testb']} fuzzy />
 
     const data = parser.parseArray('b')
     expect(data).to.have.length(1)
@@ -47,7 +47,7 @@ describe('list', () => {
   })
 
   it('sorts with fuzzy, and limits before it', () => {
-    parser.grammar = <list items={['ztest', 'testz', 'zztest']} fuzzy={true} limit={2} />
+    parser.grammar = <list items={['ztest', 'testz', 'zztest']} fuzzy limit={2} />
 
     const data = parser.parseArray('test')
     expect(data).to.have.length(2)
@@ -56,7 +56,7 @@ describe('list', () => {
   })
 
   // it('sorts with fuzzy, and limits before it', () => {
-  //   parser.grammar = <list items={['ztest', 'tezst', 'testz', 'tzest']} fuzzy={true} limit={3} />
+  //   parser.grammar = <list items={['ztest', 'tezst', 'testz', 'tzest']} fuzzy limit={3} />
   //
   //   const data = parser.parseArray($1)
   //   expect(data).to.have.length(3)
@@ -77,7 +77,7 @@ describe('list', () => {
 
   it('allows for value with fuzzy', () => {
     const items = [{text: 'testa', value: 'a'}, {text: 'testb', value: 'b'}]
-    parser.grammar = <list items={items} fuzzy={true} />
+    parser.grammar = <list items={items} fuzzy />
 
     const data = parser.parseArray('b')
     expect(data).to.have.length(1)
@@ -119,7 +119,7 @@ describe('list', () => {
 
   it('outputs score', () => {
     const items = ['ztest', 'testz', 'tezst']
-    parser.grammar = <list items={items} fuzzy={true} />
+    parser.grammar = <list items={items} fuzzy />
 
     const data = parser.parseArray('test')
     expect(data).to.have.length(2)

@@ -1,13 +1,9 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
-import chai, {expect} from 'chai'
+import {expect} from 'chai'
 import {text} from './_util'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
-import {spy} from 'sinon'
-import sinonChai from 'sinon-chai'
-
-chai.use(sinonChai)
 
 describe('label', () => {
   var parser
@@ -59,7 +55,7 @@ describe('label', () => {
   })
 
   it('suppresses with a value', () => {
-    function func(input) {
+    function func (input) {
       if (input === 'v') {
         return [{
           words: [{text: 'value', input: true}],

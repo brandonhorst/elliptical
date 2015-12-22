@@ -21,9 +21,9 @@ describe('lifecycle', () => {
     const destSpy = spy()
 
     class Test extends Phrase {
-      create() {createSpy()}
-      destroy() {destSpy()}
-      describe() {return <literal text='test' />}
+      create () { createSpy() }
+      destroy () { destSpy() }
+      describe () { return <literal text='test' /> }
     }
 
     parser.grammar = <Test />
@@ -47,15 +47,14 @@ describe('lifecycle', () => {
     const destSpy = spy()
 
     class TestSource extends Source {
-      onCreate() {createSpy()}
-      onDestroy() {destSpy()}
+      onCreate () { createSpy() }
+      onDestroy () { destSpy() }
     }
 
     class Test extends Phrase {
-      observe () { return  <TestSource /> }
-      describe() {return <literal text='test' />}
+      observe () { return <TestSource /> }
+      describe () { return <literal text='test' /> }
     }
-
 
     parser.grammar = <Test />
 

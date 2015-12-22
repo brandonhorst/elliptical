@@ -1,8 +1,7 @@
 /** @jsx createElement */
 /* eslint-env mocha */
-import chai, {expect} from 'chai'
+import {expect} from 'chai'
 import {createElement, Phrase} from 'lacona-phrase'
-import {text} from './_util'
 import { Parser, Error as LaconaError } from '..'
 
 describe('reconcile', () => {
@@ -16,7 +15,7 @@ describe('reconcile', () => {
     class Test extends Phrase {}
     Test.translations = [{
       langs: ['en-US'],
-      describe() {
+      describe () {
         return <literal text='whatever' />
       }
     }]
@@ -51,7 +50,7 @@ describe('reconcile', () => {
   })
 
   it('throws for root grammars with invalid elements', () => {
-    const Test = undefined
+    let Test
 
     parser.grammar = <Test />
 
@@ -59,7 +58,7 @@ describe('reconcile', () => {
   })
 
   it('throws for phrase grammars with invalid elements', () => {
-    const Invalid = undefined
+    let Invalid
 
     class Test extends Phrase {
       describe () {
@@ -86,7 +85,7 @@ describe('reconcile', () => {
     class TestSource {}
 
     class Test extends Phrase {
-      observe () {return <TestSource  />}
+      observe () { return <TestSource /> }
       describe () {
         return <literal text='test' />
       }

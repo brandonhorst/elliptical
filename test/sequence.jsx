@@ -5,10 +5,10 @@ import {text} from './_util'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
 
-describe('sequence', function () {
+describe('sequence', () => {
   var parser
 
-  beforeEach(function () {
+  beforeEach(() => {
     parser = new lacona.Parser()
   })
 
@@ -200,7 +200,6 @@ describe('sequence', function () {
     expect(data[0].result).to.eql('man')
   })
 
-
   it('will merge results in for optionals', () => {
     parser.grammar = (
       <sequence>
@@ -220,7 +219,7 @@ describe('sequence', function () {
 
   it('ignores strings and nulls for reconciliation', () => {
     class Test extends phrase.Phrase {
-      describe() {
+      describe () {
         return (
           <sequence>
             {null}
@@ -239,7 +238,7 @@ describe('sequence', function () {
 
   it('allows for uniqueness', () => {
     class Test extends phrase.Phrase {
-      describe() {
+      describe () {
         return (
           <sequence unique>
             <literal text='test' optional id='test' value={1} />

@@ -5,10 +5,10 @@ import {text} from './_util'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
 
-describe('literal', function () {
+describe('literal', () => {
   var parser
 
-  beforeEach(function () {
+  beforeEach(() => {
     parser = new lacona.Parser()
   })
 
@@ -109,7 +109,6 @@ describe('literal', function () {
       )
 
       const data = parser.parseArray('aa ')
-      console.log(data[0].words)
       expect(data).to.have.length(1)
       expect(text(data[0])).to.equal('aba literal')
       expect(data[0].words[3].placeholder).to.be.undefined

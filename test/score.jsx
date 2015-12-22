@@ -1,7 +1,6 @@
 /** @jsx phrase.createElement */
 /* eslint-env mocha */
-import chai, {expect} from 'chai'
-import {text} from './_util'
+import {expect} from 'chai'
 import * as lacona from '..'
 import * as phrase from 'lacona-phrase'
 
