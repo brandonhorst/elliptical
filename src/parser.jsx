@@ -1,5 +1,6 @@
 /** @jsx createElement */
 import _ from 'lodash'
+import { EventEmitter } from 'events'
 import { parse } from './parse'
 import { reconcile } from './reconcile'
 import { LaconaError } from './error'
@@ -22,12 +23,13 @@ function normalizeOutput (option) {
   return output
 }
 
-export class Parser {
-  constructor ({langs = ['default'], grammar, extensions = [], onReparse = () => {}} = {}) {
+export class Parser extends EventEmitter {
+  constructor ({langs = ['default'], grammar, extensions = []} = {}) {
+    super()
+    
     this.langs = langs
     this.grammar = grammar
     this.extensions = extensions
-    this.onReparse = onReparse
     this._currentlyParsing = false
     this._sourceManager = new SourceManager({
       update: this._maybeReparse.bind(this)
@@ -35,9 +37,7 @@ export class Parser {
   }
 
   _maybeReparse () {
-    if (!this._currentlyParsing) {
-      this.onReparse()
-    }
+    this.emit('update')
   }
 
   _getExtensions (Constructor) {

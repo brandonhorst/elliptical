@@ -28,7 +28,7 @@ export default class SourceManager {
 
     instance.setData = newData => { //setData during onCreate() doesn't trigger source Update
       instance.data = newData
-      if (!instance.isCreating) {
+      if (!instance.__isCreating) {
         this._triggerSourceUpdate(instance)
       }
     }

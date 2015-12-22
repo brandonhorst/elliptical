@@ -322,7 +322,7 @@ describe('sources', () => {
     })
   })
 
-  it("onReparse is not called for setData() during onCreate", () => {
+  it("update is not emitted for setData() during onCreate", () => {
     const changeSpy = spy()
 
     class TestSource extends Source {
@@ -340,7 +340,7 @@ describe('sources', () => {
     }
 
     parser.grammar = <Test />
-    parser.onReparse = changeSpy
+    parser.on('update', changeSpy)
 
     const data = parser.parseArray('')
     expect(data).to.have.length(1)
@@ -364,12 +364,12 @@ describe('sources', () => {
       }
     }
 
-    parser.onReparse = () => {
+    parser.on('update',  () => {
       const data = parser.parseArray('')
       expect(data).to.have.length(1)
       expect(text(data[0])).to.equal('testb')
       done()
-    }
+    })
 
     parser.grammar = <Test />
 
