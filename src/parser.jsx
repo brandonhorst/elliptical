@@ -26,11 +26,10 @@ function normalizeOutput (option) {
 export class Parser extends EventEmitter {
   constructor ({langs = ['default'], grammar, extensions = []} = {}) {
     super()
-    
+
     this.langs = langs
     this.grammar = grammar
     this.extensions = extensions
-    this._currentlyParsing = false
     this._sourceManager = new SourceManager({
       update: this._maybeReparse.bind(this)
     })
@@ -83,7 +82,6 @@ export class Parser extends EventEmitter {
   }
 
   * parse (inputString, isReparse = false) {
-    this._currentlyParsing = true
     if (!_.isString(inputString)) {
       throw new LaconaError('lacona parse input must be a string')
     }
@@ -99,8 +97,6 @@ export class Parser extends EventEmitter {
         yield normalizeOutput(output)
       }
     }
-
-    this._currentlyParsing = false
   }
 
   parseArray (inputString, isReparse = false) {
