@@ -51,15 +51,13 @@ describe('sources', () => {
     expect(fetchSpy).to.have.been.calledOnce
   })
 
-  it('onCreate () is called, can set data', () => {
+  it('can set initial data in class properties', () => {
     class TestSource extends Source {
-      onCreate() {
-        this.setData({test: 'testa'})
-      }
+      data = 'testa'
     }
 
     class Test extends Phrase {
-      describe () {return <literal text={this.source.data.test} />}
+      describe () {return <literal text={this.source.data} />}
       observe () {return <TestSource />}
     }
 
@@ -98,9 +96,9 @@ describe('sources', () => {
     expect(text(data2[0])).to.equal('test')
   })
 
-  it('passes props to create', () => {
+  it('can use props in data property initializer', () => {
     class TestSource extends Source {
-      onCreate () {this.setData(this.props.test)}
+      data = this.props.test
     }
 
     class Test extends Phrase {
@@ -117,9 +115,7 @@ describe('sources', () => {
 
   it('sources with the same props share', () => {
     class TestSource extends Source {
-      onCreate () {
-        this.setData('testa')
-      }
+      data = 'testa'
       set (input) {
         this.setData(input)
       }
@@ -149,14 +145,14 @@ describe('sources', () => {
 
   it('sources with the same props do not share if preventSharing is set', () => {
     class TestSource extends Source {
-      onCreate () {
-        this.setData('testa')
-      }
+      data = 'testa'
+
+      static preventSharing = true
+
       set (input) {
         this.setData(input)
       }
     }
-    TestSource.preventSharing = true
 
     class Test extends Phrase {
       create () {this.source.set('testb')}
@@ -181,12 +177,10 @@ describe('sources', () => {
 
   it('sources with different props do not share', () => {
     class TestSource extends Source {
+      data = 'testa'
+
       set (input) {
         this.setData(input)
-      }
-
-      onCreate () {
-        this.setData('testa')
       }
     }
 
@@ -211,38 +205,12 @@ describe('sources', () => {
     expect(text(data2[0])).to.equal('testa')
   })
 
-  it('calls onCreate, which can setData', done => {
-    class TestSource extends Source {
-      onCreate () {
-        this.setData('testa')
-        process.nextTick(() => this.setData('testb'))
-      }
-    }
-
-    class Test extends Phrase {
-      observe () {return <TestSource />}
-      describe () {return <literal text={this.source.data} />}
-    }
-
-    parser.grammar = <Test />
-
-    const data1 = parser.parseArray('')
-    expect(text(data1[0])).to.equal('testa')
-
-    process.nextTick(() => {
-      const data2 = parser.parseArray('')
-      expect(text(data2[0])).to.equal('testb')
-      done()
-    })
-  })
-
   it('can export functions, which can be called on create', () => {
     class TestSource extends Source {
+      data = 'testa'
+
       update () {
         this.setData('testb')
-      }
-      onCreate () {
-        this.setData('testa')
       }
     }
 
@@ -262,9 +230,7 @@ describe('sources', () => {
     const descSpy = spy()
 
     class TestSource extends Source {
-      onCreate () {
-        this.setData('testa')
-      }
+      data = 'testa'
     }
 
     class Test extends Phrase {
@@ -290,8 +256,9 @@ describe('sources', () => {
     const consSpy = spy()
 
     class TestSource extends Source {
+      data = 'testa'
+
       onCreate () {
-        this.setData('testa')
         process.nextTick(() => this.setData('testb'))
       }
     }
@@ -321,8 +288,9 @@ describe('sources', () => {
     const subConsSpy = spy()
 
     class TestSource extends Source {
+      data = 'testa'
+
       onCreate () {
-        this.setData('testa')
         process.nextTick(() => this.setData('testb'))
       }
     }
@@ -354,35 +322,36 @@ describe('sources', () => {
     })
   })
 
-  it('setData does not trigger change event during a parse', (done) => {
+  it("onReparse is not called for setData() during onCreate", () => {
     const changeSpy = spy()
-    class TestSource extends Source {
-      onCreate () {this.setData('testb')}
-    }
 
-    class Test extends Phrase {
-      observe () {return <TestSource />}
-      describe () {
-        return <literal text='test' />
+    class TestSource extends Source {
+      data = 'test'
+
+      onCreate () {
+        this.setData('another test')
       }
     }
 
-    parser.reparse = changeSpy
+    class Test extends Phrase {
+      observe () {return <TestSource /> }
+
+      describe () { return <literal text={this.source.data} /> }
+    }
+
     parser.grammar = <Test />
+    parser.onReparse = changeSpy
 
     const data = parser.parseArray('')
     expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('test')
-
-    process.nextTick(() => {
-      expect(changeSpy).to.not.have.been.called
-      done()
-    })
+    expect(text(data[0])).to.equal('another test')
+    expect(changeSpy).to.not.have.been.called
   })
 
-  it('setData causes change on nextTick when it occurs after a parse', (done) => {
-    const changeSpy = spy()
+  it('setData calls onReparse when it occurs after a parse', (done) => {
     class TestSource extends Source {
+      data = 'testa'
+
       onCreate () {
         process.nextTick(() => this.setData('testb'))
       }
@@ -391,32 +360,36 @@ describe('sources', () => {
     class Test extends Phrase {
       observe () {return <TestSource />}
       describe () {
-        return <literal text='test' />
+        return <literal text={this.source.data} />
       }
     }
 
-    parser.onReparse = changeSpy
+    parser.onReparse = () => {
+      const data = parser.parseArray('')
+      expect(data).to.have.length(1)
+      expect(text(data[0])).to.equal('testb')
+      done()
+    }
+
     parser.grammar = <Test />
 
     const data = parser.parseArray('')
     expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('test')
-
-    process.nextTick(() => {
-      process.nextTick(() => {
-        expect(changeSpy).to.have.been.calledOnce
-        done()
-      })
-    })
+    expect(text(data[0])).to.equal('testa')
   })
 
-  it('sources can contain other sources', () => {
+  it('can contain other sources', () => {
     class TestSource1 extends Source {
-      onCreate () { this.setData('test') }
+      data = 'test'
     }
     class TestSource2 extends Source {
-      observe () { return <TestSource1 /> }
-      onCreate () { this.setData(this.source.data) }
+      onCreate () {
+        this.setData(this.source.data)
+      }
+
+      observe () {
+        return <TestSource1 />
+      }
     }
 
     class Test extends Phrase {
@@ -433,21 +406,25 @@ describe('sources', () => {
 
   it("onUpdate is called when a source's source updates", done => {
     class TestSource1 extends Source {
+      data = 'test'
+
       onCreate () {
-        this.setData('test')
         process.nextTick(() => {
           this.setData('another test')
         })
       }
     }
     class TestSource2 extends Source {
+      data = 'wrong'
+
       observe () { return <TestSource1 /> }
-      onCreate () { this.setData('wrong') }
+
       onUpdate () { this.setData(this.source.data) }
     }
 
     class Test extends Phrase {
       observe () {return <TestSource2 /> }
+
       describe () { return <literal text={this.source.data} /> }
     }
 
@@ -465,16 +442,17 @@ describe('sources', () => {
     })
   })
 
-  it("sources can have other sources as their children", () => {
+  it("can have other sources as their children, data is available at onCreate", () => {
     class TestSource1 extends Source {
-      onCreate () {
-        this.setData('test')
-      }
+      data = 'test'
     }
+
     class TestSource2 extends Source {
-      observe () { return this.props.children[0] }
       onCreate () {
         this.setData(this.source.data)
+      }
+      observe () {
+        return this.props.children[0]
       }
     }
 
@@ -490,16 +468,18 @@ describe('sources', () => {
     expect(text(data[0])).to.equal('test')
   })
 
-  it("sources can have Source definitions as their props", () => {
+  it("can have Source definitions as their props, data is available at onCreate", () => {
     class TestSource1 extends Source {
-      onCreate () {
-        this.setData('test')
-      }
+      data = 'test'
     }
+
     class TestSource2 extends Source {
-      observe () { return <this.props.Source /> }
       onCreate () {
         this.setData(this.source.data)
+      }
+
+      observe () {
+        return <this.props.Source />
       }
     }
 

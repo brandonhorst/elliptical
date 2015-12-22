@@ -67,7 +67,7 @@
   },
   "dependencies": {
     "babel-runtime": "^6.3.19",
-    "lacona-phrase": "^0.7.0",
+    "lacona-phrase": "^0.9.0",
     "lodash": "^3.10.1",
     "smart-split": "^1.0.2"
   },

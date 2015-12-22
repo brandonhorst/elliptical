@@ -2,7 +2,7 @@
 import _ from 'lodash'
 import * as builtins from './elements'
 import { createElement } from 'lacona-phrase'
-import { getRealProps, getConstructor } from './descriptor'
+import { getRealProps, getConstructor, instantiate } from './descriptor'
 import { LaconaError } from './error'
 
 export function reconcile({descriptor, phrase, options}) {
@@ -42,8 +42,7 @@ function reconcileOne({descriptor, phrase, options}) {
   } else {
     if (phrase) destroy({phrase, sourceManager: options.sourceManager})
 
-    const newPhrase = new Constructor()
-    newPhrase.props = props
+    const newPhrase = instantiate({Constructor, props})
 
     options.sourceManager.sourceInstance(newPhrase)
 

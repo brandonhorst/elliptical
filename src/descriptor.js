@@ -73,3 +73,7 @@ export function getRealProps({descriptor, Constructor}) {
   }
   return realProps
 }
+
+export function instantiate ({Constructor, props}) {
+  return new Constructor({props})
+}

@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import {getRealProps, getConstructor} from './descriptor'
+import {getRealProps, getConstructor, instantiate} from './descriptor'
 
 export default class SourceManager {
   constructor ({update = () => {}}) {
@@ -19,16 +19,18 @@ export default class SourceManager {
 
   _createSource (descriptor) {
     const Constructor = getConstructor({Constructor: descriptor.Constructor, type: 'source'})
-    const instance = new Constructor()
     const props = getRealProps({descriptor, Constructor: descriptor.Constructor})
-    instance.props = props
+    const instance = instantiate({Constructor, props})
 
     instance.__dataVersion = 0
     instance.__subscribers = 0
+    instance.__isCreating = true
 
-    instance.setData = newData => {
+    instance.setData = newData => { //setData during onCreate() doesn't trigger source Update
       instance.data = newData
-      this._triggerSourceUpdate(instance)
+      if (!instance.isCreating) {
+        this._triggerSourceUpdate(instance)
+      }
     }
 
     this.sourceInstance(instance)
@@ -36,6 +38,8 @@ export default class SourceManager {
     this._sources.push({instance, descriptor})
 
     if (instance.onCreate) instance.onCreate()
+
+    instance.__isCreating = false
 
     return instance
   }
