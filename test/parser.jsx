@@ -6,7 +6,6 @@ import {text} from './_util'
 import * as lacona from '..'
 import Literal from '../lib/elements/literal'
 import * as phrase from 'lacona-phrase'
-import Value from '../lib/elements/value'
 
 function from(i) {const a = []; for (let x of i) a.push(x); return a}
 

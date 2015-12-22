@@ -2,11 +2,11 @@ import _ from 'lodash'
 // import {handleString} from '../input-option'
 import {Phrase} from 'lacona-phrase'
 
-export default class Value extends Phrase {
+export class Raw extends Phrase {
   *_handleParse(input, options) {
     let successes = 0
 
-    for (let output of this.props.compute(input.text)) {
+    for (let output of this.props.function(input.text)) {
       let success = false
 
       const modification = {
@@ -33,6 +33,6 @@ export default class Value extends Phrase {
   }
 }
 
-Value.defaultProps = {
+Raw.defaultProps = {
   compute: () => []
 }

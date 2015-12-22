@@ -24,7 +24,7 @@ describe('limit', () => {
         ]
       }
 
-      parser.grammar = <value limit={2} compute={compute} />
+      parser.grammar = <raw limit={2} function={compute} />
 
       const data = parser.parseArray('t')
       expect(data).to.have.length(2)
@@ -40,7 +40,7 @@ describe('limit', () => {
         ]
       }
 
-      parser.grammar = <value limit={3} compute={compute} />
+      parser.grammar = <raw limit={3} function={compute} />
 
       const data = parser.parseArray('t')
       expect(data).to.have.length(2)

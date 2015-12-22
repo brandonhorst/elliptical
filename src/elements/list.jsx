@@ -44,7 +44,7 @@ export default class List extends Phrase {
 
   describe () {
     if (this.props.fuzzy) {
-      return <value compute={this.compute.bind(this)} suggest={this.suggest.bind(this)} limit={this.props.limit} category={this.props.category} />
+      return <raw function={this.compute.bind(this)} limit={this.props.limit} category={this.props.category} />
     } else {
       const literals = _.chain(this.props.items)
         .map(this.itemify.bind(this))

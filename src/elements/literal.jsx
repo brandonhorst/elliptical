@@ -72,12 +72,12 @@ export default class Literal extends Phrase {
       return (
         <choice limit={1}>
           <literal {...this.props} decorate={false} />
-          <value compute={this.decorate.bind(this)} />
+          <raw function={this.decorate.bind(this)} />
         </choice>
       )
     } else {
-      return <value
-        compute={this.compute.bind(this)}
+      return <raw
+        function={this.compute.bind(this)}
         qualifier={this.props.qualifier}
         category={this.props.category} />
     }

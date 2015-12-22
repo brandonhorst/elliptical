@@ -30,7 +30,7 @@ export default class Freetext extends Phrase {
   }
 
   describe() {
-    return <value compute={this.filter.bind(this)} limit={this.props.limit} />
+    return <raw function={this.filter.bind(this)} limit={this.props.limit} />
   }
 }
 Freetext.defaultProps = {

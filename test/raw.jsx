@@ -7,14 +7,14 @@ import * as phrase from 'lacona-phrase'
 
 function from(i) {const a = []; for (let x of i) a.push(x); return a}
 
-describe('value', function () {
+describe('raw', function () {
   var parser
 
   beforeEach(function () {
     parser = new lacona.Parser()
   })
 
-  it('suggests a value', () => {
+  it('suggests a item', () => {
     function fun() {
       return [{
         remaining: null,
@@ -23,7 +23,7 @@ describe('value', function () {
       }]
     }
 
-    parser.grammar = <value compute={fun} />
+    parser.grammar = <raw function={fun} />
 
     const data = parser.parseArray('')
     expect(data).to.have.length(1)
@@ -31,7 +31,7 @@ describe('value', function () {
     expect(text(data[0])).to.equal('tex')
   })
 
-  it('suggests a value (generator)', () => {
+  it('suggests a item (generator)', () => {
     function *fun() {
       yield {
         remaining: null,
@@ -40,7 +40,7 @@ describe('value', function () {
       }
     }
 
-    parser.grammar = <value compute={fun} />
+    parser.grammar = <raw function={fun} />
 
     const data = parser.parseArray('')
     expect(data).to.have.length(1)
@@ -58,7 +58,7 @@ describe('value', function () {
       }]
     }
 
-    parser.grammar = <value compute={fun} />
+    parser.grammar = <raw function={fun} />
 
     const data = parser.parseArray('te')
     expect(data).to.have.length(1)
@@ -76,7 +76,7 @@ describe('value', function () {
       }
     }
 
-    parser.grammar = <value compute={fun} />
+    parser.grammar = <raw function={fun} />
 
     const data = parser.parseArray('te')
     expect(data).to.have.length(1)
@@ -95,7 +95,7 @@ describe('value', function () {
         }]
       }
 
-      describe() { return <value compute={this.fun.bind(this)} /> }
+      describe() { return <raw function={this.fun.bind(this)} /> }
     }
 
     parser.grammar = <Test myVar='myVal' />
@@ -116,7 +116,7 @@ describe('value', function () {
       }]
     }
 
-    parser.grammar = <value compute={fun} />
+    parser.grammar = <raw function={fun} />
 
     const data = parser.parseArray('')
     expect(data).to.have.length(1)

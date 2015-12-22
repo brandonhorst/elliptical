@@ -75,7 +75,7 @@ describe('label', () => {
       <sequence>
         <literal text='a ' id='a' value='a' />
         <label text='test' id='place'>
-          <value compute={func} />
+          <raw function={func} />
         </label>
       </sequence>
     )
