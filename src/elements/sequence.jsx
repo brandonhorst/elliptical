@@ -5,12 +5,11 @@ import { parse } from '../parse'
 import { reconcile } from '../reconcile'
 
 export class Sequence extends Phrase {
-  describe() {
-    //replace optionals with replacements
+  describe () {
+    // replace optionals with replacements
     if (_.some(this.props.children, _.property('props.optional'))) {
       const newChildren = _.map(this.props.children, child => {
         if (child && child.props && child.props.optional) {
-
           const newChild = _.merge({}, child, {props: {optional: false}})
           delete newChild.props.id
           delete newChild.props.merge
@@ -33,7 +32,7 @@ export class Sequence extends Phrase {
     }
   }
 
-  *_handleParse(input, options) {
+  * _handleParse (input, options) {
     this.childPhrases = reconcile({descriptor: this.props.children, phrase: this.childPhrases, options})
 
     const modifications = {
@@ -44,7 +43,7 @@ export class Sequence extends Phrase {
     yield* this.parseChild(0, _.assign({}, input, modifications), options)
   }
 
-  *parseChild(childIndex, input, options) {
+  * parseChild (childIndex, input, options) {
     if (childIndex >= this.childPhrases.length) {
       yield input
       return
@@ -57,7 +56,7 @@ export class Sequence extends Phrase {
         continue
       }
       const accumulatedResult = this.props.value || getAccumulatedResult(input.result, child, output.result)
-      const newScore = input.score *  output.score
+      const newScore = input.score * output.score
       const nextOutput = _.assign({}, output, {
         result: accumulatedResult,
         score: newScore
@@ -68,12 +67,12 @@ export class Sequence extends Phrase {
   }
 }
 
-function getAccumulatedResult(inputResult, child, childResult) {
+function getAccumulatedResult (inputResult, child, childResult) {
   if (!_.isUndefined(childResult)) {
     const childId = child.props.id
     const childMerge = child.props.merge
     if (childId) {
-       return _.assign({}, inputResult, {[childId]: childResult})
+      return _.assign({}, inputResult, {[childId]: childResult})
     } else if (childMerge) {
       if (_.isPlainObject(childResult)) {
         return _.merge({}, inputResult, childResult)

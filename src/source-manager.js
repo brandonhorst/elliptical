@@ -26,7 +26,7 @@ export default class SourceManager {
     instance.__subscribers = 0
     instance.__isCreating = true
 
-    instance.setData = newData => { //setData during onCreate() doesn't trigger source Update
+    instance.setData = newData => { // setData during onCreate() doesn't trigger source Update
       instance.data = newData
       if (!instance.__isCreating) {
         this._triggerSourceUpdate(instance)
@@ -68,7 +68,6 @@ export default class SourceManager {
     if (object.observe) {
       const sourceDescriptor = object.observe()
       if (sourceDescriptor) {
-
         const source = this._getSource(sourceDescriptor)
         source.__subscribers++
         object.__lastSourceVersion = 0

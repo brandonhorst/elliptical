@@ -1,6 +1,4 @@
-import _ from 'lodash'
-
-export function *parse({phrase, input, options}) {
+export function * parse ({phrase, input, options}) {
   if (phrase.__describedPhrase) {
     const iterator = parse({phrase: phrase.__describedPhrase, input, options})
     for (let output of iterator) {
@@ -11,7 +9,7 @@ export function *parse({phrase, input, options}) {
   } else if (phrase._handleParse) {
     yield* phrase._handleParse(input, options, parse)
   } else {
-    //noop
+    // noop
   }
 
   options.sourceManager.markSourceUpToDate(phrase)

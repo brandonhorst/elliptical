@@ -8,7 +8,7 @@ export class MapPhrase extends Phrase {
     function: _.identity
   };
 
-  *_handleParse (input, options) {
+  * _handleParse (input, options) {
     if (this.props.children && this.props.children.length > 0) {
       this.childPhrase = reconcile({descriptor: this.props.children[0], phrase: this.childPhrase, options})
 

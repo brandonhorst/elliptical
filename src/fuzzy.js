@@ -1,7 +1,7 @@
 import _ from 'lodash'
 // returns a `words` object if its a match, else null
 
-export function match(input, text) {
+export function match (input, text) {
   const anywhere = anywhereMatch({input, text})
   if (anywhere) return {words: anywhere, score: 0.5}
 
@@ -11,16 +11,15 @@ export function match(input, text) {
   return null
 }
 
-export function *sort(input, items) {
-  let results = []
+export function * sort (input, items) {
   let itemSet = _.map(items, item => ({item, matched: false}))
 
-  for (let [func, score] of [[beginningMatch, 1], [anywhereMatch, 0.5]/*, [fuzzyMatch, 0.25]*/]) {
+  for (let [func, score] of [[beginningMatch, 1], [anywhereMatch, 0.5]]) {
     yield* sortFunction({input, itemSet, func, score})
   }
 }
 
-function* sortFunction({input, itemSet, func, score}) {
+function * sortFunction ({input, itemSet, func, score}) {
   for (let obj of itemSet) {
     if (!obj.matched) {
       const words = func({input, text: obj.item.text, qualifier: obj.item.qualifier})
@@ -34,15 +33,11 @@ function* sortFunction({input, itemSet, func, score}) {
 }
 
 // escape special characters, and wrap in parens (for matching)
-function regexEscape (str) {
-  return `(${str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/, '\\$&')})`
-}
+// function regexEscape (str) {
+//   return `(${str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/, '\\$&')})`
+// }
 
-function regexSplit (str) {
-  return str.split('').map(regexEscape)
-}
-
-function beginningMatch({input, text, qualifier}) {
+function beginningMatch ({input, text, qualifier}) {
   if (_.startsWith(text.toLowerCase(), input.toLowerCase())) {
     const matches = [{text: text.slice(0, input.length), input: true, qualifier}]
     if (input.length < text.length) {
@@ -53,7 +48,7 @@ function beginningMatch({input, text, qualifier}) {
   return null
 }
 
-function anywhereMatch({input, text, qualifier}) {
+function anywhereMatch ({input, text, qualifier}) {
   const index = text.toLowerCase().indexOf(input.toLowerCase())
 
   if (index > -1) {
@@ -74,7 +69,6 @@ function anywhereMatch({input, text, qualifier}) {
   }
   return null
 }
-
 
 // function fuzzyMatch({input, text}) {
 //   const chars = regexSplit(input)

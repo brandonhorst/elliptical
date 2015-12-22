@@ -30,7 +30,7 @@ describe('sequence', function () {
     parser.grammar = (
       <sequence>
         <literal text='super' />
-        <literal text='maximum' optional={true} />
+        <literal text='maximum' optional />
         <literal text='man' />
       </sequence>
     )
@@ -45,7 +45,7 @@ describe('sequence', function () {
     parser.grammar = (
       <sequence>
         <literal text='super' />
-        <literal text='maximum' optional={true} preferred={true} />
+        <literal text='maximum' optional preferred />
         <literal text='man' />
       </sequence>
     )
@@ -60,7 +60,7 @@ describe('sequence', function () {
     parser.grammar = (
       <sequence>
         <literal text='super' />
-        <literal text='maximum' optional={true} limited={true} />
+        <literal text='maximum' optional limited />
         <literal text='man' />
       </sequence>
     )
@@ -74,7 +74,7 @@ describe('sequence', function () {
     parser.grammar = (
       <sequence>
         <literal text='super' />
-        <literal text='maximum' optional={true} preferred={true} limited={true} />
+        <literal text='maximum' optional preferred limited />
         <literal text='man' />
       </sequence>
     )
@@ -88,7 +88,7 @@ describe('sequence', function () {
     parser.grammar = (
       <sequence>
         <literal text='super' />
-        <sequence optional={true}>
+        <sequence optional>
           <literal text='man' />
           <literal text='again' />
         </sequence>
@@ -104,7 +104,7 @@ describe('sequence', function () {
     parser.grammar = (
       <sequence>
         <freetext limit={1} />
-        <sequence optional={true}>
+        <sequence optional>
           <literal text='man' />
           <freetext limit={1} />
           <literal text='returns' />
@@ -121,7 +121,7 @@ describe('sequence', function () {
     parser.grammar = (
       <sequence>
         <literal text='super' />
-        <literal text='maximum' value='someValue' id='opt' optional={true} />
+        <literal text='maximum' value='someValue' id='opt' optional />
         <literal text='man' />
       </sequence>
     )
@@ -190,7 +190,7 @@ describe('sequence', function () {
     parser.grammar = (
       <sequence>
         <literal text='super' />
-        <literal text='man' value='man' merge={true} />
+        <literal text='man' value='man' merge />
       </sequence>
     )
 
@@ -205,7 +205,7 @@ describe('sequence', function () {
     parser.grammar = (
       <sequence>
         <literal text='super' />
-        <literal text='man' value='man' optional={true} merge={true} />
+        <literal text='man' value='man' optional merge />
       </sequence>
     )
 
@@ -241,10 +241,10 @@ describe('sequence', function () {
     class Test extends phrase.Phrase {
       describe() {
         return (
-          <sequence unique={true}>
-            <literal text='test' optional={true} id='test' value={1} />
+          <sequence unique>
+            <literal text='test' optional id='test' value={1} />
             <literal text='a' />
-            <literal text='test' optional={true} id='test' value={2} />
+            <literal text='test' optional id='test' value={2} />
           </sequence>
         )
       }

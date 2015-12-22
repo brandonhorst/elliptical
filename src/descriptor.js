@@ -20,7 +20,7 @@ export function getConstructor ({Constructor, type}) {
   return Constructor
 }
 
-function subclassOf(Constructor, DesiredSuperclass) {
+function subclassOf (Constructor, DesiredSuperclass) {
   return Constructor.prototype instanceof DesiredSuperclass
 }
 
@@ -54,7 +54,6 @@ function assertValid ({Constructor, type}) {
   }
 }
 
-
 function getBuiltinsForType (type) {
   if (type === 'phrase') {
     return builtinPhrases
@@ -65,8 +64,7 @@ function getBuiltinsForType (type) {
   }
 }
 
-
-export function getRealProps({descriptor, Constructor}) {
+export function getRealProps ({descriptor, Constructor}) {
   const realProps = _.defaults(descriptor.props || {}, Constructor.defaultProps || {})
   if (descriptor.children && descriptor.children.length > 0) {
     realProps.children = _.flattenDeep(descriptor.children)

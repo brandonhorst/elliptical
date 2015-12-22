@@ -9,8 +9,6 @@ import sinonChai from 'sinon-chai'
 
 chai.use(sinonChai)
 
-function from(i) {const a = []; for (let x of i) a.push(x); return a}
-
 describe('lifecycle', () => {
   var parser
 

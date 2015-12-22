@@ -1,6 +1,6 @@
 /** @jsx createElement */
 import _ from 'lodash'
-import { createElement, Phrase } from 'lacona-phrase'
+import { Phrase } from 'lacona-phrase'
 import { parse } from '../parse'
 import { reconcile } from '../reconcile'
 
@@ -9,12 +9,12 @@ export class Label extends Phrase {
     suppress: true,
     argument: true,
     showForEmpty: false,
-    displayWhen(input) {
+    displayWhen (input) {
       return input === ''
     }
   };
-  
-  *parseChild (input, options) {
+
+  * parseChild (input, options) {
     if (this.props.showForEmpty && input.text === '') return true
 
     let showPlaceholder = true
@@ -35,7 +35,7 @@ export class Label extends Phrase {
     return false
   }
 
-  *yieldSelf(input, options) {
+  * yieldSelf (input, options) {
     const word = {
       text: this.props.text,
       input: false,
@@ -54,7 +54,7 @@ export class Label extends Phrase {
     yield _.assign({}, input, modification)
   }
 
-  *_handleParse(input, options) {
+  * _handleParse (input, options) {
     this.childPhrase = reconcile({descriptor: this.props.children[0], phrase: this.childPhrase, options})
 
     let inputWithArgument = input

@@ -3,14 +3,13 @@ import _ from 'lodash'
 import * as builtins from './elements'
 import { createElement } from 'lacona-phrase'
 import { getRealProps, getConstructor, instantiate } from './descriptor'
-import { LaconaError } from './error'
 
-export function reconcile({descriptor, phrase, options}) {
+export function reconcile ({descriptor, phrase, options}) {
   const func = _.isArray(descriptor) ? reconcileArray : reconcileOne
   return func({descriptor, phrase, options})
 }
 
-function reconcileArray({descriptor, phrase, options}) {
+function reconcileArray ({descriptor, phrase, options}) {
   return _.chain(descriptor)
     .reject(_.isNull)
     .reject(_.isString)
@@ -19,7 +18,7 @@ function reconcileArray({descriptor, phrase, options}) {
     .value()
 }
 
-function reconcileOne({descriptor, phrase, options}) {
+function reconcileOne ({descriptor, phrase, options}) {
   if (descriptor == null && phrase) return destroy({phrase, sourceManager: options.sourceManager})
 
   const Constructor = getConstructor({Constructor: descriptor.Constructor, type: 'phrase'})
@@ -35,7 +34,6 @@ function reconcileOne({descriptor, phrase, options}) {
       phrase.__describedPhrase = describedPhrase
 
       return phrase
-
     } else {
       return phrase
     }
@@ -57,15 +55,15 @@ function reconcileOne({descriptor, phrase, options}) {
   }
 }
 
-function getDescribedPhrase({phrase, extensions, options}) {
+function getDescribedPhrase ({phrase, extensions, options}) {
   const describe = getCall({prop: 'describe', Constructor: phrase.constructor, langs: options.langs})
   const description = getDescription({describe, extensions, phrase})
-  return description ?
-    reconcile({descriptor: description, options, phrase: phrase.__describedPhrase}) :
-    null
+  return description
+    ? reconcile({descriptor: description, options, phrase: phrase.__describedPhrase})
+    : null
 }
 
-function getCall({Constructor, langs, prop}) {
+function getCall ({Constructor, langs, prop}) {
   if (Constructor.prototype[prop]) {
     return Constructor.prototype[prop]
   } else if (Constructor.translations) {
@@ -73,7 +71,7 @@ function getCall({Constructor, langs, prop}) {
   }
 }
 
-function getCallFromTranslations({prop, langs, translations}) {
+function getCallFromTranslations ({prop, langs, translations}) {
   return _.chain(langs.concat('default'))
     .map(lang => _.find(translations, obj => _.includes(obj.langs, lang)))
     .filter(_.negate(_.isUndefined))
@@ -94,7 +92,7 @@ function getCallFromTranslations({prop, langs, translations}) {
 //   }
 // }
 
-function getDescription({describe, extensions, phrase}) {
+function getDescription ({describe, extensions, phrase}) {
   if (describe) {
     const tempDescription = describe.call(phrase)
     if (extensions.length) {
@@ -112,7 +110,7 @@ function getDescription({describe, extensions, phrase}) {
   }
 }
 
-export function destroy({phrase, sourceManager}) {
+export function destroy ({phrase, sourceManager}) {
   if ((phrase.constructor === builtins.choice || phrase.constructor === builtins.sequence) && phrase.childPhrases) {
     phrase.childPhrases.forEach(phrase => destroy({phrase, sourceManager}))
   }
@@ -122,6 +120,6 @@ export function destroy({phrase, sourceManager}) {
   if (phrase.destroy) phrase.destroy()
 }
 
-function create({phrase}) {
+function create ({phrase}) {
   if (phrase.create) phrase.create()
 }

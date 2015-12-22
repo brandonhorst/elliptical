@@ -1,11 +1,11 @@
 /** @jsx createElement */
 import _ from 'lodash'
-import { createElement, Phrase } from 'lacona-phrase'
+import { Phrase } from 'lacona-phrase'
 import { parse } from '../parse'
 import { reconcile } from '../reconcile'
 
 export class Choice extends Phrase {
-  *_handleParse(input, options) {
+  * _handleParse (input, options) {
     let successes = 0
     if (this.props.children && this.props.children.length > 0) {
       this.childPhrases = reconcile({descriptor: this.props.children, phrase: this.childPhrases, options})
@@ -15,9 +15,9 @@ export class Choice extends Phrase {
 
         for (let output of parse({phrase: childPhrase, input, options})) {
           const newResult = this.props.value || (
-            childPhrase.props.id != null ?
-            {[childPhrase.props.id]: output.result} :
-            output.result
+            childPhrase.props.id != null
+              ? {[childPhrase.props.id]: output.result}
+              : output.result
           )
 
           const modifications = {result: newResult}

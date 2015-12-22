@@ -6,7 +6,13 @@ import { reconcile } from './reconcile'
 import { LaconaError } from './error'
 import SourceManager from './source-manager'
 
-function from (i) {const a = []; for (let x of i) a.push(x); return a}
+function from (i) {
+  const a = []
+  for (let x of i) {
+    a.push(x)
+  }
+  return a
+}
 
 const optionDefaults = {
   text: '',

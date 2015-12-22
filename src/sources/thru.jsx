@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import {Source} from 'lacona-phrase'
 
 export default class Map extends Source {

@@ -11,7 +11,7 @@ export class List extends Phrase {
     return trueItem
   }
 
-  *compute (input) {
+  * compute (input) {
     // first check for exact matches
     const trueItems = _.map(this.props.items, this.itemify.bind(this))
 
@@ -36,7 +36,7 @@ export class List extends Phrase {
     }
   }
 
-  *suggest (input) {
+  * suggest (input) {
     for (let item of this.props.items) {
       yield this.itemify(item)
     }

@@ -2,7 +2,7 @@
 import {Phrase, createElement} from 'lacona-phrase'
 import split from 'smart-split'
 
-function* substrings (input, {splitOn, noSplit}) {
+function * substrings (input, {splitOn, noSplit}) {
   if (noSplit) {
     yield input
     return
@@ -16,14 +16,14 @@ function* substrings (input, {splitOn, noSplit}) {
 
 export class Freetext extends Phrase {
   static defaultProps = {
-    filter() {
+    filter () {
       return true
     },
     splitOn: '',
     consumeAll: false
   };
 
-  *filter (input) {
+  * filter (input) {
     for (let stringPart of substrings(input, {splitOn: this.props.splitOn, noSplit: this.props.consumeAll})) {
       if (this.props.filter(stringPart)) {
         yield {
@@ -36,7 +36,7 @@ export class Freetext extends Phrase {
     }
   }
 
-  describe() {
+  describe () {
     return <raw function={this.filter.bind(this)} limit={this.props.limit} />
   }
 }

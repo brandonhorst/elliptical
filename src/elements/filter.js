@@ -1,5 +1,5 @@
 /** @jsx createElement */
-import { createElement, Phrase } from 'lacona-phrase'
+import { Phrase } from 'lacona-phrase'
 
 export class Filter extends Phrase {
   validate (result) {

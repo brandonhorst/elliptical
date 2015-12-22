@@ -1,13 +1,12 @@
 import _ from 'lodash'
-// import {handleString} from '../input-option'
 import {Phrase} from 'lacona-phrase'
 
 export class Raw extends Phrase {
   static defaultProps = {
-    compute() {return []}
+    compute () { return [] }
   };
 
-  *_handleParse(input, options) {
+  * _handleParse (input, options) {
     let successes = 0
 
     for (let output of this.props.function(input.text)) {

@@ -4,10 +4,10 @@ import {match} from '../fuzzy'
 import {createElement, Phrase} from 'lacona-phrase'
 
 export class Literal extends Phrase {
-  compute(input) {
+  compute (input) {
     if (this.props.text == null) return []
 
-    if (input == null) { //pure suggestion
+    if (input == null) { // pure suggestion
       return [{
         words: [{text: this.props.text, input: false}],
         remaining: null,
@@ -19,7 +19,7 @@ export class Literal extends Phrase {
     const inputLower = input.toLowerCase()
     const thisTextLower = this.props.text.toLowerCase()
 
-    if (_.startsWith(inputLower, thisTextLower)) { //input is partially consumed
+    if (_.startsWith(inputLower, thisTextLower)) { // input is partially consumed
       return [{
         words: [{text: this.props.text, input: true}],
         remaining: input.substring(this.props.text.length),
@@ -28,7 +28,7 @@ export class Literal extends Phrase {
       }]
     }
 
-    if (_.startsWith(thisTextLower, inputLower)) { //input is entirely consumed
+    if (_.startsWith(thisTextLower, inputLower)) { // input is entirely consumed
       const words = []
       if (input.length > 0) {
         words.push({text: this.props.text.substring(0, input.length), input: true})
@@ -45,7 +45,7 @@ export class Literal extends Phrase {
       }]
     }
 
-    if (this.props.fuzzy) { //fuzzy matching
+    if (this.props.fuzzy) { // fuzzy matching
       const result = match(input, this.props.text)
       if (result) {
         result.remaining = ''
@@ -67,7 +67,7 @@ export class Literal extends Phrase {
     }]
   }
 
-  describe() {
+  describe () {
     if (this.props.decorate) {
       return (
         <choice limit={1}>
