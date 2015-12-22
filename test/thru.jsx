@@ -20,20 +20,18 @@ describe('sources/thru', () => {
     }
 
     class Test extends Phrase {
-      source () {
-        return {
-          data: (
-            <thru function={_.partial(_.map, _, x => `test${x}`)}>
-              <TestSource />
-            </thru>
-          )
-        }
+      observe () {
+        return (
+          <thru function={_.partial(_.map, _, x => `test${x}`)}>
+            <TestSource />
+          </thru>
+        )
       }
 
       describe () {
         return (
           <choice>
-            {_.map(this.sources.data.data, x => <literal text={x} />)}
+            {_.map(this.source.data, x => <literal text={x} />)}
           </choice>
         )
       }

@@ -54,7 +54,7 @@ describe('lifecycle', () => {
     }
 
     class Test extends Phrase {
-      source() {return {data: <TestSource />}}
+      observe () { return  <TestSource /> }
       describe() {return <literal text='test' />}
     }
 

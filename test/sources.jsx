@@ -22,7 +22,7 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      source () {return {data: <TestSource />}}
+      observe () {return <TestSource />}
       describe () {return null}
     }
 
@@ -39,7 +39,7 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      source () {return {data: <TestSource />}}
+      observe () {return <TestSource />}
       describe () {return null}
     }
 
@@ -53,12 +53,14 @@ describe('sources', () => {
 
   it('onCreate () is called, can set data', () => {
     class TestSource extends Source {
-      onCreate () {this.setData({test: 'testa'})}
+      onCreate() {
+        this.replaceData({test: 'testa'})
+      }
     }
 
     class Test extends Phrase {
-      describe () {return <literal text={this.sources.data.data.test} />}
-      source () {return {data: <TestSource />}}
+      describe () {return <literal text={this.source.data.test} />}
+      observe () {return <TestSource />}
     }
 
     parser.grammar = <Test />
@@ -76,11 +78,9 @@ describe('sources', () => {
 
     class Test extends Phrase {
       describe () {return <literal text='test' />}
-      source () {
+      observe () {
         if (this.props.useSource) {
-          return {data: <TestSource />}
-        } else {
-          return {}
+          return <TestSource />
         }
       }
     }
@@ -104,8 +104,8 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      describe () {return <literal text={this.sources.data.data.test} />}
-      source () {return {data: <TestSource test='testa' />}}
+      describe () {return <literal text={this.source.data.test} />}
+      observe () {return <TestSource test='testa' />}
     }
 
     parser.grammar = <Test />
@@ -126,13 +126,13 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      create () {this.sources.data.set('testb')}
-      source () {return {data: <TestSource />}}
-      describe () {return <literal text={this.sources.data.data.test} />}
+      create () {this.source.set('testb')}
+      observe () {return <TestSource />}
+      describe () {return <literal text={this.source.data.test} />}
     }
     class Test2 extends Phrase {
-      source () {return {data: <TestSource />}}
-      describe () {return <literal text={this.sources.data.data.test} />}
+      observe () {return <TestSource />}
+      describe () {return <literal text={this.source.data.test} />}
     }
 
     parser.grammar = <Test />
@@ -159,13 +159,13 @@ describe('sources', () => {
     TestSource.preventSharing = true
 
     class Test extends Phrase {
-      create () {this.sources.data.set('testb')}
-      source () {return {data: <TestSource />}}
-      describe () {return <literal text={this.sources.data.data} />}
+      create () {this.source.set('testb')}
+      observe () {return <TestSource />}
+      describe () {return <literal text={this.source.data} />}
     }
     class Test2 extends Phrase {
-      source () {return {data: <TestSource />}}
-      describe () {return <literal text={this.sources.data.data} />}
+      observe () {return <TestSource />}
+      describe () {return <literal text={this.source.data} />}
     }
 
     parser.grammar = <Test />
@@ -191,13 +191,13 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      create () {this.sources.data.set('testb')}
-      source () {return {data: <TestSource id='something' />}}
-      describe () {return <literal text={this.sources.data.data} />}
+      create () {this.source.set('testb')}
+      observe () {return <TestSource id='something' />}
+      describe () {return <literal text={this.source.data} />}
     }
     class Test2 extends Phrase {
-      source () {return {data: <TestSource />}}
-      describe () {return <literal text={this.sources.data.data} />}
+      observe () {return <TestSource />}
+      describe () {return <literal text={this.source.data} />}
     }
 
     parser.grammar = <Test />
@@ -220,8 +220,8 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      source () {return {data: <TestSource />}}
-      describe () {return <literal text={this.sources.data.data} />}
+      observe () {return <TestSource />}
+      describe () {return <literal text={this.source.data} />}
     }
 
     parser.grammar = <Test />
@@ -247,9 +247,9 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      source () {return {data: <TestSource />}}
-      create () {this.sources.data.update()}
-      describe () {return <literal text={this.sources.data.data} />}
+      observe () {return <TestSource />}
+      create () {this.source.update()}
+      describe () {return <literal text={this.source.data} />}
     }
 
     parser.grammar = <Test />
@@ -268,10 +268,10 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      source () {return {data: <TestSource />}}
+      observe () {return <TestSource />}
       describe () {
         descSpy()
-        return <literal text={this.sources.data.data} />
+        return <literal text={this.source.data} />
       }
     }
 
@@ -297,9 +297,9 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      source () {return {data: <TestSource />}}
+      observe () {return <TestSource />}
       create () {consSpy()}
-      describe () {return <literal text={this.sources.data.data} />}
+      describe () {return <literal text={this.source.data} />}
     }
 
     parser.grammar = <Test />
@@ -334,8 +334,8 @@ describe('sources', () => {
 
     class Test extends Phrase {
       create () { consSpy('main') }
-      source () {return {data: <TestSource />}}
-      describe () {return <SubTest val={this.sources.data.data} />}
+      observe () {return <TestSource />}
+      describe () {return <SubTest val={this.source.data} />}
     }
 
     parser.grammar = <Test />
@@ -361,7 +361,7 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      source () {return {data: <TestSource />}}
+      observe () {return <TestSource />}
       describe () {
         return <literal text='test' />
       }
@@ -389,7 +389,7 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
-      source () {return {data: <TestSource />}}
+      observe () {return <TestSource />}
       describe () {
         return <literal text='test' />
       }
@@ -415,13 +415,13 @@ describe('sources', () => {
       onCreate () { this.replaceData('test') }
     }
     class TestSource2 extends Source {
-      source () { return {data: <TestSource1 />} }
-      onCreate () { this.replaceData(this.sources.data.data) }
+      observe () { return <TestSource1 /> }
+      onCreate () { this.replaceData(this.source.data) }
     }
 
     class Test extends Phrase {
-      source () {return {data: <TestSource2 />}}
-      describe () { return <literal text={this.sources.data.data} /> }
+      observe () {return <TestSource2 />}
+      describe () { return <literal text={this.source.data} /> }
     }
 
     parser.grammar = <Test />
@@ -441,14 +441,14 @@ describe('sources', () => {
       }
     }
     class TestSource2 extends Source {
-      source () { return {data: <TestSource1 />} }
+      observe () { return <TestSource1 /> }
       onCreate () { this.replaceData('wrong') }
-      onUpdate () { this.replaceData(this.sources.data.data) }
+      onUpdate () { this.replaceData(this.source.data) }
     }
 
     class Test extends Phrase {
-      source () {return {data: <TestSource2 />}}
-      describe () { return <literal text={this.sources.data.data} /> }
+      observe () {return <TestSource2 /> }
+      describe () { return <literal text={this.source.data} /> }
     }
 
     parser.grammar = <Test />
@@ -464,27 +464,6 @@ describe('sources', () => {
       done()
     })
   })
-  //
-  // it("Can set global sources on the parser", done => {
-  //   class TestSource1 extends Source {
-  //     onCreate () {
-  //       this.replaceData('test')
-  //     }
-  //   }
-  //
-  //   class Test extends Phrase {
-  //     describe () { return <literal text={this.globalSources.data.data} /> }
-  //   }
-  //
-  //   parser.grammar = <Test />
-  //   parser.globalSources = {
-  //     data: <TestSource1 />
-  //   }
-  //
-  //   const data = parser.parseArray('')
-  //   expect(data).to.have.length(1)
-  //   expect(text(data[0])).to.equal('test')
-  // })
 
   it("sources can have other sources as their children", () => {
     class TestSource1 extends Source {
@@ -493,15 +472,15 @@ describe('sources', () => {
       }
     }
     class TestSource2 extends Source {
-      source () { return {data: this.props.children[0]} }
+      observe () { return this.props.children[0] }
       onCreate () {
-        this.replaceData(this.sources.data.data)
+        this.replaceData(this.source.data)
       }
     }
 
     class Test extends Phrase {
-      source () {return {data: <TestSource2><TestSource1 /></TestSource2>}}
-      describe () { return <literal text={this.sources.data.data} /> }
+      observe () { return  <TestSource2><TestSource1 /></TestSource2> }
+      describe () { return <literal text={this.source.data} /> }
     }
 
     parser.grammar = <Test />
@@ -518,15 +497,15 @@ describe('sources', () => {
       }
     }
     class TestSource2 extends Source {
-      source () { return {data: <this.props.Source />} }
+      observe () { return <this.props.Source /> }
       onCreate () {
-        this.replaceData(this.sources.data.data)
+        this.replaceData(this.source.data)
       }
     }
 
     class Test extends Phrase {
-      source () {return {data: <TestSource2 Source={TestSource1} />}}
-      describe () { return <literal text={this.sources.data.data} /> }
+      observe () {return <TestSource2 Source={TestSource1} /> }
+      describe () { return <literal text={this.source.data} /> }
     }
 
     parser.grammar = <Test />

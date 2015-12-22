@@ -83,13 +83,10 @@ describe('reconcile', () => {
   })
 
   it('throws for sources that do not extend Phrase', () => {
-    class TestSource {
-      onCreate () {
-        console.log(3)
-      }
-    }
+    class TestSource {}
+
     class Test extends Phrase {
-      source () {return {test: <TestSource  />}}
+      observe () {return <TestSource  />}
       describe () {
         return <literal text='test' />
       }

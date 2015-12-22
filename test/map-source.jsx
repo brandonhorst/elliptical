@@ -20,20 +20,18 @@ describe('sources/map', () => {
     }
 
     class Test extends Phrase {
-      source () {
-        return {
-          data: (
-            <map function={x => `test${x}`}>
-              <TestSource />
-            </map>
-          )
-        }
+      observe () {
+        return (
+          <map function={x => `test${x}`}>
+            <TestSource />
+          </map>
+        )
       }
 
       describe () {
         return (
           <choice>
-            {_.map(this.sources.data.data, x => <literal text={x} />)}
+            {_.map(this.source.data, x => <literal text={x} />)}
           </choice>
         )
       }

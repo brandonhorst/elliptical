@@ -9,7 +9,7 @@ export default class SourceManager {
 
   _triggerSourceUpdate (instance) {
     _.forEach(this._sources, existingSource => {
-      if (_.includes(existingSource.instance.sources, instance)) {
+      if (existingSource.instance.source === instance) {
         if (existingSource.instance.onUpdate) existingSource.instance.onUpdate()
       }
     })
@@ -37,7 +37,7 @@ export default class SourceManager {
 
     this.sourceInstance(instance)
 
-    this._sources.push({instance, descriptor: descriptor})
+    this._sources.push({instance, descriptor})
 
     if (instance.onCreate) instance.onCreate()
 
@@ -65,39 +65,40 @@ export default class SourceManager {
   sourceInstance (object) {
     object.__sources = {}
 
-    if (object.source) {
-      const sourceDescriptors = object.source()
+    if (object.observe) {
+      const sourceDescriptor = object.observe()
+      if (sourceDescriptor) {
 
-      const sources = _.mapValues(sourceDescriptors, (descriptor, name) => {
-        const source = this._getSource(descriptor)
+        const source = this._getSource(sourceDescriptor)
         source.__subscribers++
-        object.__sources[name] = {source, lastVersion: 0}
-        return source
-      })
+        object.__lastSourceVersion = 0
+        object.__descriptor = sourceDescriptor
 
-      object.sources = sources
+        object.source = source
+      }
     }
   }
 
   unsourceInstance (object) {
-    _.forEach(object.__sources, ({source, descriptor}) => {
-      source.__subscribers--
-      if (source.__subscribers === 0 && source.onDestroy) {
-        source.onDestroy()
-        this._removeSource(descriptor)
+    if (object.source) {
+      object.source.__subscribers--
+      if (object.source.__subscribers === 0 && object.source.onDestroy) {
+        object.source.onDestroy()
+        this._removeSource(object.source.__descriptor)
       }
-    })
-    object.__sources = {}
+      delete object.source
+    }
   }
 
   sourceChanged (object) {
-    return _.some(object.__sources, obj => obj.lastVersion !== obj.source.__dataVersion)
+    if (!object.source) return false
+    return object.__lastSourceVersion !== object.source.__dataVersion
   }
 
   markSourceUpToDate (object) {
-    _.forEach(object.__sources, obj => {
-      obj.lastVersion = obj.source.__dataVersion
-    })
+    if (object.source) {
+      object.__lastSourceVersion = object.source.__dataVersion
+    }
   }
 
   activate () {
