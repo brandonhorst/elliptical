@@ -1,8 +1,5 @@
-export class LaconaError extends Error {
-  constructor(message) {
-    super()
-    this.message = message
-    this.stack = (new Error()).stack;
-    this.name = this.constructor.name;
-  }
+export function LaconaError(message){
+    this.message = message;
 }
+
+LaconaError.prototype = new Error();
