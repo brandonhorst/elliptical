@@ -15,32 +15,6 @@ describe('limit', () => {
   })
 
   describe('value', () => {
-    it('limits suggestions', () => {
-      function suggest() {
-        return [{text: 'testa'}, {text: 'testb'}, {text: 'testc'}]
-      }
-
-      parser.grammar = <value limit={2} suggest={suggest} />
-
-      const data = parser.parseArray('')
-      expect(data).to.have.length(2)
-      expect(text(data[0])).to.equal('testa')
-      expect(text(data[1])).to.equal('testb')
-    })
-
-    it('accepts fewer than limit suggestions', () => {
-      function suggest() {
-        return [{text: 'testa'}, {text: 'testb'}]
-      }
-
-      parser.grammar = <value limit={3} suggest={suggest} />
-
-      const data = parser.parseArray('')
-      expect(data).to.have.length(2)
-      expect(text(data[0])).to.equal('testa')
-      expect(text(data[1])).to.equal('testb')
-    })
-
     it('limits computations', () => {
       function compute(input) {
         return [
@@ -58,7 +32,7 @@ describe('limit', () => {
       expect(text(data[1])).to.equal('testb')
     })
 
-    it('accepts fewer than limit suggestions', () => {
+    it('accepts fewer than limit computations', () => {
       function compute() {
         return [
           {words: [{text: 'testa', input: true}], remaining: ''},

@@ -6,10 +6,6 @@ import { reconcile } from '../reconcile'
 
 export class Label extends Phrase {
   *parseChild (input, options) {
-    if (!options.isReparse && this.props.trigger && _.all(input.words, 'input')) {
-      this.props.trigger(input.text)
-    }
-
     if (this.props.showForEmpty && input.text === '') return true
 
     let showPlaceholder = true
@@ -58,7 +54,7 @@ export class Label extends Phrase {
     }
 
     if (this.props.suppress) {
-      if (input.text !== '' || _.all(input.words, 'input')) {
+      if (input.text != null) {
         const showPlaceholder = yield* this.parseChild(inputWithArgument, options)
         if (showPlaceholder) {
           yield* this.yieldSelf(inputWithArgument, options)

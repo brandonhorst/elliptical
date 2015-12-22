@@ -81,7 +81,7 @@ describe('literal', function () {
       expect(data[0].result.test).to.equal('superman')
     })
 
-    it('decorates an placeholder', () => {
+    it('decorates an placeholder (complete)', () => {
       parser.grammar = (
         <sequence>
           <literal text='s' />
@@ -96,6 +96,25 @@ describe('literal', function () {
       expect(data).to.have.length(1)
       expect(text(data[0])).to.equal('sx superman')
       expect(data[0].result.test).to.equal('superman')
+    })
+
+    it('decorates an placeholder (incomplete)', () => {
+      parser.grammar = (
+        <sequence>
+          <literal text='a' />
+          <literal text='b' decorate />
+          <literal text='a ' />
+          <label text='test' id='test'>
+            <literal text='literal' />
+          </label>
+        </sequence>
+      )
+
+      const data = parser.parseArray('aa ')
+      console.log(data[0].words)
+      expect(data).to.have.length(1)
+      expect(text(data[0])).to.equal('aba literal')
+      expect(data[0].words[3].placeholder).to.be.undefined
     })
   })
 })

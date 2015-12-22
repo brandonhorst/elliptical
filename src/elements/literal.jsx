@@ -1,41 +1,52 @@
-/** @jsx createElement */
+  /** @jsx createElement */
 import _ from 'lodash'
 import {match} from '../fuzzy'
 import {createElement, Phrase} from 'lacona-phrase'
 
 export default class Literal extends Phrase {
-  suggest() {
-    if (this.props.text == null) return []
-
-    return [{text: this.props.text.replace(/\n/g, ''), value: this.props.value, score: this.props.score || 1}]
-  }
-
   compute(input) {
     if (this.props.text == null) return []
 
-    const inputLower = input.toLowerCase()
-    const thisTextLine = this.props.text.replace(/\n/g, '')
-    const thisTextLower = thisTextLine.toLowerCase()
-    if (_.startsWith(inputLower, thisTextLower)) {
+    if (input == null) { //pure suggestion
       return [{
-        words: [{text: thisTextLine, input: true}],
-        remaining: input.substring(thisTextLine.length),
+        words: [{text: this.props.text, input: false}],
+        remaining: null,
         value: this.props.value,
         score: this.props.score || 1
       }]
-    } else if (_.startsWith(thisTextLower, inputLower)) {
-      const words = [{text: thisTextLine.substring(0, input.length), input: true}]
-      if (thisTextLine.length > input.length) {
-        words.push({text: thisTextLine.substring(input.length), input: false})
+    }
+
+    const inputLower = input.toLowerCase()
+    const thisTextLower = this.props.text.toLowerCase()
+
+    if (_.startsWith(inputLower, thisTextLower)) { //input is partially consumed
+      return [{
+        words: [{text: this.props.text, input: true}],
+        remaining: input.substring(this.props.text.length),
+        value: this.props.value,
+        score: this.props.score || 1
+      }]
+    }
+
+    if (_.startsWith(thisTextLower, inputLower)) { //input is entirely consumed
+      const words = []
+      if (input.length > 0) {
+        words.push({text: this.props.text.substring(0, input.length), input: true})
       }
+      if (this.props.text.length > input.length) {
+        words.push({text: this.props.text.substring(input.length), input: false})
+      }
+
       return [{
         words,
-        remaining: '',
+        remaining: null,
         value: this.props.value,
         score: this.props.score || 1
       }]
-    } else if (this.props.fuzzy) {
-      const result = match(input, thisTextLine)
+    }
+
+    if (this.props.fuzzy) { //fuzzy matching
+      const result = match(input, this.props.text)
       if (result) {
         result.remaining = ''
         result.value = this.props.value
@@ -43,12 +54,13 @@ export default class Literal extends Phrase {
         return [result]
       }
     }
+
     return []
   }
 
   decorate (input) {
     return [{
-      words: [{text: this.props.text, input: false, decorator: true}],
+      words: [{text: this.props.text, input: false}],
       value: this.props.value,
       remaining: input,
       score: 1
@@ -66,7 +78,6 @@ export default class Literal extends Phrase {
     } else {
       return <value
         compute={this.compute.bind(this)}
-        suggest={this.suggest.bind(this)}
         qualifier={this.props.qualifier}
         category={this.props.category} />
     }

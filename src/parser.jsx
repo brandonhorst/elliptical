@@ -91,7 +91,7 @@ export class Parser extends EventEmitter {
 
     const options = this._getReconcileParseOptions({isReparse})
     for (let output of parse({phrase: this._phrase, input, options})) {
-      if (output.text === '') {
+      if (!output.text) {
         // call each callback (used for limiting)
         output.callbacks.forEach(callback => callback())
         yield normalizeOutput(output)

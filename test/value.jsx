@@ -16,10 +16,14 @@ describe('value', function () {
 
   it('suggests a value', () => {
     function fun() {
-      return [{text: 'tex', value: 'val'}]
+      return [{
+        remaining: null,
+        value: 'val',
+        words: [{text: 'tex', input: false}]
+      }]
     }
 
-    parser.grammar = <value suggest={fun} />
+    parser.grammar = <value compute={fun} />
 
     const data = parser.parseArray('')
     expect(data).to.have.length(1)
@@ -29,10 +33,14 @@ describe('value', function () {
 
   it('suggests a value (generator)', () => {
     function *fun() {
-      yield {text: 'tex', value: 'val'}
+      yield {
+        remaining: null,
+        value: 'val',
+        words: [{text: 'tex', input: false}]
+      }
     }
 
-    parser.grammar = <value suggest={fun} />
+    parser.grammar = <value compute={fun} />
 
     const data = parser.parseArray('')
     expect(data).to.have.length(1)
@@ -80,10 +88,14 @@ describe('value', function () {
     class Test extends phrase.Phrase {
       fun() {
         expect(this.props.myVar).to.equal('myVal')
-        return [{text: 'tex', value: 'val'}]
+        return [{
+          remaining: '',
+          value: 'val',
+          words: [{text: 'tex', input: true}]
+        }]
       }
 
-      describe() { return <value suggest={this.fun.bind(this)} /> }
+      describe() { return <value compute={this.fun.bind(this)} /> }
     }
 
     parser.grammar = <Test myVar='myVal' />
@@ -94,34 +106,7 @@ describe('value', function () {
     expect(data[0].result).to.equal('val')
   })
 
-  it('can set the score (suggest)', () => {
-    function fun() {
-      return [{text: 'tex', value: 'val', score: 0.5}]
-    }
-
-    parser.grammar = <value suggest={fun} />
-
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(data[0].score).to.equal(0.5)
-  })
-
-  it('can set the score (suggest)', () => {
-    function fun(input) {
-      return [{
-        text: 'test',
-        score: 0.5
-      }]
-    }
-
-    parser.grammar = <value suggest={fun} />
-
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(data[0].score).to.equal(0.5)
-  })
-
-  it('can set the score (compute)', () => {
+  it('can set the score', () => {
     function fun(input) {
       return [{
         words: [{text: 'test', input: true}],
@@ -133,7 +118,7 @@ describe('value', function () {
 
     parser.grammar = <value compute={fun} />
 
-    const data = parser.parseArray('te')
+    const data = parser.parseArray('')
     expect(data).to.have.length(1)
     expect(data[0].score).to.equal(0.5)
   })
