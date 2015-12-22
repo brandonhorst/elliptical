@@ -4,7 +4,7 @@ import { createElement, Phrase } from 'lacona-phrase'
 import { parse } from '../parse'
 import { reconcile } from '../reconcile'
 
-export default class Descriptor extends Phrase {
+export class Label extends Phrase {
   *parseChild (input, options) {
     if (!options.isReparse && this.props.trigger && _.all(input.words, 'input')) {
       this.props.trigger(input.text)
@@ -46,12 +46,6 @@ export default class Descriptor extends Phrase {
 
     modification.words = input.words.concat(word)
 
-    // if (_.isEmpty(input.suggestion)) {
-    //   modification.suggestion = input.suggestion.concat(word)
-    // } else {
-    //   modification.completion = input.completion.concat(word)
-    // }
-
     yield _.assign({}, input, modification)
   }
 
@@ -63,23 +57,24 @@ export default class Descriptor extends Phrase {
       inputWithArgument = _.assign({}, input, {currentArgument: this.props.text})
     }
 
-    if (this.props.placeholder) {
+    if (this.props.suppress) {
       if (input.text !== '' || _.all(input.words, 'input')) {
         const showPlaceholder = yield* this.parseChild(inputWithArgument, options)
         if (showPlaceholder) {
-          yield* this.yieldSelf(input, options)
+          yield* this.yieldSelf(inputWithArgument, options)
         }
       } else {
-        yield* this.yieldSelf(input, options)
+        yield* this.yieldSelf(inputWithArgument, options)
       }
     } else {
       yield* this.parseChild(inputWithArgument, options)
     }
   }
 }
-Descriptor.defaultProps = {
-  placeholder: false,
-  argument: false,
+
+Label.defaultProps = {
+  suppress: true,
+  argument: true,
   showForEmpty: false,
   displayWhen(input) {
     return input === ''

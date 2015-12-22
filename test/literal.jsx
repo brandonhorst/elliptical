@@ -86,9 +86,9 @@ describe('literal', function () {
         <sequence>
           <literal text='s' />
           <literal text='x ' decorate />
-          <placeholder text='test' id='test'>
+          <label text='test' id='test'>
             <freetext />
-          </placeholder>
+          </label>
         </sequence>
       )
 

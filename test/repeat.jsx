@@ -18,9 +18,9 @@ describe('repeat', () => {
     it('does not accept input that does not match the child', () => {
       parser.grammar = (
         <repeat separator={<literal text='man' />}>
-          <argument>
+          <label text='test'>
             <literal text='super' />
-          </argument>
+          </label>
         </repeat>
       )
 
@@ -31,9 +31,9 @@ describe('repeat', () => {
     it('accepts the child on its own', () => {
       parser.grammar = (
         <repeat separator={<literal text='man' />}>
-          <argument text='test'>
+          <label text='test'>
             <literal text='super' />
-          </argument>
+          </label>
         </repeat>
       )
 
@@ -45,9 +45,9 @@ describe('repeat', () => {
     it('accepts the child twice, with the separator in the middle', () => {
       parser.grammar = (
         <repeat separator={<literal text='man' />} max={2}>
-          <argument text='test'>
+          <label text='test'>
             <literal text='super' />
-          </argument>
+          </label>
         </repeat>
       )
 
@@ -59,12 +59,12 @@ describe('repeat', () => {
     it('allows for content to have children', () => {
       parser.grammar = (
         <repeat separator={<literal text=' ' />} max={2}>
-          <argument text='test'>
+          <label text='test'>
             <choice>
               <literal text='a' />
               <literal text='b' />
             </choice>
-          </argument>
+          </label>
         </repeat>
       )
 
@@ -78,12 +78,12 @@ describe('repeat', () => {
   it('allows for content to have children', () => {
     parser.grammar = (
       <repeat>
-        <argument text='test' showForEmpty={true}>
+        <label text='test' showForEmpty={true}>
           <choice>
             <literal text='a' />
             <literal text='b' />
           </choice>
-        </argument>
+        </label>
       </repeat>
     )
 
@@ -96,9 +96,9 @@ describe('repeat', () => {
   it('does not accept input that does not match the child', () => {
     parser.grammar = (
       <repeat>
-        <argument text='test'>
+        <label text='test'>
           <literal text='super' />
-        </argument>
+        </label>
       </repeat>
     )
     const data = from(parser.parse('wrong'))
@@ -108,9 +108,9 @@ describe('repeat', () => {
   it('accepts the child on its own', () => {
     parser.grammar = (
       <repeat>
-        <argument text='test'>
+        <label text='test'>
           <literal text='super' />
-        </argument>
+        </label>
       </repeat>
     )
 
@@ -124,9 +124,9 @@ describe('repeat', () => {
   it('accepts the child twice', () => {
     parser.grammar = (
       <repeat>
-        <argument text='test'>
+        <label text='test'>
           <literal text='super' />
-        </argument>
+        </label>
       </repeat>
     )
 
@@ -139,12 +139,12 @@ describe('repeat', () => {
   it('creates an array from the values of the children', () => {
     parser.grammar = (
       <repeat max={2}>
-        <argument text='test'>
+        <label text='test'>
           <choice>
             <literal text='super' value='super' />
             <literal text='man' value='man' />
           </choice>
-        </argument>
+        </label>
       </repeat>
     )
 
@@ -157,9 +157,9 @@ describe('repeat', () => {
   it('does not accept fewer than min iterations', () => {
     parser.grammar = (
       <repeat min={2}>
-        <argument text='test' showForEmpty={true}>
+        <label text='test' showForEmpty={true}>
           <literal text='a' />
-        </argument>
+        </label>
       </repeat>
     )
 
@@ -171,9 +171,9 @@ describe('repeat', () => {
   it('does not accept more than max iterations', () => {
     parser.grammar = (
       <repeat max={1} >
-        <argument text='test'>
+        <label text='test'>
           <literal text='a' />
-        </argument>
+        </label>
       </repeat>
     )
 
@@ -199,12 +199,12 @@ describe('repeat', () => {
   it('rejects non-unique repeated elements', () => {
     parser.grammar = (
       <repeat unique={true}>
-        <argument text='test'>
+        <label text='test'>
           <choice>
             <literal text='a' value='a' />
             <literal text='b' value='b' />
           </choice>
-        </argument>
+        </label>
       </repeat>
     )
 
@@ -215,12 +215,12 @@ describe('repeat', () => {
   it('rejects non-unique repeated elements (deep)', () => {
     parser.grammar = (
       <repeat unique={true}>
-        <argument text='test'>
+        <label text='test'>
           <choice>
             <literal text='a' value={{a: 1}} />
             <literal text='b' value={{a: 1}} />
           </choice>
-        </argument>
+        </label>
       </repeat>
     )
 
@@ -231,12 +231,12 @@ describe('repeat', () => {
   it('accepts unique repeated elements', () => {
     parser.grammar = (
       <repeat unique={true} max={2}>
-        <argument text='test'>
+        <label text='test'>
           <choice>
             <literal text='a' value='a' />
             <literal text='b' value='b' />
           </choice>
-        </argument>
+        </label>
       </repeat>
     )
 
@@ -248,12 +248,12 @@ describe('repeat', () => {
   it('accepts non-unique repeated elements (deep)', () => {
     parser.grammar = (
       <repeat unique={true}>
-        <argument text='test'>
+        <label text='test'>
           <choice>
             <literal text='a' value={{a: 1}} />
             <literal text='b' value={{a: 2}} />
           </choice>
-        </argument>
+        </label>
       </repeat>
     )
 
@@ -265,13 +265,13 @@ describe('repeat', () => {
   it('allows for choices inside of repeats to be limited', () => {
     parser.grammar = (
       <repeat>
-        <argument text='test'>
+        <label text='test'>
           <choice limit={1}>
             <literal text='aa' />
             <literal text='ab' />
             <literal text='ac' />
           </choice>
-        </argument>
+        </label>
       </repeat>
     )
 
@@ -290,9 +290,9 @@ describe('repeat', () => {
           <literal text='ac' />
         </choice>
       }>
-        <argument text='test'>
+        <label text='test'>
           <literal text='x' />
-        </argument>
+        </label>
       </repeat>
     )
 
