@@ -1220,9 +1220,8 @@ Used to provide additional metadata for within a grammar. This provides users wi
 - `argument`: `Boolean` - defaults to `true`. If `true`, all words that come from this parse segment will contain an `argument` property, which will equal the `text` of this `label`. Note that currently only the first `<label argument />` in the chain is exported.
 - `suppress`: `Boolean` - defaults to `true`. If `true`, parses that have consumed the entire input string will not continue into this `label`'s `child`. Instead, it will output a word with `{text: <text>, placeholder: true}` This improves performance and usability, as it limits the amount of suggestions that are output for an incomplete input.
 - `suppressEmpty`: `Boolean` - defaults to `false`. If `true`, this `label` will also suppress inputs that are an empty string. That is to say, if the preceding elements consume the entire input string but have not yet made any suggestions, this label will still suppress the input.
-- `suppressWhen`: `Function(input: String) => Boolean` - If the `label`'s child does not parse for a given input, the `label` will call this function. If it returns `true`, this label will suppress the input (returning a `placeholder`), even if the input is non-null. This is useful to describe incomplete but non-suggestable input.
+- `suppressWhen`: `Function(input: String) => Boolean` - When this label is parsed, it will call this function. If it returns `true`, this label will suppress the input (returning a `placeholder`), even if the input is non-null. This is useful to describe incomplete but non-suggestable input.
     - For example, imagine a phrase is designed to accept a 3-digit integer, but the user has only entered a single digit. The input is not yet valid, and it does not make sense to suggest a completion, but it also needs to show the user that they are on their way to a valid input. In this case, it makes sense to use something like `suppressWhen={(input) => /^\d{1,2}$/.test(input)}`.
-
 
 ### `freetext`
 
