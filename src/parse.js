@@ -1,8 +1,14 @@
+import _ from 'lodash'
+
+function hasPlaceholder(output) {
+  return _.any(output.words, 'placeholder')
+}
+
 export function * parse ({phrase, input, options}) {
   if (phrase.__describedPhrase) {
     const iterator = parse({phrase: phrase.__describedPhrase, input, options})
     for (let output of iterator) {
-      if (!phrase.validate || phrase.validate(output.result)) {
+      if (!phrase.validate || hasPlaceholder(output) || phrase.validate(output.result)) {
         yield output
       }
     }

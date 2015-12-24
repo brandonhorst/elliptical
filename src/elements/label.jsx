@@ -9,13 +9,10 @@ export class Label extends Phrase {
     suppress: true,
     argument: true,
     suppressEmpty: false,
-    suppressWhen (input) {
-      return input === ''
-    }
+    suppressWhen (input) { return false }
   };
 
   * parseChild (input, options) {
-    if (this.props.suppressEmpty && input.text === '') return true
 
     let showPlaceholder = true
     for (let output of parse({phrase: this.childPhrase, input, options})) {
@@ -28,9 +25,6 @@ export class Label extends Phrase {
     }
     if (!showPlaceholder) return false
 
-    if (this.props.suppressWhen(input.text)) {
-      return true
-    }
 
     return false
   }
@@ -62,15 +56,12 @@ export class Label extends Phrase {
       inputWithArgument = _.assign({}, input, {currentArgument: this.props.text})
     }
 
-    if (this.props.suppress) {
-      if (input.text != null) {
-        const showPlaceholder = yield* this.parseChild(inputWithArgument, options)
-        if (showPlaceholder) {
-          yield* this.yieldSelf(inputWithArgument, options)
-        }
-      } else {
-        yield* this.yieldSelf(inputWithArgument, options)
-      }
+    if (input.text == null || (
+        this.props.suppress && (
+          this.props.suppressEmpty && input.text === '' ||
+          this.props.suppressWhen(input.text)
+        ))) {
+      yield* this.yieldSelf(inputWithArgument, options)
     } else {
       yield* this.parseChild(inputWithArgument, options)
     }

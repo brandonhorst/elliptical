@@ -1,9 +1,13 @@
 /** @jsx createElement */
 /* eslint-env mocha */
-import {createElement, Phrase} from 'lacona-phrase'
-import {expect} from 'chai'
-import {Parser} from '..'
-import {text} from './_util'
+import { createElement, Phrase } from 'lacona-phrase'
+import chai, { expect } from 'chai'
+import { Parser } from '..'
+import { text } from './_util'
+import { spy } from 'sinon'
+import sinonChai from 'sinon-chai'
+
+chai.use(sinonChai)
 
 describe('validate', () => {
   var parser
@@ -57,5 +61,33 @@ describe('validate', () => {
     expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('c')
     expect(data[0].result).to.equal('c')
+  })
+
+
+  it('does not validate with placeholders', () => {
+    const valSpy = spy()
+
+    class Test extends Phrase {
+      validate (result) {
+        valSpy()
+        return true
+      }
+
+      describe () {
+        return (
+          <label text='test' suppressEmpty>
+            <literal text='s' />
+          </label>
+        )
+      }
+    }
+
+    parser.grammar = <Test />
+
+    const data = parser.parseArray('')
+    expect(data).to.have.length(1)
+    expect(valSpy).to.not.have.been.called
+    expect(text(data[0])).to.equal('test')
+    expect(data[0].result).to.be.undefined
   })
 })

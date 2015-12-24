@@ -3,6 +3,10 @@ import { Phrase } from 'lacona-phrase'
 import { reconcile } from '../reconcile'
 import { parse } from '../parse'
 
+function hasPlaceholder(output) {
+  return _.any(output.words, 'placeholder')
+}
+
 export class MapPhrase extends Phrase {
   static defaultProps = {
     function: _.identity
@@ -13,11 +17,13 @@ export class MapPhrase extends Phrase {
       this.childPhrase = reconcile({descriptor: this.props.children[0], phrase: this.childPhrase, options})
 
       for (let output of parse({phrase: this.childPhrase, input, options})) {
-        const newResult = this.props.function(output.result)
-
-        const modifications = {result: newResult}
-
-        yield _.assign({}, output, modifications)
+        if (hasPlaceholder(output)) {
+          yield output
+        } else {
+          const newResult = this.props.function(output.result)
+          const modifications = {result: newResult}
+          yield _.assign({}, output, modifications)
+        }
       }
     }
   }
