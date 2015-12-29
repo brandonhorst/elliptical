@@ -1,15 +1,15 @@
-/** @jsx phrase.createElement */
+/** @jsx createElement */
 /* eslint-env mocha */
 import { expect } from 'chai'
 import { text } from './_util'
-import * as lacona from '..'
-import * as phrase from 'lacona-phrase'
+import { Parser } from '..'
+import { createElement, Phrase } from 'lacona-phrase'
 
 describe('raw', () => {
   var parser
 
   beforeEach(() => {
-    parser = new lacona.Parser()
+    parser = new Parser()
   })
 
   it('suggests a item', () => {
@@ -83,7 +83,7 @@ describe('raw', () => {
   })
 
   it('can access props its function (if bound)', () => {
-    class Test extends phrase.Phrase {
+    class Test extends Phrase {
       fun () {
         expect(this.props.myVar).to.equal('myVal')
         return [{

@@ -1,15 +1,15 @@
 /** @jsx createElement */
 /* eslint-env mocha */
 import _ from 'lodash'
-import {expect} from 'chai'
-import {text} from './_util'
-import * as lacona from '..'
-import {createElement, Phrase, Source} from 'lacona-phrase'
+import { expect } from 'chai'
+import { text } from './_util'
+import { Parser } from '..'
+import { createElement, Phrase, Source } from 'lacona-phrase'
 
 describe('sources/map', () => {
   let parser
   beforeEach(() => {
-    parser = new lacona.Parser()
+    parser = new Parser()
   })
 
   it('Allows mapping of a source', () => {

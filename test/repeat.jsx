@@ -1,9 +1,9 @@
 /** @jsx createElement */
 /* eslint-env mocha */
-import {expect} from 'chai'
-import {Parser} from '..'
-import {createElement} from 'lacona-phrase'
-import {text} from './_util'
+import { expect } from 'chai'
+import { Parser } from '..'
+import { createElement } from 'lacona-phrase'
+import { text } from './_util'
 
 describe('repeat', () => {
   let parser

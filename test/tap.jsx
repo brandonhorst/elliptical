@@ -1,9 +1,9 @@
-/** @jsx phrase.createElement */
+/** @jsx createElement */
 /* eslint-env mocha */
-import chai, {expect} from 'chai'
-import * as lacona from '..'
-import * as phrase from 'lacona-phrase'
-import {spy} from 'sinon'
+import chai, { expect } from 'chai'
+import { Parser } from '..'
+import { createElement, Phrase } from 'lacona-phrase'
+import { spy } from 'sinon'
 import sinonChai from 'sinon-chai'
 
 chai.use(sinonChai)
@@ -12,7 +12,7 @@ describe('tap', () => {
   var parser
 
   beforeEach(() => {
-    parser = new lacona.Parser()
+    parser = new Parser()
   })
 
   it('calls function when entered', () => {

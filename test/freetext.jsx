@@ -1,10 +1,10 @@
 /** @jsx createElement */
 /* eslint-env mocha */
-import {createElement, Phrase} from 'lacona-phrase'
-import chai, {expect} from 'chai'
-import {Parser} from '..'
-import {text} from './_util'
-import {spy} from 'sinon'
+import { createElement, Phrase } from 'lacona-phrase'
+import chai, { expect } from 'chai'
+import { Parser } from '..'
+import { text } from './_util'
+import { spy } from 'sinon'
 import sinonChai from 'sinon-chai'
 
 chai.use(sinonChai)

@@ -1,10 +1,10 @@
 /** @jsx createElement */
 /* eslint-env mocha */
-import chai, {expect} from 'chai'
-import {text} from './_util'
-import * as lacona from '..'
-import {createElement, Phrase, Source} from 'lacona-phrase'
-import {spy} from 'sinon'
+import chai, { expect } from 'chai'
+import { text } from './_util'
+import { Parser } from '..'
+import { createElement, Phrase, Source } from 'lacona-phrase'
+import { spy } from 'sinon'
 import sinonChai from 'sinon-chai'
 
 chai.use(sinonChai)
@@ -12,7 +12,7 @@ chai.use(sinonChai)
 describe('sources', () => {
   let parser
   beforeEach(() => {
-    parser = new lacona.Parser()
+    parser = new Parser()
   })
 
   it('calling activate on the parser calls onActivate on all sources', () => {

@@ -1,15 +1,15 @@
-/** @jsx phrase.createElement */
+/** @jsx createElement */
 /* eslint-env mocha */
-import {expect} from 'chai'
-import {text} from './_util'
-import * as lacona from '..'
-import * as phrase from 'lacona-phrase'
+import { expect } from 'chai'
+import { text } from './_util'
+import { Parser } from '..'
+import { createElement, Phrase } from 'lacona-phrase'
 
 describe('list', () => {
   let parser
 
   beforeEach(() => {
-    parser = new lacona.Parser()
+    parser = new Parser()
   })
 
   it('suggests normally without fuzzy', () => {

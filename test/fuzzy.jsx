@@ -1,9 +1,9 @@
-// /** @jsx phrase.createElement */
+// /** @jsx createElement */
 // /* eslint-env mocha */
-// import {expect} from 'chai'
-// import {text} from './_util'
-// import * as lacona from '..'
-// import * as phrase from 'lacona-phrase'
+// import { expect } from 'chai'
+// import { text } from './_util'
+// import { Parser } from '..'
+// import { createElement, Phrase } from 'lacona-phrase'
 //
 // function from(i) {const a = []; for (let x of i) a.push(x); return a}
 //
@@ -11,7 +11,7 @@
 //   let parser
 //
 //   beforeEach(() => {
-//     parser = new lacona.Parser()
+//     parser = new Parser()
 //   })
 //
 //   it('supports fuzzy matching within a phrase', () => {

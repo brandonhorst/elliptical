@@ -1,19 +1,19 @@
-/** @jsx phrase.createElement */
+/** @jsx createElement */
 /* eslint-env mocha */
-import {expect} from 'chai'
-import * as lacona from '..'
-import * as phrase from 'lacona-phrase'
-import {text} from './_util'
+import { expect } from 'chai'
+import { Parser } from '..'
+import { createElement, Phrase } from 'lacona-phrase'
+import { text } from './_util'
 
 describe('children', () => {
   var parser
 
   beforeEach(() => {
-    parser = new lacona.Parser()
+    parser = new Parser()
   })
 
   it('passes children as props', () => {
-    class Test extends phrase.Phrase {
+    class Test extends Phrase {
       describe () {
         expect(this.props.children).to.have.length(2)
         return this.props.children[1]
@@ -33,7 +33,7 @@ describe('children', () => {
   })
 
   it('flattens children as props', () => {
-    class Test extends phrase.Phrase {
+    class Test extends Phrase {
       describe () {
         expect(this.props.children).to.have.length(3)
         return this.props.children[1]
@@ -54,7 +54,7 @@ describe('children', () => {
   })
 
   it('passes the child result', () => {
-    class Test extends phrase.Phrase {
+    class Test extends Phrase {
       describe () {
         return this.props.children[0]
       }

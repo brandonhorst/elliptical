@@ -1,14 +1,14 @@
-/** @jsx phrase.createElement */
+/** @jsx createElement */
 /* eslint-env mocha */
-import {expect} from 'chai'
-import * as lacona from '..'
-import * as phrase from 'lacona-phrase'
+import { expect } from 'chai'
+import { Parser } from '..'
+import { createElement, Phrase } from 'lacona-phrase'
 
 describe('score', () => {
   var parser
 
   beforeEach(() => {
-    parser = new lacona.Parser()
+    parser = new Parser()
   })
 
   it('every parse output has a numeric score', () => {

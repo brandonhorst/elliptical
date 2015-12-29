@@ -1,10 +1,10 @@
 /** @jsx createElement */
 /* eslint-env mocha */
-import chai, {expect} from 'chai'
-import {text} from './_util'
-import * as lacona from '..'
-import {createElement, Phrase, Source} from 'lacona-phrase'
-import {spy} from 'sinon'
+import chai, { expect } from 'chai'
+import { text } from './_util'
+import { Parser } from '..'
+import { createElement, Phrase, Source } from 'lacona-phrase'
+import { spy } from 'sinon'
 import sinonChai from 'sinon-chai'
 
 chai.use(sinonChai)
@@ -13,7 +13,7 @@ describe('lifecycle', () => {
   var parser
 
   beforeEach(() => {
-    parser = new lacona.Parser()
+    parser = new Parser()
   })
 
   it('calls create on creation and destroy on removal', () => {

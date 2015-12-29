@@ -1,15 +1,15 @@
-/** @jsx phrase.createElement */
+/** @jsx createElement */
 /* eslint-env mocha */
-import {expect} from 'chai'
-import {text} from './_util'
-import * as lacona from '..'
-import * as phrase from 'lacona-phrase'
+import { expect } from 'chai'
+import { text } from './_util'
+import { Parser } from '..'
+import { createElement, Phrase } from 'lacona-phrase'
 
 describe('choice', () => {
   var parser
 
   beforeEach(() => {
-    parser = new lacona.Parser()
+    parser = new Parser()
   })
 
   it('suggests one valid choice', () => {
@@ -69,7 +69,7 @@ describe('choice', () => {
   })
 
   it('adopts the value of the child', () => {
-    class Test extends phrase.Phrase {
+    class Test extends Phrase {
       describe () {
         return (
           <choice>
@@ -89,7 +89,7 @@ describe('choice', () => {
   })
 
   it('can set a value', () => {
-    class Test extends phrase.Phrase {
+    class Test extends Phrase {
       describe () {
         return (
           <choice value='override'>
@@ -109,7 +109,7 @@ describe('choice', () => {
   })
 
   it('can set a value in an object with a key', () => {
-    class Test extends phrase.Phrase {
+    class Test extends Phrase {
       describe () {
         return (
           <choice>
@@ -129,7 +129,7 @@ describe('choice', () => {
   })
 
   it('ignores strings and nulls for reconciliation', () => {
-    class Test extends phrase.Phrase {
+    class Test extends Phrase {
       describe () {
         return (
           <choice>

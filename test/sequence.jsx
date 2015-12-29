@@ -1,15 +1,15 @@
-/** @jsx phrase.createElement */
+/** @jsx createElement */
 /* eslint-env mocha */
-import {expect} from 'chai'
-import {text} from './_util'
-import * as lacona from '..'
-import * as phrase from 'lacona-phrase'
+import { expect } from 'chai'
+import { text } from './_util'
+import { Parser } from '..'
+import { createElement, Phrase } from 'lacona-phrase'
 
 describe('sequence', () => {
   var parser
 
   beforeEach(() => {
-    parser = new lacona.Parser()
+    parser = new Parser()
   })
 
   it('puts two elements in order', () => {
@@ -218,7 +218,7 @@ describe('sequence', () => {
   })
 
   it('ignores strings and nulls for reconciliation', () => {
-    class Test extends phrase.Phrase {
+    class Test extends Phrase {
       describe () {
         return (
           <sequence>
@@ -237,7 +237,7 @@ describe('sequence', () => {
   })
 
   it('allows for uniqueness', () => {
-    class Test extends phrase.Phrase {
+    class Test extends Phrase {
       describe () {
         return (
           <sequence unique>

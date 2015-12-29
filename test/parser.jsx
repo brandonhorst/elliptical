@@ -1,15 +1,16 @@
-/** @jsx phrase.createElement */
+/** @jsx createElement */
 /* eslint-env mocha */
-import {expect} from 'chai'
-import {text} from './_util'
-import * as lacona from '..'
-import * as phrase from 'lacona-phrase'
+
+import { expect } from 'chai'
+import { text } from './_util'
+import { Parser } from '..'
+import { createElement, Phrase } from 'lacona-phrase'
 
 describe('Parser', () => {
   var parser
 
   beforeEach(() => {
-    parser = new lacona.Parser()
+    parser = new Parser()
   })
 
   it('requires string input', () => {
@@ -17,7 +18,7 @@ describe('Parser', () => {
   })
 
   it('can parse in a specified language', () => {
-    class Test extends phrase.Phrase {
+    class Test extends Phrase {
       static translations = [{
         langs: ['en', 'default'],
         describe () { return <literal text='test' /> }
@@ -36,7 +37,7 @@ describe('Parser', () => {
   })
 
   it('falls back on a less specific language if the most specific is not provided', () => {
-    class Test extends phrase.Phrase {
+    class Test extends Phrase {
       static translations = [{
         langs: ['en', 'default'],
         describe () {
