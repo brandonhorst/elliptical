@@ -11,7 +11,6 @@ export class Literal extends Phrase {
       return [{
         words: [{text: this.props.text, input: false}],
         remaining: null,
-        result: this.props.value,
         score: this.props.score || 1
       }]
     }
@@ -23,7 +22,6 @@ export class Literal extends Phrase {
       return [{
         words: [{text: this.props.text, input: true}],
         remaining: input.substring(this.props.text.length),
-        result: this.props.value,
         score: this.props.score || 1
       }]
     }
@@ -40,7 +38,6 @@ export class Literal extends Phrase {
       return [{
         words,
         remaining: null,
-        result: this.props.value,
         score: this.props.score || 1
       }]
     }
@@ -49,7 +46,6 @@ export class Literal extends Phrase {
       const result = match(input, this.props.text)
       if (result) {
         result.remaining = ''
-        result.result = this.props.value
         result.score = this.props.score || result.score
         return [result]
       }
@@ -61,7 +57,6 @@ export class Literal extends Phrase {
   decorate (input) {
     return [{
       words: [{text: this.props.text, input: false}],
-      result: this.props.value,
       remaining: input,
       score: 1
     }]
@@ -76,10 +71,7 @@ export class Literal extends Phrase {
         </choice>
       )
     } else {
-      return <raw
-        function={this.compute.bind(this)}
-        qualifier={this.props.qualifier}
-        category={this.props.category} />
+      return <raw function={this.compute.bind(this)} category={this.props.category} />
     }
   }
 }

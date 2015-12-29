@@ -142,14 +142,14 @@ class Reminder extends Phrase {
       <choice>
         <sequence>
           <literal text='remind me to ' category='action' />
-          <String id='taskname' />
+          <String id='taskname' argument='reminder' />
           <literal text=' ' />
           <DateTime id='dateAndTime' />
         </sequence>
         <sequence>
           <DateTime id='dateAndTime' />
           <literal text=', remind me to ' category='action' />
-          <String id='taskname' />
+          <String id='taskname' argument='reminder' />
         </sequence>
       </choice>
     )
@@ -194,14 +194,14 @@ export class Reminder extends Phrase {
       <choice>
         <sequence>
           <literal text='remind me to ' category='action' />
-          <String id='taskName' />
+          <String id='taskName' argument='reminder' />
           <literal text=' ' />
           <DateTime id='dateAndTime' />
         </sequence>
         <sequence>
           <DateTime id='dateAndTime' />
           <literal text=', remind me to ' category='action' />
-          <String id='taskName' />
+          <String id='taskName' argument='reminder' />
         </sequence>
       </choice>
     )
@@ -218,6 +218,8 @@ Just like all Javascript functions, `describe` must return a single object. In t
 The `choice` contains two `sequence`s. `sequence` means "my child elements must occur in order."
 
 Each `sequence` is slightly different, because there are multiple ways to say this same sentence in English, but they're not difficult to understand. Notice that some of the child elements have attributes, which are called `props`. `props` modify the behavior of `phrase`s. For example, the `literal` phrase means "match whatever string is provided in my `text` prop." The `DateTime` and `String` elements have a prop called `id`. This is used for specifying the element for the purpose of organizing its data in `results`, which we will talk about later.
+
+The `String` elements also have a prop called `argument`. Because `String` is a custom Phrase, there is nothing special about this property. In reality, this controls `argument` output with this `String`'s `Word`'.
 
 So all of this is just a fancy way of specifying exactly what we sent out to specify:
 
@@ -318,7 +320,8 @@ Let's try it out. When we launch our app (perhaps using `babel-node`), it prompt
     }, {
       text: 'string',
       input: false,
-      placeholder: true
+      placeholder: true,
+      argument: 'string'
     }, {
       text: ' ',
       input: false
@@ -329,24 +332,28 @@ Let's try it out. When we launch our app (perhaps using `babel-node`), it prompt
     }
   ],
   score: 0.0001,
+  qualifiers: [],
   result: {}
 } ]
 ```
 
-Let's take a look. It is returning an array with a single item: an object with keys `words`, `score`, and `result`.
+Let's take a look. It is returning an array with a single item: an object with properties `words`, `score`, and `result`.
 
-- `score` is an number between 0 and 1 that represents how the results should be sorted when displayed to the user. The higher the score, the farther to the top it should sort. Note that the results from `parseArray` are *not* sorted automatically according to the score. Of course, in this case, it doesn't matter - we only have one result.
-- `result` is an object that describes the data that `lacona` has gleaned from the input. In this case, the user has not input any actual data - just the string `rem` - so `result` is empty.
-- `words` is an array of `word` objects, describing how `lacona` understands the given input, and its autocompletion suggestions.
-    - `text` is the string itself.
-    - `input` is a `Boolean` that represents whether or not the user input this particular word. If `input` is `true`, then this word is a match of the input. If `input` is `false`, then this word is a suggestion.
-    - `placeholder` is a `Boolean` that represents whether the `text` is an literal recommendation, or just an indicator of possible input. Placeholders are used to make it clear to the user what they should enter as they type.
+- `score`: `Number` - between 0 and 1 that represents how the results should be sorted when displayed to the user. The higher the score, the farther to the top it should sort. Note that the results from `parseArray` are *not* sorted automatically according to the score. Of course, in this case, it doesn't matter - we only have one result.
+- `result`: `Any` - an object that describes the data that `lacona` has gleaned from the input. In this case, the user has not input any actual data - just the string `rem` - so `result` is empty.
+- `qualifiers`: `[String]` - a list of qualifiers for this output. Qualifiers are arbitrary strings that any phrase in the parse chain can output. These can be used by the interface to distinguish between different outputs with the same `words`. For example, if a command allows you to "call Mom", but "Mom" has two different phone numbers, one could have `qualifiers: ['cell']` and the other could have `qualifiers: ['home']`. In this case, there is no ambiguity so there are no qualifiers.
+- `words`: `[Word]` - describes how `lacona` understands the given input and its autocompletion suggestions. Each `Word` is an object with these properties.
+    - `text`: `String` - the text itself.
+    - `input`: `Boolean` is a `Boolean` that represents whether or not this word was a part of the input. If `true`, this word is a match of the input. If `input` is `false`, then this word is a suggestion.
+    - `category`: `String` - an arbitrary string which can be used for syntax highlighting, which comes from the `category` property on various phrases. While any string can be used as a category, the standard categories are `action` for verbs and `conjunction` for punctuation and grammatical necessities.
+    - `placeholder`: `Boolean` (optional) - represents whether the `text` is an literal recommendation, or just an indicator of possible input. Placeholders are used to make it clear to the user what they should enter as they type. If `words` contains no objects with `placeholder: true`, then the output is considered complete.
+    - `argument`: `String` (optional) - the `text` prop of the highest level `<label argument={true} />`. This is used to classify output. Commands will use `<label />` to group sections of the command that can be considered independently.
 
 Our application should take this output and display it nicely to the user. For example, this output could be rendered
 
-> <strong>rem</strong>ind me to `string` `date and time`
+> <span style='color: blue'><strong>rem</strong>ind me to</span> `string` `date and time`
 
-In this way, we show the user a pleasant interface as they are typing their query.
+In this way, we show the user a pleasant interface as they are typing their command.
 
 ### Advanced Parsing
 

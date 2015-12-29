@@ -19,7 +19,9 @@ export class Repeat extends Phrase {
       score: 1
     }
 
-    yield* this.parseChild(0, _.assign({}, input, modifications), options)
+    const trueInput = _.assign({}, input, modifications)
+
+    yield* this.parseChild(0, trueInput, options)
   }
 
   * parseChild (childIndex, input, options) {
@@ -46,12 +48,21 @@ export class Repeat extends Phrase {
   }
 
   * callParseChild (childIndex, input, options) {
-    for (let output of parse({phrase: this.child, input, options})) {
+    const inputModifications = {qualifiers: []}
+    const trueInput = _.assign({}, input, inputModifications)
+
+    for (let output of parse({phrase: this.child, input: trueInput, options})) {
       if (this.props.unique && _.some(input.result, _.partial(_.isEqual, _, output.result))) {
         return
       }
-      const trueInput = _.assign({}, output, {result: input.result.concat(output.result)})
-      yield* this.parseChild(childIndex + 1, trueInput, options)
+
+      const outputModifications = {
+        result: input.result.concat(output.result),
+        qualifiers: input.qualifiers.concat(output.qualifiers)
+      }
+
+      const trueOutput = _.assign({}, output, outputModifications)
+      yield* this.parseChild(childIndex + 1, trueOutput, options)
     }
   }
 }

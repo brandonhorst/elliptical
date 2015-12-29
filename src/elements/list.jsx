@@ -5,10 +5,7 @@ import {createElement, Phrase} from 'lacona-phrase'
 
 export class List extends Phrase {
   itemify (item) {
-    const trueItem = _.isString(item) ? {text: item} : item
-    if (!_.isUndefined(this.props.value)) trueItem.value = this.props.value
-    if (!_.isUndefined(this.props.qualifier)) trueItem.qualifier = this.props.qualifier
-    return trueItem
+    return _.isString(item) ? {text: item} : item
   }
 
   * compute (input) {

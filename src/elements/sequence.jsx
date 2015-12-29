@@ -55,12 +55,12 @@ export class Sequence extends Phrase {
       if (this.props.unique && output.result != null && child.props.id && input.result[child.props.id] != null) {
         continue
       }
-      const accumulatedResult = this.props.value || getAccumulatedResult(input.result, child, output.result)
-      const newScore = input.score * output.score
-      const nextOutput = _.assign({}, output, {
-        result: accumulatedResult,
-        score: newScore
-      })
+
+      const modifications = {}
+      modifications.result = getAccumulatedResult(input.result, child, output.result)
+      modifications.score = input.score * output.score
+      modifications.qualifiers = input.qualifiers.concat(output.qualifiers)
+      const nextOutput = _.assign({}, output, modifications)
 
       yield* this.parseChild(childIndex + 1, nextOutput, options)
     }

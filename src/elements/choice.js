@@ -14,11 +14,9 @@ export class Choice extends Phrase {
         let success = false
 
         for (let output of parse({phrase: childPhrase, input, options})) {
-          const newResult = this.props.value || (
-            childPhrase.props.id != null
-              ? {[childPhrase.props.id]: output.result}
-              : output.result
-          )
+          const newResult = childPhrase.props.id != null
+            ? {[childPhrase.props.id]: output.result}
+            : output.result
 
           const modifications = {result: newResult}
           if (this.props.limit) modifications.callbacks = output.callbacks.concat(() => success = true)

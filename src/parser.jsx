@@ -17,6 +17,7 @@ function from (i) {
 const optionDefaults = {
   text: '',
   words: [],
+  qualifiers: [],
   callbacks: []
 }
 
@@ -25,7 +26,7 @@ export function createOption (options) {
 }
 
 function normalizeOutput (option) {
-  const output = _.pick(option, ['words', 'score', 'result'])
+  const output = _.pick(option, ['words', 'score', 'result', 'qualifiers'])
   return output
 }
 
