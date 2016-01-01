@@ -1,57 +1,18 @@
   /** @jsx createElement */
 import _ from 'lodash'
-import {match} from '../fuzzy'
-import {createElement, Phrase} from 'lacona-phrase'
+import { match } from '../string-match'
+import { createElement, Phrase } from 'lacona-phrase'
 
 export class Literal extends Phrase {
+  static defaultProps = {
+    fuzzy: false
+  }
+
   compute (input) {
     if (this.props.text == null) return []
 
-    if (input == null) { // pure suggestion
-      return [{
-        words: [{text: this.props.text, input: false}],
-        remaining: null,
-        score: this.props.score || 1
-      }]
-    }
-
-    const inputLower = input.toLowerCase()
-    const thisTextLower = this.props.text.toLowerCase()
-
-    if (_.startsWith(inputLower, thisTextLower)) { // input is partially consumed
-      return [{
-        words: [{text: this.props.text, input: true}],
-        remaining: input.substring(this.props.text.length),
-        score: this.props.score || 1
-      }]
-    }
-
-    if (_.startsWith(thisTextLower, inputLower)) { // input is entirely consumed
-      const words = []
-      if (input.length > 0) {
-        words.push({text: this.props.text.substring(0, input.length), input: true})
-      }
-      if (this.props.text.length > input.length) {
-        words.push({text: this.props.text.substring(input.length), input: false})
-      }
-
-      return [{
-        words,
-        remaining: null,
-        score: this.props.score || 1
-      }]
-    }
-
-    if (this.props.fuzzy) { // fuzzy matching
-      const result = match(input, this.props.text)
-      if (result) {
-        result.remaining = ''
-        result.score = this.props.score || result.score
-        return [result]
-      }
-    }
-
-    return []
+    const result = match({input, text: this.props.text, fuzzy: this.props.fuzzy})
+    return result
   }
 
   decorate (input) {

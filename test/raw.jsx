@@ -120,4 +120,21 @@ describe('raw', () => {
     expect(data).to.have.length(1)
     expect(data[0].score).to.equal(0.5)
   })
+
+  it('can set the qualifiers', () => {
+    function fun (input) {
+      return [{
+        words: [{text: 'test', input: true}],
+        result: 'val',
+        remaining: '',
+        qualifiers: ['test']
+      }]
+    }
+
+    parser.grammar = <raw function={fun} />
+
+    const data = parser.parseArray('')
+    expect(data).to.have.length(1)
+    expect(data[0].qualifiers).to.eql(['test'])
+  })
 })

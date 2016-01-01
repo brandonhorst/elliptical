@@ -29,8 +29,12 @@ export function * parse ({phrase, input, options}) {
       modifications.result = phrase.props.value
     }
 
-    if (phrase.props.qualifier || phrase.props.qualifiers) {
-      modifications.qualifiers = phrase.props.qualifiers || [phrase.props.qualifier]
+    if (phrase.props.qualifiers) {
+      modifications.qualifiers = phrase.props.qualifiers
+    }
+
+    if (phrase.props.score != null) {
+      modifications.score = phrase.props.score
     }
 
     yield _.assign({}, output, modifications)

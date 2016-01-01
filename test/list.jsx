@@ -96,26 +96,25 @@ describe('list', () => {
     expect(data[2].result).to.equal('override')
   })
 
-  // it('outputs a qualifier', () => {
-  //   const items = [{text: 'testa', qualifier: 'desca'}, 'testb']
-  //   parser.grammar = <list items={items} />
-  //
-  //   const data = parser.parseArray('')
-  //   expect(data).to.have.length(1)
-  //   expect(text(data[0])).to.equal('testa')
-  //   expect(data[0].match[0].qualifier).to.equal('desca')
-  // })
-  //
-  // it('outputs a qualifier (fuzzy)', () => {
-  //   const items = [{text: 'testa', qualifier: 'desca'}, 'testb']
-  //   parser.grammar = <list items={items} fuzzy='true' />
-  //
-  //   const data = parser.parseArray('')
-  //   expect(data).to.have.length(1)
-  //   expect(text(data[0])).to.equal('testa')
-  //   expect(data[0].suggestion[0].qualifier).to.equal('desca')
-  // })
-  //
+  it('outputs a qualifier', () => {
+    const items = [{text: 'testa', qualifiers: ['desca', 'descb']}, 'testb']
+    parser.grammar = <list items={items} />
+
+    const data = parser.parseArray('testa')
+    expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('testa')
+    expect(data[0].qualifiers).to.eql(['desca', 'descb'])
+  })
+
+  it('outputs a qualifier (fuzzy)', () => {
+    const items = [{text: 'testa', qualifiers: ['desca', 'descb']}, 'testb']
+    parser.grammar = <list items={items} fuzzy />
+
+    const data = parser.parseArray('ta')
+    expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('testa')
+    expect(data[0].qualifiers).to.eql(['desca', 'descb'])
+  })
 
   it('outputs score', () => {
     const items = ['ztest', 'testz', 'tezst']

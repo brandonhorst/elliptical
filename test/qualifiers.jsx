@@ -13,16 +13,7 @@ describe('qualifiers', () => {
     parser = new Parser()
   })
 
-  it('are exported from elements (singular)', () => {
-    parser.grammar = <literal text='test' qualifier='qual' />
-
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('test')
-    expect(data[0].qualifiers).to.eql(['qual'])
-  })
-
-  it('are exported from elements (plural)', () => {
+  it('are exported from elements', () => {
     parser.grammar = <literal text='test' qualifiers={['qual', 'ifier']} />
 
     const data = parser.parseArray('')
@@ -35,7 +26,7 @@ describe('qualifiers', () => {
     parser.grammar = (
       <sequence>
         <literal text='te' qualifiers={['qual', 'ifier']} />
-        <literal text='st' qualifier='test' />
+        <literal text='st' qualifiers={['test']} />
       </sequence>
     )
 
@@ -48,8 +39,8 @@ describe('qualifiers', () => {
   it('are passed through choices', () => {
     parser.grammar = (
       <choice>
-        <literal text='test' qualifier='qual' />
-        <literal text='wrong' qualifier='ifier' />
+        <literal text='test' qualifiers={['qual']} />
+        <literal text='wrong' qualifiers={['ifier']} />
       </choice>
     )
 
@@ -63,7 +54,7 @@ describe('qualifiers', () => {
     parser.grammar = (
       <repeat>
         <label argument={false} text='place'>
-          <literal text='test' qualifier='qual' />
+          <literal text='test' qualifiers={['qual']} />
         </label>
       </repeat>
     )

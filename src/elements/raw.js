@@ -14,8 +14,9 @@ export class Raw extends Phrase {
 
       const modification = {
         result: output.result,
-        score: output.score || 1,
         text: output.remaining,
+        score: output.score || 1,
+        qualifiers: output.qualifiers || [],
         words: input.words.concat(
           _.map(output.words, word => _.assign(word, {
             argument: input.currentArgument,
