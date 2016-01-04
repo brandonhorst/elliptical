@@ -3,7 +3,7 @@
 
 import { expect } from 'chai'
 import { text } from './_util'
-import { Parser } from '..'
+import { Parser, LaconaError } from '..'
 import { createElement, Phrase } from 'lacona-phrase'
 
 describe('Parser', () => {
@@ -14,7 +14,7 @@ describe('Parser', () => {
   })
 
   it('requires string input', () => {
-    expect(() => parser.parseArray(123)).to.throw(Error)
+    expect(() => parser.parseArray(123)).to.throw(LaconaError)
   })
 
   it('can parse in a specified language', () => {

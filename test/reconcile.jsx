@@ -2,7 +2,7 @@
 /* eslint-env mocha */
 import { expect } from 'chai'
 import { createElement, Phrase } from 'lacona-phrase'
-import { Parser, Error as LaconaError } from '..'
+import { Parser, LaconaError } from '..'
 
 describe('reconcile', () => {
   let parser
