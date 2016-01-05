@@ -65,6 +65,22 @@ describe('literal', () => {
       expect(text(data[0])).to.equal('ba')
     })
 
+    it('allows allowinput to be false', () => {
+      parser.grammar = (
+        <sequence>
+          <literal text='b' decorate allowInput={false} />
+          <literal text='a' />
+        </sequence>
+      )
+
+      const data1 = parser.parseArray('a')
+      expect(data1).to.have.length(1)
+      expect(text(data1[0])).to.equal('ba')
+
+      const data2 = parser.parseArray('b')
+      expect(data2).to.have.length(0)
+    })
+
     it('decorates an freetext', () => {
       parser.grammar = (
         <sequence>

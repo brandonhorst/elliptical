@@ -5,7 +5,8 @@ import { createElement, Phrase } from 'lacona-phrase'
 
 export class Literal extends Phrase {
   static defaultProps = {
-    fuzzy: false
+    fuzzy: false,
+    allowInput: true
   }
 
   compute (input) {
@@ -25,12 +26,16 @@ export class Literal extends Phrase {
 
   describe () {
     if (this.props.decorate) {
-      return (
-        <choice limit={1}>
-          <literal {...this.props} decorate={false} />
-          <raw function={this.decorate.bind(this)} />
-        </choice>
-      )
+      if (this.props.allowInput) {
+        return (
+          <choice limit={1}>
+            <literal {...this.props} decorate={false} />
+            <raw function={this.decorate.bind(this)} />
+          </choice>
+        )
+      } else {
+        return <raw function={this.decorate.bind(this)} />
+      }
     } else {
       return <raw function={this.compute.bind(this)} category={this.props.category} />
     }
