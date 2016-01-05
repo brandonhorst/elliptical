@@ -29,18 +29,10 @@ function assertValid ({Constructor, type}) {
     throw new LaconaError(`Constructor ${Constructor} is not a valid ${type}`)
   }
 
-  if (type === 'source') {
-    if (!subclassOf(Constructor, Source)) {
-      throw new LaconaError(`Constructor ${Constructor} must be a subclass of require('lacona-phrase').Source`)
-    }
-  }
-
   if (type === 'phrase') {
-    if (!subclassOf(Constructor, Phrase)) {
-      throw new LaconaError(`Constructor ${Constructor} must be a subclass of require('lacona-phrase').Phrase`)
-    }
+    if (Constructor.prototype.describe) {
 
-    if (Constructor.translations) {
+    } else if (Constructor.translations) {
       if (!_.every(Constructor.translations, _.partial(_.has, _, 'describe'))) {
         throw new LaconaError('Every translation must have a describe method')
       }

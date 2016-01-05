@@ -70,18 +70,15 @@ describe('reconcile', () => {
 
     expect(() => parser.reconcile()).to.throw(LaconaError)
   })
-
-  it('throws for phrase grammars that do not extend Phrase', () => {
-    class Test {
-      describe () {}
-    }
+  it('accepts phrases that do not extend phrase', () => {
+    class Test {}
 
     parser.grammar = <Test />
 
-    expect(() => parser.reconcile()).to.throw(LaconaError)
+    expect(() => parser.reconcile()).to.not.throw(Error)
   })
 
-  it('throws for sources that do not extend Phrase', () => {
+  it('accepts sources that do not extend Source', () => {
     class TestSource {}
 
     class Test extends Phrase {
@@ -93,6 +90,6 @@ describe('reconcile', () => {
 
     parser.grammar = <Test />
 
-    expect(() => parser.reconcile()).to.throw(LaconaError)
+    expect(() => parser.reconcile()).to.not.throw(Error)
   })
 })
