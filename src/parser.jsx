@@ -14,6 +14,10 @@ function from (i) {
   return a
 }
 
+function callEvery (ary) {
+  _.forEach(ary, callback => callback())
+}
+
 const optionDefaults = {
   text: '',
   words: [],
@@ -37,6 +41,7 @@ export class Parser extends EventEmitter {
     this.langs = langs
     this.grammar = grammar
     this.extensions = extensions
+    this._finalCallbacks = []
     this._sourceManager = new SourceManager({
       update: this._maybeReparse.bind(this)
     })
@@ -68,8 +73,13 @@ export class Parser extends EventEmitter {
       langs: this.langs,
       getExtensions: this._getExtensions.bind(this),
       sourceManager: this._sourceManager,
+      enqueueCallback: this._enqueueCallback.bind(this),
       isReparse
     }
+  }
+
+  _enqueueCallback (callback) {
+    this._finalCallbacks.push(callback)
   }
 
   _reconcile (options) {
@@ -99,11 +109,14 @@ export class Parser extends EventEmitter {
     const options = this._getReconcileParseOptions({isReparse})
     for (let output of parse({phrase: this._phrase, input, options})) {
       if (!output.text) {
-        // call each callback (used for limiting)
-        output.callbacks.forEach(callback => callback())
+        callEvery(output.callbacks)
         yield normalizeOutput(output)
       }
     }
+
+    callEvery(this._finalCallbacks)
+
+    this._finalCallbacks = []
   }
 
   parseArray (inputString, isReparse = false) {

@@ -321,6 +321,38 @@ describe('sources', () => {
     })
   })
 
+  it('can change props with tap', (done) => {
+    class TestSource extends Source {
+      data = 'testa'
+
+      trigger () {
+        this.setData('testb')
+      }
+    }
+
+    class Test extends Phrase {
+      observe () { return <TestSource /> }
+      describe () {
+        return (
+          <tap function={this.source.trigger.bind(this.source)}>
+            <literal text={this.source.data} />
+          </tap>
+        )
+      }
+    }
+
+    parser.grammar = <Test />
+
+    const data1 = parser.parseArray('')
+    expect(text(data1[0])).to.equal('testa')
+
+    process.nextTick(() => {
+      const data2 = parser.parseArray('')
+      expect(text(data2[0])).to.equal('testb')
+      done()
+    })
+  })
+
   it('update is not emitted for setData() during onCreate', () => {
     const changeSpy = spy()
 
@@ -347,7 +379,7 @@ describe('sources', () => {
     expect(changeSpy).to.not.have.been.called
   })
 
-  it('setData calls onReparse when it occurs after a parse', (done) => {
+  it('setData emits update when it occurs after a parse', (done) => {
     class TestSource extends Source {
       data = 'testa'
 
@@ -403,7 +435,7 @@ describe('sources', () => {
     expect(text(data[0])).to.equal('test')
   })
 
-  it('onUpdate is called when a source\'s source updates', done => {
+  it('emits update is called when a source\'s source updates', done => {
     class TestSource1 extends Source {
       data = 'test'
 
