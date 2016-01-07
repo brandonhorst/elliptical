@@ -246,7 +246,7 @@ describe('repeat', () => {
   it('accepts non-unique repeated elements (deep)', () => {
     parser.grammar = (
       <repeat unique>
-        <label text='test'>
+        <label text='test' suppressEmpty={false}>
           <choice>
             <literal text='a' value={{a: 1}} />
             <literal text='b' value={{a: 2}} />

@@ -16,7 +16,7 @@ describe('label', () => {
     parser.grammar = (
       <sequence>
         <literal text='a ' id='a' value='a' />
-        <label text='test' id='place'>
+        <label text='test' id='place' suppressEmpty={false}>
           <literal text='literal' value='test' />
         </label>
       </sequence>
@@ -54,7 +54,7 @@ describe('label', () => {
     expect(data5).to.have.length(0)
   })
 
-  it('suppresses with a raw', () => {
+  it('suppresses empty inputs by default', () => {
     function func (input) {
       if (input === 'v') {
         return [{
@@ -70,7 +70,7 @@ describe('label', () => {
     parser.grammar = (
       <sequence>
         <literal text='a ' id='a' value='a' />
-        <label text='test' id='place' suppressEmpty>
+        <label text='test' id='place'>
           <raw function={func} />
         </label>
       </sequence>
@@ -108,11 +108,58 @@ describe('label', () => {
     expect(data5).to.have.length(0)
   })
 
+  it('allows suppressEmpty={false}', () => {
+    function func (input) {
+      if (input === '') {
+        return [{
+          words: [{text: 'value', input: true}],
+          remaining: '',
+          result: 'test'
+        }]
+      } else {
+        return []
+      }
+    }
+
+    parser.grammar = (
+      <sequence>
+        <literal text='a ' id='a' value='a' />
+        <label text='test' id='place' suppressEmpty={false}>
+          <raw function={func} />
+        </label>
+      </sequence>
+    )
+
+    const data1 = parser.parseArray('')
+    expect(data1).to.have.length(1)
+    expect(text(data1[0])).to.equal('a test')
+    expect(data1[0].result).to.eql({a: 'a'})
+    expect(data1[0].words[1].placeholder).to.be.true
+    expect(data1[0].words[1].argument).to.equal('test')
+
+    const data2 = parser.parseArray('a')
+    expect(data2).to.have.length(1)
+    expect(text(data2[0])).to.equal('a test')
+    expect(data2[0].result).to.eql({a: 'a'})
+    expect(data2[0].words[2].placeholder).to.be.true
+    expect(data2[0].words[2].argument).to.equal('test')
+
+    const data3 = parser.parseArray('a ')
+    expect(data3).to.have.length(1)
+    expect(text(data3[0])).to.equal('a value')
+    expect(data3[0].result).to.eql({a: 'a', place: 'test'})
+    expect(data3[0].words[1].placeholder).to.be.undefined
+    expect(data3[0].words[1].argument).to.equal('test')
+
+    const data5 = parser.parseArray('a t')
+    expect(data5).to.have.length(0)
+  })
+
   it('handles suppressWhen', () => {
     parser.grammar = (
       <sequence>
         <literal text='a ' id='a' value='a' />
-        <label text='test' id='place' suppressWhen={input => input === 'l'}>
+        <label text='test' id='place' suppressWhen={input => input === 'l'} suppressEmpty={false}>
           <literal text='literal' value='test' />
         </label>
       </sequence>

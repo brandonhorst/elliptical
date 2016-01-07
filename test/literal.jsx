@@ -118,7 +118,7 @@ describe('literal', () => {
           <literal text='a' />
           <literal text='b' decorate />
           <literal text='a ' />
-          <label text='test' id='test'>
+          <label text='test' id='test' suppressEmpty={false}>
             <literal text='literal' />
           </label>
         </sequence>

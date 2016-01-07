@@ -8,8 +8,7 @@ export class Label extends Phrase {
   static defaultProps = {
     suppress: true,
     argument: true,
-    suppressEmpty: false,
-    suppressWhen (input) { return false }
+    suppressEmpty: true
   };
 
   * parseChild (input, options) {
@@ -59,7 +58,7 @@ export class Label extends Phrase {
     if (input.text == null || (
         this.props.suppress && (
           this.props.suppressEmpty && input.text === '' ||
-          this.props.suppressWhen(input.text)
+          (this.props.suppressWhen && this.props.suppressWhen(input.text))
         ))) {
       yield* this.yieldSelf(inputWithArgument, options)
     } else {
