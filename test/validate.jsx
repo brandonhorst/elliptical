@@ -75,7 +75,7 @@ describe('validate', () => {
 
       describe () {
         return (
-          <label text='test' suppressEmpty>
+          <label text='test'>
             <literal text='s' />
           </label>
         )

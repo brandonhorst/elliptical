@@ -76,7 +76,7 @@ describe('repeat', () => {
   it('allows for content to have children', () => {
     parser.grammar = (
       <repeat>
-        <label text='test' suppressEmpty>
+        <label text='test'>
           <choice>
             <literal text='a' />
             <literal text='b' />
@@ -155,7 +155,7 @@ describe('repeat', () => {
   it('does not accept fewer than min iterations', () => {
     parser.grammar = (
       <repeat min={2}>
-        <label text='test' suppressEmpty>
+        <label text='test'>
           <literal text='a' />
         </label>
       </repeat>

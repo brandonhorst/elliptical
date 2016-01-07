@@ -42,7 +42,7 @@ describe('elements/map', () => {
 
     parser.grammar = (
       <map function={addIng}>
-        <label text='label' suppressEmpty>
+        <label text='label'>
           <literal text='test' value='test' />
         </label>
       </map>

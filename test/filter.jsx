@@ -43,7 +43,7 @@ describe('filter', () => {
 
     parser.grammar = (
       <filter function={filter}>
-        <label text='test' suppressEmpty>
+        <label text='test'>
           <literal text='s' />
         </label>
       </filter>
