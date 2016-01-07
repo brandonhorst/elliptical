@@ -11,7 +11,7 @@ export function reconcile ({descriptor, phrase, options}) {
 
 function reconcileArray ({descriptor, phrase, options}) {
   return _.chain(descriptor)
-    .reject(_.isNull)
+    .reject(item => item == null)
     .reject(_.isString)
     .zip(phrase)
     .map(([descriptor, phrase]) => reconcile({descriptor, phrase, options}))
