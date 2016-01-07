@@ -17,18 +17,22 @@ export class Literal extends Phrase {
   }
 
   decorate (input) {
-    return [{
-      words: [{text: this.props.text, input: false}],
-      remaining: input,
-      score: 1
-    }]
+    if (input == null || input === '') {
+      return []
+    } else {
+      return [{
+        words: [{text: this.props.text, input: false}],
+        remaining: input,
+        score: 1
+      }]
+    }
   }
 
   describe () {
     if (this.props.decorate) {
       if (this.props.allowInput) {
         return (
-          <choice limit={1}>
+          <choice>
             <literal {...this.props} decorate={false} />
             <raw function={this.decorate.bind(this)} />
           </choice>

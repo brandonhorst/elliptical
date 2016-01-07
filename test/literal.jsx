@@ -90,9 +90,11 @@ describe('literal', () => {
       )
 
       const data = parser.parseArray('x superman')
-      expect(data).to.have.length(1)
+      expect(data).to.have.length(2)
       expect(text(data[0])).to.equal('x superman')
       expect(data[0].result.test).to.equal('superman')
+      expect(text(data[1])).to.equal('x x superman')
+      expect(data[1].result.test).to.equal('superman')
     })
 
     it('decorates an placeholder (complete)', () => {
