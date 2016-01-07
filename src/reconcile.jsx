@@ -23,21 +23,29 @@ function reconcileOne ({descriptor, phrase, options}) {
 
   const Constructor = getConstructor({Constructor: descriptor.Constructor, type: 'phrase'})
   const props = getRealProps({descriptor, Constructor})
-  const extensions = options.getExtensions(Constructor)
 
   if (phrase && phrase.constructor === Constructor && _.isEqual(props, phrase.props)) {
-    if (options.sourceManager.sourceChanged(phrase) ||
-        !_.isEqual(extensions, phrase.__oldExtensions)) {
+    let needsRedescribe = false
+
+    const {extensionsChanged, extensions} = getExtensions({Constructor, phrase, options})
+    if (extensionsChanged) {
+      needsRedescribe = true
+    }
+
+    if (!needsRedescribe && options.sourceManager.sourceChanged(phrase)) {
+      needsRedescribe = true
+    }
+
+    if (needsRedescribe) {
       const describedPhrase = getDescribedPhrase({Constructor, phrase, extensions, options})
 
-      phrase.__oldExtensions = extensions
       phrase.__describedPhrase = describedPhrase
-
-      return phrase
-    } else {
-      return phrase
     }
-  } else {
+
+    return phrase
+  } else { //reconstruct
+    const extensions = options.getExtensions(Constructor)
+
     if (phrase) destroy({phrase, sourceManager: options.sourceManager})
 
     const newPhrase = instantiate({Constructor, props})
@@ -52,6 +60,25 @@ function reconcileOne ({descriptor, phrase, options}) {
     newPhrase.__describedPhrase = describedPhrase
 
     return newPhrase
+  }
+}
+
+function getExtensions ({Constructor, phrase, options}) {
+  if (options.extensionsChanged) {
+    const extensions = options.getExtensions(Constructor)
+
+    if (!_.isEqual(extensions, phrase.__oldExtensions)) {
+      phrase.__oldExtensions = extensions
+      return {
+        extensions,
+        extensionsChanged: true
+      }
+    }
+  }
+
+  return {
+    extensionsChanged: false,
+    extensions: phrase.__oldExtensions
   }
 }
 

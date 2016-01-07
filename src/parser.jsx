@@ -41,6 +41,7 @@ export class Parser extends EventEmitter {
     this.langs = langs
     this.grammar = grammar
     this.extensions = extensions
+    this._oldExtensions = []
     this._finalCallbacks = []
     this._sourceManager = new SourceManager({
       update: this._maybeReparse.bind(this)
@@ -68,13 +69,14 @@ export class Parser extends EventEmitter {
     this._sourceManager.removeSource(descriptor)
   }
 
-  _getReconcileParseOptions ({isReparse = false} = {}) {
+  _getReconcileParseOptions ({isReparse = false, extensionsChanged = false} = {}) {
     return {
       langs: this.langs,
       getExtensions: this._getExtensions.bind(this),
       sourceManager: this._sourceManager,
       enqueueCallback: this._enqueueCallback.bind(this),
-      isReparse
+      isReparse,
+      extensionsChanged
     }
   }
 
@@ -103,10 +105,17 @@ export class Parser extends EventEmitter {
       throw new LaconaError('lacona parse input must be a string')
     }
 
-    const input = createOption({text: inputString})
-    this.reconcile()
+    const extensionsChanged = !_.isEqual(this._oldExtensions, this.extensions)
+    if (extensionsChanged) {
+      this._oldExtensions = _.clone(this.extensions)
+    }
 
-    const options = this._getReconcileParseOptions({isReparse})
+    const input = createOption({text: inputString})
+
+    const options = this._getReconcileParseOptions({isReparse, extensionsChanged})
+    
+    this._reconcile(options)
+
     for (let output of parse({phrase: this._phrase, input, options})) {
       if (!output.text) {
         callEvery(output.callbacks)
