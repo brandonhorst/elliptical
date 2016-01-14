@@ -94,7 +94,7 @@ describe('literal', () => {
       expect(text(data[0])).to.equal('x superman')
       expect(data[0].result.test).to.equal('superman')
       expect(text(data[1])).to.equal('x x superman')
-      expect(data[1].result.test).to.equal('superman')
+      expect(data[1].result.test).to.equal('x superman')
     })
 
     it('decorates an placeholder (complete)', () => {

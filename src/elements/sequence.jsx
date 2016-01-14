@@ -49,6 +49,10 @@ export class Sequence extends Phrase {
       return
     }
 
+    if (input.suppressIncomplete && _.some(input.words, 'placeholder')) {
+      return
+    }
+
     const child = this.childPhrases[childIndex]
 
     for (let output of parse({phrase: this.childPhrases[childIndex], input, options})) {
