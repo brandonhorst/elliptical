@@ -54,9 +54,9 @@ var parser = new lacona.Parser()
 parser.grammar = (
   <sequence>
     <literal text='do' category='action' />
-    <argument text='something' id='whatToDo'>
+    <label text='something' id='whatToDo'>
       <literal text='something' value='something' />
-    </argument>
+    </label>
   </sequence>
 )
 
@@ -979,7 +979,7 @@ Parses its children in order, one after the other.
 
 Every child of a `sequence` can set a property called `optional`. If it is `true`, It results in an implicit branch in the parse chain.
 
-If `optional` is set, the child can choose to set the props `limited` and `prefered`, which effect the output. All of these props are simply shorthand expressions, which map to `choice`s under the covers. All 3 props default to `false`. Here is how they are mapped:
+If `optional` is set, the child can choose to set the props `limited` and `preferred`, which effect the output. All of these props are simply shorthand expressions, which map to `choice`s under the covers. All 3 props default to `false`. Here is how they are mapped:
 
 ##### `optional`
 
@@ -1000,14 +1000,14 @@ If `optional` is set, the child can choose to set the props `limited` and `prefe
   </sequence>
 ```
 
-##### `optional prefered`
+##### `optional preferred`
 
 Note the orders of the resulting `choice`'s children.
 
 ```js
   <sequence>
     <literal text='Google' />
-    <literal text=' Maps' optional prefered />
+    <literal text=' Maps' optional preferred />
   </sequence>
 
   // becomes
@@ -1043,14 +1043,14 @@ Note the `limit` of the resulting `choice`. This is an easy way to say "accept t
 ```
 
 
-##### `optional prefered limited`
+##### `optional preferred limited`
 
 This is an easy way to say "accept this child if it's not there, but don't suggest its absence."
 
 ```js
   <sequence>
     <literal text='Google' />
-    <literal text=' Maps' optional prefered limited />
+    <literal text=' Maps' optional preferred limited />
   </sequence>
 
   // becomes
@@ -1209,12 +1209,9 @@ parser.parseArray('wort wort')
 ] */
 ```
 
-### `descriptor`, `placeholder`, and `argument`
+### `label`
 
 Used to provide additional metadata for within a grammar. This provides users with hints to the available options in the flexible way. This also improves performance by limiting the number of parse branches.
-
-`placeholder` is shorthand for `<descriptor placeholder {...props} />`
-`argument` is shorthand for `<descriptor argument placeholder  {...props} />`
 
 #### Score
 
