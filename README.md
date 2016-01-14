@@ -454,15 +454,15 @@ Just like `<sequence #1 />`, we will parse the children in order.
     remainingString: ' at noon, rem',
     result: new Date('2015-10-12 08:00:00'), // Date object representing tomorrow at 08:00 (8am)
     score: 0.27,
-    words: [{text: 'tomorrow', input: true, argument: 'Date'}]
+    words: [{text: 'tomorrow', input: true, argument: 'date'}]
   }, {
     remainingString: ', rem',
     result: new Date('2015-10-12 12:00:00'), // Date object representing tomorrow at 12:00 (noon)
     score: 0.23,
     words: [
-      {text: 'tomorrow', input: true, argument: 'Date'}
+      {text: 'tomorrow', input: true, argument: 'date'}
       {text: ' at ', input: true, category: 'conjunction'}
-      {text: 'noon', input: true, argument: 'Time'}
+      {text: 'noon', input: true, argument: 'time'}
     ]
   }
 ]
@@ -580,9 +580,9 @@ At long last, the parse of `<sequence #2 />` returns
   },
   score: 0.0023,
   words: [
-    {text: 'tomorrow', input: true, argument: 'Date'}
+    {text: 'tomorrow', input: true, argument: 'date'}
     {text: ' at ', input: true, category: 'conjunction'}
-    {text: 'noon', input: true, argument: 'Time'}
+    {text: 'noon', input: true, argument: 'time'}
     {text: ', rem', category: 'action', input: true},
     {text: 'ind me to ', category: 'action', input: false},
     {text: 'string', argument: 'string', placeholder: 'true'}
@@ -611,9 +611,9 @@ Finally, we are back the top level - the `Parser`'s grammar itself. The `Parser`
   },
   score: 0.0023,
   words: [
-    {text: 'tomorrow', input: true, argument: 'Date'}
+    {text: 'tomorrow', input: true, argument: 'date'}
     {text: ' at ', input: true, category: 'conjunction'}
-    {text: 'noon', input: true, argument: 'Time'}
+    {text: 'noon', input: true, argument: 'time'}
     {text: ', rem', category: 'action', input: true},
     {text: 'ind me to ', category: 'action', input: false},
     {text: 'string', argument: 'string', placeholder: 'true'}
