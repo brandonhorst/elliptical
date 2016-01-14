@@ -60,4 +60,25 @@ describe('elements/map', () => {
     expect(mapSpy).to.have.been.calledOnce
     expect(data1[0].result).to.eql('testing')
   })
+
+
+  it('exports a class', () => {
+    class ResultClass {
+      constructor (result) {
+        this.result = result
+      }
+    }
+
+    parser.grammar = (
+      <map function={result => new ResultClass(result)}>
+        <literal text='test' value='test' />
+      </map>
+    )
+
+    const data1 = parser.parseArray('')
+    expect(data1).to.have.length(1)
+    expect(text(data1[0])).to.equal('test')
+    expect(data1[0].result).to.be.an.instanceof(ResultClass)
+    expect(data1[0].result.result).to.equal('test')
+  })
 })
