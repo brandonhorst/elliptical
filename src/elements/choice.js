@@ -13,15 +13,20 @@ export class Choice extends Phrase {
       for (let childPhrase of this.childPhrases) {
         let success = false
 
-        for (let output of parse({phrase: childPhrase, input, options})) {
-          const newResult = childPhrase.props.id != null
-            ? {[childPhrase.props.id]: output.result}
-            : output.result
+        //perf opt
+        if (childPhrase.props.id == null && !this.props.limit) {
+          yield* parse({phrase: childPhrase, input, options})
+        } else {
+          for (let output of parse({phrase: childPhrase, input, options})) {
+            const newResult = childPhrase.props.id != null
+              ? {[childPhrase.props.id]: output.result}
+              : output.result
 
-          const modifications = {result: newResult}
-          if (this.props.limit) modifications.callbacks = output.callbacks.concat(() => success = true)
+            const modifications = {result: newResult}
+            if (this.props.limit) modifications.callbacks = output.callbacks.concat(() => success = true)
 
-          yield _.assign({}, output, modifications)
+            yield _.assign({}, output, modifications)
+          }
         }
 
         if (this.props.limit) {
