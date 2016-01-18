@@ -76,7 +76,8 @@ export class Parser extends EventEmitter {
       sourceManager: this._sourceManager,
       enqueueCallback: this._enqueueCallback.bind(this),
       isReparse,
-      extensionsChanged
+      extensionsChanged,
+      parses: 0
     }
   }
 
@@ -122,6 +123,7 @@ export class Parser extends EventEmitter {
         yield normalizeOutput(output)
       }
     }
+    if (global.logStatus) global.logStatus({parses: options.parses})
 
     callEvery(this._finalCallbacks)
 
