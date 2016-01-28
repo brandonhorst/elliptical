@@ -50,6 +50,21 @@ describe('repeat', () => {
       expect(data[0].ellipsis).to.be.true
     })
 
+    it('accepts the child twice and suggests when complete, with the separator in the middle', () => {
+      parser.grammar = (
+        <repeat separator={<literal text='man' />}>
+          <literal text='super' />
+        </repeat>
+      )
+
+      const data = parser.parseArray('supermansuper')
+      expect(data).to.have.length(2)
+      expect(text(data[0])).to.equal('supermansuper')
+      expect(data[0].ellipsis).to.be.true
+      expect(text(data[1])).to.equal('supermansupermansuper')
+      expect(data[1].ellipsis).to.be.true
+    })
+
     it('allows for content to have children', () => {
       parser.grammar = (
         <repeat separator={<literal text=' ' />}>
@@ -120,6 +135,21 @@ describe('repeat', () => {
     expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('supersuper')
     expect(data[0].ellipsis).to.be.true
+  })
+
+  it('accepts the child twice', () => {
+    parser.grammar = (
+      <repeat>
+        <literal text='super' />
+      </repeat>
+    )
+
+    const data = parser.parseArray('supersuper')
+    expect(data).to.have.length(2)
+    expect(text(data[0])).to.equal('supersuper')
+    expect(data[0].ellipsis).to.be.true
+    expect(text(data[1])).to.equal('supersupersuper')
+    expect(data[1].ellipsis).to.be.true
   })
 
   it('creates an array from the values of the children', () => {

@@ -37,7 +37,7 @@ export class Repeat extends Phrase {
       }
     }
 
-    if (childIndex >= this.props.min && input.text === '' || input.text == null) {
+    if (childIndex >= this.props.min && input.text == null) {
       return
     }
 
