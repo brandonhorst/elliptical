@@ -16,9 +16,7 @@ describe('repeat', () => {
     it('does not accept input that does not match the child', () => {
       parser.grammar = (
         <repeat separator={<literal text='man' />}>
-          <label text='test'>
-            <literal text='super' />
-          </label>
+          <literal text='super' />
         </repeat>
       )
 
@@ -29,74 +27,69 @@ describe('repeat', () => {
     it('accepts the child on its own', () => {
       parser.grammar = (
         <repeat separator={<literal text='man' />}>
-          <label text='test'>
-            <literal text='super' />
-          </label>
+          <literal text='super' />
         </repeat>
       )
 
       const data = parser.parseArray('superm')
       expect(data).to.have.length(1)
-      expect(text(data[0])).to.equal('supermantest')
+      expect(text(data[0])).to.equal('supermansuper')
+      expect(data[0].ellipsis).to.be.true
     })
 
     it('accepts the child twice, with the separator in the middle', () => {
       parser.grammar = (
-        <repeat separator={<literal text='man' />} max={2}>
-          <label text='test'>
-            <literal text='super' />
-          </label>
+        <repeat separator={<literal text='man' />}>
+          <literal text='super' />
         </repeat>
       )
 
       const data = parser.parseArray('supermans')
       expect(data).to.have.length(1)
       expect(text(data[0])).to.equal('supermansuper')
+      expect(data[0].ellipsis).to.be.true
     })
 
     it('allows for content to have children', () => {
       parser.grammar = (
-        <repeat separator={<literal text=' ' />} max={2}>
-          <label text='test'>
-            <choice>
-              <literal text='a' />
-              <literal text='b' />
-            </choice>
-          </label>
+        <repeat separator={<literal text=' ' />}>
+          <choice>
+            <literal text='a' />
+            <literal text='b' />
+          </choice>
         </repeat>
       )
 
-      const data = parser.parseArray('a')
+      const data = parser.parseArray('a ')
       expect(data).to.have.length(2)
-      expect(text(data[0])).to.equal('a')
-      expect(text(data[1])).to.equal('a test')
+      expect(text(data[0])).to.equal('a a')
+      expect(text(data[1])).to.equal('a b')
+      expect(data[0].ellipsis).to.be.true
+      expect(data[1].ellipsis).to.be.true
     })
   })
 
   it('allows for content to have children', () => {
     parser.grammar = (
       <repeat>
-        <label text='test'>
-          <choice>
-            <literal text='a' />
-            <literal text='b' />
-          </choice>
-        </label>
+        <choice>
+          <literal text='a' />
+          <literal text='b' />
+        </choice>
       </repeat>
     )
 
     const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('test')
-    expect(data[0].words[0].placeholder).to.be.true
+    expect(data).to.have.length(2)
+    expect(text(data[0])).to.equal('a')
+    expect(text(data[1])).to.equal('b')
+    expect(data[0].ellipsis).to.be.true
   })
 
   it('does not accept input that does not match the child', () => {
     parser.grammar = (
       <repeat>
-        <label text='test'>
-          <literal text='super' />
-        </label>
+        <literal text='super' />
       </repeat>
     )
     const data = parser.parseArray('wrong')
@@ -106,43 +99,36 @@ describe('repeat', () => {
   it('accepts the child on its own', () => {
     parser.grammar = (
       <repeat>
-        <label text='test'>
-          <literal text='super' />
-        </label>
+        <literal text='super' />
       </repeat>
     )
 
     const data = parser.parseArray('sup')
-    expect(data).to.have.length(2)
+    expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('super')
-    expect(text(data[1])).to.equal('supertest')
-    expect(data[1].words[2].placeholder).to.be.true
+    expect(data[0].ellipsis).to.be.true
   })
 
   it('accepts the child twice', () => {
     parser.grammar = (
       <repeat>
-        <label text='test'>
-          <literal text='super' />
-        </label>
+        <literal text='super' />
       </repeat>
     )
 
     const data = parser.parseArray('supers')
-    expect(data).to.have.length(2)
+    expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('supersuper')
-    expect(text(data[1])).to.equal('supersupertest')
+    expect(data[0].ellipsis).to.be.true
   })
 
   it('creates an array from the values of the children', () => {
     parser.grammar = (
-      <repeat max={2}>
-        <label text='test'>
-          <choice>
-            <literal text='super' value='super' />
-            <literal text='man' value='man' />
-          </choice>
-        </label>
+      <repeat>
+        <choice>
+          <literal text='super' value='super' />
+          <literal text='man' value='man' />
+        </choice>
       </repeat>
     )
 
@@ -150,59 +136,53 @@ describe('repeat', () => {
     expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('superman')
     expect(data[0].result).to.eql(['super', 'man'])
+    expect(data[0].ellipsis).to.be.true
   })
 
   it('does not accept fewer than min iterations', () => {
     parser.grammar = (
       <repeat min={2}>
-        <label text='test'>
-          <literal text='a' />
-        </label>
+        <literal text='a' />
       </repeat>
     )
 
     const data = parser.parseArray('a')
     expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('atest')
+    expect(text(data[0])).to.equal('aa')
+    expect(data[0].ellipsis).to.be.true
   })
 
   it('does not accept more than max iterations', () => {
     parser.grammar = (
       <repeat max={1} >
-        <label text='test'>
-          <literal text='a' />
-        </label>
+        <literal text='a' />
       </repeat>
     )
 
-    const data = parser.parseArray('a')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('a')
+    const data = parser.parseArray('aa')
+    expect(data).to.have.length(0)
   })
-  //
-  // it('passes on its category', () => {
-  //   parser.grammar = (
-  //     <repeat category='myCat'>
-  //       <literal text='a' />
-  //     </repeat>
-  //   ]
-  //
-  //   const data = parser.parseArray('')
-  //   expect(data).to.have.length(2)
-  //   expect(data[0].suggestion[0].category).to.equal('myCat')
-  //   expect(data[1].suggestion[0].category).to.equal('myCat')
-  //   expect(data[1].completion[0].category).to.equal('myCat')
-  // })
+
+  it('does not output an ellipsis at max iterations', () => {
+    parser.grammar = (
+      <repeat max={2} >
+        <literal text='a' />
+      </repeat>
+    )
+
+    const data = parser.parseArray('aa')
+    expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('aa')
+    expect(data[0].ellipsis).to.not.be.ok
+  })
 
   it('rejects non-unique repeated elements', () => {
     parser.grammar = (
       <repeat unique>
-        <label text='test'>
-          <choice>
-            <literal text='a' value='a' />
-            <literal text='b' value='b' />
-          </choice>
-        </label>
+        <choice>
+          <literal text='a' value='a' />
+          <literal text='b' value='b' />
+        </choice>
       </repeat>
     )
 
@@ -213,12 +193,10 @@ describe('repeat', () => {
   it('rejects non-unique repeated elements (deep)', () => {
     parser.grammar = (
       <repeat unique>
-        <label text='test'>
-          <choice>
-            <literal text='a' value={{a: 1}} />
-            <literal text='b' value={{a: 1}} />
-          </choice>
-        </label>
+        <choice>
+          <literal text='a' value={{a: 1}} />
+          <literal text='b' value={{a: 1}} />
+        </choice>
       </repeat>
     )
 
@@ -228,55 +206,51 @@ describe('repeat', () => {
 
   it('accepts unique repeated elements', () => {
     parser.grammar = (
-      <repeat unique max={2}>
-        <label text='test'>
-          <choice>
-            <literal text='a' value='a' />
-            <literal text='b' value='b' />
-          </choice>
-        </label>
+      <repeat unique>
+        <choice>
+          <literal text='a' value='a' />
+          <literal text='b' value='b' />
+        </choice>
       </repeat>
     )
 
     const data = parser.parseArray('ab')
     expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('ab')
+    expect(data[0].ellipsis).to.be.true
   })
 
   it('accepts non-unique repeated elements (deep)', () => {
     parser.grammar = (
       <repeat unique>
-        <label text='test' suppressEmpty={false}>
-          <choice>
-            <literal text='a' value={{a: 1}} />
-            <literal text='b' value={{a: 2}} />
-          </choice>
-        </label>
+        <choice>
+          <literal text='a' value={{a: 1}} />
+          <literal text='b' value={{a: 2}} />
+        </choice>
       </repeat>
     )
 
     const data = parser.parseArray('ab')
     expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('ab')
+    expect(data[0].ellipsis).to.be.true
   })
 
   it('allows for choices inside of repeats to be limited', () => {
     parser.grammar = (
       <repeat>
-        <label text='test'>
-          <choice limit={1}>
-            <literal text='aa' />
-            <literal text='ab' />
-            <literal text='ac' />
-          </choice>
-        </label>
+        <choice limit={1}>
+          <literal text='aa' />
+          <literal text='ab' />
+          <literal text='ac' />
+        </choice>
       </repeat>
     )
 
     const data = parser.parseArray('aba')
-    expect(data).to.have.length(2)
+    expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('abaa')
-    expect(text(data[1])).to.equal('abaatest')
+    expect(data[0].ellipsis).to.be.true
   })
 
   it('allows for choices inside of repeat separators to be limited', () => {
@@ -288,14 +262,13 @@ describe('repeat', () => {
           <literal text='ac' />
         </choice>
       }>
-        <label text='test'>
-          <literal text='x' />
-        </label>
+        <literal text='x' />
       </repeat>
     )
 
     const data = parser.parseArray('xa')
     expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('xaatest')
+    expect(text(data[0])).to.equal('xaax')
+    expect(data[0].ellipsis).to.be.true
   })
 })

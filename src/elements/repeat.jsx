@@ -30,10 +30,14 @@ export class Repeat extends Phrase {
     }
 
     if (childIndex >= this.props.min) {
-      yield input
+      if (childIndex < this.props.max) {
+        yield _.assign({}, input, {ellipsis: true})
+      } else {
+        yield input
+      }
     }
 
-    if (_.some(input.words, 'placeholder')) {
+    if (childIndex >= this.props.min && input.text === '' || input.text == null) {
       return
     }
 

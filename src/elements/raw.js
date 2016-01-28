@@ -22,10 +22,11 @@ export class Raw extends Phrase {
             argument: input.currentArgument,
             category: this.props.category
           }))
-        )
+        ),
       }
 
       if (this.props.limit) modification.callbacks = input.callbacks.concat(() => success = true)
+      if (output.ellipsis) modification.ellipsis = true
 
       yield _.assign({}, input, modification)
 

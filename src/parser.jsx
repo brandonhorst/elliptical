@@ -30,7 +30,7 @@ export function createOption (options) {
 }
 
 function normalizeOutput (option) {
-  const output = _.pick(option, ['words', 'score', 'result', 'qualifiers'])
+  const output = _.pick(option, ['words', 'score', 'result', 'qualifiers', 'ellipsis'])
   return output
 }
 

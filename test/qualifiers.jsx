@@ -60,10 +60,8 @@ describe('qualifiers', () => {
     )
 
     const data = parser.parseArray('testte')
-    expect(data).to.have.length(2)
+    expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('testtest')
     expect(data[0].qualifiers).to.eql(['qual', 'qual'])
-    expect(text(data[1])).to.equal('testtestplace')
-    expect(data[1].qualifiers).to.eql(['qual', 'qual'])
   })
 })
