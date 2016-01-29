@@ -14,7 +14,7 @@ export class Choice extends Phrase {
         let success = false
 
         //perf opt
-        if (childPhrase.props.id == null && !this.props.limit) {
+        if (childPhrase.props.id == null && !childPhrase.props.ellipsis && !this.props.limit) {
           yield* parse({phrase: childPhrase, input, options})
         } else {
           for (let output of parse({phrase: childPhrase, input, options})) {
@@ -23,6 +23,7 @@ export class Choice extends Phrase {
               : output.result
 
             const modifications = {result: newResult}
+            // if (childPhrase.props.ellipsis) modifications.ellipsis = true
             if (this.props.limit) modifications.callbacks = output.callbacks.concat(() => success = true)
 
             yield _.assign({}, output, modifications)

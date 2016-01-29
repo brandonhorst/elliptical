@@ -54,6 +54,44 @@ describe('label', () => {
     expect(data5).to.have.length(0)
   })
 
+  // it('suppresses with an ellipsis', () => {
+  //   parser.grammar = (
+  //     <sequence>
+  //       <literal text='a ' id='a' value='a' />
+  //       <label ellipsis id='place' suppressEmpty={false}>
+  //         <literal text='literal' value='test' />
+  //       </label>
+  //     </sequence>
+  //   )
+
+  //   const data1 = parser.parseArray('')
+  //   expect(data1).to.have.length(1)
+  //   expect(text(data1[0])).to.equal('a ')
+  //   expect(data1[0].ellipsis).to.be.true
+
+  //   const data2 = parser.parseArray('a')
+  //   expect(data2).to.have.length(1)
+  //   expect(text(data2[0])).to.equal('a ')
+  //   expect(data2[0].ellipsis).to.be.true
+
+  //   const data3 = parser.parseArray('a ')
+  //   expect(data3).to.have.length(1)
+  //   expect(text(data3[0])).to.equal('a literal')
+  //   expect(data3[0].ellipsis).to.not.be.ok
+  //   expect(data3[0].result).to.eql({a: 'a', place: 'test'})
+  //   expect(data3[0].words[1].placeholder).to.be.undefined
+
+  //   const data4 = parser.parseArray('a l')
+  //   expect(data4).to.have.length(1)
+  //   expect(text(data4[0])).to.equal('a literal')
+  //   expect(data4[0].ellipsis).to.not.be.ok
+  //   expect(data4[0].result).to.eql({a: 'a', place: 'test'})
+  //   expect(data4[0].words[1].placeholder).to.be.undefined
+
+  //   const data5 = parser.parseArray('a t')
+  //   expect(data5).to.have.length(0)
+  // })
+
   it('suppresses empty inputs by default', () => {
     function func (input) {
       if (input === 'v') {
@@ -226,66 +264,66 @@ describe('label', () => {
     expect(data[0].words[3].argument).to.not.be.true
   })
 
-  it('suppressIncomplete suppresses an incomplete child', () => {
-    parser.grammar = (
-      <label text='arg' suppressIncomplete>
-        <sequence>
-          <literal text='a' />
-          <label text='test'>
-            <literal text='b' />
-          </label>
-        </sequence>
-      </label>
-    )
+  // it('suppressIncomplete suppresses an incomplete child', () => {
+  //   parser.grammar = (
+  //     <label text='arg' suppressIncomplete>
+  //       <sequence>
+  //         <literal text='a' />
+  //         <label text='test'>
+  //           <literal text='b' />
+  //         </label>
+  //       </sequence>
+  //     </label>
+  //   )
 
-    const data1 = parser.parseArray('')
-    expect(data1).to.have.length(1)
-    expect(text(data1[0])).to.equal('arg')
-    expect(data1[0].words[0].placeholder).to.be.true
+  //   const data1 = parser.parseArray('')
+  //   expect(data1).to.have.length(1)
+  //   expect(text(data1[0])).to.equal('arg')
+  //   expect(data1[0].words[0].placeholder).to.be.true
 
-    const data2 = parser.parseArray('a')
-    expect(data2).to.have.length(1)
-    expect(text(data2[0])).to.equal('arg')
-    expect(data2[0].words[0].placeholder).to.be.true
+  //   const data2 = parser.parseArray('a')
+  //   expect(data2).to.have.length(1)
+  //   expect(text(data2[0])).to.equal('arg')
+  //   expect(data2[0].words[0].placeholder).to.be.true
 
-    const data3 = parser.parseArray('ab')
-    expect(data3).to.have.length(1)
-    expect(text(data3[0])).to.equal('ab')
-    expect(data3[0].words).to.have.length(2)
-  })
+  //   const data3 = parser.parseArray('ab')
+  //   expect(data3).to.have.length(1)
+  //   expect(text(data3[0])).to.equal('ab')
+  //   expect(data3[0].words).to.have.length(2)
+  // })
 
-  it('suppressIncomplete allows a complete child', () => {
-    parser.grammar = (
-      <label text='arg' suppressIncomplete>
-        <sequence>
-          <literal text='a' />
-          <choice>
-            <literal text='b' />
-            <label text='test'>
-              <literal text='c' />
-            </label>
-          </choice>
-        </sequence>
-      </label>
-    )
+  // it('suppressIncomplete allows a complete child', () => {
+  //   parser.grammar = (
+  //     <label text='arg' suppressIncomplete>
+  //       <sequence>
+  //         <literal text='a' />
+  //         <choice>
+  //           <literal text='b' />
+  //           <label text='test'>
+  //             <literal text='c' />
+  //           </label>
+  //         </choice>
+  //       </sequence>
+  //     </label>
+  //   )
 
-    const data1 = parser.parseArray('')
-    expect(data1).to.have.length(1)
-    expect(text(data1[0])).to.equal('arg')
-    expect(data1[0].words[0].placeholder).to.be.true
+  //   const data1 = parser.parseArray('')
+  //   expect(data1).to.have.length(1)
+  //   expect(text(data1[0])).to.equal('arg')
+  //   expect(data1[0].words[0].placeholder).to.be.true
 
-    const data2 = parser.parseArray('a')
-    expect(data2).to.have.length(2)
-    expect(text(data2[0])).to.equal('ab')
-    expect(text(data2[1])).to.equal('arg')
-    expect(data2[1].words[0].placeholder).to.be.true
+  //   const data2 = parser.parseArray('a')
+  //   expect(data2).to.have.length(2)
+  //   expect(text(data2[0])).to.equal('ab')
+  //   expect(text(data2[1])).to.equal('arg')
+  //   expect(data2[1].words[0].placeholder).to.be.true
 
-    const data3 = parser.parseArray('ab')
-    expect(data3).to.have.length(1)
-    expect(text(data3[0])).to.equal('ab')
+  //   const data3 = parser.parseArray('ab')
+  //   expect(data3).to.have.length(1)
+  //   expect(text(data3[0])).to.equal('ab')
 
-    const data4 = parser.parseArray('ac')
-    expect(data4).to.have.length(1)
-    expect(text(data4[0])).to.equal('ac')
-  })
+  //   const data4 = parser.parseArray('ac')
+  //   expect(data4).to.have.length(1)
+  //   expect(text(data4[0])).to.equal('ac')
+  // })
 })

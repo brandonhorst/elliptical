@@ -19,7 +19,7 @@ export class Sequence extends Phrase {
           if (child.props.preferred) choiceChildren.reverse()
 
           return (
-            <choice limit={child.props.limited ? 1 : undefined} id={child.props.id} merge={child.props.merge}>
+            <choice limit={child.props.limited ? 1 : undefined} id={child.props.id} merge={child.props.merge} ellipsis={false}>
               {choiceChildren}
             </choice>
           )
@@ -44,27 +44,41 @@ export class Sequence extends Phrase {
   }
 
   * parseChild (childIndex, input, options) {
-    if (childIndex >= this.childPhrases.length) {
-      yield input
-      return
-    }
-
-    if (input.suppressIncomplete && _.some(input.words, 'placeholder')) {
-      return
-    }
-
     const child = this.childPhrases[childIndex]
 
-    for (let output of parse({phrase: this.childPhrases[childIndex], input, options})) {
-      if (this.props.unique && output.result != null && child.props.id && input.result[child.props.id] != null) {
-        continue
+    for (let output of parse({phrase: child, input, options})) {
+      if (this.props.unique && output.result != null) {
+        if (child.props.id && input.result[child.props.id] != null) { // id
+          continue
+        } else if (child.props.merge && !_.isEmpty(_.intersection(_.keys(input.result), _.keys(output.result)))) { // merge
+          continue
+        }
       }
 
       const modifications = {}
       modifications.result = getAccumulatedResult(input.result, child, output.result)
       modifications.score = input.score * output.score
       modifications.qualifiers = input.qualifiers.concat(output.qualifiers)
-      const nextOutput = _.assign({}, output, modifications)
+      let nextOutput = _.assign({}, output, modifications)
+
+      if (childIndex + 1 >= this.childPhrases.length) {
+        if (output.ellipsis) {
+          yield _.assign({}, nextOutput, {ellipsis: false})
+        } else {
+          yield nextOutput
+        }
+        continue
+      }
+
+      if (output.ellipsis) {
+        if (output.text == null) {
+          yield nextOutput
+          continue
+        } else if (output.text === '') {
+          yield _.assign({}, nextOutput, {ellipsis: false})
+        }
+        nextOutput = _.assign({}, nextOutput, {ellipsis: false})
+      }
 
       yield* this.parseChild(childIndex + 1, nextOutput, options)
     }
@@ -78,7 +92,7 @@ function getAccumulatedResult (inputResult, child, childResult) {
     if (childId) {
       return _.assign({}, inputResult, {[childId]: childResult})
     } else if (childMerge) {
-      if (_.isPlainObject(childResult)) {
+      if (!_.isEmpty(inputResult) && _.isPlainObject(childResult)) {
         return _.merge({}, inputResult, childResult)
       } else {
         return childResult
