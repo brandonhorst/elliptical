@@ -33,7 +33,45 @@ describe('elements/map', () => {
     expect(data[0].result).to.eql('testing')
   })
 
-  it('maps an element\'s result', () => {
+  it('maps an element\'s result with an iterator', () => {
+    function * addSuffixes (result) {
+      yield `${result}ing`
+      yield `${result}ed`
+    }
+
+    parser.grammar = (
+      <map iteratorFunction={addSuffixes}>
+        <literal text='test' value='test' />
+      </map>
+    )
+
+    const data = parser.parseArray('test')
+    expect(data).to.have.length(2)
+    expect(text(data[0])).to.equal('test')
+    expect(data[0].result).to.eql('testing')
+    expect(text(data[1])).to.equal('test')
+    expect(data[1].result).to.eql('tested')
+  })
+
+  it('maps an element\'s result with an iterator, and can be limited', () => {
+    function * addSuffixes (result) {
+      yield `${result}ing`
+      yield `${result}ed`
+    }
+
+    parser.grammar = (
+      <map iteratorFunction={addSuffixes} limit={1}>
+        <literal text='test' value='test' />
+      </map>
+    )
+
+    const data = parser.parseArray('test')
+    expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('test')
+    expect(data[0].result).to.eql('testing')
+  })
+
+  it('maps an element\'s result, but not if there is a placeholder', () => {
     const mapSpy = spy()
     function addIng (result) {
       mapSpy()

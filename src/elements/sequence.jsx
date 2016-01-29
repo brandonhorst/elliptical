@@ -7,6 +7,19 @@ import { reconcile } from '../reconcile'
 export class Sequence extends Phrase {
   describe () {
     // replace optionals with replacements
+    const ellipsisIndex = _.findIndex(this.props.children, _.property('props.ellipsis'))
+    if (ellipsisIndex > -1 && ellipsisIndex < (this.props.children.length - 1)) {
+      return (
+        <sequence>
+          {this.props.children.slice(0, ellipsisIndex)}
+          {_.merge({}, this.props.children[ellipsisIndex], {props: {ellipsis: false}})}
+          <sequence optional limited merge>
+            {this.props.children.slice(ellipsisIndex + 1)}
+          </sequence>
+        </sequence>
+      )
+    }
+
     if (_.some(this.props.children, _.property('props.optional'))) {
       const newChildren = _.map(this.props.children, child => {
         if (child && child.props && child.props.optional) {
@@ -19,7 +32,7 @@ export class Sequence extends Phrase {
           if (child.props.preferred) choiceChildren.reverse()
 
           return (
-            <choice limit={child.props.limited ? 1 : undefined} id={child.props.id} merge={child.props.merge} ellipsis={false}>
+            <choice limit={child.props.limited ? 1 : undefined} id={child.props.id} merge={child.props.merge}>
               {choiceChildren}
             </choice>
           )
@@ -62,23 +75,21 @@ export class Sequence extends Phrase {
       let nextOutput = _.assign({}, output, modifications)
 
       if (childIndex + 1 >= this.childPhrases.length) {
-        if (output.ellipsis) {
-          yield _.assign({}, nextOutput, {ellipsis: false})
-        } else {
-          yield nextOutput
-        }
+        yield nextOutput
         continue
       }
 
-      if (output.ellipsis) {
-        if (output.text == null) {
-          yield nextOutput
-          continue
-        } else if (output.text === '') {
-          yield _.assign({}, nextOutput, {ellipsis: false})
-        }
-        nextOutput = _.assign({}, nextOutput, {ellipsis: false})
-      }
+      // if (child.props.ellipsis) {
+      //   yield nextOutput
+
+      //   if (output.text == null) {
+      //     continue
+      //   }
+
+      //   if (output.ellipsis) {
+      //     nextOutput = _.assign({}, nextOutput, {ellipsis: false})
+      //   }
+      // }
 
       yield* this.parseChild(childIndex + 1, nextOutput, options)
     }

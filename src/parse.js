@@ -7,9 +7,9 @@ function hasPlaceholder(output) {
 function modify (phrase, output) {
   const modifications = {}
 
-  // if (phrase.props.ellipsis) {
-  //   modifications.ellipsis = true
-  // }
+  if (phrase.props.ellipsis) {
+    modifications.ellipsis = true
+  }
   
   if (phrase.props.value) {
     modifications.result = phrase.props.value
