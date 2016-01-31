@@ -123,7 +123,9 @@ That doesn't look to bad. Because `{task name}` and a `{date and time}` are abst
 
 `lacona` schemata are all written in pure Javascript. However, because if their complex nested structure, it is recommended that developers use a syntactic sugar known as [JSX](https://facebook.github.io/react/docs/jsx-in-depth.html). JSX was developed for [React](https://facebook.github.io/react/index.html) but is not tied to the HTML DOM in any way. It provides the most elegant way to build Lacona schemata.
 
-We recommend that you develop your schemata using JSX and transpile them using [babel](http://babeljs.io/) - that is how everything is developed internally. This guide will use JSX, as well as some ES2015 and even ES7 functionality. Though all development is possible using ES7 alone, babel compilation is highly recommended.
+We recommend that you develop your schemata using JSX and transpile them using [babel](http://babeljs.io/) - that is how everything is developed internally. This guide will use JSX, as well as some ES2015 and even ES7 functionality. Though all development is possible using ES5 alone, babel compilation is highly recommended.
+
+For an ES5 example, please see [this Gist](https://gist.github.com/bradvogel/9759b3fe50828ad6bae8).
 
 ## A Basic `lacona` Schema
 
