@@ -26,7 +26,7 @@ describe('sequence', () => {
     expect(data[0].result).to.be.empty
   })
 
-  it('handles an optional child with a separator', () => {
+  it('handles an optional child', () => {
     parser.grammar = (
       <sequence>
         <literal text='super' />
@@ -39,6 +39,79 @@ describe('sequence', () => {
     expect(data).to.have.length(2)
     expect(text(data[0])).to.equal('superman')
     expect(text(data[1])).to.equal('supermaximumman')
+  })
+
+  it('handles an ellipsis', () => {
+    parser.grammar = (
+      <sequence>
+        <literal text='super' ellipsis />
+        <literal text='man' />
+      </sequence>
+    )
+
+    const data1 = parser.parseArray('')
+    expect(data1).to.have.length(1)
+    expect(text(data1[0])).to.equal('super')
+
+    const data2 = parser.parseArray('super')
+    expect(data2).to.have.length(1)
+    expect(text(data2[0])).to.equal('super')
+
+    const data3 = parser.parseArray('superm')
+    expect(data3).to.have.length(1)
+    expect(text(data3[0])).to.equal('superman')
+  })
+
+  it('does not output an ellipsis twice for the same text', () => {
+    parser.grammar = (
+      <sequence>
+        <literal text='super' />
+        <literal text='man' ellipsis />
+        <literal text='rocks' ellipsis />
+      </sequence>
+    )
+
+    const data1 = parser.parseArray('')
+    expect(data1).to.have.length(1)
+    expect(text(data1[0])).to.equal('superman')
+
+    const data2 = parser.parseArray('super')
+    expect(data2).to.have.length(1)
+    expect(text(data2[0])).to.equal('superman')
+
+    const data3 = parser.parseArray('superman')
+    expect(data3).to.have.length(1)
+    expect(text(data3[0])).to.equal('superman')
+
+    const data4 = parser.parseArray('supermanr')
+    expect(data4).to.have.length(1)
+    expect(text(data4[0])).to.equal('supermanrocks')
+  })
+
+  it('handles an ellipsis that is optional', () => {
+    parser.grammar = (
+      <sequence>
+        <literal text='super' ellipsis optional  />
+        <literal text='man' />
+      </sequence>
+    )
+
+    const data1 = parser.parseArray('')
+    expect(data1).to.have.length(2)
+    expect(text(data1[0])).to.equal('')
+    expect(text(data1[1])).to.equal('super')
+
+    const data2 = parser.parseArray('s')
+    expect(data2).to.have.length(1)
+    expect(text(data2[0])).to.equal('super')
+
+    const data3 = parser.parseArray('super')
+    expect(data3).to.have.length(1)
+    expect(text(data3[0])).to.equal('super')
+
+    const data4 = parser.parseArray('superm')
+    expect(data4).to.have.length(1)
+    expect(text(data4[0])).to.equal('superman')
   })
 
   it('handles an optional child that is preferred', () => {
@@ -236,7 +309,7 @@ describe('sequence', () => {
     expect(text(data[0])).to.equal('test')
   })
 
-  it('allows for uniqueness', () => {
+  it('checks for uniqueness', () => {
     class Test extends Phrase {
       describe () {
         return (
@@ -244,6 +317,34 @@ describe('sequence', () => {
             <literal text='test' optional id='test' value={1} />
             <literal text='a' />
             <literal text='test' optional id='test' value={2} />
+          </sequence>
+        )
+      }
+    }
+
+    parser.grammar = <Test />
+    const data1 = parser.parseArray('testa')
+    expect(data1).to.have.length(1)
+    expect(text(data1[0])).to.equal('testa')
+    expect(data1[0].result.test).to.equal(1)
+
+    const data2 = parser.parseArray('atest')
+    expect(data2).to.have.length(1)
+    expect(text(data2[0])).to.equal('atest')
+    expect(data2[0].result.test).to.equal(2)
+
+    const data3 = parser.parseArray('testatest')
+    expect(data3).to.have.length(0)
+  })
+
+  it('allows for uniqueness in merges', () => {
+    class Test extends Phrase {
+      describe () {
+        return (
+          <sequence unique>
+            <literal text='test' optional id='test' value={1} />
+            <literal text='a' />
+            <literal text='test' optional merge value={{test: 2}} />
           </sequence>
         )
       }

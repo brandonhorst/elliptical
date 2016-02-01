@@ -1066,6 +1066,26 @@ This is an easy way to say "accept this child if it's not there, but don't sugge
   </sequence>
 ```
 
+There is another piece of functionality known as the `ellipsis`. If you sent a `<sequence />`s child to have `ellipsis={true}`, then it means "it is OK to stop here - make the rest of the sequence optional". This limits the options displayed to the user and can substantially improve understanding and performance. These two descriptions are precisely equivalent:
+
+```js
+<sequence>
+  <literal text='The ' />
+  <literal text='Batman' ellipsis />
+  <literal text=' and Robin' />
+</literal>
+
+//becomes
+
+<sequence>
+  <literal text='The ' />
+  <literal text='Batman' />
+  <sequence optional limited merge>
+    <literal text=' and Robin' />
+  </sequence>
+</literal>
+```
+
 #### Result
 
 `Any` - One of the following items

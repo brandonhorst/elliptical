@@ -137,4 +137,21 @@ describe('raw', () => {
     expect(data).to.have.length(1)
     expect(data[0].qualifiers).to.eql(['test'])
   })
+
+  it('can set the ellipsis', () => {
+    function fun (input) {
+      return [{
+        words: [{text: 'test', input: true}],
+        result: 'val',
+        remaining: '',
+        ellipsis: true,
+      }]
+    }
+
+    parser.grammar = <raw function={fun} />
+
+    const data = parser.parseArray('')
+    expect(data).to.have.length(1)
+    expect(data[0].ellipsis).to.be.true
+  })
 })
