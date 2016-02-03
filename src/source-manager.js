@@ -70,8 +70,8 @@ export default class SourceManager {
       if (sourceDescriptor) {
         const source = this._getSource(sourceDescriptor)
         source.__subscribers++
+        source.__descriptor = sourceDescriptor
         object.__lastSourceVersion = 0
-        object.__descriptor = sourceDescriptor
 
         object.source = source
       }

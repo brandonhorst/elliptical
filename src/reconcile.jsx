@@ -28,15 +28,7 @@ function reconcileOne ({descriptor, phrase, options}) {
     let needsRedescribe = false
 
     const {extensionsChanged, extensions} = getExtensions({Constructor, phrase, options})
-    if (extensionsChanged) {
-      needsRedescribe = true
-    }
-
-    if (!needsRedescribe && options.sourceManager.sourceChanged(phrase)) {
-      needsRedescribe = true
-    }
-
-    if (needsRedescribe) {
+    if (extensionsChanged || options.sourceManager.sourceChanged(phrase)) {
       const describedPhrase = getDescribedPhrase({Constructor, phrase, extensions, options})
 
       phrase.__describedPhrase = describedPhrase

@@ -88,12 +88,14 @@ describe('sources', () => {
     expect(destSpy).to.not.have.been.called
     expect(data1).to.have.length(1)
     expect(text(data1[0])).to.equal('test')
+    expect(parser._sourceManager._sources).to.have.length(1)
 
     parser.grammar = <Test useSource={false}/>
     const data2 = parser.parseArray('')
     expect(destSpy).to.have.been.called
     expect(data2).to.have.length(1)
     expect(text(data2[0])).to.equal('test')
+    expect(parser._sourceManager._sources).to.be.empty
   })
 
   it('can use props in data property initializer', () => {
