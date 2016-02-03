@@ -63,8 +63,6 @@ export default class SourceManager {
   }
 
   sourceInstance (object) {
-    object.__sources = {}
-
     if (object.observe) {
       const sourceDescriptor = object.observe()
       if (sourceDescriptor) {
