@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { reconcile } from './reconcile'
 
 function hasPlaceholder(output) {
   return _.any(output.words, 'placeholder')
@@ -29,8 +30,25 @@ function modify (phrase, output) {
 export function * parse ({phrase, input, options}) {
   options.parses++
 
-  if (phrase.__describedPhrase) {
-    const iterator = parse({phrase: phrase.__describedPhrase, input, options})
+  let potentialDescribedPhrase
+
+  if (input.text && phrase.fetch) {
+    if (!phrase.__fetchDescribedPhrases[input.text] || options.sourceManager.fetchSourceChanged(phrase, input.text)) {
+      options.sourceManager.fetchSourceInstance(phrase, input.text)
+
+      const potentialSource = phrase.__fetchSources[input.text].source
+      if (potentialSource) {
+        const descriptor = phrase.describe(potentialSource.data)
+        phrase.__fetchDescribedPhrases[input.text] = reconcile({descriptor, phrase, options})
+      }
+    }
+    potentialDescribedPhrase = phrase.__fetchDescribedPhrases[input.text]
+  } else {
+    potentialDescribedPhrase = phrase.__describedPhrase
+  }
+
+  if (potentialDescribedPhrase) {
+    const iterator = parse({phrase: potentialDescribedPhrase, input, options})
     for (let output of iterator) {
       if (!phrase.validate || hasPlaceholder(output) || phrase.validate(output.result)) {
         yield modify(phrase, output)

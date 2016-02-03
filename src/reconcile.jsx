@@ -42,7 +42,7 @@ function reconcileOne ({descriptor, phrase, options}) {
 
     const newPhrase = instantiate({Constructor, props})
 
-    options.sourceManager.sourceInstance(newPhrase)
+    options.sourceManager.observeSourceInstance(newPhrase)
 
     create({phrase: newPhrase})
 
@@ -50,6 +50,11 @@ function reconcileOne ({descriptor, phrase, options}) {
 
     newPhrase.__oldExtensions = extensions
     newPhrase.__describedPhrase = describedPhrase
+
+    if (newPhrase.fetch) {
+      newPhrase.__fetchDescribedPhrases = {}
+      newPhrase.__fetchSources = {}
+    }
 
     return newPhrase
   }
@@ -134,7 +139,7 @@ export function destroy ({phrase, sourceManager}) {
     phrase.childPhrases.forEach(phrase => destroy({phrase, sourceManager}))
   }
 
-  sourceManager.unsourceInstance(phrase)
+  sourceManager.observeUnsourceInstance(phrase)
 
   if (phrase.destroy) phrase.destroy()
 }

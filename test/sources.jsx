@@ -116,94 +116,77 @@ describe('sources', () => {
   })
 
   it('sources with the same props share', () => {
+    const onCreateSpy = spy()
     class TestSource extends Source {
-      data = 'testa'
-      set (input) {
-        this.setData(input)
+      onCreate () {
+        onCreateSpy()
+        this.setData(this.props.prop)
       }
     }
 
-    class Test extends Phrase {
-      create () { this.source.set('testb') }
-      observe () { return <TestSource /> }
+    class Sub1 extends Phrase {
+      observe () { return <TestSource prop='testa' /> }
       describe () { return <literal text={this.source.data} /> }
     }
-    class Test2 extends Phrase {
-      observe () { return <TestSource /> }
+    class Sub2 extends Phrase {
+      observe () { return <TestSource prop='testa' /> }
       describe () { return <literal text={this.source.data} /> }
+    }
+
+    class Test extends Phrase {
+      describe () {
+        return (
+          <choice>
+            <Sub1 />
+            <Sub2 />
+          </choice>
+        )
+      }
     }
 
     parser.grammar = <Test />
     const data1 = parser.parseArray('')
-    expect(data1).to.have.length(1)
-    expect(text(data1[0])).to.equal('testb')
-
-    parser.grammar = <Test2 />
-    const data2 = parser.parseArray('')
-    expect(data2).to.have.length(1)
-    expect(text(data2[0])).to.equal('testb')
-  })
-
-  it('sources with the same props do not share if preventSharing is set', () => {
-    class TestSource extends Source {
-      data = 'testa'
-
-      static preventSharing = true
-
-      set (input) {
-        this.setData(input)
-      }
-    }
-
-    class Test extends Phrase {
-      create () { this.source.set('testb') }
-      observe () { return <TestSource /> }
-      describe () { return <literal text={this.source.data} /> }
-    }
-    class Test2 extends Phrase {
-      observe () { return <TestSource /> }
-      describe () { return <literal text={this.source.data} /> }
-    }
-
-    parser.grammar = <Test />
-    const data1 = parser.parseArray('')
-    expect(data1).to.have.length(1)
-    expect(text(data1[0])).to.equal('testb')
-
-    parser.grammar = <Test2 />
-    const data2 = parser.parseArray('')
-    expect(data2).to.have.length(1)
-    expect(text(data2[0])).to.equal('testa')
+    expect(data1).to.have.length(2)
+    expect(text(data1[0])).to.equal('testa')
+    expect(text(data1[1])).to.equal('testa')
+    expect(onCreateSpy).to.have.been.calledOnce
   })
 
   it('sources with different props do not share', () => {
+    const onCreateSpy = spy()
     class TestSource extends Source {
-      data = 'testa'
-
-      set (input) {
-        this.setData(input)
+      onCreate () {
+        onCreateSpy()
+        this.setData(this.props.prop)
       }
     }
 
-    class Test extends Phrase {
-      create () { this.source.set('testb') }
-      observe () { return <TestSource id='something' /> }
+    class Sub1 extends Phrase {
+      observe () { return <TestSource prop='testa' /> }
       describe () { return <literal text={this.source.data} /> }
     }
-    class Test2 extends Phrase {
-      observe () { return <TestSource /> }
+    class Sub2 extends Phrase {
+      observe () { return <TestSource prop='testb' /> }
       describe () { return <literal text={this.source.data} /> }
+    }
+
+    class Test extends Phrase {
+      describe () {
+        return (
+          <choice>
+            <Sub1 />
+            <Sub2 />
+          </choice>
+        )
+      }
     }
 
     parser.grammar = <Test />
     const data1 = parser.parseArray('')
-    expect(data1).to.have.length(1)
-    expect(text(data1[0])).to.equal('testb')
-
-    parser.grammar = <Test2 />
-    const data2 = parser.parseArray('')
-    expect(data2).to.have.length(1)
-    expect(text(data2[0])).to.equal('testa')
+    expect(data1).to.have.length(2)
+    expect(text(data1[0])).to.equal('testa')
+    expect(text(data1[1])).to.equal('testb')
+    expect(onCreateSpy).to.have.been.calledTwice
   })
 
   it('can export functions, which can be called on create', () => {
