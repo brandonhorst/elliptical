@@ -107,10 +107,10 @@ describe('fetch', () => {
       expect(data2).to.have.length(0)
       process.nextTick(() => {
         const data3 = parser.parseArray('b')
+        expect(data3).to.have.length(1)
         expect(text(data3[0])).to.equal('bbb')
         expect(data3[0].result).to.equal('bbb')
         done()
-
       })
     })
   })

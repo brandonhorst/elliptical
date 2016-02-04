@@ -4,7 +4,7 @@ import {getRealProps, getConstructor, instantiate} from './descriptor'
 export default class SourceManager {
   constructor ({update = () => {}}) {
     this._sources = []
-    this._fetchSources = []
+    this._fetchObjects = []
     this.update = update
   }
 
@@ -18,7 +18,7 @@ export default class SourceManager {
     this.update()
   }
 
-  _createSource (descriptor, {fetch}) {
+  _createSource (descriptor, {fetch, object}) {
     const Constructor = getConstructor({Constructor: descriptor.Constructor, type: 'source'})
     const props = getRealProps({descriptor, Constructor: descriptor.Constructor})
     const instance = instantiate({Constructor, props})
@@ -38,10 +38,6 @@ export default class SourceManager {
 
     this._sources.push({instance, descriptor})
 
-    if (fetch) {
-      this._fetchSources.push({instance, descriptor})
-    }
-
     if (instance.onCreate) instance.onCreate()
 
     instance.__isCreating = false
@@ -49,13 +45,13 @@ export default class SourceManager {
     return instance
   }
 
-  _getSource (descriptor, {fetch = false} = {}) {
+  _getSource (descriptor, {fetch = false, object} = {}) {
     const possibleSource = _.find(this._sources, (source) => _.isEqual(descriptor, source.descriptor))
 
     if (possibleSource) {
       return possibleSource.instance
     } else {
-      return this._createSource(descriptor, {fetch})
+      return this._createSource(descriptor, {fetch, object})
     }
   }
 
@@ -99,7 +95,8 @@ export default class SourceManager {
     if (object.fetch) {
       const sourceDescriptor = object.fetch(input)
       if (sourceDescriptor) {
-        const source = this._getSource(sourceDescriptor, {fetch: true})
+        const source = this._getSource(sourceDescriptor, {fetch: true, object})
+        this._fetchObjects.push({object, input})
         source.__subscribers++
         source.__descriptor = sourceDescriptor
         object.__fetchSources[input] = {
@@ -110,14 +107,15 @@ export default class SourceManager {
     }
   }
 
-  fetchUnsourceInstance (object) {
-    if (object.fetch) {
-      _.forEach(object.__fetchSources, ({source}) => {
-        this.observeUnsourceInstance(source)
-        this.fetchUnsourceInstance(source)
-        this._removeSubscription(source)
-      })
-      delete object.__fetchSources
+  fetchUnsourceInstance (object, input) {
+    if (object.fetch && object.__fetchSources && object.__fetchSources[input]) {
+      const source = object.__fetchSources[input]
+      this.observeUnsourceInstance(source)
+      this.fetchUnsourceInstance(source)
+      this._removeSubscription(source)
+
+      delete object.__fetchSources[input]
+      delete object.__fetchDescribedPhrases[input]
     }
   }
 
@@ -150,8 +148,7 @@ export default class SourceManager {
       .forEach(source => source.instance.onDeactivate())
       .value()
 
-    _.forEach(this._fetchSources, ({instance, descriptor}) => {
-      this._removeSubscription(instance)
-    })
+    _.forEach(this._fetchObjects, ({object, input}) => this.fetchUnsourceInstance(object, input))
+    this._fetchObjects = []
   }
 }

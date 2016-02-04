@@ -33,7 +33,7 @@ export function * parse ({phrase, input, options}) {
   let potentialDescribedPhrase
 
   if (input.text && phrase.fetch) {
-    if (!phrase.__fetchDescribedPhrases[input.text] || options.sourceManager.fetchSourceChanged(phrase, input.text)) {
+    if (!phrase.__fetchDescribedPhrases[input.text]) {
       options.sourceManager.fetchSourceInstance(phrase, input.text)
 
       const potentialSource = phrase.__fetchSources[input.text].source
@@ -41,6 +41,10 @@ export function * parse ({phrase, input, options}) {
         const descriptor = phrase.describe(potentialSource.data)
         phrase.__fetchDescribedPhrases[input.text] = reconcile({descriptor, phrase, options})
       }
+    } else if (options.sourceManager.fetchSourceChanged(phrase, input.text)) {
+      const source = phrase.__fetchSources[input.text].source
+      const descriptor = phrase.describe(source.data)
+      phrase.__fetchDescribedPhrases[input.text] = reconcile({descriptor, phrase, options})
     }
     potentialDescribedPhrase = phrase.__fetchDescribedPhrases[input.text]
   } else {
