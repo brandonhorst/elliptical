@@ -13,9 +13,16 @@ export class Tap extends Phrase {
     this.childPhrase = reconcile({descriptor: this.props.children[0], phrase: this.childPhrase, options})
 
     if (input.text != null) {
-      options.enqueueCallback(() => this.props.function(input.text))
+      options.scheduleParseEndCallback(() => this.props.function(input.text))
     }
 
     yield* parse({phrase: this.childPhrase, input, options})
   }
+
+  _destroy (destroy) {
+    destroy(this.childPhrase)
+
+    delete this.childPhrase
+  }
+
 }

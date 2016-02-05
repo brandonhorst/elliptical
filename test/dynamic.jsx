@@ -9,30 +9,29 @@ import { spy } from 'sinon'
 
 chai.use(require('sinon-chai'))
 
-describe('fetch', () => {
+describe('dynamic', () => {
   var parser
 
   beforeEach(() => {
     parser = new Parser()
   })
 
-  it('calls fetch for a specific input', () => {
+  it('calls observe for a specific input', () => {
     class TestSource extends Source {
       onCreate () {
         this.setData(_.repeat(this.props.input, 3))
       }
     }
 
-    class Test extends Phrase {
-      fetch (input) {
-        return <TestSource input={input} />
-      }
-      describe (data) {
-        return <literal text={data} value={data} />
-      }
+    function fetch (input) {
+      return <TestSource input={input} />
     }
 
-    parser.grammar = <Test />
+    function describe (data) {
+      return <literal text={data} value={data} />
+    }
+
+    parser.grammar = <dynamic observe={fetch} describe={describe} />
     const data = parser.parseArray('b')
     expect(data).to.have.length(1)
     expect(text(data[0])).to.equal('bbb')
@@ -50,21 +49,22 @@ describe('fetch', () => {
       }
     }
 
-    class Test extends Phrase {
-      fetch (input) {
-        return <TestSource input={input} />
-      }
-      describe (data = '') {
-        return <literal text={data} value={data} />
-      }
+    function fetch (input) {
+      return <TestSource input={input} />
     }
 
-    parser.grammar = <Test />
+    function describe (data = '') {
+      return <literal text={data} value={data} />
+    }
+
+    parser.grammar = <dynamic observe={fetch} describe={describe} />
     parser.on('update', updateSpy)
 
     const data1 = parser.parseArray('b')
     expect(data1).to.have.length(0)
     process.nextTick(() => {
+      expect(updateSpy).to.have.been.calledOnce
+
       const data2 = parser.parseArray('b')
       expect(data2).to.have.length(1)
       expect(text(data2[0])).to.equal('bbb')
@@ -85,17 +85,15 @@ describe('fetch', () => {
       }
     }
 
-    class Test extends Phrase {
-      fetch (input) {
-        return <TestSource input={input} />
-      }
-      describe (data = '') {
-        return <literal text={data} value={data} />
-      }
+    function fetch (input) {
+      return <TestSource input={input} />
     }
 
-    parser.grammar = <Test />
-    parser.on('update', updateSpy)
+    function describe (data = '') {
+      return <literal text={data} value={data} />
+    }
+
+    parser.grammar = <dynamic observe={fetch} describe={describe} />
     parser.activate()
 
     const data1 = parser.parseArray('b')
@@ -122,13 +120,12 @@ describe('fetch', () => {
       }
     }
 
-    class Dynamic extends Phrase {
-      fetch (input) {
-        return <TestSource input={input} />
-      }
-      describe (data) {
-        return <literal text={data} value={data} />
-      }
+    function fetch (input) {
+      return <TestSource input={input} />
+    }
+
+    function describe (data) {
+      return <literal text={data} value={data} />
     }
 
     class Test extends Phrase {
@@ -137,9 +134,9 @@ describe('fetch', () => {
           <choice>
             <sequence>
               <literal text='test' />
-              <Dynamic id='dynamic' />
+              <dynamic observe={fetch} describe={describe} id='dynamic' />
             </sequence>
-            <Dynamic id='dynamic' />
+            <dynamic observe={fetch} describe={describe} id='dynamic' />
           </choice>
         )
       }
@@ -161,14 +158,12 @@ describe('fetch', () => {
       }
     }
 
-    class Dynamic extends Phrase {
-      fetch (input) {
-        return <TestSource input={input} />
-      }
+    function fetch (input) {
+      return <TestSource input={input || 'def'} />
+    }
 
-      describe (data) {
-        return <literal text={data || 'def'} value='aaa' />
-      }
+    function describe (data) {
+      return <literal text={data} value='aaa' />
     }
 
     class Test extends Phrase {
@@ -177,9 +172,9 @@ describe('fetch', () => {
           <choice>
             <sequence>
               <literal text='test' />
-              <Dynamic id='dynamic' />
+              <dynamic observe={fetch} describe={describe} id='dynamic' />
             </sequence>
-            <Dynamic id='dynamic' />
+            <dynamic observe={fetch} describe={describe} id='dynamic' />
           </choice>
         )
       }
@@ -188,7 +183,7 @@ describe('fetch', () => {
     parser.grammar = <Test />
     const data = parser.parseArray('tes')
     expect(data).to.have.length(2)
-    expect(text(data[0])).to.equal('testdef')
+    expect(text(data[0])).to.equal('testdefsuperman')
     expect(data[0].result).to.eql({dynamic: 'aaa'})
     expect(text(data[1])).to.equal('tessuperman')
     expect(data[1].result).to.eql({dynamic: 'aaa'})

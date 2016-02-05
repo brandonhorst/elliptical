@@ -94,6 +94,12 @@ export class Sequence extends Phrase {
       yield* this.parseChild(childIndex + 1, nextOutput, options)
     }
   }
+
+  _destroy (destroy) {
+    _.forEach(this.childPhrases, destroy)
+
+    delete this.childPhrases
+  }
 }
 
 function getAccumulatedResult (inputResult, child, childResult) {

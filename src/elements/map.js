@@ -44,4 +44,11 @@ export class MapPhrase extends Phrase {
       }
     }
   }
+
+  _destroy (destroy) {
+    destroy(this.childPhrase)
+
+    delete this.childPhrase
+  }
+
 }

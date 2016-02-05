@@ -20,6 +20,25 @@ export function getConstructor ({Constructor, type}) {
   return Constructor
 }
 
+export function addSource ({component, options}) {
+  if (component.observe) {
+    const sourceDescriptor = component.observe()
+    if (sourceDescriptor) {
+      const source = options.sourceManager.subscribe(sourceDescriptor)
+      component.__lastSourceVersion = 0
+
+      component.source = source
+    }
+  }
+}
+
+export function removeSource ({component, options}) {
+  if (component.source) {
+    options.sourceManager.unsubscribe(component.source)
+    delete component.source
+  }
+}
+
 function subclassOf (Constructor, DesiredSuperclass) {
   return Constructor.prototype instanceof DesiredSuperclass
 }
@@ -66,4 +85,16 @@ export function getRealProps ({descriptor, Constructor}) {
 
 export function instantiate ({Constructor, props}) {
   return new Constructor({props})
+}
+
+export function destroyPhrase ({phrase, options}) {
+  if (phrase._handleParse) {
+    function destroyCall (phrase) {
+      destroyPhrase({phrase, options})
+    }
+
+    phrase._destroy(destroyCall)
+  }
+
+  removeSource({component: phrase, options})
 }

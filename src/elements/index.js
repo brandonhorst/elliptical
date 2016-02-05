@@ -1,4 +1,5 @@
 export { Choice as choice } from './choice'
+export { Dynamic as dynamic } from './dynamic'
 export { Label as label } from './label'
 export { Filter as filter } from './filter'
 export { Freetext as freetext } from './freetext'

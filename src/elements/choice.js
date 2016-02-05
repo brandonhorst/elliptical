@@ -36,4 +36,10 @@ export class Choice extends Phrase {
       }
     }
   }
+
+  _destroy (destroy) {
+    _.forEach(this.childPhrases, destroy)
+
+    delete this.childPhrases
+  }
 }

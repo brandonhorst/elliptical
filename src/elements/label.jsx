@@ -65,4 +65,10 @@ export class Label extends Phrase {
       yield* this.parseChild(input, options)
     }
   }
+  _destroy (destroy) {
+    destroy(this.childPhrase)
+
+    delete this.childPhrase
+  }
+
 }

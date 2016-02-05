@@ -68,7 +68,7 @@ describe('sources', () => {
     expect(text(data[0])).to.equal('testa')
   })
 
-  it('onDestroy() is called, on destroy', () => {
+  it('onDestroy() is called on destroy', () => {
     const destSpy = spy()
     class TestSource extends Source {
       onDestroy () { destSpy() }
@@ -88,14 +88,14 @@ describe('sources', () => {
     expect(destSpy).to.not.have.been.called
     expect(data1).to.have.length(1)
     expect(text(data1[0])).to.equal('test')
-    expect(parser._sourceManager._sources).to.have.length(1)
+    expect(parser._sourceManager._sourceMaps).to.have.length(1)
 
     parser.grammar = <Test useSource={false}/>
     const data2 = parser.parseArray('')
     expect(destSpy).to.have.been.called
     expect(data2).to.have.length(1)
     expect(text(data2[0])).to.equal('test')
-    expect(parser._sourceManager._sources).to.be.empty
+    expect(parser._sourceManager._sourceMaps).to.be.empty
   })
 
   it('can use props in data property initializer', () => {
@@ -189,27 +189,6 @@ describe('sources', () => {
     expect(onCreateSpy).to.have.been.calledTwice
   })
 
-  it('can export functions, which can be called on create', () => {
-    class TestSource extends Source {
-      data = 'testa'
-
-      update () {
-        this.setData('testb')
-      }
-    }
-
-    class Test extends Phrase {
-      observe () { return <TestSource /> }
-      create () { this.source.update() }
-      describe () { return <literal text={this.source.data} /> }
-    }
-
-    parser.grammar = <Test />
-
-    const data = parser.parseArray('')
-    expect(text(data[0])).to.equal('testb')
-  })
-
   it('parses are not redescribed if data does not change', () => {
     const descSpy = spy()
 
@@ -248,8 +227,12 @@ describe('sources', () => {
     }
 
     class Test extends Phrase {
+      constructor (...args) {
+        super(...args)
+        consSpy()
+      }
+
       observe () { return <TestSource /> }
-      create () { consSpy() }
       describe () { return <literal text={this.source.data} /> }
     }
 
@@ -280,12 +263,18 @@ describe('sources', () => {
     }
 
     class SubTest extends Phrase {
-      create () { subConsSpy('sub') }
+      constructor (...args) {
+        super(...args)
+        subConsSpy()
+      }
       describe () { return <literal text={this.props.val} /> }
     }
 
     class Test extends Phrase {
-      create () { consSpy('main') }
+      constructor (...args) {
+        super(...args)
+        consSpy()
+      }
       observe () { return <TestSource /> }
       describe () { return <SubTest val={this.source.data} /> }
     }

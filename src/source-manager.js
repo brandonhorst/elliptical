@@ -1,15 +1,15 @@
 import _ from 'lodash'
-import {getRealProps, getConstructor, instantiate} from './descriptor'
+import {getRealProps, getConstructor, instantiate, addSource, removeSource} from './component'
 
 export default class SourceManager {
   constructor ({update = () => {}}) {
-    this._sources = []
+    this._sourceMaps = []
     this._fetchObjects = []
     this.update = update
   }
 
   _triggerSourceUpdate (instance) {
-    _.forEach(this._sources, existingSource => {
+    _.forEach(this._sourceMaps, existingSource => {
       if (existingSource.instance.source === instance) {
         if (existingSource.instance.onUpdate) existingSource.instance.onUpdate()
       }
@@ -18,13 +18,13 @@ export default class SourceManager {
     this.update()
   }
 
-  _createSource (descriptor, {fetch, object}) {
+  _createSource (descriptor) {
     const Constructor = getConstructor({Constructor: descriptor.Constructor, type: 'source'})
     const props = getRealProps({descriptor, Constructor: descriptor.Constructor})
     const instance = instantiate({Constructor, props})
 
     instance.__dataVersion = 0
-    instance.__subscribers = 0
+    instance.__subscriberCount = 0
     instance.__isCreating = true
 
     instance.setData = newData => { // setData during onCreate() doesn't trigger source Update
@@ -34,9 +34,9 @@ export default class SourceManager {
       }
     }
 
-    this.observeSourceInstance(instance)
+    addSource({component: instance, options: {sourceManager: this}})
 
-    this._sources.push({instance, descriptor})
+    this._sourceMaps.push({instance, descriptor})
 
     if (instance.onCreate) instance.onCreate()
 
@@ -45,110 +45,51 @@ export default class SourceManager {
     return instance
   }
 
-  _getSource (descriptor, {fetch = false, object} = {}) {
-    const possibleSource = _.find(this._sources, (source) => _.isEqual(descriptor, source.descriptor))
+  _destroySource (source) {
+    if (source.onDestroy) source.onDestroy()
+    removeSource({component: source, options: {sourceManager: this}})
 
-    if (possibleSource) {
-      return possibleSource.instance
+    const index = _.findIndex(this._sourceMaps, (sourceMap) => source === sourceMap.source)
+    this._sourceMaps.splice(index, 1)
+  }
+
+  subscribe (descriptor) {
+    const possibleSourceMap = _.find(this._sourceMaps, (source) => _.isEqual(descriptor, source.descriptor))
+
+    let source
+    if (possibleSourceMap) {
+      source = possibleSourceMap.instance
     } else {
-      return this._createSource(descriptor, {fetch, object})
+      source = this._createSource(descriptor)
+    }
+
+    source.__subscriberCount++
+
+    return source
+  }
+
+  unsubscribe (source) {
+    source.__subscriberCount--
+    if (source.__subscriberCount === 0) {
+      this._destroySource(source)
     }
   }
-
-  _removeSource (descriptor) {
-    const index = _.findIndex(this._sources, (source) => _.isEqual(descriptor, source.descriptor))
-    this._sources.splice(index, 1)
-  }
-
-  observeSourceInstance (object) {
-    if (object.observe) {
-      const sourceDescriptor = object.observe()
-      if (sourceDescriptor) {
-        const source = this._getSource(sourceDescriptor)
-        source.__subscribers++
-        source.__descriptor = sourceDescriptor
-        object.__lastSourceVersion = 0
-
-        object.source = source
-      }
-    }
-  }
-
-  _removeSubscription (source) {
-    source.__subscribers--
-    if (source.__subscribers === 0) {
-      if (source.onDestroy) source.onDestroy()
-      this._removeSource(source.__descriptor)
-    }
-  }
-
-  observeUnsourceInstance (object) {
-    if (object.source) {
-      this.observeUnsourceInstance(object.source)
-      this.fetchUnsourceInstance(object.source)
-      this._removeSubscription(object.source)
-      delete object.source
-    }
-  }
-
-  fetchSourceInstance (object, input) {
-    if (object.fetch) {
-      const sourceDescriptor = object.fetch(input)
-      if (sourceDescriptor) {
-        const source = this._getSource(sourceDescriptor, {fetch: true, object})
-        this._fetchObjects.push({object, input})
-        source.__subscribers++
-        source.__descriptor = sourceDescriptor
-        object.__fetchSources[input] = {
-          source,
-          lastVersion: 0
-        }
-      }
-    }
-  }
-
-  fetchUnsourceInstance (object, input) {
-    if (object.fetch && object.__fetchSources && object.__fetchSources[input]) {
-      const source = object.__fetchSources[input]
-      this.observeUnsourceInstance(source)
-      this.fetchUnsourceInstance(source)
-      this._removeSubscription(source)
-
-      delete object.__fetchSources[input]
-      delete object.__fetchDescribedPhrases[input]
-    }
-  }
-
-  sourceChanged (object) {
-    if (!object.source) return false
-    return object.__lastSourceVersion !== object.source.__dataVersion
-  }
-
-  fetchSourceChanged (object, index) {
-    if (!object.__fetchSources[index]) return false
-    return object.__fetchSources[index].version !== object.__fetchSources[index].source.__dataVersion
-  }
-
-  markSourceUpToDate (object) {
-    if (object.source) {
-      object.__lastSourceVersion = object.source.__dataVersion
-    }
+  
+  getDataVersion (source) {
+    return source.__dataVersion
   }
 
   activate () {
-    _.chain(this._sources)
+    _.chain(this._sourceMaps)
       .filter(source => source.instance.onActivate)
       .forEach(source => source.instance.onActivate())
       .value()
   }
 
   deactivate () {
-    _.chain(this._sources)
+    _.chain(this._sourceMaps)
       .filter(source => source.instance.onDeactivate)
       .forEach(source => source.instance.onDeactivate())
       .value()
-
-    _.forEach(this._fetchObjects, ({object, input}) => this.fetchUnsourceInstance(object, input))
-    this._fetchObjects = []
   }
 }

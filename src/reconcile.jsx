@@ -2,7 +2,7 @@
 import _ from 'lodash'
 import * as builtins from './elements'
 import { createElement } from 'lacona-phrase'
-import { getRealProps, getConstructor, instantiate } from './descriptor'
+import { getRealProps, getConstructor, instantiate, addSource, removeSource, destroyPhrase } from './component'
 
 export function reconcile ({descriptor, phrase, options}) {
   const func = _.isArray(descriptor) ? reconcileArray : reconcileOne
@@ -19,45 +19,38 @@ function reconcileArray ({descriptor, phrase, options}) {
 }
 
 function reconcileOne ({descriptor, phrase, options}) {
-  if (descriptor == null && phrase) return destroy({phrase, sourceManager: options.sourceManager})
+  if (descriptor == null && phrase) return destroyPhrase({phrase, sourceManager: options.sourceManager})
 
   const Constructor = getConstructor({Constructor: descriptor.Constructor, type: 'phrase'})
   const props = getRealProps({descriptor, Constructor})
 
-  if (phrase && phrase.constructor === Constructor && _.isEqual(props, phrase.props)) {
-    let needsRedescribe = false
-
+  if (phrase && phrase.constructor === Constructor && _.isEqual(props, phrase.props)) { // TODO could be sped up if we don't compare props for things without a describe
     const {extensionsChanged, extensions} = getExtensions({Constructor, phrase, options})
-    if (extensionsChanged || options.sourceManager.sourceChanged(phrase)) {
-      const describedPhrase = getDescribedPhrase({Constructor, phrase, extensions, options})
 
-      phrase.__describedPhrase = describedPhrase
+    if (extensionsChanged || sourceChanged({phrase, options})) {
+      const describedPhrase = addDescribedPhrase({Constructor, phrase, extensions, options})
     }
 
     return phrase
   } else { //reconstruct
     const extensions = options.getExtensions(Constructor)
 
-    if (phrase) destroy({phrase, sourceManager: options.sourceManager})
+    if (phrase) destroyPhrase({phrase, options})
 
     const newPhrase = instantiate({Constructor, props})
 
-    options.sourceManager.observeSourceInstance(newPhrase)
+    addSource({component: newPhrase, options})
 
-    create({phrase: newPhrase})
-
-    const describedPhrase = getDescribedPhrase({Constructor, phrase: newPhrase, extensions, options})
+    const describedPhrase = addDescribedPhrase({Constructor, phrase: newPhrase, extensions, options})
 
     newPhrase.__oldExtensions = extensions
-    newPhrase.__describedPhrase = describedPhrase
-
-    if (newPhrase.fetch) {
-      newPhrase.__fetchDescribedPhrases = {}
-      newPhrase.__fetchSources = {}
-    }
 
     return newPhrase
   }
+}
+
+function sourceChanged ({phrase, options}) {
+  return phrase.source && phrase.__lastSourceVersion < options.sourceManager.getDataVersion(phrase.source)
 }
 
 function getExtensions ({Constructor, phrase, options}) {
@@ -79,12 +72,13 @@ function getExtensions ({Constructor, phrase, options}) {
   }
 }
 
-function getDescribedPhrase ({phrase, extensions, options}) {
+function addDescribedPhrase ({phrase, extensions, options}) {
   const describe = getCall({prop: 'describe', Constructor: phrase.constructor, langs: options.langs})
   const description = getDescription({describe, extensions, phrase})
-  return description
+  const describedPhrase = description
     ? reconcile({descriptor: description, options, phrase: phrase.__describedPhrase})
     : null
+  phrase.__describedPhrase = describedPhrase
 }
 
 function getCall ({Constructor, langs, prop}) {
@@ -134,16 +128,3 @@ function getDescription ({describe, extensions, phrase}) {
   }
 }
 
-export function destroy ({phrase, sourceManager}) {
-  if ((phrase.constructor === builtins.choice || phrase.constructor === builtins.sequence) && phrase.childPhrases) {
-    phrase.childPhrases.forEach(phrase => destroy({phrase, sourceManager}))
-  }
-
-  sourceManager.observeUnsourceInstance(phrase)
-
-  if (phrase.destroy) phrase.destroy()
-}
-
-function create ({phrase}) {
-  if (phrase.create) phrase.create()
-}

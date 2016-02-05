@@ -69,4 +69,12 @@ export class Repeat extends Phrase {
       yield* this.parseChild(childIndex + 1, trueOutput, options)
     }
   }
+
+  _destroy (destroy) {
+    destroy(this.child)
+    destroy(this.separator)
+
+    delete this.child
+    delete this.separator
+  }
 }

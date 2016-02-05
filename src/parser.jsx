@@ -42,7 +42,8 @@ export class Parser extends EventEmitter {
     this.grammar = grammar
     this.extensions = extensions
     this._oldExtensions = []
-    this._finalCallbacks = []
+    this._parseEndCallbacks = []
+    this._deactivateCallbacks = []
     this._sourceManager = new SourceManager({
       update: this._maybeReparse.bind(this)
     })
@@ -61,27 +62,24 @@ export class Parser extends EventEmitter {
     }, [])
   }
 
-  _getSource (descriptor) {
-    return this._sourceManager.getSource(descriptor)
-  }
-
-  _removeSource (descriptor) {
-    this._sourceManager.removeSource(descriptor)
-  }
-
   _getReconcileParseOptions ({extensionsChanged = false} = {}) {
     return {
       langs: this.langs,
       getExtensions: this._getExtensions.bind(this),
       sourceManager: this._sourceManager,
-      enqueueCallback: this._enqueueCallback.bind(this),
+      scheduleParseEndCallback: this._scheduleParseEndCallback.bind(this),
+      scheduleDeactivateCallback: this._scheduleDeactivateCallback.bind(this),
       extensionsChanged,
       parses: 0
     }
   }
 
-  _enqueueCallback (callback) {
-    this._finalCallbacks.push(callback)
+  _scheduleParseEndCallback (callback) {
+    this._parseEndCallbacks.push(callback)
+  }
+
+  _scheduleDeactivateCallback (callback) {
+    this._deactivateCallbacks.push(callback)
   }
 
   _reconcile (options) {
@@ -97,6 +95,8 @@ export class Parser extends EventEmitter {
   }
 
   deactivate () {
+    callEvery(this._deactivateCallbacks)
+
     this._sourceManager.deactivate()
   }
 
@@ -124,9 +124,9 @@ export class Parser extends EventEmitter {
     }
     if (global.logStatus) global.logStatus({parses: options.parses})
 
-    callEvery(this._finalCallbacks)
+    callEvery(this._parseEndCallbacks)
 
-    this._finalCallbacks = []
+    this._parseEndCallbacks = []
   }
 
   parseArray (inputString) {
