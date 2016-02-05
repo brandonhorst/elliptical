@@ -55,11 +55,11 @@ export class Label extends Phrase {
   * _handleParse (input, options) {
     this.childPhrase = reconcile({descriptor: this.props.children[0], phrase: this.childPhrase, options})
 
-    if (input.text == null || (
-        this.props.suppress && (
-          this.props.suppressEmpty && input.text === '' ||
-          (this.props.suppressWhen && this.props.suppressWhen(input.text))
-        ))) {
+    if (this.props.suppress
+        && (input.text == null
+          || (this.props.suppressEmpty && input.text === '')
+          || (this.props.suppressWhen && this.props.suppressWhen(input.text))
+        )) {
       yield this.outputSelf(input, options)
     } else {
       yield* this.parseChild(input, options)
