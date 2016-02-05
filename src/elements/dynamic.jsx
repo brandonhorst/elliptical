@@ -34,7 +34,7 @@ export class Dynamic extends Phrase {
     let successes = 0
     const text = input.text
 
-    if (!this._phrases[text]) {
+    if (!this._sources[text]) {
       const sourceDescriptor = this.props.observe(text)
       if (sourceDescriptor) {
         const source = options.sourceManager.subscribe(sourceDescriptor)

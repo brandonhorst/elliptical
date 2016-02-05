@@ -96,6 +96,7 @@ export class Parser extends EventEmitter {
 
   deactivate () {
     callEvery(this._deactivateCallbacks)
+    this._deactivateCallbacks = []
 
     this._sourceManager.deactivate()
   }

@@ -88,13 +88,15 @@ export function instantiate ({Constructor, props}) {
 }
 
 export function destroyPhrase ({phrase, options}) {
-  if (phrase._handleParse) {
-    function destroyCall (phrase) {
-      destroyPhrase({phrase, options})
+  if (phrase) {
+    if (phrase._handleParse) {
+      function destroyCall (phrase) {
+        destroyPhrase({phrase, options})
+      }
+
+      phrase._destroy(destroyCall)
     }
 
-    phrase._destroy(destroyCall)
+    removeSource({component: phrase, options})
   }
-
-  removeSource({component: phrase, options})
 }
