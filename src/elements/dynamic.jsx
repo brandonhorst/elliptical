@@ -24,7 +24,6 @@ export class Dynamic extends Phrase {
   }
 
   removeSource (text, options) {
-    console.log(`removing for ${text}`)
     options.sourceManager.unsubscribe(this._sources[text])
     destroyPhrase({phrase: this._phrases[text], options})
 
@@ -42,41 +41,39 @@ export class Dynamic extends Phrase {
       reverse: this.props.greedy
     }
 
-    for (let substring of substrings(input.text, substringOpts)) {
+    const iterations = input.text == null ? ['\uFFFD'] : substrings(input.text, substringOpts)
+
+    for (let substring of iterations) {
       let success = false
-      const substringLower = substring.toLowerCase()
       
-      if (!this._sources[substringLower]) {
-        const sourceDescriptor = this.props.observe(substringLower)
+      if (!this._sources[substring]) {
+        const sourceDescriptor = this.props.observe(substring === '\uFFFD' ? undefined : substring)
         if (sourceDescriptor) {
-          console.log(`creating for ${substringLower}`)
           const source = options.sourceManager.subscribe(sourceDescriptor)
           options.scheduleDeactivateCallback(() => {
-            this.removeSource(substringLower, options)
+            this.removeSource(substring, options)
           })
-          this._sources[substringLower] = source
-          this._lastSourceVersions[substringLower] = options.sourceManager.getDataVersion(source)
-
-          const descriptor = this.props.describe(source.data)
-          this._phrases[substringLower] = reconcile({descriptor, phrase: this._phrases[substringLower], options})
+          this._sources[substring] = source
+          this._lastSourceVersions[substring] = options.sourceManager.getDataVersion(source)
         }
-      } else if (this.sourceChanged(substringLower, options)) {
-        const source = this._sources[substringLower]
-        const descriptor = this.props.describe(source.data)
-        this._phrases[substringLower] = reconcile({descriptor, phrase: this._phrases[substringLower], options})
       }
 
-      for (let output of parse({phrase: this._phrases[substringLower], input, options})) {
+      const descriptor = this.props.describe(this._sources[substring] ? this._sources[substring].data : undefined)
+      this._phrases[substring] = reconcile({descriptor, phrase: this._phrases[substring], options})
+
+      if (this._phrases[substring]) {
+        for (let output of parse({phrase: this._phrases[substring], input, options})) {
+          if (this.props.limit) {
+            yield _.assign({}, output, {callbacks: output.callbacks.concat(() => success = true)})
+          } else {
+            yield output
+          }
+        }
+
         if (this.props.limit) {
-          yield _.assign({}, output, {callbacks: output.callbacks.concat(() => success = true)})
-        } else {
-          yield output
+          if (success) successes++
+          if (this.props.limit <= successes) break
         }
-      }
-
-      if (this.props.limit) {
-        if (success) successes++
-        if (this.props.limit <= successes) break
       }
     }
   }

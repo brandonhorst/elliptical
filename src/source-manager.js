@@ -6,6 +6,7 @@ export default class SourceManager {
     this._sourceMaps = []
     this._fetchObjects = []
     this.update = update
+    this.existCount = 0;
   }
 
   _triggerSourceUpdate (instance) {
@@ -49,7 +50,7 @@ export default class SourceManager {
     if (source.onDestroy) source.onDestroy()
     removeSource({component: source, options: {sourceManager: this}})
 
-    const index = _.findIndex(this._sourceMaps, (sourceMap) => source === sourceMap.source)
+    const index = _.findIndex(this._sourceMaps, (sourceMap) => source === sourceMap.instance)
     this._sourceMaps.splice(index, 1)
   }
 

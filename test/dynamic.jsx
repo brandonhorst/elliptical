@@ -160,7 +160,7 @@ describe('dynamic', () => {
     }
 
     function fetch (input) {
-      return <TestSource input={input || 'def'} />
+      return <TestSource input={input == null ? 'def' : input} />
     }
 
     function describe (data) {
@@ -188,6 +188,44 @@ describe('dynamic', () => {
     expect(data[0].result).to.eql({dynamic: 'aaa'})
     expect(text(data[1])).to.equal('tessuperman')
     expect(data[1].result).to.eql({dynamic: 'aaa'})
+  })
+
+  it('is fine if an observe call returns nothing', () => {
+    class TestSource extends Source {
+      onCreate () {
+        this.setData(this.props.input + 'superman')
+      }
+    }
+
+    function fetch (input) {
+      if (input != null) {
+        return <TestSource input={input} />
+      }
+    }
+
+    function describe (data) {
+      return <literal text={data} value='aaa' />
+    }
+
+    class Test extends Phrase {
+      describe () {
+        return (
+          <choice>
+            <sequence>
+              <literal text='test' />
+              <dynamic observe={fetch} describe={describe} id='dynamic' consumeAll />
+            </sequence>
+            <dynamic observe={fetch} describe={describe} id='dynamic' consumeAll />
+          </choice>
+        )
+      }
+    }
+
+    parser.grammar = <Test />
+    const data = parser.parseArray('tes')
+    expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('tessuperman')
+    expect(data[0].result).to.eql({dynamic: 'aaa'})
   })
 
   it('calls observe for multiple splits', () => {
