@@ -84,6 +84,29 @@ describe('freetext', () => {
     expect(data[2].result.freetext).to.equal('anything goes test')
   })
 
+
+  it('allows greedy', () => {
+    class Test extends Phrase {
+      describe () {
+        return (
+          <sequence>
+            <freetext splitOn=' ' id='freetext' greedy />
+            <literal text=' test' />
+          </sequence>
+        )
+      }
+    }
+
+    parser.grammar = <Test />
+
+    const data = parser.parseArray('anything goes test')
+    expect(data).to.have.length(2)
+    expect(text(data[0])).to.equal('anything goes test test')
+    expect(data[0].result.freetext).to.equal('anything goes test')
+    expect(text(data[1])).to.equal('anything goes test')
+    expect(data[1].result.freetext).to.equal('anything goes')
+  })
+
   it('allows splits on regex (with weird parens)', () => {
     class Test extends Phrase {
       describe () {

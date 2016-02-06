@@ -1,18 +1,6 @@
 /** @jsx createElement */
-import {Phrase, createElement} from 'lacona-phrase'
-import split from 'smart-split'
-
-function * substrings (input, {splitOn, noSplit}) {
-  if (noSplit) {
-    yield input
-    return
-  }
-
-  let inputs = split(input, splitOn)
-  for (let i = 0; i < inputs.length; i += 2) {
-    yield inputs.slice(0, i + 1).join('')
-  }
-}
+import { Phrase, createElement } from 'lacona-phrase'
+import { substrings } from '../string-utils'
 
 export class Freetext extends Phrase {
   static defaultProps = {
@@ -24,7 +12,13 @@ export class Freetext extends Phrase {
   };
 
   * filter (input) {
-    for (let stringPart of substrings(input, {splitOn: this.props.splitOn, noSplit: this.props.consumeAll})) {
+    const substringOpts = {
+      splitOn: this.props.splitOn,
+      noSplit: this.props.consumeAll,
+      reverse: this.props.greedy
+    }
+    
+    for (let stringPart of substrings(input, substringOpts)) {
       if (this.props.filter(stringPart)) {
         yield {
           words: [{text: stringPart, input: true}],

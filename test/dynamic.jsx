@@ -57,7 +57,7 @@ describe('dynamic', () => {
       return <literal text={data} value={data} />
     }
 
-    parser.grammar = <dynamic observe={fetch} describe={describe} />
+    parser.grammar = <dynamic observe={fetch} describe={describe} consumeAll />
     parser.on('update', updateSpy)
 
     const data1 = parser.parseArray('b')
@@ -93,7 +93,7 @@ describe('dynamic', () => {
       return <literal text={data} value={data} />
     }
 
-    parser.grammar = <dynamic observe={fetch} describe={describe} />
+    parser.grammar = <dynamic observe={fetch} describe={describe} consumeAll />
     parser.activate()
 
     const data1 = parser.parseArray('b')
@@ -134,9 +134,9 @@ describe('dynamic', () => {
           <choice>
             <sequence>
               <literal text='test' />
-              <dynamic observe={fetch} describe={describe} id='dynamic' />
+              <dynamic observe={fetch} describe={describe} id='dynamic' consumeAll />
             </sequence>
-            <dynamic observe={fetch} describe={describe} id='dynamic' />
+            <dynamic observe={fetch} describe={describe} id='dynamic' consumeAll />
           </choice>
         )
       }
@@ -145,6 +145,7 @@ describe('dynamic', () => {
     parser.grammar = <Test />
     const data = parser.parseArray('testb')
     expect(data).to.have.length(2)
+    // console.log(data)
     expect(text(data[0])).to.equal('testbbatmanb')
     expect(data[0].result).to.eql({dynamic: 'bbatmanb'})
     expect(text(data[1])).to.equal('testbbatmantestb')
@@ -172,9 +173,9 @@ describe('dynamic', () => {
           <choice>
             <sequence>
               <literal text='test' />
-              <dynamic observe={fetch} describe={describe} id='dynamic' />
+              <dynamic observe={fetch} describe={describe} id='dynamic' consumeAll />
             </sequence>
-            <dynamic observe={fetch} describe={describe} id='dynamic' />
+            <dynamic observe={fetch} describe={describe} id='dynamic' consumeAll />
           </choice>
         )
       }
@@ -187,5 +188,115 @@ describe('dynamic', () => {
     expect(data[0].result).to.eql({dynamic: 'aaa'})
     expect(text(data[1])).to.equal('tessuperman')
     expect(data[1].result).to.eql({dynamic: 'aaa'})
+  })
+
+  it('calls observe for multiple splits', () => {
+    class TestSource extends Source {
+      onCreate () {
+        this.setData(this.props.input)
+      }
+    }
+
+    function fetch (input) {
+      return <TestSource input={input} />
+    }
+
+    function describe (data) {
+      return <literal text={data} value={data} />
+    }
+
+    parser.grammar = (
+      <sequence>
+        <dynamic observe={fetch} describe={describe} splitOn=' ' />
+        <literal text=' test' />
+      </sequence>
+    )
+
+    const data = parser.parseArray('b t')
+    expect(data).to.have.length(2)
+    expect(text(data[0])).to.equal('b test')
+    expect(text(data[1])).to.equal('b t test')
+  })
+
+  it('can be limited', () => {
+    class TestSource extends Source {
+      onCreate () {
+        this.setData(this.props.input)
+      }
+    }
+
+    function fetch (input) {
+      return <TestSource input={input} />
+    }
+
+    function describe (data) {
+      return <literal text={data} value={data} />
+    }
+
+    parser.grammar = (
+      <sequence>
+        <dynamic observe={fetch} describe={describe} splitOn=' ' limit={1} />
+        <literal text=' test' />
+      </sequence>
+    )
+
+    const data = parser.parseArray('b t')
+    expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('b test')
+  })
+
+  it('can be greedy', () => {
+    class TestSource extends Source {
+      onCreate () {
+        this.setData(this.props.input)
+      }
+    }
+
+    function fetch (input) {
+      return <TestSource input={input} />
+    }
+
+    function describe (data) {
+      return <literal text={data} value={data} />
+    }
+
+    parser.grammar = (
+      <sequence>
+        <dynamic observe={fetch} describe={describe} splitOn=' ' greedy />
+        <literal text=' test' />
+      </sequence>
+    )
+
+    const data = parser.parseArray('b t')
+    expect(data).to.have.length(2)
+    expect(text(data[0])).to.equal('b t test')
+    expect(text(data[1])).to.equal('b test')
+  })
+
+  it('can be limited and greedy', () => {
+    class TestSource extends Source {
+      onCreate () {
+        this.setData(this.props.input)
+      }
+    }
+
+    function fetch (input) {
+      return <TestSource input={input} />
+    }
+
+    function describe (data) {
+      return <literal text={data} value={data} />
+    }
+
+    parser.grammar = (
+      <sequence>
+        <dynamic observe={fetch} describe={describe} splitOn=' ' limit={1} greedy />
+        <literal text=' test' />
+      </sequence>
+    )
+
+    const data = parser.parseArray('b t')
+    expect(data).to.have.length(1)
+    expect(text(data[0])).to.equal('b t test')
   })
 })

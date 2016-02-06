@@ -1,8 +1,9 @@
 import _ from 'lodash'
 import { destroyPhrase } from '../component'
+import { parse } from '../parse'
 import { Phrase } from 'lacona-phrase'
 import { reconcile } from '../reconcile'
-import { parse } from '../parse'
+import { substrings } from '../string-utils'
 
 export class Dynamic extends Phrase {
   constructor (...args) {
@@ -14,7 +15,8 @@ export class Dynamic extends Phrase {
   }
 
   static defaultProps = {
-    compute () { return [] }
+    splitOn: '',
+    consumeAll: false
   }
 
   sourceChanged (text, options) {
@@ -32,27 +34,47 @@ export class Dynamic extends Phrase {
 
   * _handleParse (input, options) {
     let successes = 0
-    const text = input.text
 
-    if (!this._sources[text]) {
-      const sourceDescriptor = this.props.observe(text)
-      if (sourceDescriptor) {
-        const source = options.sourceManager.subscribe(sourceDescriptor)
-        options.scheduleDeactivateCallback(() => {
-          this.removeSource(text, options)
-        })
-        this._sources[text] = source
-        this._lastSourceVersions[text] = options.sourceManager.getDataVersion(source)
-
-        const descriptor = this.props.describe(source.data)
-        this._phrases[text] = reconcile({descriptor, phrase: this._phrases[text], options})
-      }
-    } else if (this.sourceChanged(text, options)) {
-      const source = this._sources[text]
-      const descriptor = this.props.describe(source.data)
-      this._phrases[text] = reconcile({descriptor, phrase: this._phrases[text], options})
+    let substringOpts = {
+      splitOn: this.props.splitOn,
+      noSplit: this.props.consumeAll,
+      reverse: this.props.greedy
     }
 
-    yield* parse({phrase: this._phrases[text], input, options})
+    for (let substring of substrings(input.text, substringOpts)) {
+      let success = false
+      
+      if (!this._sources[substring]) {
+        const sourceDescriptor = this.props.observe(substring)
+        if (sourceDescriptor) {
+          const source = options.sourceManager.subscribe(sourceDescriptor)
+          options.scheduleDeactivateCallback(() => {
+            this.removeSource(substring, options)
+          })
+          this._sources[substring] = source
+          this._lastSourceVersions[substring] = options.sourceManager.getDataVersion(source)
+
+          const descriptor = this.props.describe(source.data)
+          this._phrases[substring] = reconcile({descriptor, phrase: this._phrases[substring], options})
+        }
+      } else if (this.sourceChanged(substring, options)) {
+        const source = this._sources[substring]
+        const descriptor = this.props.describe(source.data)
+        this._phrases[substring] = reconcile({descriptor, phrase: this._phrases[substring], options})
+      }
+
+      for (let output of parse({phrase: this._phrases[substring], input, options})) {
+        if (this.props.limit) {
+          yield _.assign({}, output, {callbacks: output.callbacks.concat(() => success = true)})
+        } else {
+          yield output
+        }
+      }
+
+      if (this.props.limit) {
+        if (success) successes++
+        if (this.props.limit <= successes) break
+      }
+    }
   }
 }
