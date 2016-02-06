@@ -24,7 +24,8 @@ const optionDefaults = {
   text: '',
   words: [],
   qualifiers: [],
-  callbacks: []
+  callbacks: [],
+  _previousEllipsis: []
 }
 
 export function createOption (options) {

@@ -54,15 +54,16 @@ describe('sequence', () => {
     expect(text(data1[0])).to.equal('super')
 
     const data2 = parser.parseArray('super')
-    expect(data2).to.have.length(1)
+    expect(data2).to.have.length(2)
     expect(text(data2[0])).to.equal('super')
+    expect(text(data2[1])).to.equal('superman')
 
     const data3 = parser.parseArray('superm')
     expect(data3).to.have.length(1)
     expect(text(data3[0])).to.equal('superman')
   })
 
-  it('does not output an ellipsis twice for the same text', () => {
+  it('does not output an ellipsis for the last child', () => {
     parser.grammar = (
       <sequence>
         <literal text='super' />
@@ -80,8 +81,9 @@ describe('sequence', () => {
     expect(text(data2[0])).to.equal('superman')
 
     const data3 = parser.parseArray('superman')
-    expect(data3).to.have.length(1)
+    expect(data3).to.have.length(2)
     expect(text(data3[0])).to.equal('superman')
+    expect(text(data3[1])).to.equal('supermanrocks')
 
     const data4 = parser.parseArray('supermanr')
     expect(data4).to.have.length(1)
@@ -91,6 +93,7 @@ describe('sequence', () => {
   it('handles an ellipsis that is optional', () => {
     parser.grammar = (
       <sequence>
+        <literal text='the' />
         <literal text='super' ellipsis optional  />
         <literal text='man' />
       </sequence>
@@ -98,20 +101,99 @@ describe('sequence', () => {
 
     const data1 = parser.parseArray('')
     expect(data1).to.have.length(2)
-    expect(text(data1[0])).to.equal('')
-    expect(text(data1[1])).to.equal('super')
+    expect(text(data1[0])).to.equal('the')
+    expect(text(data1[1])).to.equal('thesuper')
 
-    const data2 = parser.parseArray('s')
-    expect(data2).to.have.length(1)
-    expect(text(data2[0])).to.equal('super')
+    const data2 = parser.parseArray('the')
+    expect(data2).to.have.length(3)
+    expect(text(data2[0])).to.equal('the')
+    expect(text(data2[1])).to.equal('theman')
+    expect(text(data2[2])).to.equal('thesuper')
 
-    const data3 = parser.parseArray('super')
-    expect(data3).to.have.length(1)
-    expect(text(data3[0])).to.equal('super')
+    const data3 = parser.parseArray('thesuper')
+    expect(data3).to.have.length(2)
+    expect(text(data3[0])).to.equal('thesuper')
+    expect(text(data3[1])).to.equal('thesuperman')
 
-    const data4 = parser.parseArray('superm')
+    const data4 = parser.parseArray('thesuperm')
     expect(data4).to.have.length(1)
-    expect(text(data4[0])).to.equal('superman')
+    expect(text(data4[0])).to.equal('thesuperman')
+  })
+
+  it('does not double output if an optional follows an ellipsis', () => {
+    parser.grammar = (
+      <sequence>
+        <literal text='the' />
+        <literal text='super' ellipsis optional  />
+        <literal text='man' optional />
+        <literal text='rocks' />
+      </sequence>
+    )
+
+    const data1 = parser.parseArray('')
+    expect(data1).to.have.length(2)
+    expect(text(data1[0])).to.equal('the')
+    expect(text(data1[1])).to.equal('thesuper')
+
+    const data2 = parser.parseArray('the')
+    expect(data2).to.have.length(4)
+    expect(text(data2[0])).to.equal('the')
+    expect(text(data2[1])).to.equal('therocks')
+    expect(text(data2[2])).to.equal('themanrocks')
+    expect(text(data2[3])).to.equal('thesuper')
+
+    const data3 = parser.parseArray('thesuper')
+    expect(data3).to.have.length(3)
+    expect(text(data3[0])).to.equal('thesuper')
+    expect(text(data3[1])).to.equal('thesuperrocks')
+    expect(text(data3[2])).to.equal('thesupermanrocks')
+
+    const data4 = parser.parseArray('thesuperm')
+    expect(data4).to.have.length(1)
+    expect(text(data4[0])).to.equal('thesupermanrocks')
+  })
+
+  it('does not double output if an optional ellipsis follows an ellipsis', () => {
+    parser.grammar = (
+      <sequence>
+        <literal text='the' />
+        <literal text='super' ellipsis optional  />
+        <literal text='man' ellipsis optional />
+        <literal text='rocks' />
+      </sequence>
+    )
+
+    const data1 = parser.parseArray('')
+    // console.log(require('util').inspect(data1, {depth: 8}))
+    expect(data1).to.have.length(2)
+    expect(text(data1[0])).to.equal('the')
+    expect(text(data1[1])).to.equal('thesuper')
+
+    const data2 = parser.parseArray('the')
+    expect(data2).to.have.length(4)
+    expect(text(data2[0])).to.equal('the')
+    expect(text(data2[1])).to.equal('therocks')
+    expect(text(data2[2])).to.equal('theman')
+    expect(text(data2[3])).to.equal('thesuper')
+
+    const data3 = parser.parseArray('thesuper')
+    expect(data3).to.have.length(3)
+    expect(text(data3[0])).to.equal('thesuper')
+    expect(text(data3[1])).to.equal('thesuperrocks')
+    expect(text(data3[2])).to.equal('thesuperman')
+
+    const data4 = parser.parseArray('thesuperm')
+    expect(data4).to.have.length(1)
+    expect(text(data4[0])).to.equal('thesuperman')
+
+    const data5 = parser.parseArray('thesuperman')
+    expect(data5).to.have.length(2)
+    expect(text(data5[0])).to.equal('thesuperman')
+    expect(text(data5[1])).to.equal('thesupermanrocks')
+
+    const data6 = parser.parseArray('thesupermanr')
+    expect(data6).to.have.length(1)
+    expect(text(data6[0])).to.equal('thesupermanrocks')
   })
 
   it('handles an optional child that is preferred', () => {

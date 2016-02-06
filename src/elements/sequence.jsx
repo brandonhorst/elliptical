@@ -5,46 +5,6 @@ import { parse } from '../parse'
 import { reconcile } from '../reconcile'
 
 export class Sequence extends Phrase {
-  describe () {
-    // replace optionals with replacements
-    const ellipsisIndex = _.findIndex(this.props.children, _.property('props.ellipsis'))
-    if (ellipsisIndex > -1 && ellipsisIndex < (this.props.children.length - 1)) {
-      return (
-        <sequence>
-          {this.props.children.slice(0, ellipsisIndex)}
-          {_.merge({}, this.props.children[ellipsisIndex], {props: {ellipsis: false}})}
-          <sequence optional limited merge>
-            {this.props.children.slice(ellipsisIndex + 1)}
-          </sequence>
-        </sequence>
-      )
-    }
-
-    if (_.some(this.props.children, _.property('props.optional'))) {
-      const newChildren = _.map(this.props.children, child => {
-        if (child && child.props && child.props.optional) {
-          const newChild = _.merge({}, child, {props: {optional: false}})
-          delete newChild.props.id
-          delete newChild.props.merge
-
-          const choiceChildren = [<literal text='' />, newChild]
-
-          if (child.props.preferred) choiceChildren.reverse()
-
-          return (
-            <choice limit={child.props.limited ? 1 : undefined} id={child.props.id} merge={child.props.merge}>
-              {choiceChildren}
-            </choice>
-          )
-        }
-
-        return child
-      })
-
-      return <sequence {...this.props} children={undefined}>{newChildren}</sequence>
-    }
-  }
-
   * _handleParse (input, options) {
     this.childPhrases = reconcile({descriptor: this.props.children, phrase: this.childPhrases, options})
 
@@ -53,7 +13,57 @@ export class Sequence extends Phrase {
       score: 1
     }
 
-    yield* this.parseChild(0, _.assign({}, input, modifications), options)
+    yield* this.parseChildControl(0, _.assign({}, input, modifications), options)
+  }
+
+  * parseChildControl (childIndex, input, options) {
+    if (childIndex >= this.childPhrases.length) { // we've reached the end
+      yield input
+      return
+    }
+
+    let trueInput = input
+
+    if (childIndex > 0 && this.childPhrases[childIndex - 1].props.ellipsis) {
+      const previousChild = this.childPhrases[childIndex - 1]
+      if (trueInput.text === '') {
+        if (childIndex <= 1 || !_.includes(trueInput._previousEllipsis, this.childPhrases[childIndex - 2])) {
+          yield trueInput
+          trueInput = _.assign({}, trueInput, {
+            _previousEllipsis: trueInput._previousEllipsis.concat(previousChild)
+          })
+        }
+      } else {
+        let success = false
+        yield _.assign({}, trueInput, {
+          callbacks: trueInput.callbacks.concat(() => success = true)
+        })
+        if (success) return
+      }
+    }
+
+    const child = this.childPhrases[childIndex]
+
+    if (child.props.optional) {
+      let success = false
+      if (child.props.limited) {
+        trueInput = _.assign({}, trueInput, {callbacks: trueInput.callbacks.concat(() => success = true)})
+      }
+      if (child.props.preferred) {
+        yield* this.parseChild(childIndex, trueInput, options)
+        if (!child.props.limited || !success) {
+          yield* this.parseChildControl(childIndex + 1, trueInput, options)
+        }
+      } else {
+        yield* this.parseChildControl(childIndex + 1, trueInput, options)
+        if (!child.props.limited || !success) {
+          yield* this.parseChild(childIndex, trueInput, options)
+        }
+      }
+    } else {
+      yield* this.parseChild(childIndex, trueInput, options)
+    }
+
   }
 
   * parseChild (childIndex, input, options) {
@@ -68,30 +78,16 @@ export class Sequence extends Phrase {
         }
       }
 
-      const modifications = {}
-      modifications.result = getAccumulatedResult(input.result, child, output.result)
-      modifications.score = input.score * output.score
-      modifications.qualifiers = input.qualifiers.concat(output.qualifiers)
-      let nextOutput = _.assign({}, output, modifications)
-
-      if (childIndex + 1 >= this.childPhrases.length) {
-        yield nextOutput
-        continue
+      const modifications = {
+        result: getAccumulatedResult(input.result, child, output.result),
+        score: input.score * output.score,
+        qualifiers: input.qualifiers.concat(output.qualifiers)
       }
 
-      // if (child.props.ellipsis) {
-      //   yield nextOutput
+      let nextOutput = _.assign({}, output, modifications)
 
-      //   if (output.text == null) {
-      //     continue
-      //   }
 
-      //   if (output.ellipsis) {
-      //     nextOutput = _.assign({}, nextOutput, {ellipsis: false})
-      //   }
-      // }
-
-      yield* this.parseChild(childIndex + 1, nextOutput, options)
+      yield* this.parseChildControl(childIndex + 1, nextOutput, options)
     }
   }
 
