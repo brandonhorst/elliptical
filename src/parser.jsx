@@ -6,8 +6,6 @@ import { reconcile } from './reconcile'
 import { LaconaError } from './error'
 import SourceManager from './source-manager'
 
-global.__z = 0
-
 function from (i) {
   const a = []
   for (let x of i) {
