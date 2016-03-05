@@ -1,132 +1,174 @@
-/** @jsx createElement */
 /* eslint-env mocha */
+
+import _ from 'lodash'
+import element from '../src/element'
+import {reconcileAndTraverse} from './_util'
+
 import { expect } from 'chai'
-import { text } from './_util'
-import { Parser } from '..'
-import { createElement, Phrase } from 'lacona-phrase'
 
 describe('list', () => {
-  let parser
-
-  beforeEach(() => {
-    parser = new Parser()
-  })
-
   it('suggests normally without fuzzy', () => {
-    parser.grammar = <list items={['testa', 'testb']} />
+    const grammar = <list items={['testa', 'testb']} />
 
-    const data = parser.parseArray('')
-    expect(data).to.have.length(2)
-    expect(text(data[0])).to.equal('testa')
-    expect(text(data[1])).to.equal('testb')
+    const options = reconcileAndTraverse(grammar, '')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'testa', input: false}],
+      result: undefined,
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [{text: 'testb', input: false}],
+      result: undefined,
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('suggests normally with fuzzy', () => {
-    parser.grammar = <list items={['testa', 'testb']} fuzzy />
+    const grammar = <list items={['testa', 'testb']} fuzzy />
 
-    const data = parser.parseArray('')
-    expect(data).to.have.length(2)
-    expect(text(data[0])).to.equal('testa')
-    expect(text(data[1])).to.equal('testb')
+    const options = reconcileAndTraverse(grammar, '')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'testa', input: false}],
+      result: undefined,
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [{text: 'testb', input: false}],
+      result: undefined,
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('matches without fuzzy', () => {
-    parser.grammar = <list items={['testa', 'testb']} />
+    const grammar = <list items={['testa', 'testb']} />
 
-    const data = parser.parseArray('testb')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('testb')
+    const options = reconcileAndTraverse(grammar, 'testb')
+    expect(options).to.eql([{
+      text: '',
+      words: [{text: 'testb', input: true}],
+      result: undefined,
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('matches with fuzzy', () => {
-    parser.grammar = <list items={['testa', 'testb']} fuzzy />
+    const grammar = <list items={['testa', 'testb']} fuzzy />
 
-    const data = parser.parseArray('b')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('testb')
+    const options = reconcileAndTraverse(grammar, 'b')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'test', input: false}, {text: 'b', input: true}],
+      result: undefined,
+      score: 0.5,
+      qualifiers: []
+    }]);
   })
 
   it('sorts with fuzzy, and limits before it', () => {
-    parser.grammar = <list items={['ztest', 'testz', 'zztest']} fuzzy limit={2} />
+    const grammar = <list items={['ztest', 'testz', 'zztest']} fuzzy limit={2} />
 
-    const data = parser.parseArray('test')
-    expect(data).to.have.length(2)
-    expect(text(data[0])).to.equal('testz')
-    expect(text(data[1])).to.equal('ztest')
+    const options = reconcileAndTraverse(grammar, 'test')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'test', input: true}, {text: 'z', input: false}],
+      result: undefined,
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [{text: 'z', input: false}, {text: 'test', input: true}],
+      result: undefined,
+      score: 0.5,
+      qualifiers: []
+    }]);
   })
-
-  // it('sorts with fuzzy, and limits before it', () => {
-  //   parser.grammar = <list items={['ztest', 'tezst', 'testz', 'tzest']} fuzzy limit={3} />
-  //
-  //   const data = parser.parseArray($1)
-  //   expect(data).to.have.length(3)
-  //   expect(text(data[0])).to.equal('testz')
-  //   expect(text(data[1])).to.equal('ztest')
-  //   expect(text(data[2])).to.equal('tezst')
-  // })
 
   it('allows for value without fuzzy', () => {
     const items = [{text: 'testa', value: 'a'}, {text: 'testb', value: 'b'}]
-    parser.grammar = <list items={items} />
+    const grammar = <list items={items} />
 
-    const data = parser.parseArray('testb')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('testb')
-    expect(data[0].result).to.equal('b')
+    const options = reconcileAndTraverse(grammar, 'testb')
+    expect(options).to.eql([{
+      text: '',
+      words: [{text: 'testb', input: true}],
+      result: 'b',
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('allows for value with fuzzy', () => {
     const items = [{text: 'testa', value: 'a'}, {text: 'testb', value: 'b'}]
-    parser.grammar = <list items={items} fuzzy />
+    const grammar = <list items={items} fuzzy />
 
-    const data = parser.parseArray('b')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('testb')
-    expect(data[0].result).to.equal('b')
+    const options = reconcileAndTraverse(grammar, 'b')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'test', input: false}, {text: 'b', input: true}],
+      result: 'b',
+      score: 0.5,
+      qualifiers: []
+    }]);
   })
 
   it('allows for value override', () => {
     const items = ['testa', {text: 'testb', value: 'b'}, {text: 'testc'}]
-    parser.grammar = <list items={items} value='override' />
+    const grammar = <list items={items} value='override' />
 
-    const data = parser.parseArray('')
-    expect(data).to.have.length(3)
-    expect(data[0].result).to.equal('override')
-    expect(data[1].result).to.equal('override')
-    expect(data[2].result).to.equal('override')
+    const options = reconcileAndTraverse(grammar, '')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'testa', input: false}],
+      result: 'override',
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [{text: 'testb', input: false}],
+      result: 'override',
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [{text: 'testc', input: false}],
+      result: 'override',
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('outputs a qualifier', () => {
     const items = [{text: 'testa', qualifiers: ['desca', 'descb']}, 'testb']
-    parser.grammar = <list items={items} />
+    const grammar = <list items={items} />
 
-    const data = parser.parseArray('testa')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('testa')
-    expect(data[0].qualifiers).to.eql(['desca', 'descb'])
+    const options = reconcileAndTraverse(grammar, 'testa')
+    expect(options).to.eql([{
+      text: '',
+      words: [{text: 'testa', input: true}],
+      result: undefined,
+      score: 1,
+      qualifiers: ['desca', 'descb']
+    }]);
   })
 
   it('outputs a qualifier (fuzzy)', () => {
     const items = [{text: 'testa', qualifiers: ['desca', 'descb']}, 'testb']
-    parser.grammar = <list items={items} fuzzy />
+    const grammar = <list items={items} fuzzy />
 
-    const data = parser.parseArray('ta')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('testa')
-    expect(data[0].qualifiers).to.eql(['desca', 'descb'])
-  })
-
-  it('outputs score', () => {
-    const items = ['ztest', 'testz', 'tezst']
-    parser.grammar = <list items={items} fuzzy />
-
-    const data = parser.parseArray('test')
-    expect(data).to.have.length(2)
-    expect(text(data[0])).to.equal('testz')
-    expect(data[0].score).to.equal(1)
-    expect(text(data[1])).to.equal('ztest')
-    expect(data[1].score).to.equal(0.5)
-    // expect(text(data[2])).to.equal('tezst')
-    // expect(data[2].score).to.equal(0.25)
+    const options = reconcileAndTraverse(grammar, 'a')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'test', input: false}, {text: 'a', input: true}],
+      result: undefined,
+      score: 0.5,
+      qualifiers: ['desca', 'descb']
+    }]);
   })
 })

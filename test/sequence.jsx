@@ -1,127 +1,256 @@
-/** @jsx createElement */
 /* eslint-env mocha */
+
+import _ from 'lodash'
+import element from '../src/element'
+import {reconcileAndTraverse} from './_util'
+
 import { expect } from 'chai'
-import { text } from './_util'
-import { Parser } from '..'
-import { createElement, Phrase } from 'lacona-phrase'
 
 describe('sequence', () => {
-  var parser
-
-  beforeEach(() => {
-    parser = new Parser()
-  })
-
   it('puts two elements in order', () => {
-    parser.grammar = (
+    const grammar = (
       <sequence>
         <literal text='super' />
         <literal text='man' />
       </sequence>
     )
+    const options = reconcileAndTraverse(grammar, '')
 
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('superman')
-    expect(data[0].result).to.be.empty
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'super', input: false}, {text: 'man', input: false}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('handles an optional child', () => {
-    parser.grammar = (
+    const grammar = (
       <sequence>
         <literal text='super' />
-        <literal text='maximum' optional />
+        <literal text=' ' optional />
         <literal text='man' />
       </sequence>
     )
+    const options = reconcileAndTraverse(grammar, '')
 
-    const data = parser.parseArray('')
-    expect(data).to.have.length(2)
-    expect(text(data[0])).to.equal('superman')
-    expect(text(data[1])).to.equal('supermaximumman')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'super', input: false},
+        {text: 'man', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [
+        {text: 'super', input: false},
+        {text: ' ', input: false},
+        {text: 'man', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('handles an ellipsis', () => {
-    parser.grammar = (
+    const grammar = (
       <sequence>
         <literal text='super' ellipsis />
         <literal text='man' />
       </sequence>
     )
+    let options
 
-    const data1 = parser.parseArray('')
-    expect(data1).to.have.length(1)
-    expect(text(data1[0])).to.equal('super')
+    options = reconcileAndTraverse(grammar, '')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'super', input: false}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
 
-    const data2 = parser.parseArray('super')
-    expect(data2).to.have.length(2)
-    expect(text(data2[0])).to.equal('super')
-    expect(text(data2[1])).to.equal('superman')
+    options = reconcileAndTraverse(grammar, 'super')
+    expect(options).to.eql([{
+      text: '',
+      words: [{text: 'super', input: true}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [{text: 'super', input: true}, {text: 'man', input: false}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
 
-    const data3 = parser.parseArray('superm')
-    expect(data3).to.have.length(1)
-    expect(text(data3[0])).to.equal('superman')
+    options = reconcileAndTraverse(grammar, 'superm')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'super', input: true},
+        {text: 'm', input: true},
+        {text: 'an', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('does not output an ellipsis for the last child', () => {
-    parser.grammar = (
+    const grammar = (
       <sequence>
         <literal text='super' />
         <literal text='man' ellipsis />
         <literal text='rocks' ellipsis />
       </sequence>
     )
+    let options
 
-    const data1 = parser.parseArray('')
-    expect(data1).to.have.length(1)
-    expect(text(data1[0])).to.equal('superman')
+    options = reconcileAndTraverse(grammar, '')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'super', input: false}, {text: 'man', input: false}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
 
-    const data2 = parser.parseArray('super')
-    expect(data2).to.have.length(1)
-    expect(text(data2[0])).to.equal('superman')
+    options = reconcileAndTraverse(grammar, 'super')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'super', input: true}, {text: 'man', input: false}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
 
-    const data3 = parser.parseArray('superman')
-    expect(data3).to.have.length(2)
-    expect(text(data3[0])).to.equal('superman')
-    expect(text(data3[1])).to.equal('supermanrocks')
+    options = reconcileAndTraverse(grammar, 'superman')
+    expect(options).to.eql([{
+      text: '',
+      words: [
+        {text: 'super', input: true},
+        {text: 'man', input: true},
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [
+        {text: 'super', input: true},
+        {text: 'man', input: true},
+        {text: 'rocks', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
 
-    const data4 = parser.parseArray('supermanr')
-    expect(data4).to.have.length(1)
-    expect(text(data4[0])).to.equal('supermanrocks')
+    options = reconcileAndTraverse(grammar, 'supermanr')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'super', input: true},
+        {text: 'man', input: true},
+        {text: 'r', input: true},
+        {text: 'ocks', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('handles an ellipsis that is optional', () => {
-    parser.grammar = (
+    const grammar = (
       <sequence>
         <literal text='the' />
         <literal text='super' ellipsis optional  />
         <literal text='man' />
       </sequence>
     )
+    let options
 
-    const data1 = parser.parseArray('')
-    expect(data1).to.have.length(2)
-    expect(text(data1[0])).to.equal('the')
-    expect(text(data1[1])).to.equal('thesuper')
+    options = reconcileAndTraverse(grammar, '')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'the', input: false}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [{text: 'the', input: false}, {text: 'super', input: false}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
 
-    const data2 = parser.parseArray('the')
-    expect(data2).to.have.length(3)
-    expect(text(data2[0])).to.equal('the')
-    expect(text(data2[1])).to.equal('theman')
-    expect(text(data2[2])).to.equal('thesuper')
+    options = reconcileAndTraverse(grammar, 'the')
+    expect(options).to.eql([{
+      text: '',
+      words: [{text: 'the', input: true}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [{text: 'the', input: true}, {text: 'man', input: false}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [{text: 'the', input: true}, {text: 'super', input: false}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
 
-    const data3 = parser.parseArray('thesuper')
-    expect(data3).to.have.length(2)
-    expect(text(data3[0])).to.equal('thesuper')
-    expect(text(data3[1])).to.equal('thesuperman')
+    options = reconcileAndTraverse(grammar, 'thesuper')
+    expect(options).to.eql([{
+      text: '',
+      words: [{text: 'the', input: true}, {text: 'super', input: true}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [
+        {text: 'the', input: true},
+        {text: 'super', input: true},
+        {text: 'man', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
 
-    const data4 = parser.parseArray('thesuperm')
-    expect(data4).to.have.length(1)
-    expect(text(data4[0])).to.equal('thesuperman')
+    options = reconcileAndTraverse(grammar, 'thesuperm')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'the', input: true},
+        {text: 'super', input: true},
+        {text: 'm', input: true},
+        {text: 'an', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('does not double output if an optional follows an ellipsis', () => {
-    parser.grammar = (
+    const grammar = (
       <sequence>
         <literal text='the' />
         <literal text='super' ellipsis optional  />
@@ -129,32 +258,101 @@ describe('sequence', () => {
         <literal text='rocks' />
       </sequence>
     )
+    let options
 
-    const data1 = parser.parseArray('')
-    expect(data1).to.have.length(2)
-    expect(text(data1[0])).to.equal('the')
-    expect(text(data1[1])).to.equal('thesuper')
+    options = reconcileAndTraverse(grammar, '')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'the', input: false}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [{text: 'the', input: false}, {text: 'super', input: false}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
 
-    const data2 = parser.parseArray('the')
-    expect(data2).to.have.length(4)
-    expect(text(data2[0])).to.equal('the')
-    expect(text(data2[1])).to.equal('therocks')
-    expect(text(data2[2])).to.equal('themanrocks')
-    expect(text(data2[3])).to.equal('thesuper')
+    options = reconcileAndTraverse(grammar, 'the')
+    expect(options).to.eql([{
+      text: '',
+      words: [{text: 'the', input: true}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [{text: 'the', input: true}, {text: 'rocks', input: false}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [
+        {text: 'the', input: true},
+        {text: 'man', input: false},
+        {text: 'rocks', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [{text: 'the', input: true}, {text: 'super', input: false}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
+    options = reconcileAndTraverse(grammar, 'thesuper')
+    expect(options).to.eql([{
+      text: '',
+      words: [{text: 'the', input: true}, {text: 'super', input: true}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [
+        {text: 'the', input: true},
+        {text: 'super', input: true},
+        {text: 'rocks', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [
+        {text: 'the', input: true},
+        {text: 'super', input: true},
+        {text: 'man', input: false},
+        {text: 'rocks', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
 
-    const data3 = parser.parseArray('thesuper')
-    expect(data3).to.have.length(3)
-    expect(text(data3[0])).to.equal('thesuper')
-    expect(text(data3[1])).to.equal('thesuperrocks')
-    expect(text(data3[2])).to.equal('thesupermanrocks')
-
-    const data4 = parser.parseArray('thesuperm')
-    expect(data4).to.have.length(1)
-    expect(text(data4[0])).to.equal('thesupermanrocks')
+    options = reconcileAndTraverse(grammar, 'thesuperm')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'the', input: true},
+        {text: 'super', input: true},
+        {text: 'm', input: true},
+        {text: 'an', input: false},
+        {text: 'rocks', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('does not double output if an optional ellipsis follows an ellipsis', () => {
-    parser.grammar = (
+    const grammar = (
       <sequence>
         <literal text='the' />
         <literal text='super' ellipsis optional  />
@@ -162,85 +360,212 @@ describe('sequence', () => {
         <literal text='rocks' />
       </sequence>
     )
+    let options
 
-    const data1 = parser.parseArray('')
-    // console.log(require('util').inspect(data1, {depth: 8}))
-    expect(data1).to.have.length(2)
-    expect(text(data1[0])).to.equal('the')
-    expect(text(data1[1])).to.equal('thesuper')
+    options = reconcileAndTraverse(grammar, '')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'the', input: false}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [{text: 'the', input: false}, {text: 'super', input: false}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
 
-    const data2 = parser.parseArray('the')
-    expect(data2).to.have.length(4)
-    expect(text(data2[0])).to.equal('the')
-    expect(text(data2[1])).to.equal('therocks')
-    expect(text(data2[2])).to.equal('theman')
-    expect(text(data2[3])).to.equal('thesuper')
+    options = reconcileAndTraverse(grammar, 'the')
+    expect(options).to.eql([{
+      text: '',
+      words: [{text: 'the', input: true}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [{text: 'the', input: true}, {text: 'rocks', input: false}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [{text: 'the', input: true}, {text: 'man', input: false}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [{text: 'the', input: true}, {text: 'super', input: false}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
 
-    const data3 = parser.parseArray('thesuper')
-    expect(data3).to.have.length(3)
-    expect(text(data3[0])).to.equal('thesuper')
-    expect(text(data3[1])).to.equal('thesuperrocks')
-    expect(text(data3[2])).to.equal('thesuperman')
+    options = reconcileAndTraverse(grammar, 'thesuper')
+    expect(options).to.eql([{
+      text: '',
+      words: [{text: 'the', input: true}, {text: 'super', input: true}],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [
+        {text: 'the', input: true},
+        {text: 'super', input: true},
+        {text: 'rocks', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [
+        {text: 'the', input: true},
+        {text: 'super', input: true},
+        {text: 'man', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
 
-    const data4 = parser.parseArray('thesuperm')
-    expect(data4).to.have.length(1)
-    expect(text(data4[0])).to.equal('thesuperman')
+    options = reconcileAndTraverse(grammar, 'thesuperm')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'the', input: true},
+        {text: 'super', input: true},
+        {text: 'm', input: true},
+        {text: 'an', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
 
-    const data5 = parser.parseArray('thesuperman')
-    expect(data5).to.have.length(2)
-    expect(text(data5[0])).to.equal('thesuperman')
-    expect(text(data5[1])).to.equal('thesupermanrocks')
+    options = reconcileAndTraverse(grammar, 'thesuperman')
+    expect(options).to.eql([{
+      text: '',
+      words: [
+        {text: 'the', input: true},
+        {text: 'super', input: true},
+        {text: 'man', input: true}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [
+        {text: 'the', input: true},
+        {text: 'super', input: true},
+        {text: 'man', input: true},
+        {text: 'rocks', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
 
-    const data6 = parser.parseArray('thesupermanr')
-    expect(data6).to.have.length(1)
-    expect(text(data6[0])).to.equal('thesupermanrocks')
+    options = reconcileAndTraverse(grammar, 'thesupermanr')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'the', input: true},
+        {text: 'super', input: true},
+        {text: 'man', input: true},
+        {text: 'r', input: true},
+        {text: 'ocks', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('handles an optional child that is preferred', () => {
-    parser.grammar = (
+    const grammar = (
       <sequence>
         <literal text='super' />
-        <literal text='maximum' optional preferred />
+        <literal text=' ' optional preferred />
         <literal text='man' />
       </sequence>
     )
+    const options = reconcileAndTraverse(grammar, '')
 
-    const data = parser.parseArray('')
-    expect(data).to.have.length(2)
-    expect(text(data[0])).to.equal('supermaximumman')
-    expect(text(data[1])).to.equal('superman')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'super', input: false},
+        {text: ' ', input: false},
+        {text: 'man', input: false},
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [
+        {text: 'super', input: false},
+        {text: 'man', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('handles an optional child that is limited', () => {
-    parser.grammar = (
+    const grammar = (
       <sequence>
         <literal text='super' />
-        <literal text='maximum' optional limited />
+        <literal text=' ' optional limited />
         <literal text='man' />
       </sequence>
     )
+    const options = reconcileAndTraverse(grammar, '')
 
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('superman')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'super', input: false},
+        {text: 'man', input: false},
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('handles an optional child that is preferred and limited', () => {
-    parser.grammar = (
+    const grammar = (
       <sequence>
         <literal text='super' />
-        <literal text='maximum' optional preferred limited />
+        <literal text=' ' optional preferred limited />
         <literal text='man' />
       </sequence>
     )
+    const options = reconcileAndTraverse(grammar, '')
 
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('supermaximumman')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'super', input: false},
+        {text: ' ', input: false},
+        {text: 'man', input: false},
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('handles an optional child that is a sequence', () => {
-    parser.grammar = (
+    const grammar = (
       <sequence>
         <literal text='super' />
         <sequence optional>
@@ -249,14 +574,24 @@ describe('sequence', () => {
         </sequence>
       </sequence>
     )
+    const options = reconcileAndTraverse(grammar, 'superm')
 
-    const data = parser.parseArray('superm')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('supermanagain')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'super', input: true},
+        {text: 'm', input: true},
+        {text: 'an', input: false},
+        {text: 'again', input: false},
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('handles an optional child that is a sequence with freetexts', () => {
-    parser.grammar = (
+    const grammar = (
       <sequence>
         <freetext limit={1} />
         <sequence optional>
@@ -266,62 +601,78 @@ describe('sequence', () => {
         </sequence>
       </sequence>
     )
+    const options = reconcileAndTraverse(grammar, 'supermanagainret')
 
-    const data = parser.parseArray('supermanagainret')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('supermanagainreturns')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'super', input: true},
+        {text: 'man', input: true},
+        {text: 'again', input: true},
+        {text: 'ret', input: true},
+        {text: 'urns', input: false},
+      ],
+      result: {},
+      score: options[0].score,
+      qualifiers: []
+    }]);
   })
 
   it('does not take an optional childs value', () => {
-    parser.grammar = (
+    const grammar = (
       <sequence>
         <literal text='super' />
-        <literal text='maximum' value='someValue' id='opt' optional />
+        <literal text=' ' value='someValue' id='opt' optional />
         <literal text='man' />
       </sequence>
     )
+    const options = reconcileAndTraverse(grammar, '')
 
-    const data = parser.parseArray('')
-    expect(data).to.have.length(2)
-    expect(text(data[0])).to.equal('superman')
-    expect(data[0].result.opt).to.be.undefined
-    expect(text(data[1])).to.equal('supermaximumman')
-    expect(data[1].result.opt).to.equal('someValue')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'super', input: false},
+        {text: 'man', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [
+        {text: 'super', input: false},
+        {text: ' ', input: false},
+        {text: 'man', input: false}
+      ],
+      result: {opt: 'someValue'},
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('can set a value to the result', () => {
-    parser.grammar = (
+    const grammar = (
       <sequence value='testValue'>
         <literal text='super' />
         <literal text='man' />
       </sequence>
     )
+    const options = reconcileAndTraverse(grammar, '')
 
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('superman')
-    expect(data[0].result).to.equal('testValue')
-  })
-
-  it('results is an object with id keys', () => {
-    parser.grammar = (
-      <sequence>
-        <literal id='desc' text='super' value='super' />
-        <literal id='noun' text='man' value='man' />
-      </sequence>
-    )
-
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('superman')
-    expect(data[0].result).to.eql({
-      desc: 'super',
-      noun: 'man'
-    })
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'super', input: false},
+        {text: 'man', input: false}
+      ],
+      result: 'testValue',
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('will merge results in', () => {
-    parser.grammar = (
+    const grammar = (
       <sequence>
         <literal id='desc' text='super' value='super' />
         <sequence merge='true'>
@@ -331,119 +682,143 @@ describe('sequence', () => {
       </sequence>
     )
 
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('supermanrocks')
-    expect(data[0].result).to.eql({
-      desc: 'super',
-      noun: 'man',
-      adj: 'rocks'
-    })
+    const options = reconcileAndTraverse(grammar, '')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'super', input: false},
+        {text: 'man', input: false},
+        {text: 'rocks', input: false}
+      ],
+      result: {desc: 'super', noun: 'man', adj: 'rocks'},
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
-  it('will merge non-object results in', () => {
-    parser.grammar = (
+  it('will assign for non-object merge results', () => {
+    const grammar = (
       <sequence>
         <literal text='super' />
         <literal text='man' value='man' merge />
       </sequence>
     )
-
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('superman')
-    expect(data[0].result).to.eql('man')
+    const options = reconcileAndTraverse(grammar, '')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'super', input: false},
+        {text: 'man', input: false}
+      ],
+      result: 'man',
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('will merge results in for optionals', () => {
-    parser.grammar = (
+    const grammar = (
       <sequence>
         <literal text='super' />
         <literal text='man' value='man' optional merge />
       </sequence>
     )
-
-    const data = parser.parseArray('')
-    expect(data).to.have.length(2)
-    expect(text(data[0])).to.eql('super')
-    expect(data[0].result).to.eql({})
-
-    expect(text(data[1])).to.eql('superman')
-    expect(data[1].result).to.eql('man')
-  })
-
-  it('ignores strings and nulls for reconciliation', () => {
-    class Test extends Phrase {
-      describe () {
-        return (
-          <sequence>
-            {null}
-            <literal text='test' />
-            some string
-          </sequence>
-        )
-      }
-    }
-
-    parser.grammar = <Test />
-    const data = parser.parseArray('test')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('test')
+    const options = reconcileAndTraverse(grammar, '')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'super', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [
+        {text: 'super', input: false},
+        {text: 'man', input: false}
+      ],
+      result: 'man',
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('checks for uniqueness', () => {
-    class Test extends Phrase {
-      describe () {
-        return (
-          <sequence unique>
-            <literal text='test' optional id='test' value={1} />
-            <literal text='a' />
-            <literal text='test' optional id='test' value={2} />
-          </sequence>
-        )
-      }
-    }
+    const grammar = (
+      <sequence unique>
+        <literal text='test' optional id='test' value={1} />
+        <literal text='a' />
+        <literal text='test' optional id='test' value={2} />
+      </sequence>
+    )
+    let options
 
-    parser.grammar = <Test />
-    const data1 = parser.parseArray('testa')
-    expect(data1).to.have.length(1)
-    expect(text(data1[0])).to.equal('testa')
-    expect(data1[0].result.test).to.equal(1)
+    options = reconcileAndTraverse(grammar, 'testa')
+    expect(options).to.eql([{
+      text: "",
+      words: [
+        {text: 'test', input: true},
+        {text: 'a', input: true}
+      ],
+      result: {test: 1},
+      score: 1,
+      qualifiers: []
+    }]);
 
-    const data2 = parser.parseArray('atest')
-    expect(data2).to.have.length(1)
-    expect(text(data2[0])).to.equal('atest')
-    expect(data2[0].result.test).to.equal(2)
 
-    const data3 = parser.parseArray('testatest')
-    expect(data3).to.have.length(0)
+    options = reconcileAndTraverse(grammar, 'atest')
+    expect(options).to.eql([{
+      text: "",
+      words: [
+        {text: 'a', input: true},
+        {text: 'test', input: true}
+      ],
+      result: {test: 2},
+      score: 1,
+      qualifiers: []
+    }]);
+
+
+    options = reconcileAndTraverse(grammar, 'testatest')
+    expect(options).to.eql([]);
   })
 
   it('allows for uniqueness in merges', () => {
-    class Test extends Phrase {
-      describe () {
-        return (
-          <sequence unique>
-            <literal text='test' optional id='test' value={1} />
-            <literal text='a' />
-            <literal text='test' optional merge value={{test: 2}} />
-          </sequence>
-        )
-      }
-    }
+    const grammar = (
+      <sequence unique>
+        <literal text='test' optional id='test' value={1} />
+        <literal text='a' />
+        <literal text='test' optional merge value={{test: 2}} />
+      </sequence>
+    )
+    let options
 
-    parser.grammar = <Test />
-    const data1 = parser.parseArray('testa')
-    expect(data1).to.have.length(1)
-    expect(text(data1[0])).to.equal('testa')
-    expect(data1[0].result.test).to.equal(1)
+    options = reconcileAndTraverse(grammar, 'testa')
+    expect(options).to.eql([{
+      text: "",
+      words: [
+        {text: 'test', input: true},
+        {text: 'a', input: true}
+      ],
+      result: {test: 1},
+      score: 1,
+      qualifiers: []
+    }]);
 
-    const data2 = parser.parseArray('atest')
-    expect(data2).to.have.length(1)
-    expect(text(data2[0])).to.equal('atest')
-    expect(data2[0].result.test).to.equal(2)
+    options = reconcileAndTraverse(grammar, 'atest')
+    expect(options).to.eql([{
+      text: "",
+      words: [
+        {text: 'a', input: true},
+        {text: 'test', input: true}
+      ],
+      result: {test: 2},
+      score: 1,
+      qualifiers: []
+    }]);
 
-    const data3 = parser.parseArray('testatest')
-    expect(data3).to.have.length(0)
+    options = reconcileAndTraverse(grammar, 'testatest')
+    expect(options).to.eql([]);
   })
 })

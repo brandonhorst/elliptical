@@ -1,45 +1,35 @@
-/** @jsx createElement */
 import _ from 'lodash'
-import { Phrase } from 'lacona-phrase'
-import { parse } from '../parse'
-import { reconcile } from '../reconcile'
 
-export class Choice extends Phrase {
-  * _handleParse (input, options) {
-    let successes = 0
-    if (this.props.children && this.props.children.length > 0) {
-      this.childPhrases = reconcile({descriptor: this.props.children, phrase: this.childPhrases, options})
+function * parse (option, {props: {limit}, children}) {
+  let successes = 0
+  if (children && children.length > 0) {
+    for (let child of children) {
+      let success = false
 
-      for (let childPhrase of this.childPhrases) {
-        let success = false
+      //performance optimization
+      if (child.attributes.id == null && !limit) {
+        yield* child.traverse(option)
+      } else {
+        for (let output of child.traverse(option)) {
+          const newResult = child.attributes.id != null
+            ? {[child.attributes.id]: output.result}
+            : output.result
 
-        //perf opt
-        if (childPhrase.props.id == null && !this.props.limit) {
-          yield* parse({phrase: childPhrase, input, options})
-        } else {
-          for (let output of parse({phrase: childPhrase, input, options})) {
-            const newResult = childPhrase.props.id != null
-              ? {[childPhrase.props.id]: output.result}
-              : output.result
+          const mods = {result: newResult}
 
-            const modifications = {result: newResult}
-            if (this.props.limit) modifications.callbacks = output.callbacks.concat(() => success = true)
-
-            yield _.assign({}, output, modifications)
+          if (limit) {
+            mods.callbacks = output.callbacks.concat(() => success = true)
           }
+          yield _.assign({}, output, mods)
         }
+      }
 
-        if (this.props.limit) {
-          if (success) successes++
-          if (this.props.limit <= successes) break
-        }
+      if (limit) {
+        if (success) successes++
+        if (limit <= successes) break
       }
     }
   }
-
-  _destroy (destroy) {
-    _.forEach(this.childPhrases, destroy)
-
-    delete this.childPhrases
-  }
 }
+
+export default {parse}

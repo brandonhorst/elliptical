@@ -1,72 +1,104 @@
-/** @jsx createElement */
 /* eslint-env mocha */
+
+import _ from 'lodash'
+import element from '../src/element'
+import {reconcileAndTraverse} from './_util'
+
 import { expect } from 'chai'
-import { Parser } from '..'
-import { createElement } from 'lacona-phrase'
-import { text } from './_util'
 
 describe('repeat', () => {
-  let parser
-
-  beforeEach(() => {
-    parser = new Parser()
-  })
-
   describe('separator', () => {
     it('does not accept input that does not match the child', () => {
-      parser.grammar = (
+      const grammar = (
         <repeat separator={<literal text='man' />}>
           <literal text='super' />
         </repeat>
       )
 
-      const data = parser.parseArray('wrong')
-      expect(data).to.have.length(0)
+      const options = reconcileAndTraverse(grammar, 'wrong')
+      expect(options).to.eql([])
+
     })
 
     it('accepts the child on its own', () => {
-      parser.grammar = (
+      const grammar = (
         <repeat separator={<literal text='man' />}>
           <literal text='super' />
         </repeat>
       )
 
-      const data = parser.parseArray('superm')
-      expect(data).to.have.length(1)
-      expect(text(data[0])).to.equal('supermansuper')
-      expect(data[0].ellipsis).to.be.true
+      const options = reconcileAndTraverse(grammar, 'superm')
+      expect(options).to.eql([{
+        text: null,
+        words: [
+          {text: 'super', input: true},
+          {text: 'm', input: true},
+          {text: 'an', input: false},
+          {text: 'super', input: false}
+        ],
+        result: [undefined, undefined],
+        score: 1,
+        qualifiers: []
+      }]);
     })
 
     it('accepts the child twice, with the separator in the middle', () => {
-      parser.grammar = (
+      const grammar = (
         <repeat separator={<literal text='man' />}>
           <literal text='super' />
         </repeat>
       )
 
-      const data = parser.parseArray('supermans')
-      expect(data).to.have.length(1)
-      expect(text(data[0])).to.equal('supermansuper')
-      expect(data[0].ellipsis).to.be.true
+      const options = reconcileAndTraverse(grammar, 'supermans')
+      expect(options).to.eql([{
+        text: null,
+        words: [
+          {text: 'super', input: true},
+          {text: 'man', input: true},
+          {text: 's', input: true},
+          {text: 'uper', input: false}
+        ],
+        result: [undefined, undefined],
+        score: 1,
+        qualifiers: []
+      }]);
     })
 
     it('accepts the child twice and suggests when complete, with the separator in the middle', () => {
-      parser.grammar = (
+      const grammar = (
         <repeat separator={<literal text='man' />}>
           <literal text='super' />
         </repeat>
       )
 
-      const data = parser.parseArray('supermansuper')
-      expect(data).to.have.length(2)
-      expect(text(data[0])).to.equal('supermansuper')
-      expect(data[0].ellipsis).to.be.true
-      expect(text(data[1])).to.equal('supermansupermansuper')
-      expect(data[1].ellipsis).to.be.true
+      const options = reconcileAndTraverse(grammar, 'supermansuper')
+      expect(options).to.eql([{
+        text: '',
+        words: [
+          {text: 'super', input: true},
+          {text: 'man', input: true},
+          {text: 'super', input: true}
+        ],
+        result: [undefined, undefined],
+        score: 1,
+        qualifiers: []
+      }, {
+        text: null,
+        words: [
+          {text: 'super', input: true},
+          {text: 'man', input: true},
+          {text: 'super', input: true},
+          {text: 'man', input: false},
+          {text: 'super', input: false}
+        ],
+        result: [undefined, undefined, undefined],
+        score: 1,
+        qualifiers: []
+      }]);
     })
 
     it('allows for content to have children', () => {
-      parser.grammar = (
+      const grammar = (
         <repeat separator={<literal text=' ' />}>
           <choice>
             <literal text='a' />
@@ -75,17 +107,33 @@ describe('repeat', () => {
         </repeat>
       )
 
-      const data = parser.parseArray('a ')
-      expect(data).to.have.length(2)
-      expect(text(data[0])).to.equal('a a')
-      expect(text(data[1])).to.equal('a b')
-      expect(data[0].ellipsis).to.be.true
-      expect(data[1].ellipsis).to.be.true
+      const options = reconcileAndTraverse(grammar, 'a ')
+      expect(options).to.eql([{
+        text: null,
+        words: [
+          {text: 'a', input: true},
+          {text: ' ', input: true},
+          {text: 'a', input: false}
+        ],
+        result: [undefined, undefined],
+        score: 1,
+        qualifiers: []
+      }, {
+        text: null,
+        words: [
+          {text: 'a', input: true},
+          {text: ' ', input: true},
+          {text: 'b', input: false}
+        ],
+        result: [undefined, undefined],
+        score: 1,
+        qualifiers: []
+      }]);
     })
   })
 
   it('allows for content to have children', () => {
-    parser.grammar = (
+    const grammar = (
       <repeat>
         <choice>
           <literal text='a' />
@@ -94,120 +142,141 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const data = parser.parseArray('')
-    expect(data).to.have.length(2)
-    expect(text(data[0])).to.equal('a')
-    expect(text(data[1])).to.equal('b')
-    expect(data[0].ellipsis).to.be.true
+    const options = reconcileAndTraverse(grammar, '')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'a', input: false}],
+      result: [undefined],
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [{text: 'b', input: false}],
+      result: [undefined],
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('does not accept input that does not match the child', () => {
-    parser.grammar = (
+    const grammar = (
       <repeat>
         <literal text='super' />
       </repeat>
     )
-    const data = parser.parseArray('wrong')
-    expect(data).to.have.length(0)
+    const options = reconcileAndTraverse(grammar, 'wrong')
+    expect(options).to.eql([])
   })
 
   it('accepts the child on its own', () => {
-    parser.grammar = (
+    const grammar = (
       <repeat>
-        <literal text='super' />
+        <literal text='super' value='a' />
       </repeat>
     )
 
-    const data = parser.parseArray('sup')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('super')
-    expect(data[0].ellipsis).to.be.true
+    const options = reconcileAndTraverse(grammar, 'sup')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'sup', input: true}, {text: 'er', input: false}],
+      result: ['a'],
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('accepts the child twice', () => {
-    parser.grammar = (
+    const grammar = (
       <repeat>
-        <literal text='super' />
+        <literal text='super' value='a' />
       </repeat>
     )
 
-    const data = parser.parseArray('supers')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('supersuper')
-    expect(data[0].ellipsis).to.be.true
+    const options = reconcileAndTraverse(grammar, 'supers')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'super', input: true},
+        {text: 's', input: true},
+        {text: 'uper', input: false}
+      ],
+      result: ['a', 'a'],
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
-  it('accepts the child twice', () => {
-    parser.grammar = (
+  it('accepts the child thrice', () => {
+    const grammar = (
       <repeat>
-        <literal text='super' />
+        <literal text='super' value='a' />
       </repeat>
     )
 
-    const data = parser.parseArray('supersuper')
-    expect(data).to.have.length(2)
-    expect(text(data[0])).to.equal('supersuper')
-    expect(data[0].ellipsis).to.be.true
-    expect(text(data[1])).to.equal('supersupersuper')
-    expect(data[1].ellipsis).to.be.true
-  })
-
-  it('creates an array from the values of the children', () => {
-    parser.grammar = (
-      <repeat>
-        <choice>
-          <literal text='super' value='super' />
-          <literal text='man' value='man' />
-        </choice>
-      </repeat>
-    )
-
-    const data = parser.parseArray('superm')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('superman')
-    expect(data[0].result).to.eql(['super', 'man'])
-    expect(data[0].ellipsis).to.be.true
+    const options = reconcileAndTraverse(grammar, 'supersuper')
+    expect(options).to.eql([{
+      text: '',
+      words: [
+        {text: 'super', input: true},
+        {text: 'super', input: true},
+      ],
+      result: ['a', 'a'],
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [
+        {text: 'super', input: true},
+        {text: 'super', input: true},
+        {text: 'super', input: false},
+      ],
+      result: ['a', 'a', 'a'],
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('does not accept fewer than min iterations', () => {
-    parser.grammar = (
+    const grammar = (
       <repeat min={2}>
-        <literal text='a' />
+        <literal text='a' value='a' />
       </repeat>
     )
 
-    const data = parser.parseArray('a')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('aa')
-    expect(data[0].ellipsis).to.be.true
+    const options = reconcileAndTraverse(grammar, 'a')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'a', input: true},
+        {text: 'a', input: false},
+      ],
+      result: ['a', 'a'],
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('does not accept more than max iterations', () => {
-    parser.grammar = (
+    const grammar = (
       <repeat max={1} >
-        <literal text='a' />
+        <literal text='a' value='a' />
       </repeat>
     )
 
-    const data = parser.parseArray('aa')
-    expect(data).to.have.length(0)
+    const options = reconcileAndTraverse(grammar, 'a')
+    expect(options).to.eql([{
+      text: '',
+      words: [
+        {text: 'a', input: true},
+      ],
+      result: ['a'],
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
-  it('does not output an ellipsis at max iterations', () => {
-    parser.grammar = (
-      <repeat max={2} >
-        <literal text='a' />
-      </repeat>
-    )
-
-    const data = parser.parseArray('aa')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('aa')
-    expect(data[0].ellipsis).to.not.be.ok
-  })
-
-  it('rejects non-unique repeated elements', () => {
-    parser.grammar = (
+  it('unique rejects non-unique repeated elements', () => {
+    const grammar = (
       <repeat unique>
         <choice>
           <literal text='a' value='a' />
@@ -216,12 +285,12 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const data = parser.parseArray('aa')
-    expect(data).to.have.length(0)
+    const options = reconcileAndTraverse(grammar, 'aa')
+    expect(options).to.eql([])
   })
 
-  it('rejects non-unique repeated elements (deep)', () => {
-    parser.grammar = (
+  it('unique rejects non-unique repeated elements (deep)', () => {
+    const grammar = (
       <repeat unique>
         <choice>
           <literal text='a' value={{a: 1}} />
@@ -230,12 +299,12 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const data = parser.parseArray('ab')
-    expect(data).to.have.length(0)
+    const options = reconcileAndTraverse(grammar, 'ab')
+    expect(options).to.eql([])
   })
 
-  it('accepts unique repeated elements', () => {
-    parser.grammar = (
+  it('unique accepts unique repeated elements', () => {
+    const grammar = (
       <repeat unique>
         <choice>
           <literal text='a' value='a' />
@@ -244,14 +313,21 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const data = parser.parseArray('ab')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('ab')
-    expect(data[0].ellipsis).to.be.true
+    const options = reconcileAndTraverse(grammar, 'ab')
+    expect(options).to.eql([{
+      text: '',
+      words: [
+        {text: 'a', input: true},
+        {text: 'b', input: true},
+      ],
+      result: ['a', 'b'],
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
-  it('accepts non-unique repeated elements (deep)', () => {
-    parser.grammar = (
+  it('unique accepts unique repeated elements (deep)', () => {
+    const grammar = (
       <repeat unique>
         <choice>
           <literal text='a' value={{a: 1}} />
@@ -260,14 +336,21 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const data = parser.parseArray('ab')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('ab')
-    expect(data[0].ellipsis).to.be.true
+    const options = reconcileAndTraverse(grammar, 'ab')
+    expect(options).to.eql([{
+      text: '',
+      words: [
+        {text: 'a', input: true},
+        {text: 'b', input: true},
+      ],
+      result: [{a: 1}, {a: 2}],
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('allows for choices inside of repeats to be limited', () => {
-    parser.grammar = (
+    const grammar = (
       <repeat>
         <choice limit={1}>
           <literal text='aa' />
@@ -277,14 +360,22 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const data = parser.parseArray('aba')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('abaa')
-    expect(data[0].ellipsis).to.be.true
+    const options = reconcileAndTraverse(grammar, 'aba')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'ab', input: true},
+        {text: 'a', input: true},
+        {text: 'a', input: false},
+      ],
+      result: [undefined, undefined],
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('allows for choices inside of repeat separators to be limited', () => {
-    parser.grammar = (
+    const grammar = (
       <repeat separator={
         <choice limit={1}>
           <literal text='aa' />
@@ -296,9 +387,18 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const data = parser.parseArray('xa')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('xaax')
-    expect(data[0].ellipsis).to.be.true
+    const options = reconcileAndTraverse(grammar, 'xa')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'x', input: true},
+        {text: 'a', input: true},
+        {text: 'a', input: false},
+        {text: 'x', input: false},
+      ],
+      result: [undefined, undefined],
+      score: 1,
+      qualifiers: []
+    }]);
   })
 })

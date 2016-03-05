@@ -1,135 +1,96 @@
-/** @jsx createElement */
 /* eslint-env mocha */
+
+import _ from 'lodash'
+import element from '../src/element'
+import {reconcileAndTraverse} from './_util'
+
 import { expect } from 'chai'
-import { text } from './_util'
-import { Parser } from '..'
-import { createElement, Phrase } from 'lacona-phrase'
 
 describe('literal', () => {
-  var parser
-
-  beforeEach(() => {
-    parser = new Parser()
-  })
-
   it('handles a literal', () => {
-    parser.grammar = <literal text='literal test' />
-    const data = parser.parseArray('')
+    const options = reconcileAndTraverse(
+      <literal text='literal test' value='test' />
+    , '')
 
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('literal test')
-    expect(data[0].result).to.be.empty
-  })
-
-  it('handles a literal with a value', () => {
-    parser.grammar = <literal text='literal test' value='test'/>
-    const data = parser.parseArray('')
-
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('literal test')
-    expect(data[0].result).to.equal('test')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'literal test', input: false}],
+      result: 'test',
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('maintains case', () => {
-    parser.grammar = <literal text='Test' />
-    const data = parser.parseArray('test')
+    const grammar = <literal text='Test' />
+    const options = reconcileAndTraverse(grammar, '')
 
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('Test')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'Test', input: false}],
+      result: undefined,
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   describe('decorate', () => {
     it('suggests a decoration', () => {
-      parser.grammar = (
+      const grammar = (
         <sequence>
           <literal text='a' />
           <literal text='b' decorate />
         </sequence>
       )
+      const options = reconcileAndTraverse(grammar , 'a')
 
-      const data = parser.parseArray('a')
-      expect(data).to.have.length(1)
-      expect(text(data[0])).to.equal('ab')
+      expect(options).to.eql([{
+        text: null,
+        words: [{text: 'a', input: true}, {text: 'b', input: false}],
+        result: {},
+        score: 1,
+        qualifiers: []
+      }]);
     })
 
     it('decorates an input', () => {
-      parser.grammar = (
+      const grammar = (
         <sequence>
           <literal text='b' decorate />
           <literal text='a' />
         </sequence>
       )
+      const options = reconcileAndTraverse(grammar , 'a')
 
-      const data = parser.parseArray('a')
-      expect(data).to.have.length(1)
-      expect(text(data[0])).to.equal('ba')
+      expect(options).to.eql([{
+        text: '',
+        words: [{text: 'b', input: false}, {text: 'a', input: true}],
+        result: {},
+        score: 1,
+        qualifiers: []
+      }]);
     })
 
     it('allows allowinput to be false', () => {
-      parser.grammar = (
+      const grammar = (
         <sequence>
           <literal text='b' decorate allowInput={false} />
           <literal text='a' />
         </sequence>
       )
+      let options
 
-      const data1 = parser.parseArray('a')
-      expect(data1).to.have.length(1)
-      expect(text(data1[0])).to.equal('ba')
+      options = reconcileAndTraverse(grammar , 'a')
+      expect(options).to.eql([{
+        text: '',
+        words: [{text: 'b', input: false}, {text: 'a', input: true}],
+        result: {},
+        score: 1,
+        qualifiers: []
+      }]);
 
-      const data2 = parser.parseArray('b')
-      expect(data2).to.have.length(0)
-    })
-
-    it('decorates an freetext', () => {
-      parser.grammar = (
-        <sequence>
-          <literal text='x ' decorate />
-          <freetext id='test' />
-        </sequence>
-      )
-
-      const data = parser.parseArray('x superman')
-      expect(data).to.have.length(2)
-      expect(text(data[0])).to.equal('x superman')
-      expect(data[0].result.test).to.equal('superman')
-      expect(text(data[1])).to.equal('x x superman')
-      expect(data[1].result.test).to.equal('x superman')
-    })
-
-    it('decorates an placeholder (complete)', () => {
-      parser.grammar = (
-        <sequence>
-          <literal text='s' />
-          <literal text='x ' decorate />
-          <label text='test' id='test'>
-            <freetext />
-          </label>
-        </sequence>
-      )
-
-      const data = parser.parseArray('ssuperman')
-      expect(data).to.have.length(1)
-      expect(text(data[0])).to.equal('sx superman')
-      expect(data[0].result.test).to.equal('superman')
-    })
-
-    it('decorates an placeholder (incomplete)', () => {
-      parser.grammar = (
-        <sequence>
-          <literal text='a' />
-          <literal text='b' decorate />
-          <literal text='a ' />
-          <label text='test' id='test' suppressEmpty={false}>
-            <literal text='literal' />
-          </label>
-        </sequence>
-      )
-
-      const data = parser.parseArray('aa ')
-      expect(data).to.have.length(1)
-      expect(text(data[0])).to.equal('aba literal')
-      expect(data[0].words[3].placeholder).to.be.undefined
+      options = reconcileAndTraverse(grammar , 'b')
+      expect(options).to.eql([])
     })
   })
 })

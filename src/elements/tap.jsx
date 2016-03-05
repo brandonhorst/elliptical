@@ -1,28 +1,16 @@
-/** @jsx createElement */
-import _ from 'lodash'
-import { Phrase } from 'lacona-phrase'
-import { parse } from '../parse'
-import { reconcile } from '../reconcile'
+import reconcile from '../reconcile'
 
-export class Tap extends Phrase {
-  static defaultProps = {
-    function () {}
-  };
+export default {
+  * parse (option, {props, children}) {
+    if (props.inbound) props.inbound(option)
 
-  * _handleParse (input, options) {
-    this.childPhrase = reconcile({descriptor: this.props.children[0], phrase: this.childPhrase, options})
-
-    if (input.text != null) {
-      options.scheduleParseEndCallback(() => this.props.function(input.text))
+    if (props.outbound) {
+      for (let output of children[0].traverse(option)) {
+        props.outbound(output)
+        yield output
+      }
+    } else {
+      yield* traverse(children[0], option)
     }
-
-    yield* parse({phrase: this.childPhrase, input, options})
   }
-
-  _destroy (destroy) {
-    destroy(this.childPhrase)
-
-    delete this.childPhrase
-  }
-
 }

@@ -1,12 +1,19 @@
-/** @jsx createElement */
-import { Phrase } from 'lacona-phrase'
+import {isComplete} from '../utils'
 
-export class Filter extends Phrase {
-  validate (result) {
-    return this.props.function(result)
+export default {
+  * parse (option, {
+    props: {func = () => true, incomplete = false},
+    children
   }
-
-  describe () {
-    return this.props.children[0]
+) {
+    for (let output of children[0].traverse(option)) {
+      if (incomplete || isComplete(output)) {
+        if (func(output.result)) {
+          yield output
+        }
+      } else {
+        yield output
+      }
+    }
   }
 }

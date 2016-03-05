@@ -1,44 +1,48 @@
-/** @jsx createElement */
 /* eslint-env mocha */
-import { createElement, Phrase } from 'lacona-phrase'
+
+import _ from 'lodash'
+import element from '../src/element'
+import {reconcileAndTraverse} from './_util'
+
 import chai, { expect } from 'chai'
-import { Parser } from '..'
-import { text } from './_util'
 import { spy } from 'sinon'
 import sinonChai from 'sinon-chai'
 
 chai.use(sinonChai)
 
 describe('freetext', () => {
-  var parser
-
-  beforeEach(() => {
-    parser = new Parser()
-  })
-
   it('filters input', () => {
     function filter (input) {
       return input === 'validValue'
     }
 
-    parser.grammar = <freetext filter={filter} />
+    const grammar = <freetext filter={filter} />
+    let options
 
-    const data1 = parser.parseArray('validValue')
-    expect(data1).to.have.length(1)
-    expect(text(data1[0])).to.equal('validValue')
-    expect(data1[0].result).to.equal('validValue')
+    options = reconcileAndTraverse(grammar, 'validValue')
+    expect(options).to.eql([{
+      text: '',
+      words: [{text: 'validValue', input: true}],
+      result: 'validValue',
+      score: options[0].score,
+      qualifiers: []
+    }])
 
-    const data2 = parser.parseArray('invalidValue')
-    expect(data2).to.have.length(0)
+    options = reconcileAndTraverse(grammar, 'invalidValue')
+    expect(options).to.eql([])
   })
 
   it('no filter always accepts', () => {
-    parser.grammar = <freetext id='test' />
+    const grammar = <freetext id='test' />
+    const options = reconcileAndTraverse(grammar, 'invalidValue')
 
-    const data = parser.parseArray('anything')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('anything')
-    expect(data[0].result).to.equal('anything')
+    expect(options).to.eql([{
+      text: '',
+      words: [{text: 'invalidValue', input: true}],
+      result: 'invalidValue',
+      score: options[0].score,
+      qualifiers: []
+    }])
   })
 
   it('allows consumeAll', () => {
@@ -49,88 +53,131 @@ describe('freetext', () => {
       return input === 'validValue'
     }
 
-    parser.grammar = <freetext filter={filter} consumeAll />
+    const grammar = <freetext filter={filter} consumeAll />
+    const options = reconcileAndTraverse(grammar, 'validValue')
 
-    const data = parser.parseArray('validValue')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('validValue')
+    expect(options).to.eql([{
+      text: '',
+      words: [{text: 'validValue', input: true}],
+      result: 'validValue',
+      score: options[0].score,
+      qualifiers: []
+    }])
     expect(filterSpy).to.have.been.calledOnce
   })
 
   it('allows splits on strings', () => {
-    class Test extends Phrase {
-      describe () {
-        return (
-          <sequence>
-            <freetext splitOn=' ' id='freetext' />
-            <choice>
-              <literal text=' test' />
-              <literal text='thing' />
-            </choice>
-          </sequence>
-        )
-      }
-    }
+    const grammar = (
+      <sequence>
+        <freetext splitOn=' ' id='freetext' />
+        <choice>
+          <literal text=' test' />
+          <literal text='thing' />
+        </choice>
+      </sequence>
+    )
+    const options = reconcileAndTraverse(grammar, 'anything goes test')
 
-    parser.grammar = <Test />
-
-    const data = parser.parseArray('anything goes test')
-    expect(data).to.have.length(3)
-    expect(text(data[0])).to.equal('anything goes test')
-    expect(data[0].result.freetext).to.equal('anything goes')
-    expect(text(data[1])).to.equal('anything goes test test')
-    expect(data[1].result.freetext).to.equal('anything goes test')
-    expect(text(data[2])).to.equal('anything goes testthing')
-    expect(data[2].result.freetext).to.equal('anything goes test')
+    expect(options).to.eql([{
+      text: '',
+      words: [
+        {text: 'anything goes', input: true},
+        {text: ' test', input: true}
+      ],
+      result: {freetext: 'anything goes'},
+      score: options[0].score,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [
+        {text: 'anything goes test', input: true},
+        {text: ' test', input: false}
+      ],
+      result: {freetext: 'anything goes test'},
+      score: options[1].score,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [
+        {text: 'anything goes test', input: true},
+        {text: 'thing', input: false}
+      ],
+      result: {freetext: 'anything goes test'},
+      score: options[2].score,
+      qualifiers: []
+    }])
   })
 
 
   it('allows greedy', () => {
-    class Test extends Phrase {
-      describe () {
-        return (
-          <sequence>
-            <freetext splitOn=' ' id='freetext' greedy />
-            <literal text=' test' />
-          </sequence>
-        )
-      }
-    }
+    const grammar = (
+      <sequence>
+        <freetext splitOn=' ' id='freetext' greedy />
+        <literal text=' test' />
+      </sequence>
+    )
+    const options = reconcileAndTraverse(grammar, 'anything goes test')
 
-    parser.grammar = <Test />
-
-    const data = parser.parseArray('anything goes test')
-    expect(data).to.have.length(2)
-    expect(text(data[0])).to.equal('anything goes test test')
-    expect(data[0].result.freetext).to.equal('anything goes test')
-    expect(text(data[1])).to.equal('anything goes test')
-    expect(data[1].result.freetext).to.equal('anything goes')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'anything goes test', input: true},
+        {text: ' test', input: false}
+      ],
+      result: {freetext: 'anything goes test'},
+      score: options[0].score,
+      qualifiers: []
+    }, {
+      text: '',
+      words: [
+        {text: 'anything goes', input: true},
+        {text: ' test', input: true}
+      ],
+      result: {freetext: 'anything goes'},
+      score: options[1].score,
+      qualifiers: []
+    }])
   })
 
   it('allows splits on regex (with weird parens)', () => {
-    class Test extends Phrase {
-      describe () {
-        return (
-          <sequence>
-            <freetext splitOn={/(( )())/} id='freetext' />
-            <choice>
-              <literal text=' test' />
-              <literal text='thing' />
-            </choice>
-          </sequence>
-        )
-      }
-    }
+    const grammar = (
+      <sequence>
+        <freetext splitOn={/(( )())/} id='freetext' />
+        <choice>
+          <literal text=' test' />
+          <literal text='thing' />
+        </choice>
+      </sequence>
+    )
+    const options = reconcileAndTraverse(grammar, 'anything goes test')
 
-    parser.grammar = <Test />
-
-    const data = parser.parseArray('anything goes test')
-    expect(data).to.have.length(3)
-    expect(text(data[0])).to.equal('anything goes test')
-    expect(data[0].result.freetext).to.equal('anything goes')
-    expect(text(data[1])).to.equal('anything goes test test')
-    expect(data[1].result.freetext).to.equal('anything goes test')
-    expect(text(data[2])).to.equal('anything goes testthing')
-    expect(data[2].result.freetext).to.equal('anything goes test')
+    expect(options).to.eql([{
+      text: '',
+      words: [
+        {text: 'anything goes', input: true},
+        {text: ' test', input: true}
+      ],
+      result: {freetext: 'anything goes'},
+      score: options[0].score,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [
+        {text: 'anything goes test', input: true},
+        {text: ' test', input: false}
+      ],
+      result: {freetext: 'anything goes test'},
+      score: options[1].score,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [
+        {text: 'anything goes test', input: true},
+        {text: 'thing', input: false}
+      ],
+      result: {freetext: 'anything goes test'},
+      score: options[2].score,
+      qualifiers: []
+    }])
   })
 })

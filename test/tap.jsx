@@ -1,48 +1,44 @@
-/** @jsx createElement */
 /* eslint-env mocha */
-import chai, { expect } from 'chai'
-import { Parser } from '..'
-import { createElement, Phrase } from 'lacona-phrase'
-import { spy } from 'sinon'
-import sinonChai from 'sinon-chai'
-import { text } from './_util'
 
+import element from '../src/element'
+import {reconcileAndTraverse} from './_util'
+import chai, {expect} from 'chai'
+import {spy} from 'sinon'
+import sinonChai from 'sinon-chai'
 chai.use(sinonChai)
 
 describe('tap', () => {
-  var parser
+  it('calls inbound and outbound when traversed', () => {
+    const inSpy = spy()
+    const outSpy = spy()
 
-  beforeEach(() => {
-    parser = new Parser()
-  })
-
-  it('calls function when entered', () => {
-    const func = spy()
-
-    parser.grammar = (
-      <sequence>
-        <literal text='a ' id='a' value='a' />
-        <tap function={func}>
-          <literal text='literal' />
-        </tap>
-      </sequence>
+    const grammar = (
+      <tap inbound={inSpy} outbound={outSpy}>
+        <literal text='literal' />
+      </tap>
     )
 
-    const data1 = parser.parseArray('')
-    expect(func).to.not.have.been.called
-    expect(data1).to.have.length(1)
-    expect(text(data1[0])).to.equal('a literal')
+    reconcileAndTraverse(grammar, '')
 
-    const data2 = parser.parseArray('a ')
-    expect(func).to.have.been.calledOnce
-    expect(func).to.have.been.calledWith('')
-    expect(data2).to.have.length(1)
-    expect(text(data2[0])).to.equal('a literal')
+    expect(inSpy).to.have.been.calledOnce
+    expect(inSpy.args[0][0]).to.eql({
+      text: '',
+      words: [],
+      score: 1,
+      qualifiers: [],
+      callbacks: [],
+      _previousEllipsis: []
+    })
 
-    const data3 = parser.parseArray('a l')
-    expect(func).to.have.been.calledTwice
-    expect(func).to.have.been.calledWith('l')
-    expect(data3).to.have.length(1)
-    expect(text(data3[0])).to.equal('a literal')
+    expect(outSpy).to.have.been.calledOnce
+    expect(outSpy.args[0][0]).to.eql({
+      text: null,
+      words: [{text: 'literal', input: false}],
+      score: 1,
+      result: undefined,
+      qualifiers: [],
+      callbacks: [],
+      _previousEllipsis: []
+    })
   })
 })

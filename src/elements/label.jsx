@@ -1,74 +1,66 @@
-/** @jsx createElement */
 import _ from 'lodash'
-import { Phrase } from 'lacona-phrase'
-import { parse } from '../parse'
-import { reconcile } from '../reconcile'
 
-export class Label extends Phrase {
-  static defaultProps = {
-    suppress: true,
-    argument: true,
-    suppressEmpty: true,
-  };
+export default {
+  * parse (option, {
+    props: {
+      suppress = true,
+      argument = true,
+      suppressEmpty = true,
+      text,
+      suppressWhen},
+    children
+  }) {
+    const child = children[0]
 
-  * parseChild (input, options) {
-    let didSetCurrentArgument = false
-
-    const modification = {}
-    if (this.props.argument && !input.currentArgument) {
-      modification.currentArgument = this.props.text
-      didSetCurrentArgument = true
-    }
-
-    const inputWithArgument = _.assign({}, input, modification)
-
-    let didOutputSelf = false
-
-    for (let output of parse({phrase: this.childPhrase, input: inputWithArgument, options})) {
-      if (didSetCurrentArgument) {
-        yield _.assign({}, output, {currentArgument: undefined})
-      } else {
-        yield output
-      }
-    }
-  }
-
-  outputSelf (input, options) {
-    const word = {
-      text: this.props.text,
-      input: false,
-      placeholder: true,
-      argument: input.currentArgument || (this.props.argument ? this.props.text : undefined)
-    }
-
-    const modification = {
-      score: 0.01,
-      result: undefined,
-      text: null
-    }
-
-    modification.words = input.words.concat(word)
-
-    return _.assign({}, input, modification)
-  }
-
-  * _handleParse (input, options) {
-    this.childPhrase = reconcile({descriptor: this.props.children[0], phrase: this.childPhrase, options})
-
-    if (this.props.suppress
-        && (input.text == null
-          || (this.props.suppressEmpty && input.text === '')
-          || (this.props.suppressWhen && this.props.suppressWhen(input.text))
-        )) {
-      yield this.outputSelf(input, options)
+    if (suppress && (
+      option.text == null
+      || (suppressEmpty && option.text === '')
+      || (suppressWhen && suppressWhen(option.text))
+    )) {
+      yield outputSelf(option, child, argument, text)
     } else {
-      yield* this.parseChild(input, options)
+      yield* parseChild(option, child, argument, text)
     }
   }
-  _destroy (destroy) {
-    destroy(this.childPhrase)
+}
 
-    delete this.childPhrase
+function * parseChild (option, child, argument, text) {
+  let didSetCurrentArgument = false
+
+  const modification = {}
+  if (argument && !option.currentArgument) {
+    modification.currentArgument = text
+    didSetCurrentArgument = true
   }
 
+  const optionWithArgument = _.assign({}, option, modification)
+
+  let didOutputSelf = false
+
+  for (let output of child.traverse(optionWithArgument)) {
+    if (didSetCurrentArgument) {
+      yield _.assign({}, output, {currentArgument: undefined})
+    } else {
+      yield output
+    }
+  }
+}
+
+function outputSelf (option, child, argument, text) {
+  const word = {
+    text: text,
+    input: false,
+    placeholder: true,
+    argument: option.currentArgument || (argument ? text : undefined)
+  }
+
+  const modification = {
+    score: 0.01,
+    result: undefined,
+    text: null
+  }
+
+  modification.words = option.words.concat(word)
+
+  return _.assign({}, option, modification)
 }

@@ -1,80 +1,69 @@
 import _ from 'lodash'
-import { Phrase } from 'lacona-phrase'
-import { parse } from '../parse'
-import { reconcile } from '../reconcile'
+import reconcile from '../reconcile'
 
-export class Repeat extends Phrase {
-  static defaultProps = {
-    max: Number.MAX_SAFE_INTEGER,
-    min: 1,
-    unique: false
-  };
+export default {
+  reconcile ({props}) {
+    if (props.separator) {
+      return _.assign({}, props, {separator: reconcile(props.separator)})
+    } else {
+      return props
+    }
+  },
 
-  * _handleParse (input, options) {
-    this.child = reconcile({descriptor: this.props.children[0], phrase: this.child, options})
-    this.separator = this.props.separator ? reconcile({descriptor: this.props.separator, phrase: this.separator, options}) : null
+  * parse (option, {
+    props: {max = Number.MAX_SAFE_INTEGER, min = 1, unique = false, separator},
+    children
+  }) {
+    const child = children[0]
 
     const modifications = {
       result: [],
       score: 1
     }
 
-    const trueInput = _.assign({}, input, modifications)
+    const trueOption = _.assign({}, option, modifications)
+    yield* parseChild(0, trueOption, child, min, max, unique, separator)
+  }
+}
 
-    yield* this.parseChild(0, trueInput, options)
+function * parseChild (index, option, child, min, max, unique, separator) {
+  if (index > max) {
+    return
   }
 
-  * parseChild (childIndex, input, options) {
-    if (childIndex > this.props.max) {
+  if (index >= min) {
+    yield option
+  }
+
+  if (index >= min && option.text == null) {
+    return
+  }
+
+  if (index > 0 && separator) {
+    for (let sepOutput of separator(option)) {
+      const trueOutput = _.assign({}, sepOutput, {result: option.result})
+      yield* callParseChild(index, trueOutput, child, min, max, unique, separator)
+    }
+  } else {
+    yield* callParseChild(index, option, child, min, max, unique, separator)
+  }
+}
+
+function * callParseChild (index, option, child, min, max, unique, separator) {
+  const mods = {qualifiers: []}
+  const trueOption = _.assign({}, option, mods)
+
+  for (let output of child.traverse(trueOption)) {
+    if (unique && _.some(option.result, _.partial(_.isEqual, _, output.result))) {
       return
     }
 
-    if (childIndex >= this.props.min) {
-      if (childIndex < this.props.max) {
-        yield _.assign({}, input, {ellipsis: true})
-      } else {
-        yield input
-      }
+    const outputModifications = {
+      result: option.result.concat(output.result),
+      qualifiers: option.qualifiers.concat(output.qualifiers)
     }
 
-    if (childIndex >= this.props.min && input.text == null) {
-      return
-    }
-
-    if (childIndex > 0 && this.separator) {
-      for (let sepOutput of parse({phrase: this.separator, input, options})) {
-        const trueOutput = _.assign({}, sepOutput, {result: input.result})
-        yield* this.callParseChild(childIndex, trueOutput, options)
-      }
-    } else {
-      yield* this.callParseChild(childIndex, input, options)
-    }
-  }
-
-  * callParseChild (childIndex, input, options) {
-    const inputModifications = {qualifiers: []}
-    const trueInput = _.assign({}, input, inputModifications)
-
-    for (let output of parse({phrase: this.child, input: trueInput, options})) {
-      if (this.props.unique && _.some(input.result, _.partial(_.isEqual, _, output.result))) {
-        return
-      }
-
-      const outputModifications = {
-        result: input.result.concat(output.result),
-        qualifiers: input.qualifiers.concat(output.qualifiers)
-      }
-
-      const trueOutput = _.assign({}, output, outputModifications)
-      yield* this.parseChild(childIndex + 1, trueOutput, options)
-    }
-  }
-
-  _destroy (destroy) {
-    destroy(this.child)
-    destroy(this.separator)
-
-    delete this.child
-    delete this.separator
+    const trueOutput = _.assign({}, output, outputModifications)
+    yield* parseChild(index + 1, trueOutput, child, min, max, unique, separator)
   }
 }

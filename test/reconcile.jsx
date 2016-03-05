@@ -1,95 +1,100 @@
-/** @jsx createElement */
 /* eslint-env mocha */
-import { expect } from 'chai'
-import { createElement, Phrase } from 'lacona-phrase'
-import { Parser, LaconaError } from '..'
+
+import literal from '../src/elements/literal'
+import element from '../src/element'
+import reconcile from '../src/reconcile'
+import chai, {expect} from 'chai'
+import {spy} from 'sinon'
+import sinonChai from 'sinon-chai'
+
+chai.use(sinonChai)
 
 describe('reconcile', () => {
-  let parser
-
-  beforeEach(() => {
-    parser = new Parser()
+  it('returns a function', () => {
+    const Test = {parse() {}}
+    const reconciled = reconcile(<Test />)
+    
+    expect(reconciled).to.be.an.instanceof(Function)
   })
 
-  it('throws for phrases without a default-lang schema', () => {
-    class Test extends Phrase {}
-    Test.translations = [{
-      langs: ['en-US'],
-      describe () {
-        return <literal text='whatever' />
+  it('is fine with describe returning nothing', () => {
+    const Test = {describe() {}}
+    const reconciled = reconcile(<Test />)
+    
+    expect(reconciled).to.be.an.instanceof(Function)
+  })
+
+
+  it('passes props to describe', () => {
+    const Test = {
+      describe({props, children}) {
+        expect(props).to.eql({something: 'test'})
+        expect(children).to.eql([])
       }
-    }]
-
-    parser.grammar = <Test />
-
-    expect(() => parser.reconcile()).to.throw(LaconaError)
+    }
+    const reconciled = reconcile(<Test something='test' />)
   })
 
-  it('throws for translations without a lang', () => {
-    class Test extends Phrase {}
-    Test.translations = [{
-      describe () {
-        return <literal text='whatever' />
+  it('calls register with the results of observe', () => {
+    const Test = {
+      observe () {
+        return 3
       }
-    }]
+    }
+    const register = spy()
+    const reconciled = reconcile(<Test />, register)
 
-    parser.grammar = <Test />
-
-    expect(() => parser.reconcile()).to.throw(LaconaError)
+    expect(register).to.have.been.calledWith(3)
   })
 
-  it('throws for translations without a describe', () => {
-    class Test extends Phrase {}
-    Test.translations = [{
-      lang: ['default']
-    }]
+  it('passes props to observe', () => {
+    const Test = {
+      observe ({props, children}) {
+        expect(props).to.eql({num: 3})
+        expect(children).to.eql([])
+        return props.num + 3
+      }
+    }
+    const register = spy()
+    const reconciled = reconcile(<Test num={3} />, register)
 
-    parser.grammar = <Test />
-
-    expect(() => parser.reconcile()).to.throw(LaconaError)
+    expect(register).to.have.been.calledWith(6)
   })
 
-  it('throws for root grammars with invalid elements', () => {
-    let Test
-
-    parser.grammar = <Test />
-
-    expect(() => parser.reconcile()).to.throw(LaconaError)
-  })
-
-  it('throws for phrase grammars with invalid elements', () => {
-    let Invalid
-
-    class Test extends Phrase {
-      describe () {
-        return <Invalid />
+  it('passes result of register to describe as data', () => {
+    const Test = {}
+    const Root = {
+      observe () {
+        return 3
+      },
+      describe ({data}) {
+        expect(data).to.eql(6)
+        return <Test test={data} />
       }
     }
 
-    parser.grammar = <Test />
+    const register = spy(num => num + 3)
 
-    expect(() => parser.reconcile()).to.throw(LaconaError)
-  })
-  it('accepts phrases that do not extend phrase', () => {
-    class Test {}
+    reconcile(<Root />, register)
 
-    parser.grammar = <Test />
-
-    expect(() => parser.reconcile()).to.not.throw(Error)
+    expect(register).to.have.been.calledWith(3)
   })
 
-  it('accepts sources that do not extend Source', () => {
-    class TestSource {}
+  it('flattens children', () => {
+    const describeSpy = spy()
 
-    class Test extends Phrase {
-      observe () { return <TestSource /> }
-      describe () {
-        return <literal text='test' />
+    const Test = {
+      describe ({children}) {
+        expect(children).to.eql([
+          {type: literal, attributes: {text: 'a'}, children: []},
+          {type: literal, attributes: {text: 'b'}, children: []}
+        ])
+        describeSpy()
+        return children[0]
       }
     }
 
-    parser.grammar = <Test />
-
-    expect(() => parser.reconcile()).to.not.throw(Error)
+    reconcile(<Test>{[<literal text='a' />, [<literal text='b' />]]}</Test>)
+    expect(describeSpy).to.have.been.calledOnce
   })
 })

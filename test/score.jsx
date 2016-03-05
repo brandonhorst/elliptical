@@ -1,49 +1,43 @@
-/** @jsx createElement */
 /* eslint-env mocha */
-import { expect } from 'chai'
-import { Parser } from '..'
-import { createElement, Phrase } from 'lacona-phrase'
+
+import element from '../src/element'
+import {reconcileAndTraverse} from './_util'
+import {expect} from 'chai'
 
 describe('score', () => {
-  var parser
-
-  beforeEach(() => {
-    parser = new Parser()
-  })
-
   it('every parse output has a numeric score', () => {
-    parser.grammar = <literal text='test' />
+    const grammar = <literal text='test' />
 
-    const data = parser.parseArray('')
+    const options = reconcileAndTraverse(grammar, '')
 
-    expect(data).to.have.length(1)
-    expect(data[0].score).to.equal(1)
+    expect(options).to.have.length(1)
+    expect(options[0].score).to.equal(1)
   })
 
   it('score is passed on from literals through choices', () => {
-    parser.grammar = (
+    const grammar = (
       <choice>
         <literal text='right' score={0.5} />
         <literal text='rightFirst' score={1} />
       </choice>
     )
 
-    const data = parser.parseArray('right')
-    expect(data).to.have.length(2)
-    expect(data[0].score).to.equal(0.5)
-    expect(data[1].score).to.equal(1)
+    const options = reconcileAndTraverse(grammar, 'right')
+    expect(options).to.have.length(2)
+    expect(options[0].score).to.equal(0.5)
+    expect(options[1].score).to.equal(1)
   })
 
   it('sequence multiplies all scores together', () => {
-    parser.grammar = (
+    const grammar = (
       <sequence>
         <literal text='a' score={0.5} />
         <literal text='b' score={0.5} />
       </sequence>
     )
 
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(data[0].score).to.equal(0.25)
+    const options = reconcileAndTraverse(grammar, '')
+    expect(options).to.have.length(1)
+    expect(options[0].score).to.equal(0.25)
   })
 })

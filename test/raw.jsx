@@ -1,19 +1,15 @@
-/** @jsx createElement */
 /* eslint-env mocha */
+
+import _ from 'lodash'
+import element from '../src/element'
+import {reconcileAndTraverse} from './_util'
+
 import { expect } from 'chai'
-import { text } from './_util'
-import { Parser } from '..'
-import { createElement, Phrase } from 'lacona-phrase'
 
 describe('raw', () => {
-  var parser
-
-  beforeEach(() => {
-    parser = new Parser()
-  })
-
-  it('suggests a item', () => {
-    function fun () {
+  it('adds to words, sets text and result', () => {
+    function func (input) {
+      expect(input).to.equal('t')
       return [{
         remaining: null,
         result: 'val',
@@ -21,16 +17,20 @@ describe('raw', () => {
       }]
     }
 
-    parser.grammar = <raw function={fun} />
+    const options = reconcileAndTraverse(<raw func={func} />, 't')
 
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(data[0].result).to.equal('val')
-    expect(text(data[0])).to.equal('tex')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'tex', input: false}],
+      result: 'val',
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
-  it('suggests a item (generator)', () => {
-    function * fun () {
+  it('adds to words, sets text and result with a generator', () => {
+    function * func (input) {
+      expect(input).to.equal('t')
       yield {
         remaining: null,
         result: 'val',
@@ -38,120 +38,80 @@ describe('raw', () => {
       }
     }
 
-    parser.grammar = <raw function={fun} />
+    const options = reconcileAndTraverse(<raw func={func} />, 't')
 
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(data[0].result).to.equal('val')
-    expect(text(data[0])).to.equal('tex')
-  })
-
-  it('computes a value', () => {
-    function fun (input) {
-      expect(input).to.equal('te')
-      return [{
-        remaining: '',
-        result: 'val',
-        words: [{text: 'te', input: true}, {text: 'x', input: false}]
-      }]
-    }
-
-    parser.grammar = <raw function={fun} />
-
-    const data = parser.parseArray('te')
-    expect(data).to.have.length(1)
-    expect(data[0].result).to.equal('val')
-    expect(text(data[0])).to.equal('tex')
-  })
-
-  it('computes a value (generator)', () => {
-    function * fun (input) {
-      expect(input).to.equal('te')
-      yield {
-        remaining: '',
-        result: 'val',
-        words: [{text: 'te', input: true}, {text: 'x', input: false}]
-      }
-    }
-
-    parser.grammar = <raw function={fun} />
-
-    const data = parser.parseArray('te')
-    expect(data).to.have.length(1)
-    expect(data[0].result).to.equal('val')
-    expect(text(data[0])).to.equal('tex')
-  })
-
-  it('can access props its function (if bound)', () => {
-    class Test extends Phrase {
-      fun () {
-        expect(this.props.myVar).to.equal('myVal')
-        return [{
-          remaining: '',
-          result: 'val',
-          words: [{text: 'tex', input: true}]
-        }]
-      }
-
-      describe () { return <raw function={this.fun.bind(this)} /> }
-    }
-
-    parser.grammar = <Test myVar='myVal' />
-
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(text(data[0])).to.equal('tex')
-    expect(data[0].result).to.equal('val')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'tex', input: false}],
+      result: 'val',
+      score: 1,
+      qualifiers: []
+    }]);
   })
 
   it('can set the score', () => {
-    function fun (input) {
+    function func (input) {
       return [{
-        words: [{text: 'test', input: true}],
+        remaining: null,
         result: 'val',
-        remaining: '',
+        words: [{text: 'tex', input: false}],
         score: 0.5
       }]
     }
 
-    parser.grammar = <raw function={fun} />
+    const options = reconcileAndTraverse(<raw func={func} />, 't')
 
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(data[0].score).to.equal(0.5)
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'tex', input: false}],
+      result: 'val',
+      score: 0.5,
+      qualifiers: []
+    }]);
   })
 
   it('can set the qualifiers', () => {
-    function fun (input) {
+    function func (input) {
       return [{
-        words: [{text: 'test', input: true}],
+        remaining: null,
         result: 'val',
-        remaining: '',
+        words: [{text: 'tex', input: false}],
         qualifiers: ['test']
       }]
     }
 
-    parser.grammar = <raw function={fun} />
+    const options = reconcileAndTraverse(<raw func={func} />, 't')
 
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(data[0].qualifiers).to.eql(['test'])
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'tex', input: false}],
+      result: 'val',
+      score: 1,
+      qualifiers: ['test']
+    }]);
   })
 
-  it('can set the ellipsis', () => {
-    function fun (input) {
+  it('can be limited', () => {
+    function func (input) {
       return [{
-        words: [{text: 'test', input: true}],
+        remaining: null,
         result: 'val',
-        remaining: '',
-        ellipsis: true,
+        words: [{text: 'tex', input: false}]
+      }, {
+        remaining: null,
+        result: 'val2',
+        words: [{text: 'tex2', input: false}]
       }]
     }
 
-    parser.grammar = <raw function={fun} />
+    const options = reconcileAndTraverse(<raw func={func} limit={1} />, '')
 
-    const data = parser.parseArray('')
-    expect(data).to.have.length(1)
-    expect(data[0].ellipsis).to.be.true
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'tex', input: false}],
+      result: 'val',
+      score: 1,
+      qualifiers: []
+    }]);
   })
 })
