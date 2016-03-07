@@ -53,12 +53,7 @@
       "es2015"
     ],
     "plugins": [
-      [
-        "transform-react-jsx",
-        {
-          "pragma": "createElement"
-        }
-      ],
+      "transform-react-jsx",
       [
         "transform-runtime",
         {
