@@ -67,14 +67,19 @@ function * parseChildControl (index, option, unique, children, next) {
   }
 }
 
+function hasSomeSameKeys(option, output) {
+  const sameKeys = _.intersection(_.keys(option.result), _.keys(output.result))
+  return !_.isEmpty(sameKeys)
+}
+
 function * parseChild (index, option, unique, children, next) {
   const child = children[index]
 
   for (let output of next(option, child)) {
     if (unique && output.result != null) {
-      if (child.attributes.id && option.result[child.attributes.id] != null) { // id
+      if (child.attributes.id && option.result[child.attributes.id] != null) {
         continue
-      } else if (child.attributes.merge && !_.isEmpty(_.intersection(_.keys(option.result), _.keys(output.result)))) { // merge
+      } else if (child.attributes.merge && hasSomeSameKeys(option, output)) {
         continue
       }
     }
