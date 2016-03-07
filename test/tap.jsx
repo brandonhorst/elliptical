@@ -1,7 +1,8 @@
+/** @jsx createElement */
 /* eslint-env mocha */
 
-import element from '../src/element'
-import {reconcileAndTraverse} from './_util'
+import createElement from '../src/element'
+import {compileAndTraverse} from './_util'
 import chai, {expect} from 'chai'
 import {spy} from 'sinon'
 import sinonChai from 'sinon-chai'
@@ -18,7 +19,7 @@ describe('tap', () => {
       </tap>
     )
 
-    reconcileAndTraverse(grammar, '')
+    compileAndTraverse(grammar, '')
 
     expect(inSpy).to.have.been.calledOnce
     expect(inSpy.args[0][0]).to.eql({
@@ -26,8 +27,7 @@ describe('tap', () => {
       words: [],
       score: 1,
       qualifiers: [],
-      callbacks: [],
-      _previousEllipsis: []
+      callbacks: []
     })
 
     expect(outSpy).to.have.been.calledOnce
@@ -37,8 +37,7 @@ describe('tap', () => {
       score: 1,
       result: undefined,
       qualifiers: [],
-      callbacks: [],
-      _previousEllipsis: []
+      callbacks: []
     })
   })
 })

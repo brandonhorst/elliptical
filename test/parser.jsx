@@ -1,20 +1,17 @@
+/** @jsx createElement */
 /* eslint-env mocha */
 
-import element from '../src/element'
-import createParser from '../src/create-parser'
+import createElement from '../src/element'
+import createParser from '../src/parser'
 import Observable from 'zen-observable'
-import chai, {expect} from 'chai'
-import {spy} from 'sinon'
-import sinonChai from 'sinon-chai'
-
-chai.use(sinonChai)
+import {expect} from 'chai'
 
 describe('parser', () => {
   it('returns parse and store', () => {
     const parser = createParser(<literal text='test' />)
 
     expect(parser.store).to.be.an.instanceof(Object)
-    expect(parser.store.subscribe).to.be.an.instanceof(Function)
+    expect(parser.store.data).to.be.an.instanceof(Observable)
     expect(parser.store.register).to.be.an.instanceof(Function)
     expect(parser.parse).to.be.an.instanceof(Function)
 
@@ -27,9 +24,9 @@ describe('parser', () => {
       qualifiers: []
     }])
   })
-  it('allows for sources and automatically rereconciles', (done) => {
+  it('allows for sources and automatically recompiles', (done) => {
     function Source () {
-      return new Observable(observer => {
+      return new Observable((observer) => {
         observer.next('test')
         process.nextTick(() => {
           observer.next('totally')
@@ -38,15 +35,15 @@ describe('parser', () => {
     }
 
     const Test = {
-      observe() {
+      observe () {
         return <Source />
       },
-      describe({data}) {
+      describe ({data}) {
         return <literal text={data} />
       }
     }
     const {parse} = createParser(<Test />)
-    
+
     const outputs = parse('t')
     expect(outputs).to.eql([{
       text: null,

@@ -1,7 +1,8 @@
+/** @jsx createElement */
 /* eslint-env mocha */
 
-import element from '../src/element'
-import {reconcileAndTraverse, text} from './_util'
+import createElement from '../src/element'
+import {compileAndTraverse, text} from './_util'
 import chai, {expect} from 'chai'
 import {spy} from 'sinon'
 import sinonChai from 'sinon-chai'
@@ -20,7 +21,7 @@ describe('filter', () => {
       </filter>
     )
 
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('b')
     expect(options[0].result).to.equal('b')
@@ -42,11 +43,10 @@ describe('filter', () => {
       </filter>
     )
 
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
     expect(options).to.have.length(1)
     expect(filterSpy).to.not.have.been.called
     expect(text(options[0])).to.equal('test')
     expect(options[0].result).to.be.undefined
   })
-
 })

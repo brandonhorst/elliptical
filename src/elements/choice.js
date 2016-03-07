@@ -1,16 +1,16 @@
 import _ from 'lodash'
 
-function * parse (option, {props: {limit}, children}) {
+function * traverse (option, {props: {limit}, children, next}) {
   let successes = 0
   if (children && children.length > 0) {
     for (let child of children) {
       let success = false
 
-      //performance optimization
+      // performance optimization
       if (child.attributes.id == null && !limit) {
-        yield* child.traverse(option)
+        yield * next(option, child)
       } else {
-        for (let output of child.traverse(option)) {
+        for (let output of next(option, child)) {
           const newResult = child.attributes.id != null
             ? {[child.attributes.id]: output.result}
             : output.result
@@ -18,7 +18,9 @@ function * parse (option, {props: {limit}, children}) {
           const mods = {result: newResult}
 
           if (limit) {
-            mods.callbacks = output.callbacks.concat(() => success = true)
+            mods.callbacks = output.callbacks.concat(() => {
+              success = true
+            })
           }
           yield _.assign({}, output, mods)
         }
@@ -32,4 +34,4 @@ function * parse (option, {props: {limit}, children}) {
   }
 }
 
-export default {parse}
+export default {traverse}

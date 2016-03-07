@@ -1,14 +1,14 @@
+/** @jsx createElement */
 /* eslint-env mocha */
 
-import element from '../src/element'
-import createStore from '../src/create-store'
+import createElement from '../src/element'
+import createStore from '../src/store'
 import Observable from 'zen-observable'
 import {spy} from 'sinon'
 import chai, {expect} from 'chai'
 import sinonChai from 'sinon-chai'
 
 chai.use(sinonChai)
-
 
 describe('store', () => {
   let store
@@ -17,10 +17,10 @@ describe('store', () => {
     store = createStore()
   })
 
-  describe ('register', () => {
+  describe('register', () => {
     it('takes elements whose type returns an observable', () => {
       function Test () {
-        return new Observable(observer => {
+        return new Observable((observer) => {
           observer.next(3)
         })
       }
@@ -31,8 +31,8 @@ describe('store', () => {
 
     it('passes props and children to the fetch function', () => {
       function Test ({props, children}) {
-        expect(children).to.eql(["test"])
-        return new Observable(observer => {
+        expect(children).to.eql(['test'])
+        return new Observable((observer) => {
           observer.next(props.num)
         })
       }
@@ -44,7 +44,7 @@ describe('store', () => {
     it('memoizes functions with the same type and no props', () => {
       const fetchSpy = spy()
       function Test () {
-        return new Observable(observer => {
+        return new Observable((observer) => {
           fetchSpy()
           observer.next(3)
         })
@@ -61,7 +61,7 @@ describe('store', () => {
     it('memoizes functions with the same type and props', () => {
       const fetchSpy = spy()
       function Test () {
-        return new Observable(observer => {
+        return new Observable((observer) => {
           fetchSpy()
           observer.next(3)
         })
@@ -77,7 +77,7 @@ describe('store', () => {
 
     it('calls returns a new value when the observable updates', (done) => {
       function Test () {
-        return new Observable(observer => {
+        return new Observable((observer) => {
           observer.next(3)
           process.nextTick(() => {
             observer.next(4)
@@ -101,24 +101,27 @@ describe('store', () => {
       const nextSpy = spy()
 
       function Test () {
-        return new Observable(observer => {
+        return new Observable((observer) => {
           observer.next(3)
         })
       }
 
-      store.subscribe({
-        next() { nextSpy() }
+      store.data.subscribe({
+        next (opt) {
+          expect(opt).to.eql({element: <Test />, value: 3})
+          nextSpy()
+        }
       })
 
       store.register(<Test />)
-      expect(nextSpy).to.not.have.been.called
+      expect(nextSpy).to.have.been.calledOnce
     })
 
     it('calls subscribers on updates after initial load', (done) => {
       const nextSpy = spy()
 
       function Test () {
-        return new Observable(observer => {
+        return new Observable((observer) => {
           observer.next(3)
           process.nextTick(() => {
             observer.next(4)
@@ -126,47 +129,18 @@ describe('store', () => {
         })
       }
 
-      store.subscribe({
-        next({element, value}) {
-          expect(element).to.eql({
-            type: Test,
-            attributes: {},
-            children: []
-          })
-          expect(value).to.equal(4)
-          nextSpy()
+      store.data.subscribe({
+        next (opt) {
+          nextSpy(opt)
         }
       })
 
       store.register(<Test />)
-      expect(nextSpy).to.not.have.been.called
+      expect(nextSpy).to.have.been.calledOnce
+      expect(nextSpy.args[0][0]).to.eql({element: <Test />, value: 3})
       process.nextTick(() => {
-        expect(nextSpy).to.have.been.calledOnce
-        done()
-      })
-    })
-
-    it('allows unsubscription', (done) => {
-      const nextSpy = spy()
-
-      function Test () {
-        return new Observable(observer => {
-          observer.next(3)
-          process.nextTick(() => {
-            observer.next(4)
-          })
-        })
-      }
-
-      const subscription = store.subscribe({
-        next() { nextSpy() }
-      })
-
-      store.register(<Test />)
-      expect(nextSpy).to.not.have.been.called
-      subscription.unsubscribe()
-      process.nextTick(() => {
-        expect(nextSpy).to.not.been.called
+        expect(nextSpy).to.have.been.calledTwice
+        expect(nextSpy.args[1][0]).to.eql({element: <Test />, value: 4})
         done()
       })
     })

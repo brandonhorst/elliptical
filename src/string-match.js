@@ -67,7 +67,7 @@ function fullBeginningMatch ({input, text, inputLower, textLower}) {
 //   let itemSet = _.map(items, item => ({item, matched: false}))
 //
 //   for (let [func, score] of [[beginningMatch, 1], [anywhereMatch, 0.5]]) {
-//     yield* sortFunction({input, itemSet, func, score})
+//     yield * sortFunction({input, itemSet, func, score})
 //   }
 // }
 //

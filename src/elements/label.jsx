@@ -1,30 +1,29 @@
 import _ from 'lodash'
 
-export default {
-  * parse (option, {
-    props: {
-      suppress = true,
-      argument = true,
-      suppressEmpty = true,
-      text,
-      suppressWhen},
-    children
-  }) {
-    const child = children[0]
+function * traverse (option, {
+  props: {
+    suppress = true,
+    argument = true,
+    suppressEmpty = true,
+    text,
+    suppressWhen},
+  children,
+  next
+}) {
+  const child = children[0]
 
-    if (suppress && (
-      option.text == null
-      || (suppressEmpty && option.text === '')
-      || (suppressWhen && suppressWhen(option.text))
-    )) {
-      yield outputSelf(option, child, argument, text)
-    } else {
-      yield* parseChild(option, child, argument, text)
-    }
+  if (suppress && (
+    option.text == null ||
+    (suppressEmpty && option.text === '') ||
+    (suppressWhen && suppressWhen(option.text))
+  )) {
+    yield outputSelf(option, child, argument, text)
+  } else {
+    yield * parseChild(option, child, argument, text, next)
   }
 }
 
-function * parseChild (option, child, argument, text) {
+function * parseChild (option, child, argument, text, next) {
   let didSetCurrentArgument = false
 
   const modification = {}
@@ -35,9 +34,7 @@ function * parseChild (option, child, argument, text) {
 
   const optionWithArgument = _.assign({}, option, modification)
 
-  let didOutputSelf = false
-
-  for (let output of child.traverse(optionWithArgument)) {
+  for (let output of next(optionWithArgument, child)) {
     if (didSetCurrentArgument) {
       yield _.assign({}, output, {currentArgument: undefined})
     } else {
@@ -64,3 +61,5 @@ function outputSelf (option, child, argument, text) {
 
   return _.assign({}, option, modification)
 }
+
+export default {traverse}

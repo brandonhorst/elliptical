@@ -1,7 +1,8 @@
+/** @jsx createElement */
 /* eslint-env mocha */
 
-import element from '../src/element'
-import {reconcileAndTraverse, text} from './_util'
+import createElement from '../src/element'
+import {compileAndTraverse, text} from './_util'
 
 import {expect} from 'chai'
 
@@ -17,35 +18,35 @@ describe('label', () => {
     )
     let options
 
-    options = reconcileAndTraverse(grammar, '')
+    options = compileAndTraverse(grammar, '')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('a test')
     expect(options[0].words[1].placeholder).to.be.true
     expect(options[0].words[1].argument).to.equal('test')
     expect(options[0].result).to.eql({a: 'a'})
 
-    options = reconcileAndTraverse(grammar, 'a')
+    options = compileAndTraverse(grammar, 'a')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('a test')
     expect(options[0].words[2].placeholder).to.be.true
     expect(options[0].words[2].argument).to.equal('test')
     expect(options[0].result).to.eql({a: 'a'})
 
-    options = reconcileAndTraverse(grammar, 'a ')
+    options = compileAndTraverse(grammar, 'a ')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('a literal')
     expect(options[0].result).to.eql({a: 'a', place: 'test'})
     expect(options[0].words[1].placeholder).to.be.undefined
     expect(options[0].words[1].argument).to.equal('test')
 
-    options = reconcileAndTraverse(grammar, 'a l')
+    options = compileAndTraverse(grammar, 'a l')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('a literal')
     expect(options[0].result).to.eql({a: 'a', place: 'test'})
     expect(options[0].words[1].placeholder).to.be.undefined
     expect(options[0].words[1].argument).to.equal('test')
 
-    options = reconcileAndTraverse(grammar, 'a t')
+    options = compileAndTraverse(grammar, 'a t')
     expect(options).to.have.length(0)
   })
 
@@ -72,35 +73,35 @@ describe('label', () => {
     )
     let options
 
-    options = reconcileAndTraverse(grammar, '')
+    options = compileAndTraverse(grammar, '')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('a test')
     expect(options[0].result).to.eql({a: 'a'})
     expect(options[0].words[1].placeholder).to.be.true
     expect(options[0].words[1].argument).to.equal('test')
 
-    options = reconcileAndTraverse(grammar, 'a')
+    options = compileAndTraverse(grammar, 'a')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('a test')
     expect(options[0].result).to.eql({a: 'a'})
     expect(options[0].words[2].placeholder).to.be.true
     expect(options[0].words[2].argument).to.equal('test')
 
-    options = reconcileAndTraverse(grammar, 'a ')
+    options = compileAndTraverse(grammar, 'a ')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('a test')
     expect(options[0].result).to.eql({a: 'a'})
     expect(options[0].words[1].placeholder).to.be.true
     expect(options[0].words[1].argument).to.equal('test')
 
-    options = reconcileAndTraverse(grammar, 'a v')
+    options = compileAndTraverse(grammar, 'a v')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('a value')
     expect(options[0].result).to.eql({a: 'a', place: 'test'})
     expect(options[0].words[1].placeholder).to.be.undefined
     expect(options[0].words[1].argument).to.equal('test')
 
-    options = reconcileAndTraverse(grammar, 'a t')
+    options = compileAndTraverse(grammar, 'a t')
     expect(options).to.have.length(0)
   })
 
@@ -127,28 +128,28 @@ describe('label', () => {
     )
     let options
 
-    options = reconcileAndTraverse(grammar, '')
+    options = compileAndTraverse(grammar, '')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('a test')
     expect(options[0].result).to.eql({a: 'a'})
     expect(options[0].words[1].placeholder).to.be.true
     expect(options[0].words[1].argument).to.equal('test')
 
-    options = reconcileAndTraverse(grammar, 'a')
+    options = compileAndTraverse(grammar, 'a')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('a test')
     expect(options[0].result).to.eql({a: 'a'})
     expect(options[0].words[2].placeholder).to.be.true
     expect(options[0].words[2].argument).to.equal('test')
 
-    options = reconcileAndTraverse(grammar, 'a ')
+    options = compileAndTraverse(grammar, 'a ')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('a value')
     expect(options[0].result).to.eql({a: 'a', place: 'test'})
     expect(options[0].words[1].placeholder).to.be.undefined
     expect(options[0].words[1].argument).to.equal('test')
 
-    options = reconcileAndTraverse(grammar, 'a t')
+    options = compileAndTraverse(grammar, 'a t')
     expect(options).to.have.length(0)
   })
 
@@ -156,48 +157,50 @@ describe('label', () => {
     const grammar = (
       <sequence>
         <literal text='a ' id='a' value='a' />
-        <label text='test' id='place' suppressWhen={input => input === 'l'} suppressEmpty={false}>
+        <label text='test' id='place'
+          suppressWhen={(input) => input === 'l'}
+          suppressEmpty={false}>
           <literal text='literal' value='test' />
         </label>
       </sequence>
     )
     let options
 
-    options = reconcileAndTraverse(grammar, '')
+    options = compileAndTraverse(grammar, '')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('a test')
     expect(options[0].words[1].placeholder).to.be.true
     expect(options[0].words[1].argument).to.equal('test')
     expect(options[0].result).to.eql({a: 'a'})
 
-    options = reconcileAndTraverse(grammar, 'a')
+    options = compileAndTraverse(grammar, 'a')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('a test')
     expect(options[0].words[2].placeholder).to.be.true
     expect(options[0].words[2].argument).to.equal('test')
     expect(options[0].result).to.eql({a: 'a'})
 
-    options = reconcileAndTraverse(grammar, 'a ')
+    options = compileAndTraverse(grammar, 'a ')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('a literal')
     expect(options[0].result).to.eql({a: 'a', place: 'test'})
     expect(options[0].words[1].placeholder).to.be.undefined
     expect(options[0].words[1].argument).to.equal('test')
 
-    options = reconcileAndTraverse(grammar, 'a l')
+    options = compileAndTraverse(grammar, 'a l')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('a test')
     expect(options[0].result).to.eql({a: 'a'})
     expect(options[0].words[1].placeholder).to.be.true
     expect(options[0].words[1].argument).to.equal('test')
 
-    options = reconcileAndTraverse(grammar, 'a li')
+    options = compileAndTraverse(grammar, 'a li')
     expect(text(options[0])).to.equal('a literal')
     expect(options[0].result).to.eql({a: 'a', place: 'test'})
     expect(options[0].words[1].placeholder).to.be.undefined
     expect(options[0].words[1].argument).to.equal('test')
 
-    options = reconcileAndTraverse(grammar, 'a t')
+    options = compileAndTraverse(grammar, 'a t')
     expect(options).to.have.length(0)
   })
 
@@ -215,7 +218,7 @@ describe('label', () => {
       </sequence>
     )
 
-    const options = reconcileAndTraverse(grammar, 'abcd')
+    const options = compileAndTraverse(grammar, 'abcd')
     expect(options).to.have.length(1)
     expect(options[0].words).to.have.length(4)
     expect(options[0].words[0].argument).to.not.be.true

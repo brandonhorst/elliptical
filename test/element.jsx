@@ -1,12 +1,13 @@
+/** @jsx createElement */
 /* eslint-env mocha */
 
 import literal from '../src/elements/literal'
-import element from '../src/element'
+import createElement from '../src/element'
 import {expect} from 'chai'
 
 describe('element', () => {
   it('dereferences builtin types', () => {
-    const lit = element('literal')
+    const lit = createElement('literal')
     expect(lit).to.eql({
       type: literal,
       attributes: {},
@@ -15,7 +16,7 @@ describe('element', () => {
   })
 
   it('passes through custom types', () => {
-    const lit = element({test: 1})
+    const lit = createElement({test: 1})
     expect(lit).to.eql({
       type: {test: 1},
       attributes: {},
@@ -24,7 +25,7 @@ describe('element', () => {
   })
 
   it('passes through attributes', () => {
-    const lit = element('literal', {test: 2})
+    const lit = createElement('literal', {test: 2})
     expect(lit).to.eql({
       type: literal,
       attributes: {test: 2},
@@ -33,7 +34,11 @@ describe('element', () => {
   })
 
   it('passes through children', () => {
-    const lit = element({test: 1}, null, element('literal', {text: 'test'}))
+    const lit = createElement(
+      {test: 1},
+      null,
+      createElement('literal', {text: 'test'})
+    )
     expect(lit).to.eql({
       type: {test: 1},
       attributes: {},

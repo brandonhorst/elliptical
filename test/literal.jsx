@@ -1,14 +1,14 @@
+/** @jsx createElement */
 /* eslint-env mocha */
 
-import _ from 'lodash'
-import element from '../src/element'
-import {reconcileAndTraverse} from './_util'
+import createElement from '../src/element'
+import {compileAndTraverse} from './_util'
 
 import { expect } from 'chai'
 
 describe('literal', () => {
   it('handles a literal', () => {
-    const options = reconcileAndTraverse(
+    const options = compileAndTraverse(
       <literal text='literal test' value='test' />
     , '')
 
@@ -18,12 +18,12 @@ describe('literal', () => {
       result: 'test',
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('maintains case', () => {
     const grammar = <literal text='Test' />
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
 
     expect(options).to.eql([{
       text: null,
@@ -31,7 +31,7 @@ describe('literal', () => {
       result: undefined,
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   describe('decorate', () => {
@@ -42,7 +42,7 @@ describe('literal', () => {
           <literal text='b' decorate />
         </sequence>
       )
-      const options = reconcileAndTraverse(grammar , 'a')
+      const options = compileAndTraverse(grammar, 'a')
 
       expect(options).to.eql([{
         text: null,
@@ -50,7 +50,7 @@ describe('literal', () => {
         result: {},
         score: 1,
         qualifiers: []
-      }]);
+      }])
     })
 
     it('decorates an input', () => {
@@ -60,7 +60,7 @@ describe('literal', () => {
           <literal text='a' />
         </sequence>
       )
-      const options = reconcileAndTraverse(grammar , 'a')
+      const options = compileAndTraverse(grammar, 'a')
 
       expect(options).to.eql([{
         text: '',
@@ -68,7 +68,7 @@ describe('literal', () => {
         result: {},
         score: 1,
         qualifiers: []
-      }]);
+      }])
     })
 
     it('allows allowinput to be false', () => {
@@ -80,16 +80,16 @@ describe('literal', () => {
       )
       let options
 
-      options = reconcileAndTraverse(grammar , 'a')
+      options = compileAndTraverse(grammar, 'a')
       expect(options).to.eql([{
         text: '',
         words: [{text: 'b', input: false}, {text: 'a', input: true}],
         result: {},
         score: 1,
         qualifiers: []
-      }]);
+      }])
 
-      options = reconcileAndTraverse(grammar , 'b')
+      options = compileAndTraverse(grammar, 'b')
       expect(options).to.eql([])
     })
   })

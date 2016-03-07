@@ -1,38 +1,38 @@
 /* eslint-env mocha */
+/** @jsx createElement */
 
 import literal from '../src/elements/literal'
-import element from '../src/element'
-import reconcile from '../src/reconcile'
+import createElement from '../src/element'
+import compile from '../src/compile'
 import chai, {expect} from 'chai'
 import {spy} from 'sinon'
 import sinonChai from 'sinon-chai'
 
 chai.use(sinonChai)
 
-describe('reconcile', () => {
+describe('compile', () => {
   it('returns a function', () => {
-    const Test = {parse() {}}
-    const reconciled = reconcile(<Test />)
-    
-    expect(reconciled).to.be.an.instanceof(Function)
+    const Test = {parse () {}}
+    const compiled = compile(<Test />)
+
+    expect(compiled).to.be.an.instanceof(Function)
   })
 
   it('is fine with describe returning nothing', () => {
-    const Test = {describe() {}}
-    const reconciled = reconcile(<Test />)
-    
-    expect(reconciled).to.be.an.instanceof(Function)
-  })
+    const Test = {describe () {}}
+    const compiled = compile(<Test />)
 
+    expect(compiled).to.be.an.instanceof(Function)
+  })
 
   it('passes props to describe', () => {
     const Test = {
-      describe({props, children}) {
+      describe ({props, children}) {
         expect(props).to.eql({something: 'test'})
         expect(children).to.eql([])
       }
     }
-    const reconciled = reconcile(<Test something='test' />)
+    compile(<Test something='test' />)
   })
 
   it('calls register with the results of observe', () => {
@@ -42,7 +42,7 @@ describe('reconcile', () => {
       }
     }
     const register = spy()
-    const reconciled = reconcile(<Test />, register)
+    compile(<Test />, register)
 
     expect(register).to.have.been.calledWith(3)
   })
@@ -56,7 +56,7 @@ describe('reconcile', () => {
       }
     }
     const register = spy()
-    const reconciled = reconcile(<Test num={3} />, register)
+    compile(<Test num={3} />, register)
 
     expect(register).to.have.been.calledWith(6)
   })
@@ -73,9 +73,9 @@ describe('reconcile', () => {
       }
     }
 
-    const register = spy(num => num + 3)
+    const register = spy((num) => num + 3)
 
-    reconcile(<Root />, register)
+    compile(<Root />, register)
 
     expect(register).to.have.been.calledWith(3)
   })
@@ -94,7 +94,7 @@ describe('reconcile', () => {
       }
     }
 
-    reconcile(<Test>{[<literal text='a' />, [<literal text='b' />]]}</Test>)
+    compile(<Test>{[<literal text='a' />, [<literal text='b' />]]}</Test>)
     expect(describeSpy).to.have.been.calledOnce
   })
 })

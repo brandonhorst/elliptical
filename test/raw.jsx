@@ -1,8 +1,8 @@
+/** @jsx createElement */
 /* eslint-env mocha */
 
-import _ from 'lodash'
-import element from '../src/element'
-import {reconcileAndTraverse} from './_util'
+import createElement from '../src/element'
+import {compileAndTraverse} from './_util'
 
 import { expect } from 'chai'
 
@@ -17,7 +17,7 @@ describe('raw', () => {
       }]
     }
 
-    const options = reconcileAndTraverse(<raw func={func} />, 't')
+    const options = compileAndTraverse(<raw func={func} />, 't')
 
     expect(options).to.eql([{
       text: null,
@@ -25,7 +25,7 @@ describe('raw', () => {
       result: 'val',
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('adds to words, sets text and result with a generator', () => {
@@ -38,7 +38,7 @@ describe('raw', () => {
       }
     }
 
-    const options = reconcileAndTraverse(<raw func={func} />, 't')
+    const options = compileAndTraverse(<raw func={func} />, 't')
 
     expect(options).to.eql([{
       text: null,
@@ -46,7 +46,7 @@ describe('raw', () => {
       result: 'val',
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('can set the score', () => {
@@ -59,7 +59,7 @@ describe('raw', () => {
       }]
     }
 
-    const options = reconcileAndTraverse(<raw func={func} />, 't')
+    const options = compileAndTraverse(<raw func={func} />, 't')
 
     expect(options).to.eql([{
       text: null,
@@ -67,7 +67,7 @@ describe('raw', () => {
       result: 'val',
       score: 0.5,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('can set the qualifiers', () => {
@@ -80,7 +80,7 @@ describe('raw', () => {
       }]
     }
 
-    const options = reconcileAndTraverse(<raw func={func} />, 't')
+    const options = compileAndTraverse(<raw func={func} />, 't')
 
     expect(options).to.eql([{
       text: null,
@@ -88,7 +88,7 @@ describe('raw', () => {
       result: 'val',
       score: 1,
       qualifiers: ['test']
-    }]);
+    }])
   })
 
   it('can be limited', () => {
@@ -104,7 +104,7 @@ describe('raw', () => {
       }]
     }
 
-    const options = reconcileAndTraverse(<raw func={func} limit={1} />, '')
+    const options = compileAndTraverse(<raw func={func} limit={1} />, '')
 
     expect(options).to.eql([{
       text: null,
@@ -112,6 +112,6 @@ describe('raw', () => {
       result: 'val',
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 })

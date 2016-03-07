@@ -1,69 +1,76 @@
 import _ from 'lodash'
 
-function * parse (option, {
-  props: {unique = false, value},
-  children
-}) {
+function * traverse (option, {props: {unique = false}, children, next}) {
   const mods = {result: {}, score: 1}
   const trueOption = _.assign({}, option, mods)
-  const iterator = parseChildControl(0, trueOption, unique, children);
+  const iterator = parseChildControl(0, trueOption, unique, children, next)
 
-  yield* iterator
+  yield * iterator
 }
 
-function * parseChildControl (index, option, unique, children) {
+function shouldDoEllipsis (index, option, children) {
+  // Don't do ellipsis for the first element,
+  // or if this element is both optional and ellipsis, and the text is ''
+  // because that results in duplicate options output
+  const child = children[index]
+  return (
+    index > 0 &&
+    children[index - 1].attributes.ellipsis &&
+    !(
+      child.attributes.ellipsis &&
+      child.attributes.optional &&
+      option.text === ''
+    )
+  )
+}
+
+function * parseChildControl (index, option, unique, children, next) {
   if (index >= children.length) { // we've reached the end
     yield option
     return
   }
 
-  let trueOption = option
-  if (index > 0 && children[index - 1].attributes.ellipsis) {
-    const previousChild = children[index - 1]
-    if (trueOption.text === '') {
-      if (index <= 1 || !_.includes(trueOption._previousEllipsis, children[index - 2])) {
-        yield trueOption
-        trueOption = _.assign({}, trueOption, {
-          _previousEllipsis: trueOption._previousEllipsis.concat(previousChild)
-        })
-      }
+  const child = children[index]
+
+  if (shouldDoEllipsis(index, option, children)) {
+    if (option.text === '') {
+      yield option
     } else {
       let success = false
-      yield _.assign({}, trueOption, {
-        callbacks: trueOption.callbacks.concat(() => success = true)
+      yield _.assign({}, option, {
+        callbacks: option.callbacks.concat(() => { success = true })
       })
       if (success) return
     }
   }
 
-  const child = children[index]
-
   if (child.attributes.optional) {
     let success = false
     if (child.attributes.limited) {
-      trueOption = _.assign({}, trueOption, {callbacks: trueOption.callbacks.concat(() => success = true)})
+      option = _.assign({}, option, {
+        callbacks: option.callbacks.concat(() => { success = true })
+      })
     }
     if (child.attributes.preferred) {
-      yield* parseChild(index, trueOption, unique, children)
+      yield * parseChild(index, option, unique, children, next)
       if (!child.attributes.limited || !success) {
-        yield* parseChildControl(index + 1, trueOption, unique, children)
+        yield * parseChildControl(index + 1, option, unique, children, next)
       }
     } else {
-      yield* parseChildControl(index + 1, trueOption, unique, children)
+      yield * parseChildControl(index + 1, option, unique, children, next)
       if (!child.attributes.limited || !success) {
-        yield* parseChild(index, trueOption, unique, children)
+        yield * parseChild(index, option, unique, children, next)
       }
     }
   } else {
-    yield* parseChild(index, trueOption, unique, children)
+    yield * parseChild(index, option, unique, children, next)
   }
-
 }
 
-function * parseChild (index, option, unique, children) {
+function * parseChild (index, option, unique, children, next) {
   const child = children[index]
 
-  for (let output of child.traverse(option)) {
+  for (let output of next(option, child)) {
     if (unique && output.result != null) {
       if (child.attributes.id && option.result[child.attributes.id] != null) { // id
         continue
@@ -80,7 +87,7 @@ function * parseChild (index, option, unique, children) {
 
     let nextOutput = _.assign({}, output, modifications)
 
-    yield* parseChildControl(index + 1, nextOutput, unique, children)
+    yield * parseChildControl(index + 1, nextOutput, unique, children, next)
   }
 }
 
@@ -101,4 +108,4 @@ function getAccumulatedResult (inputResult, child, childResult) {
   return inputResult
 }
 
-export default {parse}
+export default {traverse}

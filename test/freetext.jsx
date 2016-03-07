@@ -1,11 +1,11 @@
+/** @jsx createElement */
 /* eslint-env mocha */
 
-import _ from 'lodash'
-import element from '../src/element'
-import {reconcileAndTraverse} from './_util'
+import createElement from '../src/element'
+import {compileAndTraverse} from './_util'
 
-import chai, { expect } from 'chai'
-import { spy } from 'sinon'
+import chai, {expect} from 'chai'
+import {spy} from 'sinon'
 import sinonChai from 'sinon-chai'
 
 chai.use(sinonChai)
@@ -19,7 +19,7 @@ describe('freetext', () => {
     const grammar = <freetext filter={filter} />
     let options
 
-    options = reconcileAndTraverse(grammar, 'validValue')
+    options = compileAndTraverse(grammar, 'validValue')
     expect(options).to.eql([{
       text: '',
       words: [{text: 'validValue', input: true}],
@@ -28,13 +28,13 @@ describe('freetext', () => {
       qualifiers: []
     }])
 
-    options = reconcileAndTraverse(grammar, 'invalidValue')
+    options = compileAndTraverse(grammar, 'invalidValue')
     expect(options).to.eql([])
   })
 
   it('no filter always accepts', () => {
     const grammar = <freetext id='test' />
-    const options = reconcileAndTraverse(grammar, 'invalidValue')
+    const options = compileAndTraverse(grammar, 'invalidValue')
 
     expect(options).to.eql([{
       text: '',
@@ -54,7 +54,7 @@ describe('freetext', () => {
     }
 
     const grammar = <freetext filter={filter} consumeAll />
-    const options = reconcileAndTraverse(grammar, 'validValue')
+    const options = compileAndTraverse(grammar, 'validValue')
 
     expect(options).to.eql([{
       text: '',
@@ -76,7 +76,7 @@ describe('freetext', () => {
         </choice>
       </sequence>
     )
-    const options = reconcileAndTraverse(grammar, 'anything goes test')
+    const options = compileAndTraverse(grammar, 'anything goes test')
 
     expect(options).to.eql([{
       text: '',
@@ -108,7 +108,6 @@ describe('freetext', () => {
     }])
   })
 
-
   it('allows greedy', () => {
     const grammar = (
       <sequence>
@@ -116,7 +115,7 @@ describe('freetext', () => {
         <literal text=' test' />
       </sequence>
     )
-    const options = reconcileAndTraverse(grammar, 'anything goes test')
+    const options = compileAndTraverse(grammar, 'anything goes test')
 
     expect(options).to.eql([{
       text: null,
@@ -149,7 +148,7 @@ describe('freetext', () => {
         </choice>
       </sequence>
     )
-    const options = reconcileAndTraverse(grammar, 'anything goes test')
+    const options = compileAndTraverse(grammar, 'anything goes test')
 
     expect(options).to.eql([{
       text: '',

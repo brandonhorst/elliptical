@@ -1,10 +1,8 @@
 import _ from 'lodash'
 
-function* parse (option, {props: {
-  category,
-  func = () => [],
-  limit
-}}) {
+function * traverse (option, {
+  props: {category, func = () => [], limit}
+}) {
   let successes = 0
 
   for (let output of func(option.text)) {
@@ -16,15 +14,15 @@ function* parse (option, {props: {
       score: output.score || 1,
       qualifiers: output.qualifiers || [],
       words: option.words.concat(
-        _.map(output.words, word => _.assign({},
+        _.map(output.words, (word) => _.assign({},
           word,
           option.currentArgument ? {argument: option.currentArgument} : {},
           category ? {category} : {}
         ))
-      ),
+      )
     }
 
-    if (limit) modification.callbacks = option.callbacks.concat(() => success = true)
+    if (limit) modification.callbacks = option.callbacks.concat(() => { success = true })
     if (output.ellipsis) modification.ellipsis = true
 
     yield _.assign({}, option, modification)
@@ -36,4 +34,4 @@ function* parse (option, {props: {
   }
 }
 
-export default {parse}
+export default {traverse}

@@ -1,10 +1,10 @@
+/** @jsx createElement */
 /* eslint-env mocha */
 
-import _ from 'lodash'
-import element from '../src/element'
+import createElement from '../src/element'
 import Observable from 'zen-observable'
-import {reconcileAndTraverse} from './_util'
-import createStore from '../src/create-store'
+import {compileAndTraverse} from './_util'
+import createStore from '../src/store'
 
 import {spy} from 'sinon'
 import chai, {expect} from 'chai'
@@ -16,7 +16,7 @@ describe('dynamic', () => {
   it('calls observe for a specific input', () => {
     function Test ({props}) {
       expect(props).to.eql({input: 't'})
-      return new Observable(observer => {
+      return new Observable((observer) => {
         observer.next('test')
       })
     }
@@ -31,7 +31,7 @@ describe('dynamic', () => {
 
     const store = createStore()
     const grammar = <dynamic observe={observe} describe={describe} />
-    const options = reconcileAndTraverse(grammar, 't', store.register)
+    const options = compileAndTraverse(grammar, 't', store.register)
 
     expect(options).to.eql([{
       text: null,
@@ -39,12 +39,12 @@ describe('dynamic', () => {
       result: 'test',
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('calls observe for a specific input, and handles async data', (done) => {
     function Test () {
-      return new Observable(observer => {
+      return new Observable((observer) => {
         process.nextTick(() => {
           observer.next('totally')
         })
@@ -61,32 +61,32 @@ describe('dynamic', () => {
 
     const grammar = <dynamic observe={observe} describe={describe} consumeAll />
     const store = createStore()
-    const options = reconcileAndTraverse(grammar, 't', store.register)
+    const options = compileAndTraverse(grammar, 't', store.register)
     expect(options).to.eql([{
       text: null,
       words: [{text: 't', input: true}, {text: 'est', input: false}],
       result: 'test',
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
     process.nextTick(() => {
-      const options = reconcileAndTraverse(grammar, 't', store.register)
+      const options = compileAndTraverse(grammar, 't', store.register)
       expect(options).to.eql([{
         text: null,
         words: [{text: 't', input: true}, {text: 'otally', input: false}],
         result: 'totally',
         score: 1,
         qualifiers: []
-      }]);
+      }])
 
       done()
     })
   })
 
   it('calls fetch for two different inputs on the same parse', () => {
-    function Test ({props}) { 
-      return new Observable(observer => {
+    function Test ({props}) {
+      return new Observable((observer) => {
         observer.next(`${props.input}batman${props.input}`)
       })
     }
@@ -110,7 +110,7 @@ describe('dynamic', () => {
     )
     const store = createStore()
 
-    const options = reconcileAndTraverse(grammar, 'testb', store.register)
+    const options = compileAndTraverse(grammar, 'testb', store.register)
     expect(options).to.eql([{
       text: null,
       words: [
@@ -118,7 +118,7 @@ describe('dynamic', () => {
         {text: 'b', input: true},
         {text: 'batmanb', input: false}
       ],
-      result: {dynamic:'bbatmanb'},
+      result: {dynamic: 'bbatmanb'},
       score: 1,
       qualifiers: []
     }, {
@@ -130,12 +130,12 @@ describe('dynamic', () => {
       result: {dynamic: 'testbbatmantestb'},
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('is fine if an observe call returns nothing', () => {
     function Test ({props}) {
-      return new Observable(observer => {
+      return new Observable((observer) => {
         observer.next(`${props.input}superman`)
       })
     }
@@ -161,7 +161,7 @@ describe('dynamic', () => {
     )
 
     const store = createStore()
-    const options = reconcileAndTraverse(grammar, 'tes', store.register)
+    const options = compileAndTraverse(grammar, 'tes', store.register)
     expect(options).to.eql([{
       text: null,
       words: [
@@ -181,7 +181,7 @@ describe('dynamic', () => {
       result: {dynamic: 'aaa'},
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('calls observe for multiple splits', () => {
@@ -192,7 +192,7 @@ describe('dynamic', () => {
     }
 
     const grammar = <dynamic observe={observe} describe={() => {}} splitOn=' ' />
-    reconcileAndTraverse(grammar, 'b t')
+    compileAndTraverse(grammar, 'b t')
     expect(observeSpy).to.have.been.calledTwice
     expect(observeSpy).to.have.been.calledWith('b')
     expect(observeSpy).to.have.been.calledWith('b t')
@@ -206,13 +206,13 @@ describe('dynamic', () => {
     const grammar = <dynamic describe={describe} splitOn=' ' limit={1} />
 
     const store = createStore()
-    const options = reconcileAndTraverse(grammar, 'b test', store.register)
+    const options = compileAndTraverse(grammar, 'b test', store.register)
     expect(options).to.have.length(1)
   })
 
   it('can be greedy', () => {
     function Test ({props}) {
-      return new Observable(observer => {
+      return new Observable((observer) => {
         observer.next(props.input)
       })
     }
@@ -232,7 +232,7 @@ describe('dynamic', () => {
       </sequence>
     )
     const store = createStore()
-    const options = reconcileAndTraverse(grammar, 'b t', store.register)
+    const options = compileAndTraverse(grammar, 'b t', store.register)
     expect(options).to.eql([{
       text: null,
       words: [
@@ -252,6 +252,6 @@ describe('dynamic', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 })

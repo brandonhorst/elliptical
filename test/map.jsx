@@ -1,9 +1,9 @@
 /* eslint-env mocha */
+/** @jsx createElement */
 
 import literal from '../src/elements/literal'
-import element from '../src/element'
-import reconcile from '../src/reconcile'
-import {reconcileAndTraverse, text} from './_util'
+import createElement from '../src/element'
+import {compileAndTraverse, text} from './_util'
 import chai, {expect} from 'chai'
 import {spy} from 'sinon'
 
@@ -20,7 +20,7 @@ describe('map', () => {
         <literal text='test' value='test' />
       </map>
     )
-    const options = reconcileAndTraverse(grammar, 'test')
+    const options = compileAndTraverse(grammar, 'test')
 
     expect(options).to.eql([{
       text: '',
@@ -28,7 +28,7 @@ describe('map', () => {
       result: 'testing',
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('maps an element\'s result with an iterator', () => {
@@ -42,7 +42,7 @@ describe('map', () => {
         <literal text='test' value='test' />
       </map>
     )
-    const options = reconcileAndTraverse(grammar, 'test')
+    const options = compileAndTraverse(grammar, 'test')
     expect(options).to.have.length(2)
     expect(options[0].result).to.eql('testing')
     expect(options[1].result).to.eql('tested')
@@ -60,7 +60,7 @@ describe('map', () => {
       </map>
     )
 
-    const options = reconcileAndTraverse(grammar, 'test')
+    const options = compileAndTraverse(grammar, 'test')
     expect(options).to.have.length(1)
     expect(options[0].result).to.eql('testing')
   })
@@ -81,13 +81,13 @@ describe('map', () => {
     )
     let options
 
-    options = reconcileAndTraverse(grammar, '')
+    options = compileAndTraverse(grammar, '')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('label')
     expect(mapSpy).to.not.have.been.called
     expect(options[0].result).to.be.undefined
 
-    options = reconcileAndTraverse(grammar, 't')
+    options = compileAndTraverse(grammar, 't')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('test')
     expect(mapSpy).to.have.been.calledOnce

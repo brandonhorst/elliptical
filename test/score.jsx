@@ -1,14 +1,15 @@
+/** @jsx createElement */
 /* eslint-env mocha */
 
-import element from '../src/element'
-import {reconcileAndTraverse} from './_util'
+import createElement from '../src/element'
+import {compileAndTraverse} from './_util'
 import {expect} from 'chai'
 
 describe('score', () => {
   it('every parse output has a numeric score', () => {
     const grammar = <literal text='test' />
 
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
 
     expect(options).to.have.length(1)
     expect(options[0].score).to.equal(1)
@@ -22,7 +23,7 @@ describe('score', () => {
       </choice>
     )
 
-    const options = reconcileAndTraverse(grammar, 'right')
+    const options = compileAndTraverse(grammar, 'right')
     expect(options).to.have.length(2)
     expect(options[0].score).to.equal(0.5)
     expect(options[1].score).to.equal(1)
@@ -36,7 +37,7 @@ describe('score', () => {
       </sequence>
     )
 
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
     expect(options).to.have.length(1)
     expect(options[0].score).to.equal(0.25)
   })

@@ -1,8 +1,8 @@
+/** @jsx createElement */
 /* eslint-env mocha */
 
-import _ from 'lodash'
-import element from '../src/element'
-import {reconcileAndTraverse} from './_util'
+import createElement from '../src/element'
+import {compileAndTraverse} from './_util'
 
 import { expect } from 'chai'
 
@@ -15,9 +15,8 @@ describe('repeat', () => {
         </repeat>
       )
 
-      const options = reconcileAndTraverse(grammar, 'wrong')
+      const options = compileAndTraverse(grammar, 'wrong')
       expect(options).to.eql([])
-
     })
 
     it('accepts the child on its own', () => {
@@ -27,7 +26,7 @@ describe('repeat', () => {
         </repeat>
       )
 
-      const options = reconcileAndTraverse(grammar, 'superm')
+      const options = compileAndTraverse(grammar, 'superm')
       expect(options).to.eql([{
         text: null,
         words: [
@@ -39,7 +38,7 @@ describe('repeat', () => {
         result: [undefined, undefined],
         score: 1,
         qualifiers: []
-      }]);
+      }])
     })
 
     it('accepts the child twice, with the separator in the middle', () => {
@@ -49,7 +48,7 @@ describe('repeat', () => {
         </repeat>
       )
 
-      const options = reconcileAndTraverse(grammar, 'supermans')
+      const options = compileAndTraverse(grammar, 'supermans')
       expect(options).to.eql([{
         text: null,
         words: [
@@ -61,7 +60,7 @@ describe('repeat', () => {
         result: [undefined, undefined],
         score: 1,
         qualifiers: []
-      }]);
+      }])
     })
 
     it('accepts the child twice and suggests when complete, with the separator in the middle', () => {
@@ -71,7 +70,7 @@ describe('repeat', () => {
         </repeat>
       )
 
-      const options = reconcileAndTraverse(grammar, 'supermansuper')
+      const options = compileAndTraverse(grammar, 'supermansuper')
       expect(options).to.eql([{
         text: '',
         words: [
@@ -94,7 +93,7 @@ describe('repeat', () => {
         result: [undefined, undefined, undefined],
         score: 1,
         qualifiers: []
-      }]);
+      }])
     })
 
     it('allows for content to have children', () => {
@@ -107,7 +106,7 @@ describe('repeat', () => {
         </repeat>
       )
 
-      const options = reconcileAndTraverse(grammar, 'a ')
+      const options = compileAndTraverse(grammar, 'a ')
       expect(options).to.eql([{
         text: null,
         words: [
@@ -128,7 +127,7 @@ describe('repeat', () => {
         result: [undefined, undefined],
         score: 1,
         qualifiers: []
-      }]);
+      }])
     })
   })
 
@@ -142,7 +141,7 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
     expect(options).to.eql([{
       text: null,
       words: [{text: 'a', input: false}],
@@ -155,7 +154,7 @@ describe('repeat', () => {
       result: [undefined],
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('does not accept input that does not match the child', () => {
@@ -164,7 +163,7 @@ describe('repeat', () => {
         <literal text='super' />
       </repeat>
     )
-    const options = reconcileAndTraverse(grammar, 'wrong')
+    const options = compileAndTraverse(grammar, 'wrong')
     expect(options).to.eql([])
   })
 
@@ -175,14 +174,14 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const options = reconcileAndTraverse(grammar, 'sup')
+    const options = compileAndTraverse(grammar, 'sup')
     expect(options).to.eql([{
       text: null,
       words: [{text: 'sup', input: true}, {text: 'er', input: false}],
       result: ['a'],
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('accepts the child twice', () => {
@@ -192,7 +191,7 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const options = reconcileAndTraverse(grammar, 'supers')
+    const options = compileAndTraverse(grammar, 'supers')
     expect(options).to.eql([{
       text: null,
       words: [
@@ -203,7 +202,7 @@ describe('repeat', () => {
       result: ['a', 'a'],
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('accepts the child thrice', () => {
@@ -213,12 +212,12 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const options = reconcileAndTraverse(grammar, 'supersuper')
+    const options = compileAndTraverse(grammar, 'supersuper')
     expect(options).to.eql([{
       text: '',
       words: [
         {text: 'super', input: true},
-        {text: 'super', input: true},
+        {text: 'super', input: true}
       ],
       result: ['a', 'a'],
       score: 1,
@@ -228,12 +227,12 @@ describe('repeat', () => {
       words: [
         {text: 'super', input: true},
         {text: 'super', input: true},
-        {text: 'super', input: false},
+        {text: 'super', input: false}
       ],
       result: ['a', 'a', 'a'],
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('does not accept fewer than min iterations', () => {
@@ -243,17 +242,17 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const options = reconcileAndTraverse(grammar, 'a')
+    const options = compileAndTraverse(grammar, 'a')
     expect(options).to.eql([{
       text: null,
       words: [
         {text: 'a', input: true},
-        {text: 'a', input: false},
+        {text: 'a', input: false}
       ],
       result: ['a', 'a'],
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('does not accept more than max iterations', () => {
@@ -263,16 +262,16 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const options = reconcileAndTraverse(grammar, 'a')
+    const options = compileAndTraverse(grammar, 'a')
     expect(options).to.eql([{
       text: '',
       words: [
-        {text: 'a', input: true},
+        {text: 'a', input: true}
       ],
       result: ['a'],
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('unique rejects non-unique repeated elements', () => {
@@ -285,7 +284,7 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const options = reconcileAndTraverse(grammar, 'aa')
+    const options = compileAndTraverse(grammar, 'aa')
     expect(options).to.eql([])
   })
 
@@ -299,7 +298,7 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const options = reconcileAndTraverse(grammar, 'ab')
+    const options = compileAndTraverse(grammar, 'ab')
     expect(options).to.eql([])
   })
 
@@ -313,17 +312,17 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const options = reconcileAndTraverse(grammar, 'ab')
+    const options = compileAndTraverse(grammar, 'ab')
     expect(options).to.eql([{
       text: '',
       words: [
         {text: 'a', input: true},
-        {text: 'b', input: true},
+        {text: 'b', input: true}
       ],
       result: ['a', 'b'],
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('unique accepts unique repeated elements (deep)', () => {
@@ -336,17 +335,17 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const options = reconcileAndTraverse(grammar, 'ab')
+    const options = compileAndTraverse(grammar, 'ab')
     expect(options).to.eql([{
       text: '',
       words: [
         {text: 'a', input: true},
-        {text: 'b', input: true},
+        {text: 'b', input: true}
       ],
       result: [{a: 1}, {a: 2}],
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('allows for choices inside of repeats to be limited', () => {
@@ -360,18 +359,18 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const options = reconcileAndTraverse(grammar, 'aba')
+    const options = compileAndTraverse(grammar, 'aba')
     expect(options).to.eql([{
       text: null,
       words: [
         {text: 'ab', input: true},
         {text: 'a', input: true},
-        {text: 'a', input: false},
+        {text: 'a', input: false}
       ],
       result: [undefined, undefined],
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('allows for choices inside of repeat separators to be limited', () => {
@@ -387,18 +386,18 @@ describe('repeat', () => {
       </repeat>
     )
 
-    const options = reconcileAndTraverse(grammar, 'xa')
+    const options = compileAndTraverse(grammar, 'xa')
     expect(options).to.eql([{
       text: null,
       words: [
         {text: 'x', input: true},
         {text: 'a', input: true},
         {text: 'a', input: false},
-        {text: 'x', input: false},
+        {text: 'x', input: false}
       ],
       result: [undefined, undefined],
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 })

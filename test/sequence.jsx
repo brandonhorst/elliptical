@@ -1,8 +1,8 @@
+/** @jsx createElement */
 /* eslint-env mocha */
 
-import _ from 'lodash'
-import element from '../src/element'
-import {reconcileAndTraverse} from './_util'
+import createElement from '../src/element'
+import {compileAndTraverse} from './_util'
 
 import { expect } from 'chai'
 
@@ -14,7 +14,7 @@ describe('sequence', () => {
         <literal text='man' />
       </sequence>
     )
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
 
     expect(options).to.eql([{
       text: null,
@@ -22,7 +22,7 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('handles an optional child', () => {
@@ -33,7 +33,7 @@ describe('sequence', () => {
         <literal text='man' />
       </sequence>
     )
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
 
     expect(options).to.eql([{
       text: null,
@@ -54,7 +54,7 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('handles an ellipsis', () => {
@@ -66,16 +66,16 @@ describe('sequence', () => {
     )
     let options
 
-    options = reconcileAndTraverse(grammar, '')
+    options = compileAndTraverse(grammar, '')
     expect(options).to.eql([{
       text: null,
       words: [{text: 'super', input: false}],
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
-    options = reconcileAndTraverse(grammar, 'super')
+    options = compileAndTraverse(grammar, 'super')
     expect(options).to.eql([{
       text: '',
       words: [{text: 'super', input: true}],
@@ -88,9 +88,9 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
-    options = reconcileAndTraverse(grammar, 'superm')
+    options = compileAndTraverse(grammar, 'superm')
     expect(options).to.eql([{
       text: null,
       words: [
@@ -101,7 +101,7 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('does not output an ellipsis for the last child', () => {
@@ -114,30 +114,30 @@ describe('sequence', () => {
     )
     let options
 
-    options = reconcileAndTraverse(grammar, '')
+    options = compileAndTraverse(grammar, '')
     expect(options).to.eql([{
       text: null,
       words: [{text: 'super', input: false}, {text: 'man', input: false}],
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
-    options = reconcileAndTraverse(grammar, 'super')
+    options = compileAndTraverse(grammar, 'super')
     expect(options).to.eql([{
       text: null,
       words: [{text: 'super', input: true}, {text: 'man', input: false}],
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
-    options = reconcileAndTraverse(grammar, 'superman')
+    options = compileAndTraverse(grammar, 'superman')
     expect(options).to.eql([{
       text: '',
       words: [
         {text: 'super', input: true},
-        {text: 'man', input: true},
+        {text: 'man', input: true}
       ],
       result: {},
       score: 1,
@@ -152,9 +152,9 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
-    options = reconcileAndTraverse(grammar, 'supermanr')
+    options = compileAndTraverse(grammar, 'supermanr')
     expect(options).to.eql([{
       text: null,
       words: [
@@ -166,20 +166,20 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('handles an ellipsis that is optional', () => {
     const grammar = (
       <sequence>
         <literal text='the' />
-        <literal text='super' ellipsis optional  />
+        <literal text='super' ellipsis optional />
         <literal text='man' />
       </sequence>
     )
     let options
 
-    options = reconcileAndTraverse(grammar, '')
+    options = compileAndTraverse(grammar, '')
     expect(options).to.eql([{
       text: null,
       words: [{text: 'the', input: false}],
@@ -192,9 +192,9 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
-    options = reconcileAndTraverse(grammar, 'the')
+    options = compileAndTraverse(grammar, 'the')
     expect(options).to.eql([{
       text: '',
       words: [{text: 'the', input: true}],
@@ -213,9 +213,9 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
-    options = reconcileAndTraverse(grammar, 'thesuper')
+    options = compileAndTraverse(grammar, 'thesuper')
     expect(options).to.eql([{
       text: '',
       words: [{text: 'the', input: true}, {text: 'super', input: true}],
@@ -232,9 +232,9 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
-    options = reconcileAndTraverse(grammar, 'thesuperm')
+    options = compileAndTraverse(grammar, 'thesuperm')
     expect(options).to.eql([{
       text: null,
       words: [
@@ -246,21 +246,21 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('does not double output if an optional follows an ellipsis', () => {
     const grammar = (
       <sequence>
         <literal text='the' />
-        <literal text='super' ellipsis optional  />
+        <literal text='super' ellipsis optional />
         <literal text='man' optional />
         <literal text='rocks' />
       </sequence>
     )
     let options
 
-    options = reconcileAndTraverse(grammar, '')
+    options = compileAndTraverse(grammar, '')
     expect(options).to.eql([{
       text: null,
       words: [{text: 'the', input: false}],
@@ -273,9 +273,9 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
-    options = reconcileAndTraverse(grammar, 'the')
+    options = compileAndTraverse(grammar, 'the')
     expect(options).to.eql([{
       text: '',
       words: [{text: 'the', input: true}],
@@ -304,8 +304,9 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
-    options = reconcileAndTraverse(grammar, 'thesuper')
+    }])
+
+    options = compileAndTraverse(grammar, 'thesuper')
     expect(options).to.eql([{
       text: '',
       words: [{text: 'the', input: true}, {text: 'super', input: true}],
@@ -333,9 +334,9 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
-    options = reconcileAndTraverse(grammar, 'thesuperm')
+    options = compileAndTraverse(grammar, 'thesuperm')
     expect(options).to.eql([{
       text: null,
       words: [
@@ -348,21 +349,27 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('does not double output if an optional ellipsis follows an ellipsis', () => {
     const grammar = (
       <sequence>
         <literal text='the' />
-        <literal text='super' ellipsis optional  />
+        <literal text='super' ellipsis optional />
         <literal text='man' ellipsis optional />
         <literal text='rocks' />
       </sequence>
     )
     let options
+    /*
+      the opt1 opt2 ell2
+      the rocks opt1 opt2
+      the man opt1
+      the super
+    */
 
-    options = reconcileAndTraverse(grammar, '')
+    options = compileAndTraverse(grammar, '')
     expect(options).to.eql([{
       text: null,
       words: [{text: 'the', input: false}],
@@ -375,9 +382,9 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
-    options = reconcileAndTraverse(grammar, 'the')
+    options = compileAndTraverse(grammar, 'the')
     expect(options).to.eql([{
       text: '',
       words: [{text: 'the', input: true}],
@@ -402,9 +409,9 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
-    options = reconcileAndTraverse(grammar, 'thesuper')
+    options = compileAndTraverse(grammar, 'thesuper')
     expect(options).to.eql([{
       text: '',
       words: [{text: 'the', input: true}, {text: 'super', input: true}],
@@ -431,9 +438,9 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
-    options = reconcileAndTraverse(grammar, 'thesuperm')
+    options = compileAndTraverse(grammar, 'thesuperm')
     expect(options).to.eql([{
       text: null,
       words: [
@@ -445,9 +452,9 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
-    options = reconcileAndTraverse(grammar, 'thesuperman')
+    options = compileAndTraverse(grammar, 'thesuperman')
     expect(options).to.eql([{
       text: '',
       words: [
@@ -469,9 +476,9 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
-    options = reconcileAndTraverse(grammar, 'thesupermanr')
+    options = compileAndTraverse(grammar, 'thesupermanr')
     expect(options).to.eql([{
       text: null,
       words: [
@@ -484,7 +491,7 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('handles an optional child that is preferred', () => {
@@ -495,14 +502,14 @@ describe('sequence', () => {
         <literal text='man' />
       </sequence>
     )
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
 
     expect(options).to.eql([{
       text: null,
       words: [
         {text: 'super', input: false},
         {text: ' ', input: false},
-        {text: 'man', input: false},
+        {text: 'man', input: false}
       ],
       result: {},
       score: 1,
@@ -516,7 +523,7 @@ describe('sequence', () => {
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('handles an optional child that is limited', () => {
@@ -527,18 +534,18 @@ describe('sequence', () => {
         <literal text='man' />
       </sequence>
     )
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
 
     expect(options).to.eql([{
       text: null,
       words: [
         {text: 'super', input: false},
-        {text: 'man', input: false},
+        {text: 'man', input: false}
       ],
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('handles an optional child that is preferred and limited', () => {
@@ -549,19 +556,19 @@ describe('sequence', () => {
         <literal text='man' />
       </sequence>
     )
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
 
     expect(options).to.eql([{
       text: null,
       words: [
         {text: 'super', input: false},
         {text: ' ', input: false},
-        {text: 'man', input: false},
+        {text: 'man', input: false}
       ],
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('handles an optional child that is a sequence', () => {
@@ -574,7 +581,7 @@ describe('sequence', () => {
         </sequence>
       </sequence>
     )
-    const options = reconcileAndTraverse(grammar, 'superm')
+    const options = compileAndTraverse(grammar, 'superm')
 
     expect(options).to.eql([{
       text: null,
@@ -582,12 +589,12 @@ describe('sequence', () => {
         {text: 'super', input: true},
         {text: 'm', input: true},
         {text: 'an', input: false},
-        {text: 'again', input: false},
+        {text: 'again', input: false}
       ],
       result: {},
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('handles an optional child that is a sequence with freetexts', () => {
@@ -601,7 +608,7 @@ describe('sequence', () => {
         </sequence>
       </sequence>
     )
-    const options = reconcileAndTraverse(grammar, 'supermanagainret')
+    const options = compileAndTraverse(grammar, 'supermanagainret')
 
     expect(options).to.eql([{
       text: null,
@@ -610,12 +617,12 @@ describe('sequence', () => {
         {text: 'man', input: true},
         {text: 'again', input: true},
         {text: 'ret', input: true},
-        {text: 'urns', input: false},
+        {text: 'urns', input: false}
       ],
       result: {},
       score: options[0].score,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('does not take an optional childs value', () => {
@@ -626,7 +633,7 @@ describe('sequence', () => {
         <literal text='man' />
       </sequence>
     )
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
 
     expect(options).to.eql([{
       text: null,
@@ -647,7 +654,7 @@ describe('sequence', () => {
       result: {opt: 'someValue'},
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('can set a value to the result', () => {
@@ -657,7 +664,7 @@ describe('sequence', () => {
         <literal text='man' />
       </sequence>
     )
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
 
     expect(options).to.eql([{
       text: null,
@@ -668,7 +675,7 @@ describe('sequence', () => {
       result: 'testValue',
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('will merge results in', () => {
@@ -682,7 +689,7 @@ describe('sequence', () => {
       </sequence>
     )
 
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
     expect(options).to.eql([{
       text: null,
       words: [
@@ -693,7 +700,7 @@ describe('sequence', () => {
       result: {desc: 'super', noun: 'man', adj: 'rocks'},
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('will assign for non-object merge results', () => {
@@ -703,7 +710,7 @@ describe('sequence', () => {
         <literal text='man' value='man' merge />
       </sequence>
     )
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
     expect(options).to.eql([{
       text: null,
       words: [
@@ -713,7 +720,7 @@ describe('sequence', () => {
       result: 'man',
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('will merge results in for optionals', () => {
@@ -723,7 +730,7 @@ describe('sequence', () => {
         <literal text='man' value='man' optional merge />
       </sequence>
     )
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
     expect(options).to.eql([{
       text: null,
       words: [
@@ -741,7 +748,7 @@ describe('sequence', () => {
       result: 'man',
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('checks for uniqueness', () => {
@@ -754,9 +761,9 @@ describe('sequence', () => {
     )
     let options
 
-    options = reconcileAndTraverse(grammar, 'testa')
+    options = compileAndTraverse(grammar, 'testa')
     expect(options).to.eql([{
-      text: "",
+      text: '',
       words: [
         {text: 'test', input: true},
         {text: 'a', input: true}
@@ -764,12 +771,11 @@ describe('sequence', () => {
       result: {test: 1},
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
-
-    options = reconcileAndTraverse(grammar, 'atest')
+    options = compileAndTraverse(grammar, 'atest')
     expect(options).to.eql([{
-      text: "",
+      text: '',
       words: [
         {text: 'a', input: true},
         {text: 'test', input: true}
@@ -777,11 +783,10 @@ describe('sequence', () => {
       result: {test: 2},
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
-
-    options = reconcileAndTraverse(grammar, 'testatest')
-    expect(options).to.eql([]);
+    options = compileAndTraverse(grammar, 'testatest')
+    expect(options).to.eql([])
   })
 
   it('allows for uniqueness in merges', () => {
@@ -794,9 +799,9 @@ describe('sequence', () => {
     )
     let options
 
-    options = reconcileAndTraverse(grammar, 'testa')
+    options = compileAndTraverse(grammar, 'testa')
     expect(options).to.eql([{
-      text: "",
+      text: '',
       words: [
         {text: 'test', input: true},
         {text: 'a', input: true}
@@ -804,11 +809,11 @@ describe('sequence', () => {
       result: {test: 1},
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
-    options = reconcileAndTraverse(grammar, 'atest')
+    options = compileAndTraverse(grammar, 'atest')
     expect(options).to.eql([{
-      text: "",
+      text: '',
       words: [
         {text: 'a', input: true},
         {text: 'test', input: true}
@@ -816,9 +821,9 @@ describe('sequence', () => {
       result: {test: 2},
       score: 1,
       qualifiers: []
-    }]);
+    }])
 
-    options = reconcileAndTraverse(grammar, 'testatest')
-    expect(options).to.eql([]);
+    options = compileAndTraverse(grammar, 'testatest')
+    expect(options).to.eql([])
   })
 })

@@ -1,14 +1,15 @@
+/** @jsx createElement */
 /* eslint-env mocha */
 
-import element from '../src/element'
-import {reconcileAndTraverse, text} from './_util'
+import createElement from '../src/element'
+import {compileAndTraverse, text} from './_util'
 import {expect} from 'chai'
 
 describe('qualifiers', () => {
   it('are exported from elements', () => {
     const grammar = <literal text='test' qualifiers={['qual', 'ifier']} />
 
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('test')
     expect(options[0].qualifiers).to.eql(['qual', 'ifier'])
@@ -22,7 +23,7 @@ describe('qualifiers', () => {
       </sequence>
     )
 
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('test')
     expect(options[0].qualifiers).to.eql(['qual', 'ifier', 'test'])
@@ -36,7 +37,7 @@ describe('qualifiers', () => {
       </choice>
     )
 
-    const options = reconcileAndTraverse(grammar, 'test')
+    const options = compileAndTraverse(grammar, 'test')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('test')
     expect(options[0].qualifiers).to.eql(['qual'])
@@ -51,7 +52,7 @@ describe('qualifiers', () => {
       </repeat>
     )
 
-    const options = reconcileAndTraverse(grammar, 'testte')
+    const options = compileAndTraverse(grammar, 'testte')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('testtest')
     expect(options[0].qualifiers).to.eql(['qual', 'qual'])

@@ -1,8 +1,8 @@
 /* eslint-env mocha */
+/** @jsx createElement */
 
-import _ from 'lodash'
-import element from '../src/element'
-import {reconcileAndTraverse, text} from './_util'
+import createElement from '../src/element'
+import {compileAndTraverse, text} from './_util'
 
 import { expect } from 'chai'
 
@@ -14,7 +14,7 @@ describe('choice', () => {
         <literal text='wrong' />
       </choice>
     )
-    const options = reconcileAndTraverse(grammar, 'r')
+    const options = compileAndTraverse(grammar, 'r')
 
     expect(options).to.eql([{
       text: null,
@@ -22,7 +22,7 @@ describe('choice', () => {
       result: undefined,
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('suggests multiple valid choices', () => {
@@ -32,7 +32,7 @@ describe('choice', () => {
         <literal text='right also' />
       </choice>
     )
-    const options = reconcileAndTraverse(grammar, 'r')
+    const options = compileAndTraverse(grammar, 'r')
 
     expect(options).to.eql([{
       text: null,
@@ -46,7 +46,7 @@ describe('choice', () => {
       result: undefined,
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('suggests no valid choices', () => {
@@ -56,9 +56,9 @@ describe('choice', () => {
         <literal text='wrong also' />
       </choice>
     )
-    const options = reconcileAndTraverse(grammar, 'r')
+    const options = compileAndTraverse(grammar, 'r')
 
-    expect(options).to.eql([]);
+    expect(options).to.eql([])
   })
 
   it('adopts the value of the child', () => {
@@ -68,7 +68,7 @@ describe('choice', () => {
         <literal text='wrong' />
       </choice>
     )
-    const options = reconcileAndTraverse(grammar, 'r')
+    const options = compileAndTraverse(grammar, 'r')
 
     expect(options).to.eql([{
       text: null,
@@ -76,7 +76,7 @@ describe('choice', () => {
       result: 'testValue',
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('can set a value', () => {
@@ -86,7 +86,7 @@ describe('choice', () => {
         <literal text='wrong' />
       </choice>
     )
-    const options = reconcileAndTraverse(grammar, 'r')
+    const options = compileAndTraverse(grammar, 'r')
 
     expect(options).to.eql([{
       text: null,
@@ -94,7 +94,7 @@ describe('choice', () => {
       result: 'override',
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('can set a value in an object with an id', () => {
@@ -104,7 +104,7 @@ describe('choice', () => {
         <literal text='wrong' />
       </choice>
     )
-    const options = reconcileAndTraverse(grammar, 'r')
+    const options = compileAndTraverse(grammar, 'r')
 
     expect(options).to.eql([{
       text: null,
@@ -112,7 +112,7 @@ describe('choice', () => {
       result: {key: 'testValue'},
       score: 1,
       qualifiers: []
-    }]);
+    }])
   })
 
   it('can be restricted by a limit of 1', () => {
@@ -123,7 +123,7 @@ describe('choice', () => {
       </choice>
     )
 
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('right')
     expect(options[0].result).to.equal('testValue')
@@ -138,7 +138,7 @@ describe('choice', () => {
       </choice>
     )
 
-    const options = reconcileAndTraverse(grammar, '')
+    const options = compileAndTraverse(grammar, '')
     expect(options).to.have.length(2)
     expect(text(options[0])).to.equal('right')
     expect(text(options[1])).to.equal('right also')
@@ -156,7 +156,7 @@ describe('choice', () => {
       </choice>
     )
 
-    const options = reconcileAndTraverse(grammar, 'ri')
+    const options = compileAndTraverse(grammar, 'ri')
     expect(options).to.have.length(3)
     expect(text(options[0])).to.equal('right')
     expect(text(options[1])).to.equal('right also')
@@ -176,7 +176,7 @@ describe('choice', () => {
       </sequence>
     )
 
-    const options = reconcileAndTraverse(grammar, 'test')
+    const options = compileAndTraverse(grammar, 'test')
     expect(options).to.have.length(2)
     expect(text(options[0])).to.equal('testaalso')
     expect(text(options[1])).to.equal('testbalso')
@@ -194,7 +194,7 @@ describe('choice', () => {
       </sequence>
     )
 
-    const options = reconcileAndTraverse(grammar, 'righta')
+    const options = compileAndTraverse(grammar, 'righta')
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('rightalso')
   })

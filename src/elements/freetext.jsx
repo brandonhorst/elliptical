@@ -1,4 +1,5 @@
-import element from '../element'
+/** @jsx createElement */
+import createElement from '../element'
 import { substrings } from '../string-utils'
 
 function describe ({props: {
@@ -9,15 +10,15 @@ function describe ({props: {
   greedy = false
 }}) {
   return <raw
-    func={input => {
+    func={(input) => {
       return filterInput(input, {limit, splitOn, consumeAll, filter, greedy})
     }}
     limit={limit} />
 }
 
 function * filterInput (input, {limit, splitOn, consumeAll, filter, greedy}) {
-  const substringOpts = {splitOn, noSplit : consumeAll, reverse: greedy}
-  
+  const substringOpts = {splitOn, noSplit: consumeAll, reverse: greedy}
+
   for (let stringPart of substrings(input, substringOpts)) {
     if (filter(stringPart)) {
       yield {

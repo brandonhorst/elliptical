@@ -1,5 +1,6 @@
+/** @jsx createElement */
 import _ from 'lodash'
-import element from '../element'
+import createElement from '../element'
 import { match } from '../string-match'
 
 export default {
@@ -7,7 +8,7 @@ export default {
     const trueItems = _.map(props.items, itemify)
 
     return <raw
-      func={input => compute(input, trueItems, props)}
+      func={(input) => compute(input, trueItems, props)}
       limit={props.limit} category={props.category} />
   }
 }
@@ -47,6 +48,6 @@ function * compute (input, items, props) {
       yield _.assign({}, output, {result: props.value})
     }
   } else {
-    yield* finalIterator
+    yield * finalIterator
   }
 }

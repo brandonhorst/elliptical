@@ -1,60 +1,52 @@
 import _ from 'lodash'
-import reconcile from '../reconcile'
 
-export default {
-  reconcile ({props}) {
-    if (props.separator) {
-      return _.assign({}, props, {separator: reconcile(props.separator)})
-    } else {
-      return props
-    }
-  },
+function * traverse (option, {
+  props: {max = Number.MAX_SAFE_INTEGER, min = 1, unique = false, separator},
+  children,
+  next
+}) {
+  const child = children[0]
 
-  * parse (option, {
-    props: {max = Number.MAX_SAFE_INTEGER, min = 1, unique = false, separator},
-    children
-  }) {
-    const child = children[0]
-
-    const modifications = {
-      result: [],
-      score: 1
-    }
-
-    const trueOption = _.assign({}, option, modifications)
-    yield* parseChild(0, trueOption, child, min, max, unique, separator)
+  const modifications = {
+    result: [],
+    score: 1
   }
+  const props = {max, min, unique, separator}
+
+  const trueOption = _.assign({}, option, modifications)
+  yield * parseChild(0, trueOption, child, props, next)
 }
 
-function * parseChild (index, option, child, min, max, unique, separator) {
-  if (index > max) {
+function * parseChild (index, option, child, props, next) {
+  if (index > props.max) {
     return
   }
 
-  if (index >= min) {
+  if (index >= props.min) {
     yield option
   }
 
-  if (index >= min && option.text == null) {
+  if (index >= props.min && option.text == null) {
     return
   }
 
-  if (index > 0 && separator) {
-    for (let sepOutput of separator(option)) {
+  if (index > 0 && props.separator) {
+    for (let sepOutput of next(option, props.separator)) {
       const trueOutput = _.assign({}, sepOutput, {result: option.result})
-      yield* callParseChild(index, trueOutput, child, min, max, unique, separator)
+      yield * callParseChild(index, trueOutput, child, props, next)
     }
   } else {
-    yield* callParseChild(index, option, child, min, max, unique, separator)
+    yield * callParseChild(index, option, child, props, next)
   }
 }
 
-function * callParseChild (index, option, child, min, max, unique, separator) {
+function * callParseChild (index, option, child, props, next) {
   const mods = {qualifiers: []}
   const trueOption = _.assign({}, option, mods)
 
-  for (let output of child.traverse(trueOption)) {
-    if (unique && _.some(option.result, _.partial(_.isEqual, _, output.result))) {
+  for (let output of next(trueOption, child)) {
+    if (props.unique &&
+        _.some(option.result, _.partial(_.isEqual, _, output.result))) {
       return
     }
 
@@ -64,6 +56,8 @@ function * callParseChild (index, option, child, min, max, unique, separator) {
     }
 
     const trueOutput = _.assign({}, output, outputModifications)
-    yield* parseChild(index + 1, trueOutput, child, min, max, unique, separator)
+    yield * parseChild(index + 1, trueOutput, child, props, next)
   }
 }
+
+export default {traverse}
