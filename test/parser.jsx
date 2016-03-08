@@ -15,7 +15,10 @@ describe('parser', () => {
     expect(parser.store.register).to.be.an.instanceof(Function)
     expect(parser.parse).to.be.an.instanceof(Function)
 
-    const outputs = parser.parse('t')
+    let outputs
+    parser.parse('t').subscribe({
+      next (x) { outputs = x }
+    })
     expect(outputs).to.eql([{
       text: null,
       words: [{text: 't', input: true}, {text: 'est', input: false}],
@@ -24,6 +27,7 @@ describe('parser', () => {
       qualifiers: []
     }])
   })
+
   it('allows for sources and automatically recompiles', (done) => {
     function Source () {
       return new Observable((observer) => {
@@ -44,7 +48,11 @@ describe('parser', () => {
     }
     const {parse} = createParser(<Test />)
 
-    const outputs = parse('t')
+    let outputs
+    parse('t').subscribe({
+      next (x) { outputs = x }
+    })
+
     expect(outputs).to.eql([{
       text: null,
       words: [{text: 't', input: true}, {text: 'est', input: false}],
@@ -54,7 +62,6 @@ describe('parser', () => {
     }])
 
     process.nextTick(() => {
-      const outputs = parse('t')
       expect(outputs).to.eql([{
         text: null,
         words: [{text: 't', input: true}, {text: 'otally', input: false}],
