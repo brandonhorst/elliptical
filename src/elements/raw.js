@@ -1,37 +1,37 @@
 import _ from 'lodash'
+import {limitIterator} from '../utils'
 
-function * traverse (option, {
-  props: {category, func = () => [], limit}
-}) {
-  let successes = 0
-
-  for (let output of func(option.text)) {
-    let success = false
-
-    const modification = {
-      result: output.result,
-      text: output.remaining,
-      score: output.score || 1,
-      qualifiers: output.qualifiers || [],
-      words: option.words.concat(
-        _.map(output.words, (word) => _.assign({},
-          word,
-          option.currentArgument ? {argument: option.currentArgument} : {},
-          category ? {category} : {}
-        ))
-      )
-    }
-
-    if (limit) modification.callbacks = option.callbacks.concat(() => { success = true })
-    if (output.ellipsis) modification.ellipsis = true
-
-    yield _.assign({}, option, modification)
-
-    if (limit) {
-      if (success) successes++
-      if (limit <= successes) break
-    }
+function modifyOption(option, rawOutput, category) {
+  const modification = {
+    result: rawOutput.result,
+    text: rawOutput.remaining,
+    score: rawOutput.score || 1,
+    qualifiers: rawOutput.qualifiers || [],
+    words: option.words.concat(
+      _.map(rawOutput.words, (word) => _.assign({},
+        word,
+        option.currentArgument ? {argument: option.currentArgument} : {},
+        category ? {category} : {}
+      ))
+    )
   }
+
+  return _.assign({}, option, modification)
+}
+
+function * optionsFromRawOutputs (option, rawOutputs, category) {
+  for (let rawOutput of rawOutputs) {
+    yield modifyOption(option, rawOutput, category)
+  }
+}
+
+function * traverse (option, {props}) {
+  if (!props.func) return
+
+  const rawOutputs = props.func(option.text)
+  const outputs = optionsFromRawOutputs(option, rawOutputs, props.category)
+
+  yield * limitIterator(outputs, props.limit)
 }
 
 export default {traverse}

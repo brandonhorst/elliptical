@@ -1,37 +1,36 @@
 import _ from 'lodash'
+import {limitIterator} from '../utils'
 
-function * traverse (option, {props: {limit}, children, next}) {
-  let successes = 0
-  if (children && children.length > 0) {
-    for (let child of children) {
-      let success = false
+function * traverseChild (option, child, next) {
+  const childOutputs = next(option, child)
 
-      // performance optimization
-      if (child.attributes.id == null && !limit) {
-        yield * next(option, child)
-      } else {
-        for (let output of next(option, child)) {
-          const newResult = child.attributes.id != null
-            ? {[child.attributes.id]: output.result}
-            : output.result
+  // slight performance optimization
+  if (child.attributes.id == null) {
+    yield * childOutputs
+  } else {
+    for (let output of childOutputs) {
+      const newResult = child.attributes.id != null
+        ? {[child.attributes.id]: output.result}
+        : output.result
 
-          const mods = {result: newResult}
+      const mods = {result: newResult}
 
-          if (limit) {
-            mods.callbacks = output.callbacks.concat(() => {
-              success = true
-            })
-          }
-          yield _.assign({}, output, mods)
-        }
-      }
-
-      if (limit) {
-        if (success) successes++
-        if (limit <= successes) break
-      }
+      yield _.assign({}, output, mods)
     }
   }
+}
+
+function * childrenTraversals (option, children, next) {
+  if (children && children.length > 0) {
+    for (let child of children) {
+      yield traverseChild(option, child, next)
+    }
+  }
+}
+
+function * traverse (option, {props, children, next}) {
+  const traversals = childrenTraversals(option, children, next)
+  yield * limitIterator(traversals, props.limit)
 }
 
 export default {traverse}

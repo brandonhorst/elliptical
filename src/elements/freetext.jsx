@@ -2,25 +2,13 @@
 import createElement from '../element'
 import { substrings } from '../string-utils'
 
-function describe ({props: {
-  limit,
-  filter = () => true,
-  splitOn = '',
-  consumeAll = false,
-  greedy = false
-}}) {
-  return <raw
-    func={(input) => {
-      return filterInput(input, {limit, splitOn, consumeAll, filter, greedy})
-    }}
-    limit={limit} />
+function describe ({props}) {
+  return <raw func={(input) => filterInput(input, props)} limit={props.limit} />
 }
 
-function * filterInput (input, {limit, splitOn, consumeAll, filter, greedy}) {
-  const substringOpts = {splitOn, noSplit: consumeAll, reverse: greedy}
-
-  for (let stringPart of substrings(input, substringOpts)) {
-    if (filter(stringPart)) {
+function * filterInput (input, props) {
+  for (let stringPart of substrings(input || '', props)) {
+    if (!props.filter || props.filter(stringPart)) {
       yield {
         words: [{text: stringPart, input: true}],
         result: stringPart,

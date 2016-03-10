@@ -11,12 +11,12 @@ chai.use(sinonChai)
 
 describe('filter', () => {
   it('filters result', () => {
-    function filter (result) {
-      return result === 'b'
+    function filter (option) {
+      return option.result === 'b'
     }
 
     const grammar = (
-      <filter func={filter}>
+      <filter outbound={filter}>
         <list items={[{text: 'a', value: 'a'}, {text: 'b', value: 'b'}]} />
       </filter>
     )
@@ -30,13 +30,13 @@ describe('filter', () => {
   it('does not filter with placeholders', () => {
     const filterSpy = spy()
 
-    function filter (result) {
+    function filter (option) {
       filterSpy()
       return true
     }
 
     const grammar = (
-      <filter func={filter}>
+      <filter outbound={filter} skipIncomplete>
         <label text='test'>
           <literal text='s' />
         </label>
@@ -48,5 +48,24 @@ describe('filter', () => {
     expect(filterSpy).to.not.have.been.called
     expect(text(options[0])).to.equal('test')
     expect(options[0].result).to.be.undefined
+  })
+
+  it('filters inbound', () => {
+    const tapSpy = spy()
+    function filter (option) {
+      return false
+    }
+
+    const grammar = (
+      <filter inbound={filter}>
+        <tap inbound={tapSpy}>
+          <literal text='test' />
+        </tap>
+      </filter>
+    )
+
+    const options = compileAndTraverse(grammar, '')
+    expect(options).to.have.length(0)
+    expect(tapSpy).to.not.have.been.called
   })
 })

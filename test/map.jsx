@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 /** @jsx createElement */
 
+import _ from 'lodash'
 import literal from '../src/elements/literal'
 import createElement from '../src/element'
 import {compileAndTraverse, text} from './_util'
@@ -10,13 +11,13 @@ import {spy} from 'sinon'
 chai.use(require('sinon-chai'))
 
 describe('map', () => {
-  it('maps an element\'s result', () => {
-    function addIng (result) {
-      return `${result}ing`
+  it('maps an option outbound', () => {
+    function addIng (option) {
+      return _.assign({}, option, {result: `${option.result}ing`})
     }
 
     const grammar = (
-      <map func={addIng}>
+      <map outbound={addIng}>
         <literal text='test' value='test' />
       </map>
     )
@@ -31,14 +32,35 @@ describe('map', () => {
     }])
   })
 
-  it('maps an element\'s result with an iterator', () => {
-    function * addSuffixes (result) {
-      yield `${result}ing`
-      yield `${result}ed`
+  it('maps an option inbound', () => {
+    function changeText (option) {
+      return _.assign({}, option, {text: 'te'})
     }
 
     const grammar = (
-      <map flat func={addSuffixes}>
+      <map inbound={changeText}>
+        <literal text='test' value='test' />
+      </map>
+    )
+    const options = compileAndTraverse(grammar, 'nothing')
+
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'te', input: true}, {text: 'st', input: false}],
+      result: 'test',
+      score: 1,
+      qualifiers: []
+    }])
+  })
+
+  it('maps an element\'s result with an iterator', () => {
+    function * addSuffixes (option) {
+      yield _.assign({}, option, {result: `${option.result}ing`})
+      yield _.assign({}, option, {result: `${option.result}ed`})
+    }
+
+    const grammar = (
+      <map outbound={addSuffixes}>
         <literal text='test' value='test' />
       </map>
     )
@@ -49,13 +71,13 @@ describe('map', () => {
   })
 
   it('maps an element\'s result with an iterator, and can be limited', () => {
-    function * addSuffixes (result) {
-      yield `${result}ing`
-      yield `${result}ed`
+    function * addSuffixes (option) {
+      yield _.assign({}, option, {result: `${option.result}ing`})
+      yield _.assign({}, option, {result: `${option.result}ed`})
     }
 
     const grammar = (
-      <map flat func={addSuffixes} limit={1}>
+      <map outbound={addSuffixes} limit={1}>
         <literal text='test' value='test' />
       </map>
     )
@@ -65,15 +87,15 @@ describe('map', () => {
     expect(options[0].result).to.eql('testing')
   })
 
-  it("maps an element's result, but not if there is a placeholder", () => {
+  it("maps an element's result, but not if there is a placeholder and skipIncomplete", () => {
     const mapSpy = spy()
-    function addIng (result) {
+    function addIng (option) {
       mapSpy()
-      return `${result}ing`
+      return _.assign({}, option, {result: `${option.result}ing`})
     }
 
     const grammar = (
-      <map func={addIng}>
+      <map outbound={addIng} skipIncomplete>
         <label text='label'>
           <literal text='test' value='test' />
         </label>

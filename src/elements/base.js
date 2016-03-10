@@ -1,21 +1,36 @@
+/** @jsx createElement */
+
 import _ from 'lodash'
+import createElement from '../element'
 
-function * traverse (option, {children, next}) {
-  const trueOption = _.assign({}, option, {callbacks: []})
-
-  for (let output of next(trueOption, children[0])) {
-    // filter items that haven't consumed the text
-    if (output.text === '' || output.text == null) {
-      // call all limit callbacks
-      _.forEach(output.callbacks, (callback) => callback())
-
-      // remote callbacks
-      const newOutput = _.clone(output)
-      delete newOutput.callbacks
-
-      yield newOutput
-    }
-  }
+function textIsEmpty (option) {
+  return option.text === '' || option.text == null
 }
 
-export default {traverse}
+function callCallbacks (option) {
+  _.forEach(option.callbacks, (callback) => callback())
+}
+
+function addCallbacks (option) {
+  return _.assign({}, option, {callbacks: []})
+}
+
+function removeCallbacks (option) {
+  const newOption = _.clone(option)
+  delete newOption.callbacks
+  return newOption
+}
+
+function describe ({children}) {
+  return (
+    <map inbound={addCallbacks} outbound={removeCallbacks}>
+      <tap outbound={callCallbacks}>
+        <filter outbound={textIsEmpty}>
+          {children}
+        </filter>
+      </tap>
+    </map>
+  )
+}
+
+export default {describe}

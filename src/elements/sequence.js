@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import {limitIterator} from '../utils'
 
 function * traverse (option, {props: {unique = false}, children, next}) {
   const mods = {result: {}, score: 1}
@@ -24,6 +25,21 @@ function shouldDoEllipsis (index, option, children) {
   )
 }
 
+function * parseOptionals (index, option, unique, children, next) {
+  const child = children[index]
+
+  const withChildParse = parseChild(index, option, unique, children, next)
+  const withoutChildParse = parseChildControl(index + 1, option, unique, children, next)
+
+  if (child.attributes.preferred) {
+    yield * withChildParse
+    yield * withoutChildParse
+  } else {
+    yield * withoutChildParse
+    yield * withChildParse
+  }
+}
+
 function * parseChildControl (index, option, unique, children, next) {
   if (index >= children.length) { // we've reached the end
     yield option
@@ -45,23 +61,8 @@ function * parseChildControl (index, option, unique, children, next) {
   }
 
   if (child.attributes.optional) {
-    let success = false
-    if (child.attributes.limited) {
-      option = _.assign({}, option, {
-        callbacks: option.callbacks.concat(() => { success = true })
-      })
-    }
-    if (child.attributes.preferred) {
-      yield * parseChild(index, option, unique, children, next)
-      if (!child.attributes.limited || !success) {
-        yield * parseChildControl(index + 1, option, unique, children, next)
-      }
-    } else {
-      yield * parseChildControl(index + 1, option, unique, children, next)
-      if (!child.attributes.limited || !success) {
-        yield * parseChild(index, option, unique, children, next)
-      }
-    }
+    const optionals = parseOptionals(index, option, unique, children, next)
+    yield * limitIterator(optionals, child.attributes.limited ? 1 : undefined)
   } else {
     yield * parseChild(index, option, unique, children, next)
   }
