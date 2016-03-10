@@ -1,7 +1,9 @@
 import _ from 'lodash'
 
 function * traverse (option, {children, next}) {
-  for (let output of next(option, children[0])) {
+  const trueOption = _.assign({}, option, {callbacks: []})
+
+  for (let output of next(trueOption, children[0])) {
     // filter items that haven't consumed the text
     if (output.text === '' || output.text == null) {
       // call all limit callbacks

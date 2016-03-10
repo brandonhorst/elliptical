@@ -89,7 +89,13 @@ You must not mutate this object.
 ```js
 {
   parse: (String) => Array<Option>,
-  outputs: Observable<Array<Option>>,
+  watch: (String) => Observable<Array<Option>>,
   store: Store
 }
 ```
+
+If you are creating a static parse, use `parse`, which will
+simply return an Array of `Option`s. If some of your components
+contain `observe` functions, you should use `watch`, which will return
+an observable which will send a new Array of `Option`s whenever
+the data changes.

@@ -7,12 +7,21 @@ create grammars to pass to `compile` and `createParser`. This function
 matches the JSX signature. Strings passed to the `type` parameter will be
 automatically dereferenced with the built-in commands.
 
-```
+```js
 createElement: (
   type : String | Component | Source,
   attributes: Object<Any>,
   children: Array<Element>
 ) => Element<Component|Source>
+```
+
+## `createParser`
+
+Convenience function that kickstarts a natural language parser.
+Most applications should use this function.
+
+```js
+createParser: (grammar: Element) => Parser
 ```
 
 ## `createOption`
@@ -55,10 +64,3 @@ are using `createParser`, the `Store` is generated for you.
 ```js
 createStore: () => Store
 ```
-
-## `createParser`
-
-Convenience function that kickstarts a natural language parser.
-
-``js
-createParser: (grammar: Element) => Parser

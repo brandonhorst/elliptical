@@ -50,10 +50,9 @@ Branches the parsing logic. Consumes no characters.
 
 `Any` - One of the following items:
 
-- the contents of the `value` prop
-- if there is no `value` prop, the `result` of the child for this branch
-- if the child has an `id` prop, the result will be
+- If the child has an `id` prop, the result will be
   an `Object` of the form `{[childId]: childResult}`
+- Otherwise, the `result` of the child for this branch
 
 ## Score
 
