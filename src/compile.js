@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import {isComplete} from './utils'
 
 const nextSymbol = Symbol('tarse-compile-next')
 
@@ -26,60 +27,60 @@ export default function compile (element, register) {
     return () => []
   }
 
-  // call observe
-  if (element.type.observe) {
-    const observation = element.type.observe({
-      props: element.attributes,
-      children: element.children
-    })
+  const model = {
+    props: _.defaults({}, element.attributes, element.type.defaultProps || {}),
+    children: element.children
+  }
 
-    data = register(observation)
+  // call observe, add data to model
+  if (element.type.observe) {
+    const observation = element.type.observe(model)
+
+    model.data = register(observation)
   }
 
   // call describe
   if (element.type.describe) {
-    const description = element.type.describe({
-      props: element.attributes,
-      children: element.children,
-      data
-    })
+    const description = element.type.describe(model)
 
-    return setAutos(element, compile(description, register))
+    return setAutos(element, model, compile(description, register))
   }
 
   // if there's no describe, call compile and let it set props
-  const reconciledAttrs = _.mapValues(element.attributes, (attribute) => {
-    if (attribute && attribute.type && attribute.attributes &&
-        attribute.children && _.isPlainObject(attribute.type) &&
-        _.isPlainObject(attribute.type) && _.isArray(attribute.children)) {
+  model.props = _.mapValues(model.props, (props) => {
+    if (props && props.type && props.attributes &&
+        props.children && _.isPlainObject(props.type) &&
+        _.isPlainObject(props.type) && _.isArray(props.children)) {
       // We can be pretty sure this is an element,
-      return addNext(attribute, register)
+      return addNext(props, register)
     } else {
-      return attribute
+      return props
     }
   })
 
   // generate the traverse thunk
-  const children = _.map(element.children, (child) => {
+  model.children = _.map(element.children, (child) => {
     return addNext(child, register)
   })
 
-  return setAutos(element, (option) => {
-    const outputs = element.type.traverse(option, {
-      props: reconciledAttrs,
-      children,
-      data,
-      register,
-      next
-    })
+  _.assign(model, {register, next})
 
-    return outputs
-  })
+  function traverse (option) {
+    return element.type.traverse(option, model)
+  }
+
+  return setAutos(element, model, traverse)
 }
 
-function setAutos (element, traverse) {
+function setAutos (element, model, traverse) {
   return function * (option) {
     for (let output of traverse(option)) {
+      if (element.type.validate &&
+          isComplete(output) &&
+          !element.type.validate(output.result, model)) {
+        continue
+      }
+
       const mods = {}
       if (element.attributes.value != null) {
         mods.result = element.attributes.value

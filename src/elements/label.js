@@ -12,11 +12,11 @@ function * traverse (option, {
 }) {
   const child = children[0]
 
-  if (suppress && (
+  if (suppress && 
     option.text == null ||
     (suppressEmpty && option.text === '') ||
     (suppressWhen && suppressWhen(option.text))
-  )) {
+  ) {
     yield outputSelf(option, child, argument, text)
   } else {
     yield * parseChild(option, child, argument, text, next)

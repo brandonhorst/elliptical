@@ -30,7 +30,7 @@ export default function createParser (element) {
   })
 
   return {
-    parse (input) {
+    watch (input) {
       if (currentObserver) {
         currentObserver.complete()
       }
@@ -40,6 +40,9 @@ export default function createParser (element) {
         currentInput = input
         compileAndTraverse()
       })
+    },
+    parse (input) {
+      return Array.from(traverse(createOption({text: input})))
     },
     store
   }

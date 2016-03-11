@@ -7,16 +7,17 @@ import Observable from 'zen-observable'
 import {expect} from 'chai'
 
 describe('parser', () => {
-  it('returns parse and store', () => {
+  it('returns pars, watch, and store', () => {
     const parser = createParser(<literal text='test' />)
 
     expect(parser.store).to.be.an.instanceof(Object)
     expect(parser.store.data).to.be.an.instanceof(Observable)
     expect(parser.store.register).to.be.an.instanceof(Function)
     expect(parser.parse).to.be.an.instanceof(Function)
+    expect(parser.watch).to.be.an.instanceof(Function)
 
     let outputs
-    parser.parse('t').subscribe({
+    parser.watch('t').subscribe({
       next (x) { outputs = x }
     })
     expect(outputs).to.eql([{
@@ -28,7 +29,26 @@ describe('parser', () => {
     }])
   })
 
-  it('allows for sources and automatically recompiles', (done) => {
+  it('parse traverses', () => {
+    const Test = {
+      describe () {
+        return <literal text='test' />
+      }
+    }
+    const {parse} = createParser(<Test />)
+
+    const outputs = parse('t')
+
+    expect(outputs).to.eql([{
+      text: null,
+      words: [{text: 't', input: true}, {text: 'est', input: false}],
+      result: undefined,
+      score: 1,
+      qualifiers: []
+    }])
+  })
+
+  it('watch allows for sources and automatically recompiles', (done) => {
     function Source () {
       return new Observable((observer) => {
         observer.next('test')
@@ -46,10 +66,10 @@ describe('parser', () => {
         return <literal text={data} />
       }
     }
-    const {parse} = createParser(<Test />)
+    const {watch} = createParser(<Test />)
 
     let outputs
-    parse('t').subscribe({
+    watch('t').subscribe({
       next (x) { outputs = x }
     })
 

@@ -35,6 +35,17 @@ describe('compile', () => {
     compile(<Test something='test' />)
   })
 
+  it('passes defaultProps to describe', () => {
+    const Test = {
+      defaultProps: {something: 'test'},
+      describe ({props, children}) {
+        expect(props).to.eql({something: 'test', else: 'another'})
+        expect(children).to.eql([])
+      }
+    }
+    compile(<Test else='another' />)
+  })
+
   it('calls register with the results of observe', () => {
     const Test = {
       observe () {
