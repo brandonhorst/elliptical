@@ -1,4 +1,4 @@
-When tarse is traversing a `Component` tree, it does so using `option`s.
+When elliptical is traversing a `Component` tree, it does so using `option`s.
 These `option`s are what is ultimately returned.
 
 An `option` is just a plain Javascript object. It looks something like this:
@@ -7,10 +7,10 @@ An `option` is just a plain Javascript object. It looks something like this:
 {
   text: null,
   words: [
-    {text: 'tarse r', input: true},
+    {text: 'elliptical r', input: true},
     {text: 'ocks', input: false}
   ],
-  result: {library: 'tarse'},
+  result: {library: 'elliptical'},
   score: 1,
   qualifiers: []
 }

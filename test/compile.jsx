@@ -1,7 +1,6 @@
 /* eslint-env mocha */
 /** @jsx createElement */
 
-import literal from '../src/elements/literal'
 import createElement from '../src/element'
 import compile from '../src/compile'
 import chai, {expect} from 'chai'
@@ -97,8 +96,8 @@ describe('compile', () => {
     const Test = {
       describe ({children}) {
         expect(children).to.eql([
-          {type: literal, attributes: {text: 'a'}, children: []},
-          {type: literal, attributes: {text: 'b'}, children: []}
+          {type: 'literal', props: {text: 'a'}, children: []},
+          {type: 'literal', props: {text: 'b'}, children: []}
         ])
         describeSpy()
         return children[0]

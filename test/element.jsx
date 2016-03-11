@@ -1,7 +1,6 @@
 /** @jsx createElement */
 /* eslint-env mocha */
 
-import literal from '../src/elements/literal'
 import createElement from '../src/element'
 import {expect} from 'chai'
 
@@ -9,8 +8,8 @@ describe('element', () => {
   it('dereferences builtin types', () => {
     const lit = createElement('literal')
     expect(lit).to.eql({
-      type: literal,
-      attributes: {},
+      type: 'literal',
+      props: {},
       children: []
     })
   })
@@ -19,16 +18,16 @@ describe('element', () => {
     const lit = createElement({test: 1})
     expect(lit).to.eql({
       type: {test: 1},
-      attributes: {},
+      props: {},
       children: []
     })
   })
 
-  it('passes through attributes', () => {
+  it('passes through props', () => {
     const lit = createElement('literal', {test: 2})
     expect(lit).to.eql({
-      type: literal,
-      attributes: {test: 2},
+      type: 'literal',
+      props: {test: 2},
       children: []
     })
   })
@@ -41,10 +40,10 @@ describe('element', () => {
     )
     expect(lit).to.eql({
       type: {test: 1},
-      attributes: {},
+      props: {},
       children: [{
-        type: literal,
-        attributes: {text: 'test'},
+        type: 'literal',
+        props: {text: 'test'},
         children: []
       }]
     })
@@ -55,10 +54,10 @@ describe('element', () => {
     const lit = <Test><literal text='test' /></Test>
     expect(lit).to.eql({
       type: {test: 1},
-      attributes: {},
+      props: {},
       children: [{
-        type: literal,
-        attributes: {text: 'test'},
+        type: 'literal',
+        props: {text: 'test'},
         children: []
       }]
     })

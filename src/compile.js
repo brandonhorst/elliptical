@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import {isComplete} from './utils'
+import * as components from './components'
 
 const nextSymbol = Symbol('tarse-compile-next')
 
@@ -14,8 +15,10 @@ function addNext (element, register) {
     newElement[nextSymbol] = next
     return newElement
   } catch (e) {
-    console.log(element, 'looks like an element but failed reconciliation.')
+    console.log('element failed reconciliation.')
+    console.log(element)
     console.error(e)
+    console.log()
     return element
   }
 }
@@ -27,34 +30,39 @@ export default function compile (element, register) {
     return () => []
   }
 
+  const component = _.isString(element.type)
+    ? components[element.type]
+    : element.type
+
   const model = {
-    props: _.defaults({}, element.attributes, element.type.defaultProps || {}),
+    props: _.defaults({}, element.props, element.type.defaultProps || {}),
     children: element.children
   }
 
   // call observe, add data to model
-  if (element.type.observe) {
-    const observation = element.type.observe(model)
+  if (component.observe) {
+    const observation = component.observe(model)
 
     model.data = register(observation)
   }
 
   // call describe
-  if (element.type.describe) {
-    const description = element.type.describe(model)
+  if (component.describe) {
+    const description = component.describe(model)
 
     return setAutos(element, model, compile(description, register))
   }
 
   // if there's no describe, call compile and let it set props
-  model.props = _.mapValues(model.props, (props) => {
-    if (props && props.type && props.attributes &&
-        props.children && _.isPlainObject(props.type) &&
-        _.isPlainObject(props.type) && _.isArray(props.children)) {
+  model.props = _.mapValues(model.props, (prop) => {
+    if (prop && prop.type && prop.props &&
+        prop.children &&
+        (_.isPlainObject(prop.type) || _.isString(prop.type)) &&
+        _.isPlainObject(prop.props) && _.isArray(prop.children)) {
       // We can be pretty sure this is an element,
-      return addNext(props, register)
+      return addNext(prop, register)
     } else {
-      return props
+      return prop
     }
   })
 
@@ -66,7 +74,7 @@ export default function compile (element, register) {
   _.assign(model, {register, next})
 
   function traverse (option) {
-    return element.type.traverse(option, model)
+    return component.traverse(option, model)
   }
 
   return setAutos(element, model, traverse)
@@ -82,14 +90,14 @@ function setAutos (element, model, traverse) {
       }
 
       const mods = {}
-      if (element.attributes.value != null) {
-        mods.result = element.attributes.value
+      if (element.props.value != null) {
+        mods.result = element.props.value
       }
-      if (element.attributes.qualifiers != null) {
-        mods.qualifiers = element.attributes.qualifiers
+      if (element.props.qualifiers != null) {
+        mods.qualifiers = element.props.qualifiers
       }
-      if (element.attributes.score != null) {
-        mods.score = element.attributes.score
+      if (element.props.score != null) {
+        mods.score = element.props.score
       }
 
       yield _.assign({}, output, mods)

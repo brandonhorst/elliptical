@@ -5,12 +5,12 @@ function * traverseChild (option, child, next) {
   const childOutputs = next(option, child)
 
   // slight performance optimization
-  if (child.attributes.id == null) {
+  if (child.props.id == null) {
     yield * childOutputs
   } else {
     for (let output of childOutputs) {
-      const newResult = child.attributes.id != null
-        ? {[child.attributes.id]: output.result}
+      const newResult = child.props.id != null
+        ? {[child.props.id]: output.result}
         : output.result
 
       const mods = {result: newResult}

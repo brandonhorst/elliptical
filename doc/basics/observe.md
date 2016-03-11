@@ -1,9 +1,10 @@
-Language is not static, so tarse grammars can't always be static either.
+Language is not static, so elliptical grammars can't always be static either.
 Sometimes grammars depend on information that cannot be hard-coded. Perhaps
 it is stored in a database, or obtained from a web service.
 
 Dynamic behavior can seriously increase complexity,
-so it must be managed well. Tarse handles this using "Declarative Observers".
+so it must be managed well. Elliptical handles this using
+"Declarative Observers".
 
 It's not difficult. It's just a component that has an `observe` function.
 
@@ -51,7 +52,7 @@ major environments, so you will need to use a lightweight Polyfill like
 that uses the same interface, like
 [ReactiveX/RxJS](https://github.com/ReactiveX/RxJS). Note that FRP libraries
 that do not match the spec (Bacon, Kefir, Reactive-Extensions/RxJS) will
-not automatically work with tarse.
+not automatically work with elliptical.
 
 In our code, we are creating a new `Observable`. The first thing it does is
 push an empty Array, which, in this case, means that no data

@@ -2,7 +2,6 @@
 /** @jsx createElement */
 
 import _ from 'lodash'
-import literal from '../src/elements/literal'
 import createElement from '../src/element'
 import {compileAndTraverse, text} from './_util'
 import chai, {expect} from 'chai'

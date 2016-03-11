@@ -1,7 +1,7 @@
 # Note on ES2015 and JSX
 
-Tarse is plain ES5 Javacript, and should run in any modern browser.
-Anything making use of tarse may use plain ES5 as well. However,
+Elliptical is plain ES5 Javacript, and should run in any modern browser.
+Anything making use of elliptical may use plain ES5 as well. However,
 using language features from ES2015 (ES6) and JSX makes development
 significantly easier. It is recommended (but again - not required!) that
 you use [Babel](https://babeljs.io/) to precompile your code into pure
@@ -14,40 +14,40 @@ npm install babel-preset-es2015 --save-dev
 npm install babel-plugin-transform-react-jsx --save-dev
 ```
 
-JSX needs a `pragma` to know the name of the `element` function. If you leave
-it out, JSX defaults to `React.createElement` and your code will throw
-lots of `React is not defined` errors.
+JSX needs a `pragma` to know the name of the `createElement` function.
+If you leave it out, JSX defaults to `React.createElement` and your
+code will throw lots of `React is not defined` errors.
 
-Set the `pragma` in your `.babelrc` file:
 
+You can specify this pragma it in each of your
+files with a `@jsx` pragma comment. You will need to put this comment
+at the top of every file that imports `element`.
+
+```js
+/** @jsx createElement */
+
+import {createElement} from 'elliptical'
+```
+
+Alternatively, you can set the `pragma` in your `.babelrc` file:
+
+```
 {
   "presets": ["es2015"],
   "plugins": [
     ["transform-react-jsx", {"pragma": "element"}]
   ]
 }
-Alternatively, you can specify it in each of your
-files with a `@jsx` pragma comment. You will need to put this comment
-at the top of every file that imports `element`.
-
-```js
-/** @jsx element */
-
-import {element} from 'tarse'
 ```
 
-If tarse will be running on your server, you can use `babel-cli` to compile
-your source files to plain ES5.
+However, keep in mind that this will likely cause your linter to complain.
 
-```js
-npm install --save-dev babel-cli
+If elliptical will be running on your server, you can use `babel-register`
+to compile your source files to plain ES5.
 
-#compile all files in `src` and puts them in `lib`
-babel src -d lib
-```
-
-If tarse will be running in a browser, you should make use of
-[Browserify](http://browserify.org/).
+If elliptical will be running in a browser, you should make use of
+[Browserify](http://browserify.org/) or [Rollup](http://rollupjs.org/) to 
+build browser runnable code.
 
 ```sh
 npm install --save-dev browserify

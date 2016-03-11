@@ -18,7 +18,7 @@ export default function createStore () {
       } else {
         const newItem = {element}
         const thisObservable = element.type(
-          {props: element.attributes, children: element.children}
+          {props: element.props, children: element.children}
         )
 
         thisObservable.subscribe({

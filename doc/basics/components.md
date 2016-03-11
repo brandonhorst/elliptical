@@ -1,6 +1,6 @@
 # Components
 
-In tarse, natural language is modeled using `Components`. This allows
+In elliptical, natural language is modeled using `Components`. This allows
 you to model language in an extensible, composable, dynamic way. At its most
 basic level, a `Component` is just an object that has a single function
 called `describe`.
@@ -8,7 +8,7 @@ called `describe`.
 ```jsx
 const Exclamation = {
   describe() {
-    return <literal text='tarse rocks!' />
+    return <literal text='elliptical rocks!' />
   }
 }
 ```
@@ -17,7 +17,7 @@ const Exclamation = {
 in `element`s of our own.
 
 ```jsx
-createParser(<Exclamation />).parse('') // => 'tarse rocks!'
+createParser(<Exclamation />).parse('') // => 'elliptical rocks!'
 ```
 
 We can also set `attributes` on our `Components`, which are exposed

@@ -19,7 +19,7 @@ describe('validate', () => {
       validate (result, {props, children, data}) {
         expect(result).to.equal('test')
         expect(props).to.eql({prop: 'test'})
-        expect(children).to.eql([{type: FakeTest, attributes: {}, children: []}])
+        expect(children).to.eql([{type: FakeTest, props: {}, children: []}])
         expect(data).to.be.undefined
         validateSpy()
 

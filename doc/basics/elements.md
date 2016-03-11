@@ -1,6 +1,6 @@
 # Language Elements
 
-In tarse, language is modeled through `element`s. An `element` is just a plain
+In elliptical, language is modeled through `element`s. An `element` is just a plain
 old Javascript object. It looks like this:
 
 ```js
@@ -17,20 +17,20 @@ Its properties are:
 - `attributes` - an arbitrary `Object` that can be used by the `type`
 - `children` - an `Array` of `elements` that are owned by this `element`
 
-`element`s are the primary way to describe language in tarse, so to help
-you create them, tarse contains a function to build them for you,
+`element`s are the primary way to describe language in elliptical, so to help
+you create them, elliptical contains a function to build them for you,
 also called `element`.
 
 ```js
 element(
   'choice', //component name
   {value: 'awesome'}, // attributes
-  element('literal', {text: 'tarse'}), // first child
+  element('literal', {text: 'elliptical'}), // first child
   element('literal', {text: 'lacona'}) // second child...
 )
 ```
 
-If you pass a string as the first argument, tarse will look up that string
+If you pass a string as the first argument, elliptical will look up that string
 in the built-in `Component`s. If you pass a `Component` itself,
 it will use that.
 
@@ -51,7 +51,7 @@ this friendly syntax:
 
 ```jsx
 <choice value='literal'>
-  <literal text='tarse' />
+  <literal text='elliptical' />
   <literal text='lacona' />
 </choice>
 ```

@@ -1,7 +1,7 @@
 {
   "name": "elliptical",
   "version": "1.0.0-rc1",
-  "description": "Interactive natural language interfaces",
+  "description": "Interactive natural-language interfaces",
   "main": "lib/index.js",
   "scripts": {
     "test": "mocha --compilers jsx:babel-register --watch-extensions jsx",

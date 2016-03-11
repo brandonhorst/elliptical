@@ -1,12 +1,9 @@
 import _ from 'lodash'
-import * as elements from './elements'
 
-export default function (type, attributes, ...children) {
-  const trueType = typeof type === 'string' ? elements[type] : type
-
+export default function (type, props, ...children) {
   return {
-    type: trueType,
-    attributes: attributes || {},
+    type,
+    props: props == null ? {} : props,
     children: _.flattenDeep(children)
   }
 }

@@ -16,10 +16,10 @@ function shouldDoEllipsis (index, option, children) {
   const child = children[index]
   return (
     index > 0 &&
-    children[index - 1].attributes.ellipsis &&
+    children[index - 1].props.ellipsis &&
     !(
-      child.attributes.ellipsis &&
-      child.attributes.optional &&
+      child.props.ellipsis &&
+      child.props.optional &&
       option.text === ''
     )
   )
@@ -31,7 +31,7 @@ function * parseOptionals (index, option, unique, children, next) {
   const withChildParse = parseChild(index, option, unique, children, next)
   const withoutChildParse = parseChildControl(index + 1, option, unique, children, next)
 
-  if (child.attributes.preferred) {
+  if (child.props.preferred) {
     yield * withChildParse
     yield * withoutChildParse
   } else {
@@ -60,9 +60,9 @@ function * parseChildControl (index, option, unique, children, next) {
     }
   }
 
-  if (child.attributes.optional) {
+  if (child.props.optional) {
     const optionals = parseOptionals(index, option, unique, children, next)
-    yield * limitIterator(optionals, child.attributes.limited ? 1 : undefined)
+    yield * limitIterator(optionals, child.props.limited ? 1 : undefined)
   } else {
     yield * parseChild(index, option, unique, children, next)
   }
@@ -78,9 +78,9 @@ function * parseChild (index, option, unique, children, next) {
 
   for (let output of next(option, child)) {
     if (unique && output.result != null) {
-      if (child.attributes.id && option.result[child.attributes.id] != null) {
+      if (child.props.id && option.result[child.props.id] != null) {
         continue
-      } else if (child.attributes.merge && hasSomeSameKeys(option, output)) {
+      } else if (child.props.merge && hasSomeSameKeys(option, output)) {
         continue
       }
     }
@@ -99,8 +99,8 @@ function * parseChild (index, option, unique, children, next) {
 
 function getAccumulatedResult (inputResult, child, childResult) {
   if (!_.isUndefined(childResult)) {
-    const childId = child.attributes.id
-    const childMerge = child.attributes.merge
+    const childId = child.props.id
+    const childMerge = child.props.merge
     if (childId) {
       return _.assign({}, inputResult, {[childId]: childResult})
     } else if (childMerge) {

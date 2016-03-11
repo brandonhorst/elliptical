@@ -1,4 +1,4 @@
-In tarse, language is modeled as a tree of `Component`s. That may sound
+In elliptical, language is modeled as a tree of `Component`s. That may sound
 scary but it's really not. Take a look at this grammar:
 
 ```jsx
@@ -51,7 +51,7 @@ It looks something like this:
 }]
 ```
 
-The `words` property shows us a representation tarse's understanding of the
+The `words` property shows us a representation elliptical's understanding of the
 input. Note that the case has been fixed, and it is suggesting the string
 `"man"` as a completion to the input. Each `word` also contains an
 `input` property, which tells us whether it was a part of the original input,
