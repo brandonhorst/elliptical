@@ -2,7 +2,7 @@ import _ from 'lodash'
 import {isComplete} from './utils'
 import * as phrases from './phrases'
 
-const nextSymbol = Symbol('tarse-compile-next')
+const nextSymbol = Symbol('elliptical-compile-next')
 
 function next (option, element) {
   return element[nextSymbol](option)

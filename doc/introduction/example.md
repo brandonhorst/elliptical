@@ -52,7 +52,7 @@ const grammar = (
 const parser = createParser(grammar)
 
 document.getElementById('parse-input').onclick = () => {
-  const query = document.getElementById('tarse-input').value
+  const query = document.getElementById('elliptical-input').value
   const outputs = parser.parse(query)
   console.log(outputs)
 }

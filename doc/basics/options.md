@@ -28,6 +28,3 @@ in a logical way. Used to do something based upon the input.
 - `score : Number` - used for sorting outputs.
 - `qualifiers: Array<String>` - used for distinguishing between outputs
 with similar `words`.
-
-When tarse traverses the `element` it starts 
-Tarse starts with a single `option`
