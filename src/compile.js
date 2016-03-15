@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import {isComplete} from './utils'
-import * as components from './components'
+import * as phrases from './phrases'
 
 const nextSymbol = Symbol('tarse-compile-next')
 
@@ -15,7 +15,7 @@ function addNext (element, register) {
     newElement[nextSymbol] = next
     return newElement
   } catch (e) {
-    console.log('element failed reconciliation.')
+    console.log('element failed compliation')
     console.log(element)
     console.error(e)
     console.log()
@@ -30,8 +30,8 @@ export default function compile (element, register) {
     return () => []
   }
 
-  const component = _.isString(element.type)
-    ? components[element.type]
+  const phrase = _.isString(element.type)
+    ? phrases[element.type]
     : element.type
 
   const model = {
@@ -40,15 +40,15 @@ export default function compile (element, register) {
   }
 
   // call observe, add data to model
-  if (component.observe) {
-    const observation = component.observe(model)
+  if (phrase.observe) {
+    const observation = phrase.observe(model)
 
     model.data = register(observation)
   }
 
   // call describe
-  if (component.describe) {
-    const description = component.describe(model)
+  if (phrase.describe) {
+    const description = phrase.describe(model)
 
     return setAutos(element, model, compile(description, register))
   }
@@ -74,7 +74,7 @@ export default function compile (element, register) {
   _.assign(model, {register, next})
 
   function traverse (option) {
-    return component.traverse(option, model)
+    return phrase.traverse(option, model)
   }
 
   return setAutos(element, model, traverse)

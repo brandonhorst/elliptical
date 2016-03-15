@@ -2,7 +2,7 @@
 
 ```
 element(
-  type : String | Component,
+  type : String | Phrase,
   attributes: Object<Any>,
   children: Array<Element>
 ) => Element

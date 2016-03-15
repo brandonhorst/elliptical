@@ -9,10 +9,10 @@ automatically dereferenced with the built-in commands.
 
 ```js
 createElement: (
-  type : String | Component | Source,
+  type : String | Phrase | Source,
   attributes: Object<Any>,
   children: Array<Element>
-) => Element<Component|Source>
+) => Element<Phrase|Source>
 ```
 
 ## `createParser`
@@ -52,13 +52,13 @@ If you are using `createParser`, you will should not need this function.
 
 ```js
 compile: (
-  grammar: Element<Component>,
+  grammar: Element<Phrase>,
   register: (descriptor: Element<Source>) => Any
 ) => ((option: Option) => Iterable<Option>)
 
 ## `createStore`
 
-Creates a `Store`, which is used to store state for `Component`s. If you
+Creates a `Store`, which is used to store state for `Phrase`s. If you
 are using `createParser`, the `Store` is generated for you.
 
 ```js

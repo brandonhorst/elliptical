@@ -1,4 +1,4 @@
-In elliptical, language is modeled as a tree of `Component`s. That may sound
+In elliptical, language is modeled as a tree of `Phrase`s. That may sound
 scary but it's really not. Take a look at this grammar:
 
 ```jsx
@@ -19,10 +19,10 @@ you can see that there are two "branches":
 - "I'm Superman"
 - "I'm Batman"
 
-You've just met 3 built-in components:
+You've just met 3 built-in phrases:
 
-- `sequence` says "these Components must occur one-after-the-other."
-- `choice` says "any of these Components works" - it creates a "branch"
+- `sequence` says "these Phrases must occur one-after-the-other."
+- `choice` says "any of these Phrases works" - it creates a "branch"
 in the tree.
 - `literal` matches a literal string, as defined in the `text` attribute.
 
@@ -78,7 +78,7 @@ const grammar = (
 ```
 
 We have added the `id` attribute to our `<choice>`. `id` is used by
-children of the `<sequence>` component, and it determines the key in
+children of the `<sequence>` phrase, and it determines the key in
 the `results` Object. We have added `value` attributes to our `<literal>`s,
 which will serve as the values for our `results` Object. If we parse
 this new grammar, we get information in the `outputs`:
@@ -93,5 +93,5 @@ this new grammar, we get information in the `outputs`:
 
 Now we can take these results and do something with them.
 
-There are a bunch of built-in `Component`s, and you can add custom
-`Component`s, to model any language constructs imaginable.
+There are a bunch of built-in `Phrase`s, and you can add custom
+`Phrase`s, to model any language constructs imaginable.

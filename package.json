@@ -11,13 +11,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lacona/lacona.git"
+    "url": "https://github.com/laconalabs/elliptical.git"
   },
   "keywords": [
     "lingustic",
     "natural",
     "language",
-    "parsing"
+    "parsing",
+    "lacona",
+    "interactive"
   ],
   "author": {
     "name": "Brandon Horst",
@@ -26,9 +28,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/lacona/lacona/issues"
+    "url": "https://github.com/laconalabs/elliptical/issues"
   },
-  "homepage": "https://github.com/lacona/lacona",
+  "homepage": "https://github.com/laconalabs/elliptical",
   "devDependencies": {
     "babel-cli": "^6.6.5",
     "babel-plugin-transform-react-jsx": "^6.6.5",

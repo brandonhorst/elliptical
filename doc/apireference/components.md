@@ -1,9 +1,9 @@
-# Built-in Components
+# Built-in Phrases
 
-There is nothing magical about any of these components. All of them
-are implemented using the same public API available to custom components.
+There is nothing magical about any of these phrases. All of them
+are implemented using the same public API available to custom phrases.
 
-All components can take the following props:
+All phrases can take the following props:
 
   - `score: Number` - set to the `score` property of the output `Option`.
   Higher numbers sort higher. Defaults to `1`. 

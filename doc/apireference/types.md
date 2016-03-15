@@ -4,47 +4,60 @@
 
 ```js
 {
-  type: Component|Source,
+  type: Phrase|Source,
   attributes: Object<Any>,
   children: Array<Element>
 }
 ```
 
-## `Component`
+## `Phrase`
 
 ```js
 {
+  defaultProps: Object<Any>,
+
   observe?: ({
     props: Object<Any>,
     children: Array<Element>
   }) => Element<Source>,
+
+  validate?: (
+    result: Any,
+    {
+      props: Object<Any>,
+      children: Array<Element>,
+      data: Any
+    }
+  ) => Boolean
+
   describe?: ({
     props: Object<Any>,
     children: Array<Element>,
     data: Any
-  }) => Element<Component>,
+  }) => Element<Phrase>,
+
   traverse?: (
     option: Option,
     {
       props: Object<Any>,
       children: Array<Element>, // each Element also has a `traverse` function
       data: Any,
-      next: (Option, Element<Component>) => Iterable<Option>
+      next: (Option, Element<Phrase>) => Iterable<Option>
       register: (Element<Source>) => Any
     }
   )
 }
 ```
 
-`Component`s must have either a `describe` or a `traverse` function.
+`Phrase`s must have either a `describe` or a `traverse` function.
 
 ## `Option`
 
 An object representing the current state of parse tree traversal. Each
-component in the tree will create a new `Option` based upon the `Option`
+phrase in the tree will create a new `Option` based upon the `Option`
 passed to it.
 
-Components may add properties when traversing the tree. They should remove
+Phrase may add properties when traversing the tree. They should remove
 them when their traverse is outbound, so as not to pollute the object.
 Ensure that these properties are unique to avoid name conflicts.
 
@@ -95,7 +108,7 @@ You must not mutate this object.
 ```
 
 If you are creating a static parse, use `parse`, which will
-simply return an Array of `Option`s. If some of your components
+simply return an Array of `Option`s. If some of your phrases
 contain `observe` functions, you should use `watch`, which will return
 an observable which will send a new Array of `Option`s whenever
 the data changes.

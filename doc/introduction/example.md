@@ -1,9 +1,10 @@
 # Example
 
 ```
-/** @jsx element */
-import {element, createParser} from 'lacona'
+/** @jsx createElement */
+import {createElement, createParser} from 'elliptical'
 import request from 'request'
+import Observable from 'zen-observable'
 
 function CountrySource () {
   const url = 'http://services.groupkt.com/country/get/all'
