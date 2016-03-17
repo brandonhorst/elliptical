@@ -1,16 +1,12 @@
 import _ from 'lodash'
 import {isComplete} from './utils'
 import * as phrases from './phrases'
+import {nextSymbol} from './symbols'
 
-const nextSymbol = Symbol('elliptical-compile-next')
 
-function next (option, element) {
-  return element[nextSymbol](option)
-}
-
-function addNext (element, {register, process}) {
+function addNext (element, process) {
   try {
-    const next = compile(element, {register, process})
+    const next = compile(element, process)
     const newElement = _.clone(element) // _.assign can't do symbols
     newElement[nextSymbol] = next
     return newElement
@@ -23,72 +19,67 @@ function addNext (element, {register, process}) {
   }
 }
 
-export default function compile (element, {register, process} = {}) {
-  let data
+export default function compile (element, process) {
+  // ignore null elements
+  if (element == null) return () => []
 
-  if (element == null) {
-    return () => []
+  if (process) {
+    element = process(element)
+    if (element == null) return () => []
   }
+
+  // assign defaultProps
+  element = _.assign({}, element, {
+    props: _.defaults({}, element.props, element.type.defaultProps || {})
+  })
 
   const phrase = _.isString(element.type)
     ? phrases[element.type]
     : element.type
 
-  const model = {
-    props: _.defaults({}, element.props, element.type.defaultProps || {}),
-    children: element.children
-  }
-
-  // call observe, add data to model
-  if (phrase.observe && register) {
-    const observation = phrase.observe(model)
-
-    model.data = register(observation)
-  }
-
   // call describe
   if (phrase.describe) {
-    let description = phrase.describe(model)
-    if (process) {
-      let description = process(description)
-    }
-    const traverse = compile(description, {register, process})
-    return setAutos(element, model, traverse)
+    let description = phrase.describe(element)
+    const traverse = compile(description, process)
+    return setAutos(element, traverse)
   }
 
   // if there's no describe, check to see if any props are elements
   // and compile those
-  model.props = _.mapValues(model.props, (prop) => {
+  const propsWithNext = _.mapValues(element.props, (prop) => {
     if (prop && prop.type && prop.props && prop.children &&
         (_.isPlainObject(prop.type) || _.isString(prop.type)) &&
         _.isPlainObject(prop.props) && _.isArray(prop.children)) {
       // We can be pretty sure this is an element,
-      return addNext(prop, {register, process})
+      return addNext(prop, process)
     } else {
       return prop
     }
   })
 
   // generate the traverse thunk
-  model.children = _.map(element.children, (child) => {
-    return addNext(child, {register, process})
+  const childrenWithNext = _.map(element.children, (child) => {
+    return addNext(child, process)
   })
 
-  _.assign(model, {register, next})
+  element = _.assign({}, element, {
+    props: propsWithNext,
+    children: childrenWithNext
+  })
 
   function traverse (option) {
-    return phrase.traverse(option, model)
+    return phrase.visit(option, element)
   }
 
-  return setAutos(element, model, traverse)
+  return setAutos(element, traverse)
 }
 
-function setAutos (element, model, traverse) {
+function setAutos (element, traverse) {
   return function * (option) {
     for (let output of traverse(option)) {
       if (element.type.validate &&
           isComplete(output) &&
-          !element.type.validate(output.result, model)) {
+          !element.type.validate(output.result, element)) {
         continue
       }
 

@@ -1,3 +1,4 @@
+import traverse from '../traverse'
 import {isComplete} from '../utils'
 
 const defaultProps = {
@@ -5,14 +6,14 @@ const defaultProps = {
   option: false
 }
 
-function * traverse (option, {props, children, next}) {
+function * visit (option, {props, children}) {
   if (props.inbound) {
     if (!props.inbound(props.option ? option : option.result)) {
       return
     }
   }
 
-  for (let output of next(option, children[0])) {
+  for (let output of traverse(option, children[0])) {
     if (props.skipIncomplete && !isComplete(output)) {
       yield output
     } else {
@@ -24,4 +25,4 @@ function * traverse (option, {props, children, next}) {
   }
 }
 
-export default {defaultProps, traverse}
+export default {defaultProps, visit}

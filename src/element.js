@@ -4,6 +4,6 @@ export default function (type, props, ...children) {
   return {
     type,
     props: props == null ? {} : props,
-    children: _.flattenDeep(children)
+    children: _.chain(children).flattenDeep().filter().value()
   }
 }

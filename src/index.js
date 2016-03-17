@@ -1,5 +1,5 @@
 export {default as createElement} from './element'
 export {default as compile} from './compile'
+export {default as traverse} from './traverse'
 export {default as createOption} from './option'
-export {default as createStore} from './store'
 export {default as createParser} from './parser'

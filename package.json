@@ -46,7 +46,6 @@
   },
   "dependencies": {
     "babel-runtime": "^6.6.1",
-    "zen-observable": "^0.2.1",
     "lodash": "^4.6.1",
     "smart-split": "^3.0.0"
   },

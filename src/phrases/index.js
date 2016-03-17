@@ -1,6 +1,5 @@
 export { default as base } from './base'
 export { default as choice } from './choice'
-export { default as dynamic } from './dynamic'
 export { default as filter } from './filter'
 export { default as freetext } from './freetext'
 export { default as label } from './label'

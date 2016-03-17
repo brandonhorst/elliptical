@@ -1,0 +1,1 @@
+export const nextSymbol = Symbol('elliptical-compile-next')

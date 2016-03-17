@@ -1,8 +1,9 @@
 import _ from 'lodash'
+import traverse from '../traverse'
 import {limitIterator} from '../utils'
 
-function * traverseChild (option, child, next) {
-  const childOutputs = next(option, child)
+function * traverseChild (option, child) {
+  const childOutputs = traverse(option, child)
 
   // slight performance optimization
   if (child.props.id == null) {
@@ -20,17 +21,17 @@ function * traverseChild (option, child, next) {
   }
 }
 
-function * childrenTraversals (option, children, next) {
+function * childrenTraversals (option, children) {
   if (children && children.length > 0) {
     for (let child of children) {
-      yield traverseChild(option, child, next)
+      yield traverseChild(option, child)
     }
   }
 }
 
-function * traverse (option, {props, children, next}) {
-  const traversals = childrenTraversals(option, children, next)
+function * visit (option, {props, children}) {
+  const traversals = childrenTraversals(option, children)
   yield * limitIterator(traversals, props.limit)
 }
 
-export default {traverse}
+export default {visit}

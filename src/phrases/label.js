@@ -1,40 +1,39 @@
 import _ from 'lodash'
+import traverse from '../traverse'
 
-function * traverse (option, {
-  props: {
-    suppress = true,
-    argument = true,
-    suppressEmpty = true,
-    text,
-    suppressWhen},
-  children,
-  next
-}) {
+const defaultProps = {
+  suppress: true,
+  argument: true,
+  suppressEmpty: true,
+}
+
+function * visit (option, {props, children}) {
+  props = _.defaults({}, props, defaultProps)
   const child = children[0]
 
-  if (suppress && 
+  if (props.suppress && 
     option.text == null ||
-    (suppressEmpty && option.text === '') ||
-    (suppressWhen && suppressWhen(option.text))
+    (props.suppressEmpty && option.text === '') ||
+    (props.suppressWhen && props.suppressWhen(option.text))
   ) {
-    yield outputSelf(option, child, argument, text)
+    yield outputSelf(option, child, props)
   } else {
-    yield * parseChild(option, child, argument, text, next)
+    yield * parseChild(option, child, props)
   }
 }
 
-function * parseChild (option, child, argument, text, next) {
+function * parseChild (option, child, props) {
   let didSetCurrentArgument = false
 
   const modification = {}
-  if (argument && !option.currentArgument) {
-    modification.currentArgument = text
+  if (props.argument && !option.currentArgument) {
+    modification.currentArgument = props.text
     didSetCurrentArgument = true
   }
 
   const optionWithArgument = _.assign({}, option, modification)
 
-  for (let output of next(optionWithArgument, child)) {
+  for (let output of traverse(optionWithArgument, child)) {
     if (didSetCurrentArgument) {
       yield _.assign({}, output, {currentArgument: undefined})
     } else {
@@ -43,12 +42,13 @@ function * parseChild (option, child, argument, text, next) {
   }
 }
 
-function outputSelf (option, child, argument, text) {
+function outputSelf (option, child, props) {
   const word = {
-    text: text,
+    text: props.text,
     input: false,
     placeholder: true,
-    argument: option.currentArgument || (argument ? text : undefined)
+    argument: option.currentArgument ||
+      (props.argument ? props.text : undefined)
   }
 
   const modification = {
@@ -62,4 +62,4 @@ function outputSelf (option, child, argument, text) {
   return _.assign({}, option, modification)
 }
 
-export default {traverse}
+export default {visit}

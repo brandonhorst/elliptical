@@ -1,14 +1,15 @@
 import _ from 'lodash'
+import traverse from '../traverse'
 import {limitIterator, isComplete} from '../utils'
 
-function * traverse (option, {props, children, next}) {
+function * visit (option, {props, children}) {
   // preprocess with inbound
   let newOption = option
   if (props.inbound) {
     newOption = props.inbound(option)
   }
 
-  const iterator = next(newOption, children[0])
+  const iterator = traverse(newOption, children[0])
   if (!props.outbound) {
     yield * iterator
     return
@@ -28,5 +29,5 @@ function * traverse (option, {props, children, next}) {
   }
 }
 
-export default {traverse}
+export default {visit}
 

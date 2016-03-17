@@ -45,49 +45,26 @@ describe('compile', () => {
     compile(<Test else='another' />)
   })
 
-  it('calls register with the results of observe', () => {
-    const Test = {
-      observe () {
-        return 3
-      }
-    }
-    const register = spy()
-    compile(<Test />, {register})
+  it('calls process with elements', () => {
+    const process = spy()
 
-    expect(register).to.have.been.calledWith(3)
+    compile(<literal text='test' />, process)
+    expect(process).to.have.been.calledOnce
+    expect(process.args[0][0].props).to.eql({text: 'test'})
   })
 
-  it('passes props to observe', () => {
+  it('replaces element with process results', () => {
+    const process = (elem) => elem.type === 'literal' ? <Test /> : elem
+    const descSpy = spy()
     const Test = {
-      observe ({props, children}) {
-        expect(props).to.eql({num: 3})
-        expect(children).to.eql([])
-        return props.num + 3
-      }
-    }
-    const register = spy()
-    compile(<Test num={3} />, {register})
-
-    expect(register).to.have.been.calledWith(6)
-  })
-
-  it('passes result of register to describe as data', () => {
-    const Test = {}
-    const Root = {
-      observe () {
-        return 3
-      },
-      describe ({data}) {
-        expect(data).to.eql(6)
-        return <Test test={data} />
+      describe () {
+        descSpy()
+        return <raw />
       }
     }
 
-    const register = spy((num) => num + 3)
-
-    compile(<Root />, {register})
-
-    expect(register).to.have.been.calledWith(3)
+    compile(<literal text='test' />, process)
+    expect(descSpy).to.have.been.calledOnce;
   })
 
   it('flattens children', () => {

@@ -25,7 +25,7 @@ function * optionsFromRawOutputs (option, rawOutputs, category) {
   }
 }
 
-function * traverse (option, {props}) {
+function * visit (option, {props}) {
   if (!props.func) return
 
   const rawOutputs = props.func(option.text)
@@ -34,4 +34,4 @@ function * traverse (option, {props}) {
   yield * limitIterator(outputs, props.limit)
 }
 
-export default {traverse}
+export default {visit}

@@ -8,7 +8,7 @@ export function text (input) {
   return _.map(input.words, 'text').join('')
 }
 
-export function compileAndTraverse (element, input, register) {
-  const traverse = compile(<base>{element}</base>, {register})
+export function compileAndTraverse (element, input) {
+  const traverse = compile(<base>{element}</base>)
   return Array.from(traverse(option({text: input})))
 }
