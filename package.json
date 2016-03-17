@@ -1,6 +1,6 @@
 {
   "name": "elliptical",
-  "version": "1.0.0-rc2",
+  "version": "1.0.0-rc3",
   "description": "Interactive natural-language interfaces",
   "main": "lib/index.js",
   "scripts": {
