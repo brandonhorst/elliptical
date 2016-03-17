@@ -2,5 +2,5 @@
 
 * [Introduction](README.md)
 * [Contributing](CONTRIBUTING.md)
-* Basic
+* [Basic](doc/basic)
 
