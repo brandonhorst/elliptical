@@ -23,15 +23,15 @@ export default function compile (element, process) {
   // ignore null elements
   if (element == null) return () => []
 
-  if (process) {
-    element = process(element)
-    if (element == null) return () => []
-  }
-
   // assign defaultProps
   element = _.assign({}, element, {
     props: _.defaults({}, element.props, element.type.defaultProps || {})
   })
+
+  if (process) {
+    element = process(element)
+    if (element == null) return () => []
+  }
 
   const phrase = _.isString(element.type)
     ? phrases[element.type]
@@ -77,10 +77,17 @@ export default function compile (element, process) {
 function setAutos (element, traverse) {
   return function * (option) {
     for (let output of traverse(option)) {
-      if (element.type.validate &&
-          isComplete(output) &&
-          !element.type.validate(output.result, element)) {
-        continue
+      if (isComplete(output)) {
+
+        if (element.type.mapResult) {
+          const newResult = element.type.mapResult(output.result, element)
+          output = _.assign({}, output, {result: newResult})
+        }
+
+        if (element.type.filterResult &&
+            !element.type.filterResult(output.result, element)) {
+          continue
+        }
       }
 
       const mods = {}

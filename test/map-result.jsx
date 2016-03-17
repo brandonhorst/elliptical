@@ -2,28 +2,26 @@
 /* eslint-env mocha */
 
 import createElement from '../src/element'
-import {compileAndTraverse} from './_util'
+import {text, compileAndTraverse} from './_util'
 import {spy} from 'sinon'
 import chai, { expect } from 'chai'
 import sinonChai from 'sinon-chai'
 
 chai.use(sinonChai)
 
-
-describe('validate', () => {
-  it('rejects a result', () => {
-    const validateSpy = spy()
+describe('augment', () => {
+  it('modifies a result', () => {
+    const mapSpy = spy()
     const FakeTest = {}
 
     const Test = {
-      validate (result, {props, children, data}) {
+      mapResult (result, {props, children}) {
         expect(result).to.equal('test')
         expect(props).to.eql({prop: 'test'})
         expect(children).to.eql([{type: FakeTest, props: {}, children: []}])
-        expect(data).to.be.undefined
-        validateSpy()
+        mapSpy()
 
-        return false
+        return 3
       },
 
       describe () {
@@ -32,7 +30,9 @@ describe('validate', () => {
     }
     const options = compileAndTraverse(<Test prop='test'><FakeTest /></Test>)
 
-    expect(options).to.eql([])
-    expect(validateSpy).to.have.been.calledOnce
+    expect(options).to.have.length(1)
+    expect(options[0].result).to.equal(3)
+    expect(text(options[0])).to.equal('test')
+    expect(mapSpy).to.have.been.calledOnce
   })
 })
