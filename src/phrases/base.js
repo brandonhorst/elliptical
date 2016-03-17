@@ -23,9 +23,9 @@ function removeCallbacks (option) {
 
 function describe ({children}) {
   return (
-    <map inbound={addCallbacks} outbound={removeCallbacks}>
-      <tap outbound={callCallbacks}>
-        <filter outbound={textIsEmpty}>
+    <map inbound={addCallbacks} outbound={removeCallbacks} option>
+      <tap outbound={callCallbacks} option>
+        <filter outbound={textIsEmpty} option>
           {children}
         </filter>
       </tap>

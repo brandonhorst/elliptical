@@ -6,16 +6,16 @@ import createStore from './store'
 import compile from './compile'
 import Observable from 'zen-observable'
 
-export default function createParser (element) {
+export default function createParser (element, process) {
   const store = createStore()
   const root = <base>{element}</base>
 
   let currentObserver
   let currentInput
-  let traverse = compile(root, store.register)
+  let traverse = compile(root, {register: store.register, process})
 
   function compileAndTraverse () {
-    traverse = compile(root, store.register)
+    traverse = compile(root, {register: store.register, process})
     const outputs = Array.from(traverse(createOption({text: currentInput})))
     currentObserver.next(outputs)
   }
@@ -25,7 +25,7 @@ export default function createParser (element) {
       if (currentObserver) {
         compileAndTraverse()
       }
-      traverse = compile(root, store.register)
+      traverse = compile(root, {register: store.register, process})
     }
   })
 

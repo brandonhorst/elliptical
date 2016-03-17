@@ -8,9 +8,9 @@ function next (option, element) {
   return element[nextSymbol](option)
 }
 
-function addNext (element, register) {
+function addNext (element, {register, process}) {
   try {
-    const next = compile(element, register)
+    const next = compile(element, {register, process})
     const newElement = _.clone(element) // _.assign can't do symbols
     newElement[nextSymbol] = next
     return newElement
@@ -23,7 +23,7 @@ function addNext (element, register) {
   }
 }
 
-export default function compile (element, register) {
+export default function compile (element, {register, process} = {}) {
   let data
 
   if (element == null) {
@@ -40,7 +40,7 @@ export default function compile (element, register) {
   }
 
   // call observe, add data to model
-  if (phrase.observe) {
+  if (phrase.observe && register) {
     const observation = phrase.observe(model)
 
     model.data = register(observation)
@@ -48,19 +48,22 @@ export default function compile (element, register) {
 
   // call describe
   if (phrase.describe) {
-    const description = phrase.describe(model)
-
-    return setAutos(element, model, compile(description, register))
+    let description = phrase.describe(model)
+    if (process) {
+      let description = process(description)
+    }
+    const traverse = compile(description, {register, process})
+    return setAutos(element, model, traverse)
   }
 
-  // if there's no describe, call compile and let it set props
+  // if there's no describe, check to see if any props are elements
+  // and compile those
   model.props = _.mapValues(model.props, (prop) => {
-    if (prop && prop.type && prop.props &&
-        prop.children &&
+    if (prop && prop.type && prop.props && prop.children &&
         (_.isPlainObject(prop.type) || _.isString(prop.type)) &&
         _.isPlainObject(prop.props) && _.isArray(prop.children)) {
       // We can be pretty sure this is an element,
-      return addNext(prop, register)
+      return addNext(prop, {register, process})
     } else {
       return prop
     }
@@ -68,7 +71,7 @@ export default function compile (element, register) {
 
   // generate the traverse thunk
   model.children = _.map(element.children, (child) => {
-    return addNext(child, register)
+    return addNext(child, {register, process})
   })
 
   _.assign(model, {register, next})

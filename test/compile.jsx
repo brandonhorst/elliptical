@@ -52,7 +52,7 @@ describe('compile', () => {
       }
     }
     const register = spy()
-    compile(<Test />, register)
+    compile(<Test />, {register})
 
     expect(register).to.have.been.calledWith(3)
   })
@@ -66,7 +66,7 @@ describe('compile', () => {
       }
     }
     const register = spy()
-    compile(<Test num={3} />, register)
+    compile(<Test num={3} />, {register})
 
     expect(register).to.have.been.calledWith(6)
   })
@@ -85,7 +85,7 @@ describe('compile', () => {
 
     const register = spy((num) => num + 3)
 
-    compile(<Root />, register)
+    compile(<Root />, {register})
 
     expect(register).to.have.been.calledWith(3)
   })

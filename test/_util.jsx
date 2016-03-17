@@ -9,6 +9,6 @@ export function text (input) {
 }
 
 export function compileAndTraverse (element, input, register) {
-  const traverse = compile(<base>{element}</base>, register)
+  const traverse = compile(<base>{element}</base>, {register})
   return Array.from(traverse(option({text: input})))
 }

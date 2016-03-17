@@ -1,8 +1,13 @@
 import {isComplete} from '../utils'
 
+const defaultProps = {
+  skipIncomplete: false,
+  option: false
+}
+
 function * traverse (option, {props, children, next}) {
   if (props.inbound) {
-    if (!props.inbound(option)) {
+    if (!props.inbound(props.option ? option : option.result)) {
       return
     }
   }
@@ -11,11 +16,12 @@ function * traverse (option, {props, children, next}) {
     if (props.skipIncomplete && !isComplete(output)) {
       yield output
     } else {
-      if (!props.outbound || props.outbound(output)) {
+      if (!props.outbound ||
+          props.outbound(props.option ? output : output.result)) {
         yield output
       }
     }
   }
 }
 
-export default {traverse}
+export default {defaultProps, traverse}
