@@ -1,5 +1,5 @@
 # Summary
 
 * [Introduction](README.md)
-* Contributing
+* [Contributing](CONTRIBUTING.md)
 
