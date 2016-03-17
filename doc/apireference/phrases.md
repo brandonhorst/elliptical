@@ -409,20 +409,23 @@ the one in which the freetext consumed the fewest characters.
 
 ## `filter`
 
-Filter output of its child by passing results to an arbitrary function.
+Filter options with an arbitrary function.
 
 ### Props
 
-- child - parse the child, but reject it unless `function` returns `true`
-- `function` - `Function(result: Any) => Boolean` - a function that
-  takes the result of the child and returns `true` to pass it through
-  or `false` to reject it
+- `inbound: (option: Option) => Boolean` -
+  If it returns false, children will not be parsed
+- `outbound: (option: Option) => Boolean` -
+  Called for each child output option. If it returns true, it will not
+  output that option.
+- `skipIncomplete: Boolean` - if true, `outbound` will not be called if
+  the output option contains a placeholder
 
 ### Example
 
 ```js
 parser.grammar = (
-  <filter function={_.isString}>
+  <filter outbound={(option) => _.isString(option.result)}>
     <list items={[
       {text: 'some string', value: 'string'},
       {text: 'some object', value: {key: 'value'}}
@@ -442,20 +445,25 @@ parser.parseArray('some ')
 
 ## `map`
 
-Modify child results with an arbitrary function.
+Modify options with an arbitrary function.
 
 ### Props
 
-- child: `LaconaElement` - the child to parse
-- `function` - `Function(result: Any) => Any` - a function that takes the
-  result of the child and returns a new result
+- `inbound: (option: Option) => Option` - Changes an option before parsing
+  children
+- `outbound: (option: Option) => (Option | Iterable<Option>)` - Changes the
+  output options after parsing children. If it returns an Iterable, all
+  options will be output
+- `limit: Number` - Limits output if `outbound` returns an Iterable
+- `skipIncomplete: Boolean` - if true, `outbound` will not be called if
+  the output option contains a placeholder
 
 ### Example
 
 ```js
 parser.grammar = (
-  <map function={_.trim}>
-  <literal text='lacona' value='     lacona     ' />
+  <map outbound={(option) => _.merge({}, option, {result: 'test'})}>
+    <literal text='lacona' value='lacona' />
   </repeat>
 )
 parser.parseArray('lac')
@@ -465,7 +473,7 @@ parser.parseArray('lac')
     {text: 'ona', input: false}
   ],
   score: 1,
-  result: 'lacona'
+  result: 'test'
 }] */
 ```
 
@@ -477,20 +485,21 @@ the outside world based upon parsing.
 
 ### Props
 
-- child: `LaconaElement` - the child to pass the parse to
-- `func` - `Function(input: String)` - called everytime
-  this element is parsed
+- `inbound` - `Function(input: String)` - called everytime this element
+  is visited
+- `outbound` - `Function(input: String)` - called everytime this element's
+  child outputs an option
 
 ### Example
 
 ```js
 parser.grammar = (
-  <tap function={console.log}>
+  <tap outbound={console.log}>
     <literal text='lacona' />
   </repeat>
 )
 parser.parseArray('lac')
-/* logs: lac */
+/* logs: {text: null, words: [...], ...} */
 ```
 
 ## `list`

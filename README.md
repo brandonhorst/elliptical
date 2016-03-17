@@ -9,7 +9,7 @@ elliptical
 Elliptical is a Javascript library for building interactive natural
 language text interfaces.
 
-It is framework-agnostic and it runs on both the client and the server.
+It is framework-independent and runs on both the client and the server.
 It is language-agnostic, modular, expressive, functional,
 compositional, and extensible.
 
@@ -22,7 +22,7 @@ npm install elliptical
 ## What is an Interactive Natural Language Interface?
 
 Interactive Natural Language Interfaces allow users to enter data in a natural,
-unstructured way, but provide interactive nicities like
+unstructured way, but still have interactive nicities like
 *intelligent suggestions*, *sorting*, *autocomplete*, and *syntax highlighting*.
 
 Well-designed interfaces can give users an unprecedented level of
@@ -42,59 +42,41 @@ for dynamic grammars that are still easy to understand.
 Elliptical is **not**:
 
 - a library to extract meaningful information from unstructured text,
-like [`nltk`](http://www.nltk.org/). Elliptical does not know anything about
-English (or any other language's) grammar. Rather, it parses
-possible strings according to a predefined schema.
+  like [`nltk`](http://www.nltk.org/). Elliptical does not know anything about
+  English (or any other language's) grammar. Rather, it parses
+  possible strings according to a predefined schema.
 - a voice command system, like Siri. Elliptical only operates on text
-(though it could conceivably as a layer in such an application).
+  (though it could conceivably as a layer in such an application).
+- a machine learning system. Elliptical parses strings according to a preset
+  algorithm
 - a static string parser, like regular expressions. Elliptical schemata are
-dynamic -  can execute arbitrary code, pull data from external sources, and
-interact with one another. Abstractions are provided to make these complex
-tasks as reasonable as possible.
+  dynamic - can execute arbitrary code, pull data from external sources, and
+  interact with one another. Abstractions are provided to make these complex
+  tasks as reasonable as possible.
 - designed for automated parsing. Elliptical is designed to build
-*interactive* textural interfaces for relatively short inputs.
-- an application. Elliptical is an open-source, general purpose
-language processing library. It is being developed alongside a
-proprietary natural language command line application called
-[Lacona](http://lacona.io), but it is entirely general-purpose.
+  *interactive* textural interfaces for relatively short inputs.
 
 ## Example
 
 ```jsx
 /** @jsx createElement */
 import {createElement, createParser} from 'elliptical'
-import request from 'request'
-import Observable from 'zen-observable'
 
-// Define a Source
-function CountrySource () {
-  const url = 'http://services.groupkt.com/country/get/all'
-  return new Observable(observer => {
-    observer.next([])
-
-    request(url, (err, response, body) => {
-      if (err) {
-        observer.error(err)
-      } else {
-        observer.next(body)
-      }
-    })
-  })
-})
+// Some data to work with
+const countryData = [
+  {text: "China (People's Republic of)", value: 'CN'},
+  {text: 'Ireland', value: 'IE'},
+  {text: 'Macedonia (the former Yugoslav Republic of)', value: 'MK'},
+  {text: 'United Kingdom of Great Britain and Northern Ireland', value: 'IE'},
+  {text: 'United States', value: 'US'}
+]
 
 // Define a Phrase
 const Country = {
-  observe () {
-    return <CountrySource />
-  },
-  describe ({data}) {
-    const countryItems = data.map(country => {
-      return {text: country.name, value: country.alpha2_code}
-    })
-
+  describe () {
     return (
       <label text='Country'>
-        <list items={countryItems} fuzzy />
+        <list items={countryData} fuzzy />
       </label>
     )
   }
@@ -115,16 +97,11 @@ const grammar = (
 // Obtain a parse function from our grammar
 const {parse} = createParser(grammar)
 
-// Whenever a user clicks a button, parse the contents of a text field
-document.getElementById('parse-input').onclick = () => {
-  const query = document.getElementById('elliptical-input').value
-  const outputs = parse(query)
-  console.log(outputs)
-}
+// Parse based upon a given query
+const outputs = parse('flights to irela)
+console.log(outputs)
 
 /*
-For input 'flights to irela':
-
   [{ // direct match
     words: [
       {text: 'flights', input: true},

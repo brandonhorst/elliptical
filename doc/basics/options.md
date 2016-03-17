@@ -1,5 +1,7 @@
+# Options
+
 When elliptical is traversing a `Component` tree, it does so using `option`s.
-These `option`s are what is ultimately returned.
+These `option`s are what is ultimately returned by a parse.
 
 An `option` is just a plain Javascript object. It looks something like this:
 

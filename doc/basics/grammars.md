@@ -1,3 +1,5 @@
+# Grammars
+
 In elliptical, language is modeled as a tree of `Phrase`s. That may sound
 scary but it's really not. Take a look at this grammar:
 
@@ -26,6 +28,8 @@ You've just met 3 built-in phrases:
 in the tree.
 - `literal` matches a literal string, as defined in the `text` attribute.
 
+## Parsing Grammars
+
 The simplest way to parse a grammar is to use `createParser`. It takes
 a grammar and returns an object with a `parse` method. Let's try to parse
 the string "i'm bat".
@@ -51,6 +55,8 @@ It looks something like this:
 }]
 ```
 
+## Words
+
 The `words` property shows us a representation elliptical's understanding of the
 input. Note that the case has been fixed, and it is suggesting the string
 `"man"` as a completion to the input. Each `word` also contains an
@@ -59,6 +65,8 @@ or whether it is a suggestion. This can be used to present a nice
 interface for the user. Perhaps it would look something like this:
 
 > **I'm Bat**man
+
+## Results
 
 However, we want to be able to do something with the input beyond just
 displaying it. To do that, we should use the `results` property.
@@ -93,5 +101,10 @@ this new grammar, we get information in the `outputs`:
 
 Now we can take these results and do something with them.
 
-There are a bunch of built-in `Phrase`s, and you can add custom
-`Phrase`s, to model any language constructs imaginable.
+## Phrases
+
+There are many more built-in `Phrase`s, and you can add custom
+`Phrase`s to model any language constructs imaginable.
+
+Elliptical makes no assumptions about language - it processes
+raw unicode strings. Grammars can be constructed in any language.

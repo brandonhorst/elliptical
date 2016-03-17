@@ -7,6 +7,8 @@ significantly easier. It is recommended (but again - not required!) that
 you use [Babel](https://babeljs.io/) to precompile your code into pure
 ES5 format.
 
+## Using Babel
+
 If you would like to, you can set up your project like this:
 
 ```sh
@@ -14,10 +16,11 @@ npm install babel-preset-es2015 --save-dev
 npm install babel-plugin-transform-react-jsx --save-dev
 ```
 
+## JSX Pragma
+
 JSX needs a `pragma` to know the name of the `createElement` function.
 If you leave it out, JSX defaults to `React.createElement` and your
 code will throw lots of `React is not defined` errors.
-
 
 You can specify this pragma it in each of your
 files with a `@jsx` pragma comment. You will need to put this comment
@@ -42,6 +45,8 @@ Alternatively, you can set the `pragma` in your `.babelrc` file:
 
 However, keep in mind that this will likely cause your linter to complain.
 
+## Building
+
 If elliptical will be running on your server, you can use `babel-register`
 to compile your source files to plain ES5.
 
@@ -56,6 +61,8 @@ npm install --save-dev babelify
 # compile the entry point `src/index.js` to `dist/script.js`
 browserify -t babelify src/index.js -o dist/script.js
 ```
+
+## Note about Generators
 
 Please note that if you wish to use `function *` generators
 in the browser, you will likely need to use `babel-plugin-transform-runtime`

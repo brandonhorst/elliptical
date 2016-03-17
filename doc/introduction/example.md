@@ -3,23 +3,6 @@
 ```
 /** @jsx createElement */
 import {createElement, createParser} from 'elliptical'
-import request from 'request'
-import Observable from 'zen-observable'
-
-function CountrySource () {
-  const url = 'http://services.groupkt.com/country/get/all'
-  return new Observable(observer => {
-    observer.next([])
-
-    request(url, (err, response, body) => {
-      if (err) {
-        observer.error(err)
-      } else {
-        observer.next(body)
-      }
-    })
-  })
-})
 
 const Country = {
   observe () {
