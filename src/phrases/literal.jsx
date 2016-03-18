@@ -1,11 +1,18 @@
 /** @jsx createElement */
+import _ from 'lodash'
 import {match} from '../string-match'
 import createElement from '../element'
 
-function compute (input, text, fuzzy) {
+
+function compute (input, text, strategy) {
   if (text == null) return []
 
-  return match({input, text, fuzzy})
+  const matchObj = match({input, text, strategy})
+  if (matchObj) {
+    return [matchObj]
+  } else {
+    return []
+  }
 }
 
 function decorateFunc (input, text) {
@@ -20,28 +27,29 @@ function decorateFunc (input, text) {
   }
 }
 
-function describe ({props: {
-  text = '',
-  decorate = false,
-  allowInput = true,
-  fuzzy = false,
-  category
-}}) {
-  if (decorate) {
-    if (allowInput) {
+function describe ({props}) {
+  props = _.defaults({}, props, {
+    text: '',
+    decorate: false,
+    allowInput: true,
+    strategy: 'start'
+  })
+
+  if (props.decorate) {
+    if (props.allowInput) {
       return (
         <choice>
-          <literal text={text} fuzzy={fuzzy} />
-          <raw func={(input) => decorateFunc(input, text)} />
+          <literal text={props.text} strategy={props.strategy} />
+          <raw func={(input) => decorateFunc(input, props.text)} />
         </choice>
       )
     } else {
-      return <raw func={(input) => decorateFunc(input, text)} />
+      return <raw func={(input) => decorateFunc(input, props.text)} />
     }
   } else {
     return <raw
-      func={(input) => compute(input, text, fuzzy)}
-      category={category} />
+      func={(input) => compute(input, props.text, props.strategy)}
+      category={props.category} />
   }
 }
 

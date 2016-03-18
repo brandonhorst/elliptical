@@ -7,7 +7,7 @@ import {compileAndTraverse} from './_util'
 import { expect } from 'chai'
 
 describe('list', () => {
-  it('suggests normally without fuzzy', () => {
+  it('suggests normally', () => {
     const grammar = <list items={['testa', 'testb']} />
 
     const options = compileAndTraverse(grammar, '')
@@ -26,8 +26,8 @@ describe('list', () => {
     }])
   })
 
-  it('suggests normally with fuzzy', () => {
-    const grammar = <list items={['testa', 'testb']} fuzzy />
+  it('suggests normally with contain', () => {
+    const grammar = <list items={['testa', 'testb']} strategy='contain' />
 
     const options = compileAndTraverse(grammar, '')
     expect(options).to.eql([{
@@ -45,7 +45,7 @@ describe('list', () => {
     }])
   })
 
-  it('matches without fuzzy', () => {
+  it('matches', () => {
     const grammar = <list items={['testa', 'testb']} />
 
     const options = compileAndTraverse(grammar, 'testb')
@@ -58,8 +58,8 @@ describe('list', () => {
     }])
   })
 
-  it('matches with fuzzy', () => {
-    const grammar = <list items={['testa', 'testb']} fuzzy />
+  it('matches with contain', () => {
+    const grammar = <list items={['testa', 'testb']} strategy='contain' />
 
     const options = compileAndTraverse(grammar, 'b')
     expect(options).to.eql([{
@@ -71,8 +71,11 @@ describe('list', () => {
     }])
   })
 
-  it('sorts with fuzzy, and limits before it', () => {
-    const grammar = <list items={['ztest', 'testz', 'zztest']} fuzzy limit={2} />
+  it('sorts with contain, and limits before it', () => {
+    const grammar = <list
+      items={['ztest', 'testz', 'zztest']}
+      strategy='contain'
+      limit={2} />
 
     const options = compileAndTraverse(grammar, 'test')
     expect(options).to.eql([{
@@ -90,7 +93,7 @@ describe('list', () => {
     }])
   })
 
-  it('allows for value without fuzzy', () => {
+  it('allows for value', () => {
     const items = [{text: 'testa', value: 'a'}, {text: 'testb', value: 'b'}]
     const grammar = <list items={items} />
 
@@ -104,9 +107,9 @@ describe('list', () => {
     }])
   })
 
-  it('allows for value with fuzzy', () => {
+  it('allows for value with contain', () => {
     const items = [{text: 'testa', value: 'a'}, {text: 'testb', value: 'b'}]
-    const grammar = <list items={items} fuzzy />
+    const grammar = <list items={items} strategy='contain' />
 
     const options = compileAndTraverse(grammar, 'b')
     expect(options).to.eql([{
@@ -158,9 +161,9 @@ describe('list', () => {
     }])
   })
 
-  it('outputs a qualifier (fuzzy)', () => {
+  it('outputs a qualifier with contain', () => {
     const items = [{text: 'testa', qualifiers: ['desca', 'descb']}, 'testb']
-    const grammar = <list items={items} fuzzy />
+    const grammar = <list items={items} strategy='contain' />
 
     const options = compileAndTraverse(grammar, 'a')
     expect(options).to.eql([{

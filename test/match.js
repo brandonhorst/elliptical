@@ -1,0 +1,103 @@
+import {match} from '../src/string-match'
+import {expect} from 'chai'
+
+describe('match', () => {
+  it('handles start matches', () => {
+    const output = match({text: 'superman', input: 'super', strategy: 'start'})
+    expect(output.remaining).to.be.null
+    expect(output.score).to.equal(1)
+    expect(output.words).to.eql([
+      {text: 'super', input: true},
+      {text: 'man', input: false}
+    ])
+  })
+
+  it('handles fully consumed start matches', () => {
+    const output = match({text: 'super', input: 'superman', strategy: 'start'})
+    expect(output.remaining).to.equal('man')
+    expect(output.score).to.equal(1)
+    expect(output.words).to.eql([
+      {text: 'super', input: true}
+    ])
+  })
+
+  it('handles null matches', () => {
+    const output = match({text: 'super', input: null, strategy: 'start'})
+    expect(output.remaining).to.equal(null)
+    expect(output.score).to.equal(1)
+    expect(output.words).to.eql([
+      {text: 'super', input: false}
+    ])
+  })
+
+  it('handles contain matches', () => {
+    const output = match({text: 'superman', input: 'man', strategy: 'contain'})
+    expect(output.remaining).to.equal(null)
+    expect(output.score).to.be.lessThan(1)
+    expect(output.words).to.eql([
+      {text: 'super', input: false},
+      {text: 'man', input: true}
+    ])
+  })
+
+  it('handles contain at the beginning', () => {
+    const output = match({text: 'superman', input: 'super', strategy: 'contain'})
+    expect(output.remaining).to.equal(null)
+    expect(output.score).to.equal(1)
+    expect(output.words).to.eql([
+      {text: 'super', input: true},
+      {text: 'man', input: false}
+    ])
+  })
+
+  it('handles fuzzy at the beginning', () => {
+    const output = match({text: 'superman', input: 'super', strategy: 'fuzzy'})
+    expect(output.remaining).to.equal(null)
+    expect(output.score).to.equal(1)
+    expect(output.words).to.eql([
+      {text: 'super', input: true},
+      {text: 'man', input: false}
+    ])
+  })
+
+  it('handles fuzzy anywhere', () => {
+    const output = match({text: 'superman', input: 'man', strategy: 'fuzzy'})
+    expect(output.remaining).to.equal(null)
+    expect(output.score).to.be.lessThan(1)
+    expect(output.words).to.eql([
+      {text: 'super', input: false},
+      {text: 'man', input: true}
+    ])
+  })
+
+  it('handles true fuzzy', () => {
+    const output = match({text: 'superman', input: 'sm', strategy: 'fuzzy'})
+    expect(output.remaining).to.equal(null)
+    expect(output.score).to.be.lessThan(1)
+    expect(output.words).to.eql([
+      {text: 's', input: true},
+      {text: 'uper', input: false},
+      {text: 'm', input: true},
+      {text: 'an', input: false}
+    ])
+  })
+
+  it('handles true fuzzy with special characters', () => {
+    const output = match({
+      text: '[super] - (man)',
+      input: ']-(',
+      strategy: 'fuzzy'
+    })
+    expect(output.remaining).to.equal(null)
+    expect(output.score).to.be.lessThan(1)
+    expect(output.words).to.eql([
+      {text: '[super', input: false},
+      {text: ']', input: true},
+      {text: ' ', input: false},
+      {text: '-', input: true},
+      {text: ' ', input: false},
+      {text: '(', input: true},
+      {text: 'man)', input: false}
+    ])
+  })
+})

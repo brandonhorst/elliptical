@@ -5,6 +5,7 @@ import { match } from '../string-match'
 
 export default {
   describe ({props}) {
+    props = _.defaults({}, props, {strategy: 'start'})
     const trueItems = _.map(props.items, itemify)
 
     return <raw
@@ -19,10 +20,11 @@ function itemify (item) {
 
 function * doMatch (input, items, props) {
   for (let item of items) {
-    for (let output of match({input, text: item.text, fuzzy: props.fuzzy})) {
-      output.result = item.value
-      output.qualifiers = item.qualifiers
-      yield output
+    const matchObj = match({input, text: item.text, strategy: props.strategy})
+    if (matchObj) {
+      matchObj.result = item.value
+      matchObj.qualifiers = item.qualifiers
+      yield matchObj
     }
   }
 }
@@ -30,7 +32,7 @@ function * doMatch (input, items, props) {
 function * compute (input, items, props) {
   const resultIterator = doMatch(input, items, props)
   let finalIterator = resultIterator
-  if (props.fuzzy) {
+  if (props.strategy !== 'start') {
     // TODO - this could be optimized
     //  Right now it is going to do fuzzy matching for every single item
     //  much of this processing could be eliminated if it ran the
