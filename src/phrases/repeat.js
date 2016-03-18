@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import traverse from '../traverse'
 
 const defaultProps = {
   max: Number.MAX_SAFE_INTEGER,
@@ -7,7 +6,7 @@ const defaultProps = {
   unique: false
 }
 
-function * visit (option, {props, children}) {
+function * visit (option, {props, children}, traverse) {
   props = _.defaults({}, props, defaultProps)
   const child = children[0]
 
@@ -17,10 +16,10 @@ function * visit (option, {props, children}) {
   }
 
   const trueOption = _.assign({}, option, modifications)
-  yield * parseChild(0, trueOption, child, props)
+  yield * parseChild(0, trueOption, child, props, traverse)
 }
 
-function * parseChild (index, option, child, props) {
+function * parseChild (index, option, child, props, traverse) {
   if (index > props.max) {
     return
   }
@@ -34,20 +33,20 @@ function * parseChild (index, option, child, props) {
   }
 
   if (index > 0 && props.separator) {
-    for (let sepOutput of traverse(option, props.separator)) {
+    for (let sepOutput of traverse(props.separator, option)) {
       const trueOutput = _.assign({}, sepOutput, {result: option.result})
-      yield * callParseChild(index, trueOutput, child, props)
+      yield * callParseChild(index, trueOutput, child, props, traverse)
     }
   } else {
-    yield * callParseChild(index, option, child, props)
+    yield * callParseChild(index, option, child, props, traverse)
   }
 }
 
-function * callParseChild (index, option, child, props) {
+function * callParseChild (index, option, child, props, traverse) {
   const mods = {qualifiers: []}
   const trueOption = _.assign({}, option, mods)
 
-  for (let output of traverse(trueOption, child)) {
+  for (let output of traverse(child, trueOption)) {
     if (props.unique &&
         _.some(option.result, _.partial(_.isEqual, _, output.result))) {
       return
@@ -59,7 +58,7 @@ function * callParseChild (index, option, child, props) {
     }
 
     const trueOutput = _.assign({}, output, outputModifications)
-    yield * parseChild(index + 1, trueOutput, child, props)
+    yield * parseChild(index + 1, trueOutput, child, props, traverse)
   }
 }
 

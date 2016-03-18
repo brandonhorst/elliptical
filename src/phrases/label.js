@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import traverse from '../traverse'
 
 const defaultProps = {
   suppress: true,
@@ -7,7 +6,7 @@ const defaultProps = {
   suppressEmpty: true,
 }
 
-function * visit (option, {props, children}) {
+function * visit (option, {props, children}, traverse) {
   props = _.defaults({}, props, defaultProps)
   const child = children[0]
 
@@ -18,11 +17,11 @@ function * visit (option, {props, children}) {
   ) {
     yield outputSelf(option, child, props)
   } else {
-    yield * parseChild(option, child, props)
+    yield * parseChild(option, child, props, traverse)
   }
 }
 
-function * parseChild (option, child, props) {
+function * parseChild (option, child, props, traverse) {
   let didSetCurrentArgument = false
 
   const modification = {}
@@ -33,7 +32,7 @@ function * parseChild (option, child, props) {
 
   const optionWithArgument = _.assign({}, option, modification)
 
-  for (let output of traverse(optionWithArgument, child)) {
+  for (let output of traverse(child, optionWithArgument)) {
     if (didSetCurrentArgument) {
       yield _.assign({}, output, {currentArgument: undefined})
     } else {

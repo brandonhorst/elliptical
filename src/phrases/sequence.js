@@ -1,11 +1,10 @@
 import _ from 'lodash'
-import traverse from '../traverse'
 import {limitIterator} from '../utils'
 
-function * visit (option, {props: {unique = false}, children}) {
+function * visit (option, {props: {unique = false}, children}, traverse) {
   const mods = {result: {}, score: 1}
   const trueOption = _.assign({}, option, mods)
-  const iterator = parseChildControl(0, trueOption, unique, children)
+  const iterator = parseChildControl(0, trueOption, unique, children, traverse)
 
   yield * iterator
 }
@@ -26,11 +25,13 @@ function shouldDoEllipsis (index, option, children) {
   )
 }
 
-function * parseOptionals (index, option, unique, children) {
+function * parseOptionals (index, option, unique, children, traverse) {
   const child = children[index]
 
-  const withChildParse = parseChild(index, option, unique, children)
-  const withoutChildParse = parseChildControl(index + 1, option, unique, children)
+  const withChildParse = parseChild(index, option, unique, children, traverse)
+  const withoutChildParse = parseChildControl(
+    index + 1, option, unique, children, traverse
+  )
 
   if (child.props.preferred) {
     yield * withChildParse
@@ -41,7 +42,7 @@ function * parseOptionals (index, option, unique, children) {
   }
 }
 
-function * parseChildControl (index, option, unique, children) {
+function * parseChildControl (index, option, unique, children, traverse) {
   if (index >= children.length) { // we've reached the end
     yield option
     return
@@ -62,10 +63,10 @@ function * parseChildControl (index, option, unique, children) {
   }
 
   if (child.props.optional) {
-    const optionals = parseOptionals(index, option, unique, children)
+    const optionals = parseOptionals(index, option, unique, children, traverse)
     yield * limitIterator(optionals, child.props.limited ? 1 : undefined)
   } else {
-    yield * parseChild(index, option, unique, children)
+    yield * parseChild(index, option, unique, children, traverse)
   }
 }
 
@@ -74,10 +75,10 @@ function hasSomeSameKeys(option, output) {
   return !_.isEmpty(sameKeys)
 }
 
-function * parseChild (index, option, unique, children) {
+function * parseChild (index, option, unique, children, traverse) {
   const child = children[index]
 
-  for (let output of traverse(option, child)) {
+  for (let output of traverse(child, option)) {
     if (unique && output.result != null) {
       if (child.props.id && option.result[child.props.id] != null) {
         continue
@@ -94,7 +95,7 @@ function * parseChild (index, option, unique, children) {
 
     let nextOutput = _.assign({}, output, modifications)
 
-    yield * parseChildControl(index + 1, nextOutput, unique, children)
+    yield * parseChildControl(index + 1, nextOutput, unique, children, traverse)
   }
 }
 

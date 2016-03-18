@@ -1,80 +1,94 @@
 import _ from 'lodash'
 import {isComplete} from './utils'
 import * as phrases from './phrases'
-import {nextSymbol} from './symbols'
+import createOption from './option'
 
+function applyDefaults (element) {
+  return _.assign({}, element, {
+    props: _.defaults({}, element.props, element.type.defaultProps || {})
+  })
+}
 
-function addNext (element, process) {
+function compileSubElement (subElement, process, elementMap) {
+  let traverse
   try {
-    const next = compile(element, process)
-    const newElement = _.clone(element) // _.assign can't do symbols
-    newElement[nextSymbol] = next
-    return newElement
+    traverse = compileNonRoot(subElement, process)
   } catch (e) {
-    console.log('element failed compliation')
-    console.log(element)
+    console.log(`Element failed compilation. Element: ${subElement}`)
     console.error(e)
-    console.log()
-    return element
+    return subElement
+  }
+
+  elementMap.set(subElement, traverse)
+}
+
+function next (elementMap, subElement, option) {
+  const traverser = elementMap.get(subElement)
+  if (traverser) {
+    return traverser(option)
+  } else {
+    throw new Error(`Attempted to traverse non-compiled element: ${JSON.stringify(subElement)}`)
   }
 }
 
-export default function compile (element, process) {
+function compileProp (prop, process, elementMap) {
+  if (prop && prop.type && prop.props && prop.children &&
+      (_.isPlainObject(prop.type) || _.isString(prop.type)) &&
+      _.isPlainObject(prop.props) && _.isArray(prop.children)) {
+    // We can be pretty sure this is an element,
+    return compileSubElement(prop, process, elementMap)
+  } else {
+    return prop
+  }
+}
+
+function getPhrase(element) {
+  return _.isString(element.type)
+    ? phrases[element.type]
+    : element.type
+}
+
+function compileNonRoot (element, process) {
   // ignore null elements
   if (element == null) return () => []
 
   // assign defaultProps
-  element = _.assign({}, element, {
-    props: _.defaults({}, element.props, element.type.defaultProps || {})
-  })
+  element = applyDefaults(element)
 
   if (process) {
     element = process(element)
+
+    // allow process calls to nullify elements
     if (element == null) return () => []
   }
 
-  const phrase = _.isString(element.type)
-    ? phrases[element.type]
-    : element.type
+  const phrase = getPhrase(element)
 
   // call describe
   if (phrase.describe) {
     let description = phrase.describe(element)
-    const traverse = compile(description, process)
-    return setAutos(element, traverse)
+    const traverse = compileNonRoot(description, process)
+    return addOutbound(element, traverse)
   }
+
+  const elementMap = new Map()
 
   // if there's no describe, check to see if any props are elements
   // and compile those
-  const propsWithNext = _.mapValues(element.props, (prop) => {
-    if (prop && prop.type && prop.props && prop.children &&
-        (_.isPlainObject(prop.type) || _.isString(prop.type)) &&
-        _.isPlainObject(prop.props) && _.isArray(prop.children)) {
-      // We can be pretty sure this is an element,
-      return addNext(prop, process)
-    } else {
-      return prop
-    }
-  })
+  _.forEach(element.props, (prop) => compileProp(prop, process, elementMap))
 
   // generate the traverse thunk
-  const childrenWithNext = _.map(element.children, (child) => {
-    return addNext(child, process)
+  _.forEach(element.children, (child) => {
+    return compileSubElement(child, process, elementMap)
   })
 
-  element = _.assign({}, element, {
-    props: propsWithNext,
-    children: childrenWithNext
-  })
+  const subTraverse = (subElem, option) => next(elementMap, subElem, option)
+  const traverse = (option) => phrase.visit(option, element, subTraverse)
 
-  function traverse (option) {
-    return phrase.visit(option, element)
-  }
-
-  return setAutos(element, traverse)
+  return addOutbound(element, traverse)
 }
 
-function setAutos (element, traverse) {
+function addOutbound (element, traverse) {
   return function * (option) {
     for (let output of traverse(option)) {
       if (isComplete(output)) {
@@ -102,6 +116,28 @@ function setAutos (element, traverse) {
       }
 
       yield _.assign({}, output, mods)
+    }
+  }
+}
+
+export default function compile (element, process) {
+  const compiled = compileNonRoot(element, process)
+  return function traverse (input) {
+    const postProcessed = postProcess(compiled, input)
+    return Array.from(postProcessed)
+  }
+}
+
+function * postProcess (compiled, input) {
+  const option = createOption({text: input})
+  const outputs = compiled(option)
+  for (let output of outputs) {
+    if (output.text === '' || output.text == null) {
+      _.forEach(output.callbacks, callback => callback())
+
+      const newOutput = _.clone(output)
+      delete newOutput.callbacks
+      yield newOutput
     }
   }
 }
