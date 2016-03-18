@@ -1,16 +1,17 @@
 {
-  "gitbook": "2.x.x",
-  "structure": {
-    "summary": "doc/README.md"
-  },
-  "plugins": ["edit-link", "prism", "-highlight"],
-  "pluginsConfig": {
-    "edit-link": {
-      "base": "https://github.com/laconalabs/elliptical/tree/master",
-      "label": "Edit This Page"
+    "gitbook": "2.x.x",
+    "structure": {
+        "summary": "doc/README.md"
     },
-    "github": {
-      "url": "https://github.com/laconalabs/elliptical/"
+    "plugins": [
+        "edit-link",
+        "-prism",
+        "-highlight"
+    ],
+    "pluginsConfig": {
+        "edit-link": {
+            "base": "https://github.com/laconalabs/elliptical/tree/master",
+            "label": "Edit This Page"
+        }
     }
-  }
 }
