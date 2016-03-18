@@ -5,7 +5,7 @@
     },
     "plugins": [
         "edit-link",
-        "-prism",
+        "prism",
         "-highlight"
     ],
     "pluginsConfig": {
