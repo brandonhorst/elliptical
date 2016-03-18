@@ -33,11 +33,12 @@ grammars by combining linguistic building blocks (called `Phrases`).
 Elliptical uses that grammar to process strings, and returns objects that
 describe the input, offer suggestions, and allow for intelligent sorting.
 
-Elliptical also constructs objects that describe the input in a programmatic
-way, so you can easily do things based upon the user's input.
+Elliptical also uses the user input to build plain Javascript objects,
+so you can easily do things based upon the user's input.
 
-`Phrases` can easily make use of external data sources, allowing
-for dynamic grammars that are still easy to understand.
+Lacona is extensible, allowing phrases to have smart internationalization
+functionality, make use of external data sources, and more.
+This allows for powerful, dynamic grammars that are still easy to understand.
 
 Elliptical is **not**:
 
@@ -60,7 +61,7 @@ Elliptical is **not**:
 
 ```jsx
 /** @jsx createElement */
-import {createElement, createParser} from 'elliptical'
+import {createElement, compile} from 'elliptical'
 
 // Some data to work with
 const countryData = [
@@ -95,7 +96,7 @@ const grammar = (
 )
 
 // Obtain a parse function from our grammar
-const {parse} = createParser(grammar)
+const parse = compile(grammar)
 
 // Parse based upon a given query
 const outputs = parse('flights to irela)

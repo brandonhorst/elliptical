@@ -1,8 +1,5 @@
 {
     "gitbook": "2.x.x",
-    "structure": {
-        "summary": "doc/README.md"
-    },
     "plugins": [
         "edit-link",
         "prism",

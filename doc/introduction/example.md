@@ -2,25 +2,29 @@
 
 ```
 /** @jsx createElement */
-import {createElement, createParser} from 'elliptical'
+import {createElement, compile} from 'elliptical'
 
+// Some data to work with
+const countryData = [
+  {text: "China (People's Republic of)", value: 'CN'},
+  {text: 'Ireland', value: 'IE'},
+  {text: 'Macedonia (the former Yugoslav Republic of)', value: 'MK'},
+  {text: 'United Kingdom of Great Britain and Northern Ireland', value: 'IE'},
+  {text: 'United States', value: 'US'}
+]
+
+// Define a Phrase
 const Country = {
-  observe () {
-    return <CountrySource />
-  },
-  describe ({data}) {
-    const countryItems = data.map(country => {
-      return {text: country.name, value: country.alpha2_code}
-    })
-
+  describe () {
     return (
       <label text='Country'>
-        <list items={countryItems} fuzzy />
+        <list items={countryData} fuzzy />
       </label>
     )
   }
 }
 
+// Build our grammar out of Elements
 const grammar = (
   <sequence>
     <literal text='flights ' />
@@ -32,17 +36,14 @@ const grammar = (
   </sequence>
 )
 
-const parser = createParser(grammar)
+// Obtain a parse function from our grammar
+const parse = compile(grammar)
 
-document.getElementById('parse-input').onclick = () => {
-  const query = document.getElementById('elliptical-input').value
-  const outputs = parser.parse(query)
-  console.log(outputs)
-}
+// Parse based upon a given query
+const outputs = parse('flights to irela)
+console.log(outputs)
 
 /*
-For input 'flights to irela':
-
   [{ // direct match
     words: [
       {text: 'flights', input: true},

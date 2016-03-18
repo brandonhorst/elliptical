@@ -20,4 +20,4 @@ node_modules
 
 # Generated files
 lib
-tmp
+_book

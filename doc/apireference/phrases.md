@@ -16,20 +16,19 @@ Matches or suggests a single literal string.
 
 ### Props
 
-- `text`: `String` - The string to accept as input.
-- `fuzzy`: `Boolean` - whether or not to use fuzzy matching for this `literal`. Note that fuzzy matching should rarely be used for literals - if you want to fuzzy match many items, use a [`list`](#list).
-- `decorate`: `Boolean` - if `true`, then suggest `text` even if it does not match the input. Useful for displaying implicit information.
-- `allowInput`: `Boolean` - if `true`, then force decoration, and do not consume any input even if exists. Only applies with `decorate`.
-- `category`: `String` - a category to output to the `words` object. Useful for syntax highlighting.
+- `text: String` - The string to accept as input.
+- `fuzzy: Boolean` - whether or not to use fuzzy matching for this `literal`. Note that fuzzy matching should rarely be used for literals - if you want to fuzzy match many items, use a [`list`](#list).
+- `decorate: Boolean` - if `true`, then suggest `text` even if it does not match the input. Useful for displaying implicit information.
+- `allowInput: Boolean` - if `true`, then force decoration, and do not consume any input even if exists. Only applies with `decorate`.
+- `category: String` - a category to output to the `words` object. Useful for syntax highlighting.
 
 ### Example
 
 ```js
-parser.grammar = <literal
-  text='Lacona'
-  value='http://lacona.io'
-  category='website' />
-parser.parseArray('Lac')
+const parse = compile(
+  <literal text='Lacona' value='http://lacona.io' category='website' />
+)
+parse('Lac')
 /* [
   {
     words: [
@@ -62,7 +61,7 @@ The score of the child for this branch.
 
 - children - The `choice` can contain any number of child elements.
   Each child represents a separate branch that the parse can flow through.
-- `limit`: `Integer` - If `<limit>` children are parsed successfully
+- `limit: Integer` - If `<limit>` children are parsed successfully
   (all the way to the end of the parse chain), then stop attempting to parse
   further children. This is very useful in situations where some children are
   synonymous, and there is no need suggest multiples.
@@ -70,7 +69,7 @@ The score of the child for this branch.
 ### Example
 
 ```js
-parser.grammar = (
+const parse = compile(
   <choice limit={2}>
     <literal text='Google' value='http://google.com' />
     <literal text='Gmail' value='http://mail.google.com' />
@@ -78,7 +77,7 @@ parser.grammar = (
     <literal text='Google Drive' value='http://drive.google.com' />
   </choice>
 )
-parser.parseArray('Goog')
+parse('Goog')
 /* [
   {
     words: [
@@ -240,10 +239,7 @@ The score of all parsed children, multiplied together.
 
 ### Props
 
-- children - The `sequence` can contain any number of child elements.
-  Each child will be parsed in order. See the `optional` section
-  for more information.
-- `unique`: `Boolean` - If `true`, the sequence will check the `id` prop
+- `unique: Boolean` - If `true`, the sequence will check the `id` prop
   of each child before parsing. If the child's `id` prop is already in the
   `result` object (from an child earlier in the chain), it will be skipped.
   Useful with `optional` children.
@@ -251,14 +247,14 @@ The score of all parsed children, multiplied together.
 ### Example
 
 ```js
-parser.grammar = (
+const parse = compile(
   <sequence>
     <literal text='Google' value='google' id='base' />
     <literal text=' Maps' value='maps' id='sub' score={0.5} optional />
     <literal text=' rocks!' />
   </sequence>
 )
-parser.parseArray('Goog')
+parse('Goog')
 /* [
   {
     words: [
@@ -295,24 +291,24 @@ Allows an element to be repeated multiple times, with an optional separator.
 
 ### Props
 
-- `separator`: `LaconaElement` - A single element, which will be placed
+- `separator: Element` - A single element, which will be placed
   in sequence between every repetition. Its result is ignored.
-- `unique`: `Boolean` - If `true`, the `repeat` will not allow repetitions
+- `unique: Boolean` - If `true`, the `repeat` will not allow repetitions
   that have the same `result`. That is to say, the `repeat`'s `result` is
   guaranteed to be `unique`.
-- `max`: `Integer` - the maximum number of repetitions to allow. Defaults
+- `max: Number` - the maximum number of repetitions to allow. Defaults
   to unlimited.
-- `min`: `Integer` - the minimum number of repetitions to allow. Defaults to 1.
+- `min: Number` - the minimum number of repetitions to allow. Defaults to 1.
 
 ### Example
 
 ```js
-parser.grammar = (
+const parse = compile(
   <repeat separator={<literal text=' '/>} max={3}>
     <literal text='wort' value='go' />
   </repeat>
 )
-parser.parseArray('wort wort')
+parse('wort wort')
 /* [
   {
     words: [
@@ -349,24 +345,24 @@ completed suggestions appear before incomplete ones.
 
 ### Props
 
-- `text`: `String` - this text is used as the `argument` name and
+- `text: String` - this text is used as the `argument` name and
   the `suppress` placeholder, if either is `true`
-- `argument`: `Boolean` - defaults to `true`. If `true`, all words
+- `argument: Boolean` - defaults to `true`. If `true`, all words
   that come from this parse segment will contain an `argument` property,
   which will equal the `text` of this `label`. Note that currently only the
   first `<label argument />` in the chain is exported.
-- `suppress`: `Boolean` - defaults to `true`. If `true`, parses that have
+- `suppress: Boolean` - defaults to `true`. If `true`, parses that have
   consumed the entire input string will not continue into this `label`'s
   `child`. Instead, it will output a word with
   `{text: <text>, placeholder: true}` This improves performance and
   usability, as it limits the amount of suggestions that are output
   for an incomplete input.
-- `suppressEmpty`: `Boolean` - defaults to `false`. If `true`,
+- `suppressEmpty: Boolean` - defaults to `false`. If `true`,
   this `label` will also suppress inputs that are an empty string.
   That is to say, if the preceding elements consume the entire input
   string but have not yet made any suggestions, this label will still
   suppress the input.
-- `suppressWhen`: `(input: String) => Boolean` - When this label is parsed,
+- `suppressWhen: (input: String) => Boolean` - When this label is parsed,
   it will call this function. If it returns `true`, this label will suppress
   the input (returning a `placeholder`), even if the input is non-null. This
   is useful to describe incomplete but non-suggestable input.
@@ -396,14 +392,14 @@ the one in which the freetext consumed the fewest characters.
 
 ### Props
 
-- `splitOn`: `String | RegExp` - Argument to `String::split` to determine
+- `splitOn: String | RegExp` - Argument to `String::split` to determine
   which substrings to attempt parsing.
-- `consumeAll`: `Boolean` - Do not attempt to parse substrings, only parse
+- `consumeAll: Boolean` - Do not attempt to parse substrings, only parse
   the entire remaining string. Improves performance if the `freetext` is
   the final phrase in a command
-- `filter`: `Function(input: String) => Boolean` - Better-performing
+- `filter: Function(input: String) => Boolean` - Better-performing
   shorthand for `<filter function={filter}><freetext ...otherProps /></filter>`.
-- `limit`: `Integer` - If `<limit>` substrings are parsed successfully
+- `limit: Integer` - If `<limit>` substrings are parsed successfully
   (all the way to the end of the parse chain), then stop attempting
   to parse further substrings.
 
@@ -424,7 +420,7 @@ Filter options with an arbitrary function.
 ### Example
 
 ```js
-parser.grammar = (
+const parse = compile(
   <filter outbound={(option) => _.isString(option.result)}>
     <list items={[
       {text: 'some string', value: 'string'},
@@ -432,7 +428,7 @@ parser.grammar = (
     ]} />
   </filter>
 )
-parser.parseArray('some ')
+parse('some ')
 /* [{
   words: [
     {text: 'some ', input: true},
@@ -461,12 +457,12 @@ Modify options with an arbitrary function.
 ### Example
 
 ```js
-parser.grammar = (
+const parse = compile(
   <map outbound={(option) => _.merge({}, option, {result: 'test'})}>
     <literal text='lacona' value='lacona' />
   </repeat>
 )
-parser.parseArray('lac')
+parse('lac')
 /* [{
   words: [
     {text: 'lac', input: true},
@@ -493,12 +489,12 @@ the outside world based upon parsing.
 ### Example
 
 ```js
-parser.grammar = (
+const parse = compile(
   <tap outbound={console.log}>
     <literal text='lacona' />
   </repeat>
 )
-parser.parseArray('lac')
+parse('lac')
 /* logs: {text: null, words: [...], ...} */
 ```
 
@@ -519,15 +515,15 @@ you should use a `list` instead. If you have a `choice` that is has a
 
 ### Props
 
-- `items`: `Array<{String | Object}>` - An array valid items.
+- `items: Array<{String | Object}>` - An array valid items.
   The parse will branch for each one. If `item` is a `String`, it
   is equivalent to `{text: item}`. Each `item` is an `Object` with
   these properties:
-    - `text`: `String` - The text to parse
-    - `value`: `Any` - The `list`'s result in this parse branch
-    - `qualifier`: `String`
-- `fuzzy`: `Boolean` - If `true`, the `items` will be fuzzy matched.
-- `limit`: `Integer` - If `<limit>` `items` are parsed successfully
+    - `text: String` - The text to parse
+    - `value: Any` - The `list`'s result in this parse branch
+    - `qualifier: String`
+- `fuzzy: Boolean` - If `true`, the `items` will be fuzzy matched.
+- `limit: Integer` - If `<limit>` `items` are parsed successfully
   (all the way to the end of the parse chain), then stop attempting to
   parse further children. Note that if `fuzzy` is `true`, then fuzzy
   sorting is applied *before* limiting, so the best matches will not be limited.
@@ -535,13 +531,15 @@ you should use a `list` instead. If you have a `choice` that is has a
 ### Example
 
 ```js
-parser.grammar = <list limit={2} items={[
-  {text: 'Google', value: 'http://google.com'},
-  {text: 'Gmail', value: 'http://mail.google.com'},
-  {text: 'Google Maps', value: 'http://maps.google.com'},
-  {text: 'Google Drive', value: 'http://drive.google.com'}
-]} />
-parser.parseArray('gm')
+const parse = compile(
+  <list limit={2} items={[
+    {text: 'Google', value: 'http://google.com'},
+    {text: 'Gmail', value: 'http://mail.google.com'},
+    {text: 'Google Maps', value: 'http://maps.google.com'},
+    {text: 'Google Drive', value: 'http://drive.google.com'}
+  ]} />
+)
+parse('gm')
 /* [
   {
     words: [
@@ -564,4 +562,5 @@ parser.parseArray('gm')
 
 ## `raw`
 
-The lowest-level phrase, which allows completely arbitrary manipulation of outputs. See tests for examples, but only use as a last resort.
+The lowest-level phrase, which allows completely arbitrary manipulation
+of outputs.

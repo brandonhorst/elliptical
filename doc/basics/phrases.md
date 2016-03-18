@@ -20,7 +20,8 @@ const Exclamation = {
 Once we have a `Component`, we can use it in `element`s of our own.
 
 ```jsx
-createParser(<Exclamation />).parse('') // => 'elliptical rocks!'
+const parse = compile(<Exclamation />)
+parse('') // => 'elliptical rocks!'
 ```
 
 ## Props
@@ -35,7 +36,8 @@ const Exclamation = {
     return <literal text={`${props.app} rocks!`} />
   }
 }
-createParser(<Exclamation app='Lacona' />).parse('') // => 'Lacona rocks!'
+const parse = compile(<Exclamation app='Lacona' />)
+parse('') // => 'Lacona rocks!'
 ```
 
 ## Children
@@ -57,7 +59,8 @@ const Exclamation = {
 }
 
 const grammar = <Exclamation><literal text='Batman' /></Exclamation>
-createParser(grammar).parse('') // => 'Batman rocks!'
+const parse = compile(grammar)
+parse('') // => 'Batman rocks!'
 ```
 
 ## defaultProps
@@ -75,7 +78,8 @@ const Exclamation = {
   }
 }
 
-createParser(<Exclamation />).parse('') // => 'Google Chrome rocks!'
+const parse = compile(<Exclamation />)
+parse('') // => 'Google Chrome rocks!'
 ```
 
 ## Result Helpers

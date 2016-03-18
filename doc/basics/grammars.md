@@ -30,13 +30,14 @@ in the tree.
 
 ## Parsing Grammars
 
-The simplest way to parse a grammar is to use `createParser`. It takes
+To parse a grammar, we first have to compile it. We do this
+with the `compile` function. It takes
 a grammar and returns an object with a `parse` method. Let's try to parse
 the string "i'm bat".
 
 ```js
-const parser = createParser(grammar)
-const outputs = parser.parse("i'm bat")
+const parse = compile(grammar)
+const outputs = parse("i'm bat")
 ```
 
 The results are contained in `outputs`. It is an array of `option` objects.

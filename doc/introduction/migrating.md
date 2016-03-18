@@ -12,10 +12,22 @@ For those who did build on 0.x, here's what changed:
 - Phrases are no longer represented as classes, but rather plain objects.
 - `validate` has been renamed to `filterResult`
 - `mapResult` was added
-- there is no longer a `Parser` class. Similar behavior can be achieved with
-  `const {parse} = createParser(<grammar>)`
+- there is no longer a `Parser` class. Instead, you simply compile a grammar,
+  which returns an unbound parse method.
 - `parseArray` has been renamed to `parse`. The ability to access output
   options as an Iterator was removed.
+
+```js
+/* old */
+const parser = new Parser()
+parser.grammar = <MyPhrase />
+const outputs = parser.parseArray('')
+
+/* new */
+const parse = compile(<MyPhrase />)
+const outputs = parse('')
+```
+
 - there is no longer a `LaconaError` class - normal JS errors are thrown.
 - The phrase method known as `_handleParse` is now known as `visit`.
 - `<map>`, `<filter>`, and `<tap>` are now passed the entire `Option`
