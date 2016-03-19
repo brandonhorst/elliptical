@@ -84,7 +84,7 @@ function anywhereMatch ({input, text, inputLower, textLower}) {
     return {
       words,
       remaining: null,
-      score: 0.5
+      score: 1 - (index / (2 * text.length))
     }
   }
 
@@ -95,21 +95,63 @@ function regexSplit(text) {
   return _.map(text.split(''), escapeRegex)
 }
 
-function fuzzyMatch({input, text, inputLower, textLower}) {
+function acronymMatches({inputLower, textLower}) {
+  if (_.includes(textLower, ' ')) {
+    const chars = regexSplit(inputLower)
+    const fuzzyString = chars.reduce(
+      (a, b) => (`${a}(.*(?:\\s|^))(${b})`),
+      '^'
+    ) + '(.*)$'
+    const fuzzyRegex = new RegExp(fuzzyString)
+    const matches = textLower.match(fuzzyRegex)
+    if (matches) {
+      return {score: 0.5, matches}
+    }
+  }
+}
+
+function capitalMatches({inputLower, text, textLower}) {
+  if (/[A-Z]/.test(text)) {
+    const chars = regexSplit(inputLower)
+    const fuzzyString = chars.reduce(
+      (a, b) => {
+        const bUpper = b.toUpperCase()
+        return (`${a}([^${bUpper}]*)(${bUpper})`)
+      },
+      '^'
+    ) + '(.*)$'
+    const fuzzyRegex = new RegExp(fuzzyString)
+    const matches = text.match(fuzzyRegex)
+    if (matches) {
+      return {score: 0.4, matches}
+    }
+  }
+}
+
+function trueFuzzyMatches({inputLower, textLower}) {
   const chars = regexSplit(inputLower)
   const fuzzyString = chars.reduce(
     (a, b) => (`${a}([^${b}]*)(${b})`),
     '^'
   ) + '(.*)$'
   const fuzzyRegex = new RegExp(fuzzyString)
-  const fuzzyMatches = textLower.match(fuzzyRegex)
+  const matches = textLower.match(fuzzyRegex)
+  if (matches) {
+    return {score: 0.3 * (1 / matches.length), matches}
+  }
+}
 
-  if (fuzzyMatches) {
+function fuzzyMatch({input, text, inputLower, textLower}) {
+  const {score, matches} = acronymMatches({inputLower, textLower}) ||
+    capitalMatches({inputLower, text, textLower}) || 
+    trueFuzzyMatches({inputLower, textLower}) || {}
+
+  if (matches) {
     const words = []
-    for (let i = 1, l = fuzzyMatches.length; i < l; i++) {
-      if (fuzzyMatches[i].length > 0) {
+    for (let i = 1, l = matches.length; i < l; i++) {
+      if (matches[i].length > 0) {
         words.push({
-          text: fuzzyMatches[i],
+          text: matches[i],
           input: i % 2 === 0
         })
       }
@@ -118,7 +160,7 @@ function fuzzyMatch({input, text, inputLower, textLower}) {
     return {
       words,
       remaining: null,
-      score: 0.25
+      score
     }
   }
   return null

@@ -70,10 +70,36 @@ describe('match', () => {
     ])
   })
 
+  it('handles acronym fuzzy', () => {
+    const output = match({text: 'remind me to', input: 'rmt', strategy: 'fuzzy'})
+    expect(output.remaining).to.equal(null)
+    expect(output.score).to.be.equal(0.5)
+    expect(output.words).to.eql([
+      {text: 'r', input: true},
+      {text: 'emind ', input: false},
+      {text: 'm', input: true},
+      {text: 'e ', input: false},
+      {text: 't', input: true},
+      {text: 'o', input: false}
+    ])
+  })
+
+  it('handles capital fuzzy', () => {
+    const output = match({text: 'GoodAsDone', input: 'gd', strategy: 'fuzzy'})
+    expect(output.remaining).to.equal(null)
+    expect(output.score).to.equal(0.4)
+    expect(output.words).to.eql([
+      {text: 'G', input: true},
+      {text: 'oodAs', input: false},
+      {text: 'D', input: true},
+      {text: 'one', input: false}
+    ])
+  })
+
   it('handles true fuzzy', () => {
     const output = match({text: 'superman', input: 'sm', strategy: 'fuzzy'})
     expect(output.remaining).to.equal(null)
-    expect(output.score).to.be.lessThan(1)
+    expect(output.score).to.be.lessThan(0.3)
     expect(output.words).to.eql([
       {text: 's', input: true},
       {text: 'uper', input: false},

@@ -66,7 +66,7 @@ describe('list', () => {
       text: null,
       words: [{text: 'test', input: false}, {text: 'b', input: true}],
       result: undefined,
-      score: 0.5,
+      score: 0.6,
       qualifiers: []
     }])
   })
@@ -88,7 +88,7 @@ describe('list', () => {
       text: null,
       words: [{text: 'z', input: false}, {text: 'test', input: true}],
       result: undefined,
-      score: 0.5,
+      score: 0.9,
       qualifiers: []
     }])
   })
@@ -116,7 +116,7 @@ describe('list', () => {
       text: null,
       words: [{text: 'test', input: false}, {text: 'b', input: true}],
       result: 'b',
-      score: 0.5,
+      score: 0.6,
       qualifiers: []
     }])
   })
@@ -170,7 +170,7 @@ describe('list', () => {
       text: null,
       words: [{text: 'test', input: false}, {text: 'a', input: true}],
       result: undefined,
-      score: 0.5,
+      score: 0.6,
       qualifiers: ['desca', 'descb']
     }])
   })
