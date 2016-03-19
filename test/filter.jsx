@@ -11,8 +11,8 @@ chai.use(sinonChai)
 
 describe('filter', () => {
   it('filters result', () => {
-    function filter (result) {
-      return result === 'b'
+    function filter (option) {
+      return option.result === 'b'
     }
 
     const grammar = (

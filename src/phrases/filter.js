@@ -7,7 +7,7 @@ const defaultProps = {
 
 function * visit (option, {props, children}, traverse) {
   if (props.inbound) {
-    if (!props.inbound(props.option ? option : option.result)) {
+    if (!props.inbound(option)) {
       return
     }
   }
@@ -16,8 +16,7 @@ function * visit (option, {props, children}, traverse) {
     if (props.skipIncomplete && !isComplete(output)) {
       yield output
     } else {
-      if (!props.outbound ||
-          props.outbound(props.option ? output : output.result)) {
+      if (!props.outbound || props.outbound(output)) {
         yield output
       }
     }
