@@ -17,10 +17,15 @@ Matches or suggests a single literal string.
 ### Props
 
 - `text: String` - The string to accept as input.
-- `fuzzy: Boolean` - whether or not to use fuzzy matching for this `literal`. Note that fuzzy matching should rarely be used for literals - if you want to fuzzy match many items, use a [`list`](#list).
-- `decorate: Boolean` - if `true`, then suggest `text` even if it does not match the input. Useful for displaying implicit information.
-- `allowInput: Boolean` - if `true`, then force decoration, and do not consume any input even if exists. Only applies with `decorate`.
-- `category: String` - a category to output to the `words` object. Useful for syntax highlighting.
+- `strategy: String ('start'|'contain'|'fuzzy')` - the matching strategy
+  to use for this element. Note that fuzzy matching should rarely be used
+  for literals - if you want to fuzzy match many items, use a [`list`](#list).
+- `decorate: Boolean` - if `true`, then suggest `text` even if it does
+  not match the input. Useful for displaying implicit information.
+- `allowInput: Boolean` - if `true`, then force decoration, and do not
+  consume any input even if exists. Only applies with `decorate`.
+- `category: String` - a category to output to the `words` object.
+  Useful for syntax highlighting.
 
 ### Example
 
@@ -500,14 +505,12 @@ parse('lac')
 
 ## `list`
 
-Logically, a `list` can be thought of as a `choice` of `literal`s.
+Logically, a `<list>` can be thought of as a `<choice>` of `<literal>` elements.
 However, it has enhancements that allow it to work better for large lists,
 especially when limiting and fuzzy matching is used. It also performs better.
 
-In general, everytime you have a `choice` containing only `literal`s,
-you should use a `list` instead. If you have a `choice` that is has a
-`limit` whose children are `literal`s with `fuzzy`, you *must* use
-`list`, or the output may be incorrect.
+In general, everytime you have a `<choice>` containing only `<literal>`
+elements, you should use a `<list>` instead.
 
 ### Result
 
@@ -522,7 +525,8 @@ you should use a `list` instead. If you have a `choice` that is has a
     - `text: String` - The text to parse
     - `value: Any` - The `list`'s result in this parse branch
     - `qualifier: String`
-- `fuzzy: Boolean` - If `true`, the `items` will be fuzzy matched.
+- `strategy: String ('start'|'contain'|'fuzzy')` - Matching strategy
+  to use for these items.
 - `limit: Integer` - If `<limit>` `items` are parsed successfully
   (all the way to the end of the parse chain), then stop attempting to
   parse further children. Note that if `fuzzy` is `true`, then fuzzy

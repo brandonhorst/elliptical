@@ -1,3 +1,0 @@
-# Score
-
-**Coming Soon**

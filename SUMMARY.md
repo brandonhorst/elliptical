@@ -17,7 +17,6 @@
   * [Labels](doc/advanced/labels.md)
   * [Limiting](doc/advanced/limiting.md)
   * [Qualifiers](doc/advanced/qualifiers.md)
-  * [Score](doc/advanced/score.md)
   * [Visit](doc/advanced/visit.md)
 * API Reference
   * [Built-in Phrases](doc/apireference/phrases.md)
