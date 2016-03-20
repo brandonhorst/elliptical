@@ -7,8 +7,7 @@ For those who did build on 0.x, here's what changed:
   reduce confusion about its relationship with the
   [Lacona app](http://lacona.io).
 - `lacona-phrase` is no longer used. `createElement` is now a part of
-  elliptical proper. Because of this, phrases published independently
-  should use `peerDependencies` to refer to elliptical.
+  elliptical proper.
 - Phrases are no longer represented as classes, but rather plain objects.
 - `validate` has been renamed to `filterResult`
 - `mapResult` was added
