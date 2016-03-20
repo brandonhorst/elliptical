@@ -13,6 +13,8 @@ It is framework-independent and runs on both the client and the server.
 It is language-agnostic, modular, expressive, functional,
 compositional, and extensible.
 
+[**Full Documentation**](http://elliptical.laconalabs.com/)
+
 ## Installation
 
 ```
