@@ -38,5 +38,5 @@ element compiled.
 combineProcessors: (
   processor: (element: Element) => Element,
   ...
-)
+) => (element: Element) => Element
 ```
