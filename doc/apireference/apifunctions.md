@@ -19,9 +19,24 @@ createElement: (
 
 Compiles a `Element` tree and returns a function that traverses the tree.
 
+If a `processor` function is provided, it will call it for each Element
+in the tree, and compile the returned Element instead.
+
 ```js
 compile: (
   grammar: Element<Phrase>,
-  process: (element: Element) => Element
+  processor?: (element: Element) => Element
 ) => ((input: String) => Array<Option>)
+```
+
+## `combineProcessors`
+
+Combines any number of processors. They will be applied in order to each
+element compiled.
+
+```js
+combineProcessors: (
+  processor: (element: Element) => Element,
+  ...
+)
 ```
