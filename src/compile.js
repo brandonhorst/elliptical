@@ -124,7 +124,8 @@ export default function compile (element, process) {
   const compiled = compileNonRoot(element, process)
   return function traverse (input) {
     const postProcessed = postProcess(compiled, input)
-    return Array.from(postProcessed)
+    const allOutputs = Array.from(postProcessed)
+    return _.sortBy(allOutputs, (output) => -output.score)
   }
 }
 

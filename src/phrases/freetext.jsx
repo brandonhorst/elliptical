@@ -7,13 +7,16 @@ function describe ({props}) {
 }
 
 function * filterInput (input, props) {
-  for (let stringPart of substrings(input || '', props)) {
-    if (!props.filter || props.filter(stringPart)) {
+  for (let substring of substrings(input || '', props)) {
+    if (!props.filter || props.filter(substring)) {
+      const score = props.greedy
+        ? 0.1 + (1 - (1 / substring.length))
+        : 0.1 + (1 / substring.length)
       yield {
-        words: [{text: stringPart, input: true}],
-        result: stringPart,
-        remaining: input.substring(stringPart.length),
-        score: 0.1 + (1 / (stringPart.length + 2))
+        words: [{text: substring, input: true}],
+        result: substring,
+        remaining: input.substring(substring.length),
+        score
       }
     }
   }
