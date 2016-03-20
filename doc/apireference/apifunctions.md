@@ -24,3 +24,4 @@ compile: (
   grammar: Element<Phrase>,
   process: (element: Element) => Element
 ) => ((input: String) => Array<Option>)
+```
