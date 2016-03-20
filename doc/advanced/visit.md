@@ -6,19 +6,20 @@ This is the lowest-level elliptical feature, and most people will never
 need to use it.
 
 ```js
-visit: (option: Option, element: Element) => Iterable<Option>
+visit: (
+  option: Option,
+  element: Element
+  traverse: (element: Element, option: Option) => Iterable<Option>
+) => Iterable<Option>
 ```
 
 The `visit` function will only be called if `describe` does not exist.
 If it needs to parse children, it can do so with the `traverse` function
-provided in the elliptical package.
-
+which is passed as the third argument.
 
 ```js
-import {traverse} from 'elliptical'
-
 const MyPhrase = {
-  visit (option, {props, children}) {
+  visit (option, {props, children}, traverse) {
     console.log('props', props, 'option', option)
     return traverse(children[0])
   }

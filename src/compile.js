@@ -27,7 +27,8 @@ function next (elementMap, subElement, option) {
   if (traverser) {
     return traverser(option)
   } else {
-    throw new Error(`Attempted to traverse non-compiled element: ${JSON.stringify(subElement)}`)
+    const newTraverser = compileNonRoot(subElement)
+    return newTraverser(option)
   }
 }
 

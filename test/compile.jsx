@@ -5,6 +5,7 @@ import createElement from '../src/element'
 import compile from '../src/compile'
 import chai, {expect} from 'chai'
 import {spy} from 'sinon'
+import {text} from './_util'
 import sinonChai from 'sinon-chai'
 
 chai.use(sinonChai)
@@ -45,16 +46,29 @@ describe('compile', () => {
     compile(<Test else='another' />)
   })
 
-  it('calls process with elements', () => {
-    const process = spy()
+  it('compiles dynamic children with visit', () => {
+    const Test = {
+      visit (option, _, traverse) {
+        return traverse(<literal text='test' />, option)
+      }
+    }
 
-    compile(<literal text='test' />, process)
-    expect(process).to.have.been.calledOnce
-    expect(process.args[0][0].props).to.eql({text: 'test'})
+    const parse = compile(<Test />)
+    const options = parse('')
+    expect(options).to.have.length(1)
+    expect(text(options[0])).to.equal('test')
   })
 
-  it('replaces element with process results', () => {
-    const process = (elem) => elem.type === 'literal' ? <Test /> : elem
+  it('calls processor with elements', () => {
+    const processor = spy()
+
+    compile(<literal text='test' />, processor)
+    expect(processor).to.have.been.calledOnce
+    expect(processor.args[0][0].props).to.eql({text: 'test'})
+  })
+
+  it('replaces element with processor results', () => {
+    const processor = (elem) => elem.type === 'literal' ? <Test /> : elem
     const descSpy = spy()
     const Test = {
       describe () {
@@ -63,7 +77,7 @@ describe('compile', () => {
       }
     }
 
-    compile(<literal text='test' />, process)
+    compile(<literal text='test' />, processor)
     expect(descSpy).to.have.been.calledOnce;
   })
 
