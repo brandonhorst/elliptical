@@ -10,10 +10,29 @@ Elliptical is a Javascript library for building interactive natural
 language text interfaces.
 
 It is framework-independent and runs on both the client and the server.
-It is language-agnostic, modular, expressive, functional,
-compositional, and extensible.
+It works with any written language that can be represented with Unicode.
+It is functional, compositional, easily extensible, and it's got
+[great docs](http://elliptical.laconalabs.com).
 
-[**Full Documentation**](http://elliptical.laconalabs.com/)
+There are addons to allow for
+[internationalization](https://github.com/brandonhorst/elliptical-translate),
+[linguistic extension](https://github.com/brandonhorst/elliptical-extend),
+[sideways data loading](https://github.com/brandonhorst/elliptical-observe),
+and more.
+
+There are pre-build phrases for parsing English
+[dates and times](https://github.com/laconalabs/elliptical-datetime),
+[numbers](https://github.com/laconalabs/elliptical-number),
+[urls](https://github.com/laconalabs/elliptical-url),
+[phone numbers](https://github.com/laconalabs/elliptical-phone),
+[email addresses](https://github.com/laconalabs/elliptical-email),
+[arbitrary strings](https://github.com/laconalabs/elliptical-string),
+and more. Of course, you can develop your own phrases.
+
+To see an example of Elliptical in action, check out the
+[Lacona App](http://www.lacona.io).
+
+[**Full Documentation**](http://elliptical.laconalabs.com)
 
 ## Installation
 
