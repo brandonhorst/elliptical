@@ -31,8 +31,10 @@ compile: (
 
 ## `combineProcessors`
 
-Combines any number of processors. They will be applied in order to each
-element compiled.
+Combines any number of processors, returning a single processor that
+executes each in order, passing the element returned from one
+to the next. If any processor does not return an element, the chain
+will not continue.
 
 ```js
 combineProcessors: (

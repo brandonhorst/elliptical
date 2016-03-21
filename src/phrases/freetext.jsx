@@ -1,6 +1,6 @@
 /** @jsx createElement */
 import createElement from '../element'
-import { substrings } from '../string-utils'
+import { substrings } from '../utils'
 
 function describe ({props}) {
   return <raw func={(input) => filterInput(input, props)} limit={props.limit} />

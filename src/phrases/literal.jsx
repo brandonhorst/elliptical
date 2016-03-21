@@ -1,6 +1,6 @@
 /** @jsx createElement */
 import _ from 'lodash'
-import {match} from '../string-match'
+import {match} from '../match'
 import createElement from '../element'
 
 

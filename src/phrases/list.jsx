@@ -1,7 +1,7 @@
 /** @jsx createElement */
 import _ from 'lodash'
 import createElement from '../element'
-import { match } from '../string-match'
+import { match } from '../match'
 
 export default {
   describe ({props}) {

@@ -1,9 +1,9 @@
 import _ from 'lodash'
+import split from 'smart-split'
 
 export function isComplete (option) {
   return !_.some(option.words, 'placeholder')
 }
-
 
 // Accepts either an iterator of Options, or an iterator of iterators of Options
 export function * limitIterator (iterator, limit) {
@@ -40,10 +40,21 @@ export function * limitIterator (iterator, limit) {
   }
 }
 
-// export function addWords (option, words) {
-//   if (s
-//   const mods = {
-//     phrases: {
-//       [option.phrases.length - 1]: 
-//   _.last(option.phrases)
-// }
+export function * substrings (
+  input,
+  {splitOn = '', consumeAll = false, greedy = false}
+) {
+  if (consumeAll) {
+    yield input
+    return
+  }
+
+  let inputs = split(input, splitOn)
+  for (let i = 0; i < inputs.length; i += 2) {
+    if (greedy) {
+      yield inputs.slice(0, inputs.length - i).join('')
+    } else {
+      yield inputs.slice(0, i + 1).join('')
+    }
+  }
+}

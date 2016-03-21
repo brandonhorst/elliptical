@@ -4,7 +4,7 @@
 import _ from 'lodash'
 import createElement from '../src/element'
 import compile from '../src/compile'
-import combineProcessors from '../src/processor'
+import combineProcessors from '../src/combine'
 import chai, {expect} from 'chai'
 import sinonChai from 'sinon-chai'
 import {spy} from 'sinon'

@@ -1,4 +1,4 @@
-import {match} from '../src/string-match'
+import {match} from '../src/match'
 import {expect} from 'chai'
 
 describe('match', () => {
