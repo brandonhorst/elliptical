@@ -1,5 +1,4 @@
-elliptical
-======
+# Elliptical
 
 [![Build Status](https://img.shields.io/travis/laconalabs/elliptical.svg?style=flat)](https://travis-ci.org/laconalabs/elliptical)
 [![Join Gitter Chat](https://img.shields.io/badge/gitter-join%20chat-00DA75.svg)](https://gitter.im/laconalabs/elliptical)
