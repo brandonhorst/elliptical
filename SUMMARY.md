@@ -1,5 +1,6 @@
 # Summary
 
+* [Readme](README.md)
 * [Introduction](doc/introduction/README.md)
   * [Motivation](doc/introduction/motivation.md)
   * [Example](doc/introduction/example.md)
