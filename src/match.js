@@ -95,22 +95,22 @@ function regexSplit(text) {
   return _.map(text.split(''), escapeRegex)
 }
 
-function acronymMatches({inputLower, textLower}) {
-  if (_.includes(textLower, ' ')) {
+function acronymMatches({inputLower, text}) {
+  if (_.includes(text, ' ')) {
     const chars = regexSplit(inputLower)
     const fuzzyString = chars.reduce(
       (a, b) => (`${a}(.*(?:\\s|^))(${b})`),
       '^'
     ) + '(.*)$'
-    const fuzzyRegex = new RegExp(fuzzyString)
-    const matches = textLower.match(fuzzyRegex)
+    const fuzzyRegex = new RegExp(fuzzyString, 'i')
+    const matches = text.match(fuzzyRegex)
     if (matches) {
       return {score: 0.5, matches}
     }
   }
 }
 
-function capitalMatches({inputLower, text, textLower}) {
+function capitalMatches({inputLower, text}) {
   if (/[A-Z]/.test(text)) {
     const chars = regexSplit(inputLower)
     const fuzzyString = chars.reduce(
@@ -128,23 +128,23 @@ function capitalMatches({inputLower, text, textLower}) {
   }
 }
 
-function trueFuzzyMatches({inputLower, textLower}) {
+function trueFuzzyMatches({inputLower, text}) {
   const chars = regexSplit(inputLower)
   const fuzzyString = chars.reduce(
     (a, b) => (`${a}([^${b}]*)(${b})`),
     '^'
   ) + '(.*)$'
-  const fuzzyRegex = new RegExp(fuzzyString)
-  const matches = textLower.match(fuzzyRegex)
+  const fuzzyRegex = new RegExp(fuzzyString, 'i')
+  const matches = text.match(fuzzyRegex)
   if (matches) {
     return {score: 0.3 * (1 / matches.length), matches}
   }
 }
 
 function fuzzyMatch({input, text, inputLower, textLower}) {
-  const {score, matches} = acronymMatches({inputLower, textLower}) ||
-    capitalMatches({inputLower, text, textLower}) || 
-    trueFuzzyMatches({inputLower, textLower}) || {}
+  const {score, matches} = acronymMatches({inputLower, text}) ||
+    capitalMatches({inputLower, text}) || 
+    trueFuzzyMatches({inputLower, text}) || {}
 
   if (matches) {
     const words = []

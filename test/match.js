@@ -71,11 +71,11 @@ describe('match', () => {
   })
 
   it('handles acronym fuzzy', () => {
-    const output = match({text: 'remind me to', input: 'rmt', strategy: 'fuzzy'})
+    const output = match({text: 'Remind me to', input: 'rmt', strategy: 'fuzzy'})
     expect(output.remaining).to.equal(null)
     expect(output.score).to.be.equal(0.5)
     expect(output.words).to.eql([
-      {text: 'r', input: true},
+      {text: 'R', input: true},
       {text: 'emind ', input: false},
       {text: 'm', input: true},
       {text: 'e ', input: false},
