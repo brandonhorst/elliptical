@@ -6,8 +6,8 @@ export function match ({input, text, strategy}) {
   const nullInput = nullMatch({input, text})
   if (nullInput) return nullInput
 
-  const inputLower = input.toLowerCase()
-  const textLower = text.toLowerCase()
+  const inputLower = _.deburr(input.toLowerCase())
+  const textLower = _.deburr(text.toLowerCase())
 
   const partialBeginning = partialBeginningMatch({input, text, inputLower, textLower})
   if (partialBeginning) return partialBeginning

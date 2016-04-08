@@ -126,4 +126,47 @@ describe('match', () => {
       {text: 'man)', input: false}
     ])
   })
+
+  it('handles start with burrs', () => {
+    const output = match({
+      text: 'hörst',
+      input: 'horst',
+      strategy: 'start'
+    })
+    expect(output.remaining).to.equal('')
+    expect(output.score).to.equal(1)
+    expect(output.words).to.eql([
+      {text: 'hörst', input: true}
+    ])
+  })
+
+  it('handles contain with burrs', () => {
+    const output = match({
+      text: 'hörst',
+      input: 'o',
+      strategy: 'contain'
+    })
+    expect(output.remaining).to.equal(null)
+    expect(output.score).to.be.lessThan(1)
+    expect(output.words).to.eql([
+      {text: 'h', input: false},
+      {text: 'ö', input: true},
+      {text: 'rst', input: false}
+    ])
+  })
+
+  it('handles fuzzy with burrs', () => {
+    const output = match({
+      text: 'hörst',
+      input: 'o',
+      strategy: 'fuzzy'
+    })
+    expect(output.remaining).to.equal(null)
+    expect(output.score).to.be.lessThan(1)
+    expect(output.words).to.eql([
+      {text: 'h', input: false},
+      {text: 'ö', input: true},
+      {text: 'rst', input: false}
+    ])
+  })
 })
