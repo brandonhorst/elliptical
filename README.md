@@ -79,6 +79,9 @@ Elliptical is **not**:
 
 ## Example
 
+You can play with this example yourself at
+[elliptical-example](https://github.com/laconalabs/elliptical-example).
+
 ```jsx
 /** @jsx createElement */
 import {createElement, compile} from 'elliptical'
