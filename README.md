@@ -119,7 +119,7 @@ const grammar = (
 const parse = compile(grammar)
 
 // Parse based upon a given query
-const outputs = parse('flights to irela)
+const outputs = parse('flights to irela')
 console.log(outputs)
 
 /*
