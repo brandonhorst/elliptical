@@ -97,7 +97,7 @@ const Country = {
   describe () {
     return (
       <label text='Country'>
-        <list items={countryData} fuzzy />
+        <list items={countryData} strategy='fuzzy' />
       </label>
     )
   }
@@ -108,8 +108,8 @@ const grammar = (
   <sequence>
     <literal text='flights ' />
     <choice id='direction'>
-      <literal text=' from ' value='from' />
-      <literal text=' to ' value='to' />
+      <literal text='from ' value='from' />
+      <literal text='to ' value='to' />
     </choice>
     <Country id='country' />
   </sequence>
@@ -119,7 +119,7 @@ const grammar = (
 const parse = compile(grammar)
 
 // Parse based upon a given query
-const outputs = parse('flights to irela)
+const outputs = parse('flights to irela')
 console.log(outputs)
 
 /*
@@ -146,7 +146,7 @@ console.log(outputs)
       direction: 'to',
       country: 'GB'
     },
-    score: 0.75
+    score: 0.5673076923076923
   }, { // fuzzy match
     words: [
       {text: 'flights', input: true},
@@ -165,7 +165,7 @@ console.log(outputs)
       direction: 'to',
       country: 'MK'
     },
-    score: 0.5
+    score: 0.024999999999999998
   }]
 */
 ```
