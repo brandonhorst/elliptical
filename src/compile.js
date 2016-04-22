@@ -9,7 +9,7 @@ function applyDefaults (element) {
   })
 }
 
-function compileSubElement (subElement, process, elementMap) {
+function compileAndAddToMap (subElement, process, elementMap) {
   let traverse
   try {
     traverse = compileNonRoot(subElement, process)
@@ -20,14 +20,16 @@ function compileSubElement (subElement, process, elementMap) {
   }
 
   elementMap.set(subElement, traverse)
+
+  return traverse
 }
 
-function next (elementMap, subElement, option) {
-  const traverser = elementMap.get(subElement)
+function next (elementMap, process, subElement, option) {
+  let traverser = elementMap.get(subElement)
   if (traverser) {
     return traverser(option)
   } else {
-    const newTraverser = compileNonRoot(subElement)
+    const newTraverser = compileAndAddToMap(subElement, process, elementMap)
     return newTraverser(option)
   }
 }
@@ -37,7 +39,7 @@ function compileProp (prop, process, elementMap) {
       (_.isPlainObject(prop.type) || _.isString(prop.type)) &&
       _.isPlainObject(prop.props) && _.isArray(prop.children)) {
     // We can be pretty sure this is an element,
-    return compileSubElement(prop, process, elementMap)
+    return compileAndAddToMap(prop, process, elementMap)
   } else {
     return prop
   }
@@ -80,10 +82,10 @@ function compileNonRoot (element, process) {
 
   // generate the traverse thunk
   _.forEach(element.children, (child) => {
-    return compileSubElement(child, process, elementMap)
+    return compileAndAddToMap(child, process, elementMap)
   })
 
-  const subTraverse = (subElem, option) => next(elementMap, subElem, option)
+  const subTraverse = (subElem, option) => next(elementMap, process, subElem, option)
   const traverse = (option) => phrase.visit(option, element, subTraverse)
 
   return addOutbound(element, traverse)
