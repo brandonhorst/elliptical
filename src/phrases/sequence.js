@@ -25,7 +25,7 @@ function shouldDoEllipsis (index, option, children) {
   )
 }
 
-function * parseOptionals (index, option, unique, children, traverse) {
+function * optionalTraversals (index, option, unique, children, traverse) {
   const child = children[index]
 
   const withChildParse = parseChild(index, option, unique, children, traverse)
@@ -33,12 +33,13 @@ function * parseOptionals (index, option, unique, children, traverse) {
     index + 1, option, unique, children, traverse
   )
 
+    // yield * limitIterator(optionals, child.props.limited ? 1 : undefined)
   if (child.props.preferred) {
-    yield * withChildParse
-    yield * withoutChildParse
+    yield withChildParse
+    yield withoutChildParse
   } else {
-    yield * withoutChildParse
-    yield * withChildParse
+    yield withoutChildParse
+    yield withChildParse
   }
 }
 
@@ -63,8 +64,10 @@ function * parseChildControl (index, option, unique, children, traverse) {
   }
 
   if (child.props.optional) {
-    const optionals = parseOptionals(index, option, unique, children, traverse)
-    yield * limitIterator(optionals, child.props.limited ? 1 : undefined)
+    yield * limitIterator(
+      optionalTraversals(index, option, unique, children, traverse),
+      child.props.limited ? 1 : undefined
+    )
   } else {
     yield * parseChild(index, option, unique, children, traverse)
   }

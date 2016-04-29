@@ -548,6 +548,37 @@ describe('sequence', () => {
     }])
   })
 
+  it('handles an optional child that is limited with a list after', () => {
+    const grammar = (
+      <sequence>
+        <literal text='super' />
+        <literal text=' ' optional limited />
+        <list items={['man', 'maiden']} />
+      </sequence>
+    )
+    const options = compileAndTraverse(grammar, '')
+
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'super', input: false},
+        {text: 'man', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }, {
+      text: null,
+      words: [
+        {text: 'super', input: false},
+        {text: 'maiden', input: false}
+      ],
+      result: {},
+      score: 1,
+      qualifiers: []
+    }])
+  })
+
   it('handles an optional child that is preferred and limited', () => {
     const grammar = (
       <sequence>
