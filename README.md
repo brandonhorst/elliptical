@@ -19,7 +19,7 @@ There are addons to allow for
 [sideways data loading](https://github.com/brandonhorst/elliptical-observe),
 and more.
 
-There are pre-build phrases for parsing English
+There are pre-built phrases for parsing English
 [dates and times](https://github.com/laconalabs/elliptical-datetime),
 [numbers](https://github.com/laconalabs/elliptical-number),
 [urls](https://github.com/laconalabs/elliptical-url),
