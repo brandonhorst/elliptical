@@ -38,9 +38,10 @@ function * compute (input, items, props) {
     //  much of this processing could be eliminated if it ran the
     //  non-fuzzy (score 1) parses first, and then did the fuzzy (score 0.5)
     //  parses
-    const sortedResults = _.chain(Array.from(resultIterator))
-      .sortBy(({score}) => -score)
-      .value()
+    const sortedResults = _.sortBy(
+      Array.from(resultIterator),
+      ({score}) => -score
+    )
 
     finalIterator = sortedResults
   }
