@@ -14,9 +14,9 @@ function compileAndAddToMap (subElement, process, elementMap) {
   try {
     traverse = compileNonRoot(subElement, process)
   } catch (e) {
-    console.log(`Element failed compilation. Element: ${JSON.stringify(subElement, null, 1)}`)
-    console.error(e)
-    return subElement
+    const message = `Element failed compilation. Element: ${JSON.stringify(subElement)}, Message: ${e.message}`
+    e.message = message
+    throw e
   }
 
   elementMap.set(subElement, traverse)
