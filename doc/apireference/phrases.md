@@ -362,7 +362,7 @@ completed suggestions appear before incomplete ones.
   `{text: <text>, placeholder: true}` This improves performance and
   usability, as it limits the amount of suggestions that are output
   for an incomplete input.
-- `suppressEmpty: Boolean` - defaults to `false`. If `true`,
+- `suppressEmpty: Boolean` - defaults to `true`. If `true`,
   this `label` will also suppress inputs that are an empty string.
   That is to say, if the preceding elements consume the entire input
   string but have not yet made any suggestions, this label will still
