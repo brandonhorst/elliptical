@@ -29,7 +29,7 @@
     "email": "brandonhorst@gmail.com",
     "url": "http://github.com/brandonhorst"
   },
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/laconalabs/elliptical/issues"
   },
@@ -48,7 +48,7 @@
     "rimraf": "^2.5.2",
     "sinon": "^1.17.3",
     "sinon-chai": "^2.8.0",
-    "standard": "^6.0.7"
+    "standard": "^7.1.2"
   },
   "dependencies": {
     "babel-runtime": "^6.6.1",
