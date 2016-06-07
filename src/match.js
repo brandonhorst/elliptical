@@ -9,11 +9,8 @@ export function match ({input, text, strategy}) {
   const inputLower = _.deburr(input.toLowerCase())
   const textLower = _.deburr(text.toLowerCase())
 
-  const partialBeginning = partialBeginningMatch({input, text, inputLower, textLower})
-  if (partialBeginning) return partialBeginning
-
-  const fullBeginning = fullBeginningMatch({input, text, inputLower, textLower})
-  if (fullBeginning) return fullBeginning
+  const beginning = beginningMatch({input, text, inputLower, textLower})
+  if (beginning) return beginning
 
   if (strategy === 'contain' || strategy === 'fuzzy') {
     const anywhere = anywhereMatch({input, text, inputLower, textLower})
@@ -26,7 +23,7 @@ export function match ({input, text, strategy}) {
   }
 }
 
-function nullMatch ({input, text}) {
+export function nullMatch ({input, text}) {
   if (input == null) {
     return {
       words: [{text, input: false}],
@@ -64,7 +61,15 @@ function fullBeginningMatch ({input, text, inputLower, textLower}) {
   }
 }
 
-function anywhereMatch ({input, text, inputLower, textLower}) {
+export function beginningMatch ({input, text, inputLower, textLower}) {
+  const partialBeginning = partialBeginningMatch({input, text, inputLower, textLower})
+  if (partialBeginning) return partialBeginning
+
+  const fullBeginning = fullBeginningMatch({input, text, inputLower, textLower})
+  if (fullBeginning) return fullBeginning
+}
+
+export function anywhereMatch ({input, text, inputLower, textLower}) {
   const index = textLower.indexOf(inputLower)
 
   if (index > -1) {
@@ -141,7 +146,7 @@ function trueFuzzyMatches({inputLower, text}) {
   }
 }
 
-function fuzzyMatch({input, text, inputLower, textLower}) {
+export function fuzzyMatch({input, text, inputLower, textLower}) {
   const {score, matches} = acronymMatches({inputLower, text}) ||
     capitalMatches({inputLower, text}) || 
     trueFuzzyMatches({inputLower, text}) || {}

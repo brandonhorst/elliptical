@@ -1,7 +1,7 @@
 /** @jsx createElement */
 import _ from 'lodash'
 import createElement from '../element'
-import { match } from '../match'
+import { nullMatch, beginningMatch, anywhereMatch, fuzzyMatch } from '../match'
 
 export default {
   describe ({props}) {
@@ -15,42 +15,52 @@ export default {
 }
 
 function itemify (item) {
-  return _.isString(item) ? {text: item} : item
+  return _.isString(item)
+    ? {text: item, textLower: _.deburr(item.toLowerCase())}
+    : _.assign({}, item, {textLower: _.deburr(item.text.toLowerCase())})
 }
 
-function * doMatch (input, items, props) {
+function * doOneMatch (input, inputLower, items, props, match, alreadyYielded) {
+  // Need to use for-of so we can use yield, no fun _.forEach here
+  let i = -1
   for (let item of items) {
-    const matchObj = match({input, text: item.text, strategy: props.strategy})
+    i++
+    if (alreadyYielded[i]) continue
+
+    const matchObj = match({input, inputLower, text: item.text, textLower: item.textLower})
     if (matchObj) {
       matchObj.result = item.value
       matchObj.qualifiers = item.qualifiers
+      alreadyYielded[i] = true
       yield matchObj
     }
   }
 }
 
-function * compute (input, items, props) {
-  const resultIterator = doMatch(input, items, props)
-  let finalIterator = resultIterator
-  if (props.strategy !== 'start') {
-    // TODO - this could be optimized
-    //  Right now it is going to do fuzzy matching for every single item
-    //  much of this processing could be eliminated if it ran the
-    //  non-fuzzy (score 1) parses first, and then did the fuzzy (score 0.5)
-    //  parses
-    const sortedResults = _.sortBy(
-      Array.from(resultIterator),
-      ({score}) => -score
-    )
+function * doAppropriateMatches (input, items, props) {
+  const inputLower = _.deburr(input ? input.toLowerCase() : null)
 
-    finalIterator = sortedResults
+  const alreadyYielded = []
+  yield* doOneMatch(input, inputLower, items, props, nullMatch, alreadyYielded)
+  yield* doOneMatch(input, inputLower, items, props, beginningMatch, alreadyYielded)
+
+  if (props.strategy === 'contain' || props.strategy === 'fuzzy') {
+    yield* doOneMatch(input, inputLower, items, props, anywhereMatch, alreadyYielded)
   }
 
+  if (props.strategy === 'fuzzy') {
+    yield* doOneMatch(input, inputLower, items, props, fuzzyMatch, alreadyYielded)
+  }
+}
+
+function * compute (input, items, props) {
+  const resultIterator = doAppropriateMatches(input, items, props)
+  
   if (props.value != null) {
-    for (let output of finalIterator) {
+    for (let output of resultIterator) {
       yield _.assign({}, output, {result: props.value})
     }
   } else {
-    yield * finalIterator
+    yield * resultIterator
   }
 }
