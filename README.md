@@ -67,7 +67,7 @@ Elliptical is **not**:
   English (or any other language's) grammar. Rather, it parses
   possible strings according to a predefined schema.
 - a voice command system, like Siri. Elliptical only operates on text
-  (though it could conceivably as a layer in such an application).
+  (though it could conceivably be used as a layer in such an application).
 - a machine learning system. Elliptical parses strings according to a preset
   algorithm
 - a static string parser, like regular expressions. Elliptical schemata are
