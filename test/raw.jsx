@@ -24,7 +24,10 @@ describe('raw', () => {
       words: [{text: 'tex', input: false}],
       result: 'val',
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      arguments: [],
+      categories: [],
+      annotations:[]
     }])
   })
 
@@ -45,7 +48,10 @@ describe('raw', () => {
       words: [{text: 'tex', input: false}],
       result: 'val',
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      arguments: [],
+      categories: [],
+      annotations:[]
     }])
   })
 
@@ -66,17 +72,23 @@ describe('raw', () => {
       words: [{text: 'tex', input: false}],
       result: 'val',
       score: 0.5,
-      qualifiers: []
+      qualifiers: [],
+      arguments: [],
+      categories: [],
+      annotations:[]
     }])
   })
 
-  it('can set the qualifiers', () => {
+  it('can set additions', () => {
     function func (input) {
       return [{
         remaining: null,
         result: 'val',
         words: [{text: 'tex', input: false}],
-        qualifiers: ['test']
+        qualifiers: ['a'],
+        annotation: 'a',
+        categories: ['a'],
+        argument: 'a'
       }]
     }
 
@@ -87,7 +99,10 @@ describe('raw', () => {
       words: [{text: 'tex', input: false}],
       result: 'val',
       score: 1,
-      qualifiers: ['test']
+      qualifiers: [{value: 'a', start: 0, end: 1}],
+      arguments: [{value: 'a', start: 0, end: 1}],
+      categories: [{value: 'a', start: 0, end: 1}],
+      annotations: [{value: 'a', start: 0, end: 1}]
     }])
   })
 
@@ -111,7 +126,10 @@ describe('raw', () => {
       words: [{text: 'tex', input: false}],
       result: 'val',
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      arguments: [],
+      categories: [],
+      annotations:[]
     }])
   })
 })

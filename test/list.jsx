@@ -16,13 +16,19 @@ describe('list', () => {
       words: [{text: 'testa', input: false}],
       result: undefined,
       score: 1,
-      qualifiers: []
+      categories: [],
+      arguments: [],
+      qualifiers: [],
+      annotations:[]
     }, {
       text: null,
       words: [{text: 'testb', input: false}],
       result: undefined,
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }])
   })
 
@@ -35,13 +41,19 @@ describe('list', () => {
       words: [{text: 'testa', input: false}],
       result: undefined,
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }, {
       text: null,
       words: [{text: 'testb', input: false}],
       result: undefined,
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }])
   })
 
@@ -54,7 +66,10 @@ describe('list', () => {
       words: [{text: 'testb', input: true}],
       result: undefined,
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }])
   })
 
@@ -67,7 +82,10 @@ describe('list', () => {
       words: [{text: 'test', input: false}, {text: 'b', input: true}],
       result: undefined,
       score: 0.6,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }])
   })
 
@@ -83,13 +101,19 @@ describe('list', () => {
       words: [{text: 'test', input: true}, {text: 'z', input: false}],
       result: undefined,
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }, {
       text: null,
       words: [{text: 'z', input: false}, {text: 'test', input: true}],
       result: undefined,
       score: 0.9,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }])
   })
 
@@ -103,7 +127,10 @@ describe('list', () => {
       words: [{text: 'testb', input: true}],
       result: 'b',
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }])
   })
 
@@ -117,7 +144,10 @@ describe('list', () => {
       words: [{text: 'test', input: false}, {text: 'b', input: true}],
       result: 'b',
       score: 0.6,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }])
   })
 
@@ -131,24 +161,42 @@ describe('list', () => {
       words: [{text: 'testa', input: false}],
       result: 'override',
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }, {
       text: null,
       words: [{text: 'testb', input: false}],
       result: 'override',
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }, {
       text: null,
       words: [{text: 'testc', input: false}],
       result: 'override',
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }])
   })
 
-  it('outputs a qualifier', () => {
-    const items = [{text: 'testa', qualifiers: ['desca', 'descb']}, 'testb']
+  it('outputs an addition (plural)', () => {
+    const items = [
+      {
+        text: 'testa',
+        qualifiers: ['a', 'b'],
+        categories: ['a', 'b'],
+        arguments: ['a', 'b'],
+        annotations: ['a', 'b']
+      },
+      'testb'
+    ]
     const grammar = <list items={items} />
 
     const options = compileAndTraverse(grammar, 'testa')
@@ -157,21 +205,56 @@ describe('list', () => {
       words: [{text: 'testa', input: true}],
       result: undefined,
       score: 1,
-      qualifiers: ['desca', 'descb']
+      qualifiers: [
+        {value: 'a', start: 0, end: 1},
+        {value: 'b', start: 0, end: 1}
+      ],
+      arguments: [
+        {value: 'a', start: 0, end: 1},
+        {value: 'b', start: 0, end: 1}
+      ],
+      annotations: [
+        {value: 'a', start: 0, end: 1},
+        {value: 'b', start: 0, end: 1}
+      ],
+      categories: [
+        {value: 'a', start: 0, end: 1},
+        {value: 'b', start: 0, end: 1}
+      ]
     }])
   })
 
-  it('outputs a qualifier with contain', () => {
-    const items = [{text: 'testa', qualifiers: ['desca', 'descb']}, 'testb']
-    const grammar = <list items={items} strategy='contain' />
+  it('outputs an addition (singular)', () => {
+    const items = [
+      {
+        text: 'testa',
+        qualifier: 'a',
+        annotation: 'a',
+        category: 'a',
+        argument: 'a'
+      },
+      'testb'
+    ]
+    const grammar = <list items={items} />
 
-    const options = compileAndTraverse(grammar, 'a')
+    const options = compileAndTraverse(grammar, 'testa')
     expect(options).to.eql([{
-      text: null,
-      words: [{text: 'test', input: false}, {text: 'a', input: true}],
+      text: '',
+      words: [{text: 'testa', input: true}],
       result: undefined,
-      score: 0.6,
-      qualifiers: ['desca', 'descb']
+      score: 1,
+      qualifiers: [
+        {value: 'a', start: 0, end: 1}
+      ],
+      arguments: [
+        {value: 'a', start: 0, end: 1}
+      ],
+      annotations: [
+        {value: 'a', start: 0, end: 1}
+      ],
+      categories: [
+        {value: 'a', start: 0, end: 1}
+      ]
     }])
   })
 })

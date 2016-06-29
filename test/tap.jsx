@@ -27,6 +27,9 @@ describe('tap', () => {
       words: [],
       score: 1,
       qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations: [],
       callbacks: []
     })
 
@@ -37,6 +40,9 @@ describe('tap', () => {
       score: 1,
       result: undefined,
       qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations: [],
       callbacks: []
     })
   })

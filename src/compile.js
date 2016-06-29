@@ -114,15 +114,23 @@ function addOutbound (element, traverse) {
       if (element.props.value != null) {
         mods.result = element.props.value
       }
-      if (element.props.qualifiers != null) {
-        mods.qualifiers = _.concat(element.props.qualifiers, output.qualifiers)
-      }
       if (element.props.score != null) {
         mods.score = element.props.score
       }
-      // if (element.props.annotations != null) {
-      //   mods.annotations = 
-      // }
+      _.forEach([
+        ['qualifiers', 'qualifier'],
+        ['arguments', 'argument'],
+        ['annotations', 'annotation'],
+        ['categories', 'category']
+      ], ([plural, singular]) => {
+        if (element.props[plural] != null || element.props[singular] != null) {
+          const theseAdditions = element.props[plural] || [element.props[singular]]
+          const outputAdditions = _.map(theseAdditions, addition => {
+            return {value: addition, start, end}
+          })
+          mods[plural] = _.concat(outputAdditions , output[plural])
+        }
+      })
 
       yield _.assign({}, output, mods)
     }

@@ -7,8 +7,11 @@ All phrases can take the following props:
 
   - `score: Number` - set to the `score` property of the output `Option`.
   Higher numbers sort higher. Defaults to `1`. 
-  - `qualifiers: Array<String>` - set to the `qualifiers` property of output `Option`.
   - `value: Any` - set to the `result` property of the output `Option`.
+  - `qualifiers: Array<Any> | qualifier: Any` - set to the `qualifiers` property of output `Option`.
+  - `categories: Array<Any> | category: Any` - set to the `categories` property of output `Option`.
+  - `annotations: Array<Any> | annotation: Any` - set to the `annotations` property of output `Option`.
+  - `arguments: Array<Any> | argument: Any` - set to the `arguments` property of output `Option`.
 
 ## `literal`
 
@@ -24,21 +27,19 @@ Matches or suggests a single literal string.
   not match the input. Useful for displaying implicit information.
 - `allowInput: Boolean` - if `true`, then force decoration, and do not
   consume any input even if exists. Only applies with `decorate`.
-- `category: String` - a category to output to the `words` object.
-  Useful for syntax highlighting.
 
 ### Example
 
 ```js
 const parse = compile(
-  <literal text='Lacona' value='http://lacona.io' category='website' />
+  <literal text='Lacona' value='http://lacona.io' />
 )
 parse('Lac')
 /* [
   {
     words: [
-      {text: 'Lac', category: 'website', input: true},
-      {text: 'ona', category: 'website' input: false}
+      {text: 'Lac', input: true},
+      {text: 'ona', input: false}
     ],
     score: 1,
     result: 'http://lacona.io'

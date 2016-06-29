@@ -27,7 +27,10 @@ describe('map', () => {
       words: [{text: 'test', input: true}],
       result: 'testing',
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations: []
     }])
   })
 
@@ -48,7 +51,10 @@ describe('map', () => {
       words: [{text: 'te', input: true}, {text: 'st', input: false}],
       result: 'test',
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations: []
     }])
   })
 
@@ -95,9 +101,9 @@ describe('map', () => {
 
     const grammar = (
       <map outbound={addIng} skipIncomplete>
-        <label text='label'>
+        <placeholder text='label'>
           <literal text='test' value='test' />
-        </label>
+        </placeholder>
       </map>
     )
     let options

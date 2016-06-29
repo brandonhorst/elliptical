@@ -21,7 +21,10 @@ describe('dynamic', () => {
       words: [{text: 'test', input: true}],
       result: 'test',
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      annotations: [],
+      categories: [],
+      arguments: []
     }])
   })
 })

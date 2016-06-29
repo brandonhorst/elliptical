@@ -17,7 +17,10 @@ describe('literal', () => {
       words: [{text: 'literal test', input: false}],
       result: 'test',
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }])
   })
 
@@ -30,7 +33,10 @@ describe('literal', () => {
       words: [{text: 'Test', input: false}],
       result: undefined,
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }])
   })
 
@@ -49,7 +55,10 @@ describe('literal', () => {
         words: [{text: 'a', input: true}, {text: 'b', input: false}],
         result: {},
         score: 1,
-        qualifiers: []
+        qualifiers: [],
+        categories: [],
+        arguments: [],
+        annotations:[]
       }])
     })
 
@@ -67,7 +76,10 @@ describe('literal', () => {
         words: [{text: 'b', input: false}, {text: 'a', input: true}],
         result: {},
         score: 1,
-        qualifiers: []
+        qualifiers: [],
+        categories: [],
+        arguments: [],
+        annotations:[]
       }])
     })
 
@@ -86,7 +98,10 @@ describe('literal', () => {
         words: [{text: 'b', input: false}, {text: 'a', input: true}],
         result: {},
         score: 1,
-        qualifiers: []
+        qualifiers: [],
+        categories: [],
+        arguments: [],
+        annotations:[]
       }])
 
       options = compileAndTraverse(grammar, 'b')

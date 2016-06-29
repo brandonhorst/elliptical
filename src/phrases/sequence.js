@@ -81,7 +81,14 @@ function hasSomeSameKeys(option, output) {
 function * parseChild (index, option, unique, children, traverse) {
   const child = children[index]
 
-  for (let output of traverse(child, option)) {
+  const childOption = _.assign({}, option, {
+    qualifiers: [],
+    annotations: [],
+    categories: [],
+    arguments: []
+  })
+
+  for (let output of traverse(child, childOption)) {
     if (unique && output.result != null) {
       if (child.props.id && option.result[child.props.id] != null) {
         continue
@@ -93,7 +100,10 @@ function * parseChild (index, option, unique, children, traverse) {
     const modifications = {
       result: getAccumulatedResult(option.result, child, output.result),
       score: option.score * output.score,
-      qualifiers: option.qualifiers.concat(output.qualifiers)
+      qualifiers: option.qualifiers.concat(output.qualifiers),
+      annotations: option.annotations.concat(output.annotations),
+      categories: option.categories.concat(output.categories),
+      arguments: option.arguments.concat(output.arguments)
     }
 
     let nextOutput = _.assign({}, output, modifications)

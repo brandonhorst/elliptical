@@ -25,7 +25,10 @@ describe('freetext', () => {
       words: [{text: 'validValue', input: true}],
       result: 'validValue',
       score: options[0].score,
-      qualifiers: []
+      qualifiers: [],
+      annotations: [],
+      categories: [],
+      arguments: []
     }])
 
     options = compileAndTraverse(grammar, 'invalidValue')
@@ -41,7 +44,10 @@ describe('freetext', () => {
       words: [{text: 'invalidValue', input: true}],
       result: 'invalidValue',
       score: options[0].score,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations: []
     }])
   })
 
@@ -61,7 +67,10 @@ describe('freetext', () => {
       words: [{text: 'validValue', input: true}],
       result: 'validValue',
       score: options[0].score,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations: []
     }])
     expect(filterSpy).to.have.been.calledOnce
   })
@@ -86,7 +95,10 @@ describe('freetext', () => {
       ],
       result: {freetext: 'anything goes'},
       score: options[0].score,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations: []
     }, {
       text: null,
       words: [
@@ -95,7 +107,10 @@ describe('freetext', () => {
       ],
       result: {freetext: 'anything goes test'},
       score: options[1].score,
-      qualifiers: []
+      categories: [],
+      arguments: [],
+      qualifiers: [],
+      annotations: []
     }, {
       text: null,
       words: [
@@ -104,7 +119,10 @@ describe('freetext', () => {
       ],
       result: {freetext: 'anything goes test'},
       score: options[2].score,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations: []
     }])
   })
 
@@ -125,7 +143,10 @@ describe('freetext', () => {
       ],
       result: {freetext: 'anything goes test'},
       score: options[0].score,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations: []
     }, {
       text: '',
       words: [
@@ -134,7 +155,10 @@ describe('freetext', () => {
       ],
       result: {freetext: 'anything goes'},
       score: options[1].score,
-      qualifiers: []
+      categories: [],
+      arguments: [],
+      qualifiers: [],
+      annotations: []
     }])
   })
 
@@ -158,7 +182,10 @@ describe('freetext', () => {
       ],
       result: {freetext: 'anything goes'},
       score: options[0].score,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations: []
     }, {
       text: null,
       words: [
@@ -167,7 +194,10 @@ describe('freetext', () => {
       ],
       result: {freetext: 'anything goes test'},
       score: options[1].score,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations: []
     }, {
       text: null,
       words: [
@@ -176,7 +206,10 @@ describe('freetext', () => {
       ],
       result: {freetext: 'anything goes test'},
       score: options[2].score,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations: []
     }])
   })
 })

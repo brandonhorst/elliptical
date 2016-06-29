@@ -2,8 +2,7 @@ import _ from 'lodash'
 
 const defaultProps = {
   suppress: true,
-  argument: true,
-  suppressEmpty: true,
+  suppressEmpty: true
 }
 
 function * visit (option, {props, children}, traverse) {
@@ -22,41 +21,24 @@ function * visit (option, {props, children}, traverse) {
 }
 
 function * parseChild (option, child, props, traverse) {
-  let didSetCurrentArgument = false
-
-  const modification = {}
-  if (props.argument && !option.currentArgument) {
-    modification.currentArgument = props.text
-    didSetCurrentArgument = true
-  }
-
-  const optionWithArgument = _.assign({}, option, modification)
-
-  for (let output of traverse(child, optionWithArgument)) {
-    if (didSetCurrentArgument) {
-      yield _.assign({}, output, {currentArgument: undefined})
-    } else {
-      yield output
-    }
+  for (let output of traverse(child, option)) {
+    yield output
   }
 }
 
 function outputSelf (option, child, props) {
   const word = {
-    text: props.text,
+    text: props.text || props.argument,
     input: false,
-    placeholder: true,
-    argument: option.currentArgument ||
-      (props.argument ? props.text : undefined)
+    placeholder: true
   }
 
   const modification = {
     score: 0.01,
     result: undefined,
-    text: null
+    text: null,
+    words: option.words.concat(word)
   }
-
-  modification.words = option.words.concat(word)
 
   return _.assign({}, option, modification)
 }

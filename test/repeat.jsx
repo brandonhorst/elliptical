@@ -37,7 +37,10 @@ describe('repeat', () => {
         ],
         result: [undefined, undefined],
         score: 1,
-        qualifiers: []
+        qualifiers: [],
+        categories: [],
+        arguments: [],
+        annotations:[]
       }])
     })
 
@@ -59,7 +62,10 @@ describe('repeat', () => {
         ],
         result: [undefined, undefined],
         score: 1,
-        qualifiers: []
+        qualifiers: [],
+        categories: [],
+        arguments: [],
+        annotations:[]
       }])
     })
 
@@ -80,7 +86,10 @@ describe('repeat', () => {
         ],
         result: [undefined, undefined],
         score: 1,
-        qualifiers: []
+        qualifiers: [],
+        categories: [],
+        arguments: [],
+        annotations:[]
       }, {
         text: null,
         words: [
@@ -92,7 +101,10 @@ describe('repeat', () => {
         ],
         result: [undefined, undefined, undefined],
         score: 1,
-        qualifiers: []
+        qualifiers: [],
+        categories: [],
+        arguments: [],
+        annotations:[]
       }])
     })
 
@@ -116,7 +128,10 @@ describe('repeat', () => {
         ],
         result: [undefined, undefined],
         score: 1,
-        qualifiers: []
+        qualifiers: [],
+        categories: [],
+        arguments: [],
+        annotations:[]
       }, {
         text: null,
         words: [
@@ -126,7 +141,10 @@ describe('repeat', () => {
         ],
         result: [undefined, undefined],
         score: 1,
-        qualifiers: []
+        qualifiers: [],
+        categories: [],
+        arguments: [],
+        annotations:[]
       }])
     })
   })
@@ -147,13 +165,19 @@ describe('repeat', () => {
       words: [{text: 'a', input: false}],
       result: [undefined],
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }, {
       text: null,
       words: [{text: 'b', input: false}],
       result: [undefined],
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }])
   })
 
@@ -180,7 +204,10 @@ describe('repeat', () => {
       words: [{text: 'sup', input: true}, {text: 'er', input: false}],
       result: ['a'],
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }])
   })
 
@@ -201,7 +228,10 @@ describe('repeat', () => {
       ],
       result: ['a', 'a'],
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }])
   })
 
@@ -221,7 +251,10 @@ describe('repeat', () => {
       ],
       result: ['a', 'a'],
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }, {
       text: null,
       words: [
@@ -231,7 +264,10 @@ describe('repeat', () => {
       ],
       result: ['a', 'a', 'a'],
       score: 1,
-      qualifiers: []
+      categories: [],
+      arguments: [],
+      qualifiers: [],
+      annotations:[]
     }])
   })
 
@@ -251,7 +287,10 @@ describe('repeat', () => {
       ],
       result: ['a', 'a'],
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }])
   })
 
@@ -270,7 +309,10 @@ describe('repeat', () => {
       ],
       result: ['a'],
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }])
   })
 
@@ -321,7 +363,10 @@ describe('repeat', () => {
       ],
       result: ['a', 'b'],
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }])
   })
 
@@ -344,7 +389,10 @@ describe('repeat', () => {
       ],
       result: [{a: 1}, {a: 2}],
       score: 1,
-      qualifiers: []
+      categories: [],
+      arguments: [],
+      qualifiers: [],
+      annotations:[]
     }])
   })
 
@@ -369,7 +417,10 @@ describe('repeat', () => {
       ],
       result: [undefined, undefined],
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }])
   })
 
@@ -397,7 +448,10 @@ describe('repeat', () => {
       ],
       result: [undefined, undefined],
       score: 1,
-      qualifiers: []
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
     }])
   })
 })

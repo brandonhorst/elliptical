@@ -43,7 +43,12 @@ function * parseChild (index, option, child, props, traverse) {
 }
 
 function * callParseChild (index, option, child, props, traverse) {
-  const mods = {qualifiers: []}
+  const mods = {
+    qualifiers: [],
+    arguments: [],
+    categories: [],
+    annotations: []
+  }
   const trueOption = _.assign({}, option, mods)
 
   for (let output of traverse(child, trueOption)) {
@@ -54,7 +59,10 @@ function * callParseChild (index, option, child, props, traverse) {
 
     const outputModifications = {
       result: option.result.concat(output.result),
-      qualifiers: option.qualifiers.concat(output.qualifiers)
+      qualifiers: option.qualifiers.concat(output.qualifiers),
+      arguments: option.arguments.concat(output.arguments),
+      categories: option.categories.concat(output.categories),
+      annotations: option.annotations.concat(output.annotations)
     }
 
     const trueOutput = _.assign({}, output, outputModifications)
