@@ -47,9 +47,7 @@ function describe ({props}) {
       return <raw func={(input) => decorateFunc(input, props.text)} />
     }
   } else {
-    return <raw
-      func={(input) => compute(input, props.text, props.strategy)}
-      category={props.category} />
+    return <raw func={(input) => compute(input, props.text, props.strategy)} />
   }
 }
 

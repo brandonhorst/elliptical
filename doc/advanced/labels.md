@@ -1,3 +1,0 @@
-# Labels
-
-**Coming Soon**

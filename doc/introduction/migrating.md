@@ -1,3 +1,27 @@
+#Migrating from `1.0.0-rc15` and earlier
+
+With `1.0.0-rc16`, some major changes were made to `arguments`, `categories`,
+and `qualifiers`, to simplify interactions.
+
+- All phrases can now have `arguments`, `categories`, `qualifiers`, or
+  `annotations`. They can also use these in the singular form.
+- The `<label />` phrase was removed, and replaced with `<placeholder />`.
+  Since `arguments` had been split out, there was no longer a need for any
+  `<label />` functionaliy except suppression. 
+- There are 4 new `Option` properties: `arguments`, `categories`,
+  and `annotations`. Each have the same structure:
+
+```js
+arguments: {value: 'argument value', start: 0, end: 2}
+```
+
+  Where `start` is the index of the first `word` with that `argument`, and `end` is the
+  index of the last word *without* that argument.
+
+- `qualifiers` follows the above format as well.
+- `category` and `argument` are no longer output with `words`.
+
+
 # Migrating from `lacona/lacona` 0.x
 
 With version 1.0, changes will slow considerably and the API will stabilize.

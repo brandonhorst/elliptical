@@ -9,12 +9,16 @@ An `option` is just a plain Javascript object. It looks something like this:
 {
   text: null,
   words: [
-    {text: 'elliptical r', input: true},
+    {text: 'elliptical ', input: true},
+    {text: 'r', input: true},
     {text: 'ocks', input: false}
   ],
   result: {library: 'elliptical'},
   score: 1,
-  qualifiers: []
+  qualifiers: [],
+  annotations: [{value: 'https://elliptical.laconalabs.com', start: 0, end: 1}],
+  categories: [{value: 'verb', start: 1, end: 2}],
+  arguments: []
 }
 ```
 
@@ -28,5 +32,9 @@ already been parsed. Used to display an interface to the user.
 - `results: Any` - an arbitrary object that represents the parsed input
 in a logical way. Used to do something based upon the input.
 - `score : Number` - used for sorting outputs.
-- `qualifiers: Array<String>` - used for distinguishing between outputs
+- `qualifiers: Array<Any>` - used for distinguishing between outputs
 with similar `words`.
+- `annotations: Array<Any>` - optional data associated with words that is not
+required for comprehension
+- `categories: Array<Any>` - arbitrary (non-semantic) data associated with words
+- `arguments: Array<Any>` - arbitrary semantic data associated with words

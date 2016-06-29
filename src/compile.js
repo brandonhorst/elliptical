@@ -93,9 +93,10 @@ function compileNonRoot (element, process) {
 
 function addOutbound (element, traverse) {
   return function * (option) {
+    const start = option.words.length
+
     for (let output of traverse(option)) {
       if (isComplete(output)) {
-
         if (element.type.mapResult) {
           const newResult = element.type.mapResult(output.result, element)
           output = _.assign({}, output, {result: newResult})
@@ -107,16 +108,29 @@ function addOutbound (element, traverse) {
         }
       }
 
+      const end = output.words.length
+
       const mods = {}
       if (element.props.value != null) {
         mods.result = element.props.value
       }
-      if (element.props.qualifiers != null) {
-        mods.qualifiers = element.props.qualifiers
-      }
       if (element.props.score != null) {
         mods.score = element.props.score
       }
+      _.forEach([
+        ['qualifiers', 'qualifier'],
+        ['arguments', 'argument'],
+        ['annotations', 'annotation'],
+        ['categories', 'category']
+      ], ([plural, singular]) => {
+        if (element.props[plural] != null || element.props[singular] != null) {
+          const theseAdditions = element.props[plural] || [element.props[singular]]
+          const outputAdditions = _.map(theseAdditions, addition => {
+            return {value: addition, start, end}
+          })
+          mods[plural] = _.concat(outputAdditions , output[plural])
+        }
+      })
 
       yield _.assign({}, output, mods)
     }

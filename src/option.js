@@ -5,6 +5,9 @@ export default function createOption (mods) {
     text: '',
     words: [],
     qualifiers: [],
+    annotations: [],
+    categories: [],
+    arguments: [],
     score: 1,
     callbacks: []
   })

@@ -1,27 +1,41 @@
 import _ from 'lodash'
 import {limitIterator} from '../utils'
 
-function modifyOption(option, rawOutput, category) {
-  const modification = {
-    result: rawOutput.result,
-    text: rawOutput.remaining,
-    score: rawOutput.score || 1,
-    qualifiers: rawOutput.qualifiers || [],
-    words: option.words.concat(
-      _.map(rawOutput.words, (word) => _.assign({},
-        word,
-        option.currentArgument ? {argument: option.currentArgument} : {},
-        category ? {category} : {}
-      ))
-    )
+function handleAdditions (output, plural, singular, start, end) {
+  const theseAdditions = output[singular] ? [output[singular]] : output[plural]
+  if (theseAdditions) {
+    return {
+      [plural]: _.map(theseAdditions, value => ({value, start, end}))
+    }
+  } else {
+    return {}
   }
-
-  return _.assign({}, option, modification)
 }
 
-function * optionsFromRawOutputs (option, rawOutputs, category) {
+function modifyOption(option, rawOutput) {
+  const start = option.words.length
+  const words = option.words.concat(rawOutput.words)
+  const end = words.length
+
+
+  return _.assign({},
+    option,
+    {
+      result: rawOutput.result,
+      text: rawOutput.remaining,
+      score: rawOutput.score || 1,
+      words
+    },
+    handleAdditions(rawOutput, 'categories', 'category', start, end),
+    handleAdditions(rawOutput, 'arguments', 'argument', start, end),
+    handleAdditions(rawOutput, 'annotations', 'annotation', start, end),
+    handleAdditions(rawOutput, 'qualifiers', 'qualifier', start, end)
+  )
+}
+
+function * optionsFromRawOutputs (option, rawOutputs) {
   for (let rawOutput of rawOutputs) {
-    yield modifyOption(option, rawOutput, category)
+    yield modifyOption(option, rawOutput)
   }
 }
 
@@ -29,7 +43,7 @@ function * visit (option, {props}) {
   if (!props.func) return
 
   const rawOutputs = props.func(option.text)
-  const outputs = optionsFromRawOutputs(option, rawOutputs, props.category)
+  const outputs = optionsFromRawOutputs(option, rawOutputs)
 
   yield * limitIterator(outputs, props.limit)
 }

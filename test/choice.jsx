@@ -16,13 +16,8 @@ describe('choice', () => {
     )
     const options = compileAndTraverse(grammar, 'r')
 
-    expect(options).to.eql([{
-      text: null,
-      words: [{text: 'r', input: true}, {text: 'ight', input: false}],
-      result: undefined,
-      score: 1,
-      qualifiers: []
-    }])
+    expect(options).to.have.length(1)
+    expect(options[0].words).to.eql([{text: 'r', input: true}, {text: 'ight', input: false}])
   })
 
   it('suggests multiple valid choices', () => {
@@ -34,19 +29,9 @@ describe('choice', () => {
     )
     const options = compileAndTraverse(grammar, 'r')
 
-    expect(options).to.eql([{
-      text: null,
-      words: [{text: 'r', input: true}, {text: 'ight', input: false}],
-      result: undefined,
-      score: 1,
-      qualifiers: []
-    }, {
-      text: null,
-      words: [{text: 'r', input: true}, {text: 'ight also', input: false}],
-      result: undefined,
-      score: 1,
-      qualifiers: []
-    }])
+    expect(options).to.have.length(2)
+    expect(options[0].words).to.eql([{text: 'r', input: true}, {text: 'ight', input: false}])
+    expect(options[1].words).to.eql([{text: 'r', input: true}, {text: 'ight also', input: false}])
   })
 
   it('suggests no valid choices', () => {
@@ -70,13 +55,8 @@ describe('choice', () => {
     )
     const options = compileAndTraverse(grammar, 'r')
 
-    expect(options).to.eql([{
-      text: null,
-      words: [{text: 'r', input: true}, {text: 'ight', input: false}],
-      result: 'testValue',
-      score: 1,
-      qualifiers: []
-    }])
+    expect(options).to.have.length(1)
+    expect(options[0].result).to.eql('testValue')
   })
 
   it('can set a value', () => {
@@ -88,13 +68,8 @@ describe('choice', () => {
     )
     const options = compileAndTraverse(grammar, 'r')
 
-    expect(options).to.eql([{
-      text: null,
-      words: [{text: 'r', input: true}, {text: 'ight', input: false}],
-      result: 'override',
-      score: 1,
-      qualifiers: []
-    }])
+    expect(options).to.have.length(1)
+    expect(options[0].result).to.eql('override')
   })
 
   it('can set a value in an object with an id', () => {
@@ -106,13 +81,8 @@ describe('choice', () => {
     )
     const options = compileAndTraverse(grammar, 'r')
 
-    expect(options).to.eql([{
-      text: null,
-      words: [{text: 'r', input: true}, {text: 'ight', input: false}],
-      result: {key: 'testValue'},
-      score: 1,
-      qualifiers: []
-    }])
+    expect(options).to.have.length(1)
+    expect(options[0].result).to.eql({key: 'testValue'})
   })
 
   it('can be restricted by a limit of 1', () => {
