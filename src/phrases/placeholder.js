@@ -28,8 +28,7 @@ function * parseChild (option, child, props, traverse) {
 
 function outputSelf (option, child, props) {
   const word = {
-    text: props.text || props.argument,
-    input: false,
+    label: props.label,
     placeholder: true
   }
 

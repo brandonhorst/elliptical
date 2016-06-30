@@ -37,7 +37,7 @@ describe('filter', () => {
 
     const grammar = (
       <filter outbound={filter} skipIncomplete>
-        <placeholder text='test'>
+        <placeholder label='test'>
           <literal text='s' />
         </placeholder>
       </filter>

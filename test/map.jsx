@@ -101,7 +101,7 @@ describe('map', () => {
 
     const grammar = (
       <map outbound={addIng} skipIncomplete>
-        <placeholder text='label'>
+        <placeholder label='label'>
           <literal text='test' value='test' />
         </placeholder>
       </map>

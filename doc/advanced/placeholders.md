@@ -15,6 +15,6 @@ In Elliptical, this is handled through the `<placeholder />` element.
 When the parser is parsing a tree and hits a `<placeholder />`, it checks
 to see if all of the input text has been consumed. If it has, it simply
 outputs a `Word` with `placeholder: true` and continues. The `<placeholder />`'s
-children are not parsed.
+child is not parsed.
 
-If there is input text remaining, the children will be parsed as usual.
+If there is input text remaining, the child will be parsed as usual.

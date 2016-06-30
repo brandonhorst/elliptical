@@ -67,7 +67,7 @@ The score of the child for this branch.
 
 - children - The `choice` can contain any number of child elements.
   Each child represents a separate branch that the parse can flow through.
-- `limit: Integer` - If `<limit>` children are parsed successfully
+- `limit: Integer` - If `limit` children are parsed successfully
   (all the way to the end of the parse chain), then stop attempting to parse
   further children. This is very useful in situations where some children are
   synonymous, and there is no need suggest multiples.
@@ -338,38 +338,30 @@ parse('wort wort')
 ] */
 ```
 
-## `label`
+## `placeholder`
 
-Used to provide additional metadata for within a grammar. This provides users
-with hints to the available options in the flexible way. This also improves
-performance by limiting the number of parse branches.
+Parses that have consumed the entire input string will not
+continue into this placeholder's `child`. Instead, it will output a word with
+`{placeholder: true, label: label}` This improves performance and
+usability, as it limits the number of suggestions that are output
+for an incomplete input.
 
 ### Score
 
-`label`s that suppress input have a very low score, to ensure that
-completed suggestions appear before incomplete ones.
+`placeholder`s that suppress input have a very low score, to ensure that
+completed suggestions appear before incomplete ones. 
 
 ### Props
 
-- `text: String` - this text is used as the `argument` name and
-  the `suppress` placeholder, if either is `true`
-- `argument: Boolean` - defaults to `true`. If `true`, all words
-  that come from this parse segment will contain an `argument` property,
-  which will equal the `text` of this `label`. Note that currently only the
-  first `<label argument />` in the chain is exported.
-- `suppress: Boolean` - defaults to `true`. If `true`, parses that have
-  consumed the entire input string will not continue into this `label`'s
-  `child`. Instead, it will output a word with
-  `{text: <text>, placeholder: true}` This improves performance and
-  usability, as it limits the amount of suggestions that are output
-  for an incomplete input.
+- `label: Any` - An object describing the placeholder. If the placeholder
+  suppresses parsing, it will output this label in its `Word`.
 - `suppressEmpty: Boolean` - defaults to `true`. If `true`,
-  this `label` will also suppress inputs that are an empty string.
+  this `placeholder` will also suppress inputs that are an empty string.
   That is to say, if the preceding elements consume the entire input
-  string but have not yet made any suggestions, this label will still
+  string but have not yet made any suggestions, this placeholder will still
   suppress the input.
-- `suppressWhen: (input: String) => Boolean` - When this label is parsed,
-  it will call this function. If it returns `true`, this label will suppress
+- `suppressWhen: (input: String) => Boolean` - When this placeholder is parsed,
+  it will call this function. If it returns `true`, this placeholder will suppress
   the input (returning a `placeholder`), even if the input is non-null. This
   is useful to describe incomplete but non-suggestable input.
     - For example, imagine a phrase is designed to accept a 3-digit integer,
@@ -378,6 +370,70 @@ completed suggestions appear before incomplete ones.
       show the user that they are on their way to a valid input. In this case,
       it makes sense to use something like
       `suppressWhen={(input) => /^\d{1,2}$/.test(input)}`.
+
+## `list`
+
+Logically, a `<list>` can be thought of as a `<choice>` of `<literal>` elements.
+However, it has enhancements that allow it to work better for large lists,
+especially when limiting and fuzzy matching is used. It also performs better.
+
+In general, everytime you have a `<choice>` containing only `<literal>`
+elements, you should use a `<list>` instead.
+
+### Result
+
+`Any` - The `value` of the `item`, or `undefined`
+
+### Props
+
+- `items: Array<{String | Object}>` - An array valid items.
+  The parse will branch for each one. If `item` is a `String`, it
+  is equivalent to `{text: item}`. Each `item` is an `Object` with
+  these properties:
+    - `text: String` - The text to parse
+    - `value: Any` - The `list`'s result in this parse branch
+    - `qualifiers: Array<Any> | qualifier: Any`
+    - `arguments: Array<Any> | argument: Any`
+    - `annotations: Array<Any> | annotation: Any`
+    - `categories: Array<Any> | category: Any`
+- `strategy: String ('start'|'contain'|'fuzzy')` - Matching strategy
+  to use for these items.
+- `limit: Integer` - If `<limit>` `items` are parsed successfully
+  (all the way to the end of the parse chain), then stop attempting to
+  parse further children. Note that the outputs have a score,
+  sorting is applied *before* limiting, so the best matches will not be limited.
+
+### Example
+
+```js
+const parse = compile(
+  <list limit={2} items={[
+    {text: 'Google', value: 'http://google.com'},
+    {text: 'Gmail', value: 'http://mail.google.com'},
+    {text: 'Google Maps', value: 'http://maps.google.com'},
+    {text: 'Google Drive', value: 'http://drive.google.com'}
+  ]} />
+)
+parse('gm')
+/* [
+  {
+    words: [
+      {text: 'Gm', input: true},
+      {text: 'ail', input: false}
+    ],
+    score: 1,
+    result: 'http://mail.google.com'
+  },
+  {
+    words: [
+      {text: 'Goo', input: true},
+      {text: 'gle Maps', input: false}
+    ],
+    score: 1,
+    result: 'http://maps.google.com'
+  }
+] */
+```
 
 ## `freetext`
 
@@ -408,6 +464,28 @@ the one in which the freetext consumed the fewest characters.
 - `limit: Integer` - If `<limit>` substrings are parsed successfully
   (all the way to the end of the parse chain), then stop attempting
   to parse further substrings.
+- `greedy: Boolean` - Used alongside limiting. Which order should
+  input substrings be attempted in
+
+## `dynamic`
+
+Generate grammars dynamically based upon input.
+
+### Props
+
+- `describe`: Function(input:String) - This function is called with each
+  input substring. If it returns an `Element`, that element will be parsed
+  with that input in place of this element.
+- `splitOn: String | RegExp` - Argument to `String::split` to determine
+  which substrings to attempt parsing.
+  - `consumeAll: Boolean` - Do not attempt to parse substrings, only parse
+  the entire remaining string. Improves performance if the `freetext` is
+  the final phrase in a command
+- `limit: Integer` - If `<limit>` substrings are parsed successfully
+  (all the way to the end of the parse chain), then stop attempting
+  to parse further substrings.
+- `greedy: Boolean` - Used alongside limiting. Which order should
+  input substrings be attempted in
 
 ## `filter`
 
@@ -502,67 +580,6 @@ const parse = compile(
 )
 parse('lac')
 /* logs: {text: null, words: [...], ...} */
-```
-
-## `list`
-
-Logically, a `<list>` can be thought of as a `<choice>` of `<literal>` elements.
-However, it has enhancements that allow it to work better for large lists,
-especially when limiting and fuzzy matching is used. It also performs better.
-
-In general, everytime you have a `<choice>` containing only `<literal>`
-elements, you should use a `<list>` instead.
-
-### Result
-
-`Any` - The `value` of the `item`, or `undefined`
-
-### Props
-
-- `items: Array<{String | Object}>` - An array valid items.
-  The parse will branch for each one. If `item` is a `String`, it
-  is equivalent to `{text: item}`. Each `item` is an `Object` with
-  these properties:
-    - `text: String` - The text to parse
-    - `value: Any` - The `list`'s result in this parse branch
-    - `qualifier: String`
-- `strategy: String ('start'|'contain'|'fuzzy')` - Matching strategy
-  to use for these items.
-- `limit: Integer` - If `<limit>` `items` are parsed successfully
-  (all the way to the end of the parse chain), then stop attempting to
-  parse further children. Note that if `fuzzy` is `true`, then fuzzy
-  sorting is applied *before* limiting, so the best matches will not be limited.
-
-### Example
-
-```js
-const parse = compile(
-  <list limit={2} items={[
-    {text: 'Google', value: 'http://google.com'},
-    {text: 'Gmail', value: 'http://mail.google.com'},
-    {text: 'Google Maps', value: 'http://maps.google.com'},
-    {text: 'Google Drive', value: 'http://drive.google.com'}
-  ]} />
-)
-parse('gm')
-/* [
-  {
-    words: [
-      {text: 'Gm', input: true},
-      {text: 'ail', input: false}
-    ],
-    score: 1,
-    result: 'http://mail.google.com'
-  },
-  {
-    words: [
-      {text: 'Goo', input: true},
-      {text: 'gle Maps', input: false}
-    ],
-    score: 1,
-    result: 'http://maps.google.com'
-  }
-] */
 ```
 
 ## `raw`

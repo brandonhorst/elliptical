@@ -5,7 +5,7 @@ import option from '../src/option'
 import compile from '../src/compile'
 
 export function text (input) {
-  return _.map(input.words, 'text').join('')
+  return _.map(input.words, word => word.text || word.label).join('')
 }
 
 export function compileAndTraverse (element, input) {
