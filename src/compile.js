@@ -69,9 +69,21 @@ function compileNonRoot (element, process) {
 
   // call describe
   if (phrase.describe) {
-    let description = phrase.describe(element)
-    const traverse = compileNonRoot(description, process)
-    return addOutbound(element, traverse)
+    if (phrase.lazy === false) {
+      const description = phrase.describe(element)
+      const traverse = compileNonRoot(description, process)
+      return addOutbound(element, traverse)
+    } else {
+      let subTraverse
+      function traverse (input) {
+        if (!subTraverse) {
+          const description = phrase.describe(element)
+          subTraverse = compileNonRoot(description, process)
+        }
+        return subTraverse(input)
+      }
+      return addOutbound(element, traverse)
+    }
   }
 
   const elementMap = new Map()
