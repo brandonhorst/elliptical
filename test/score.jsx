@@ -15,6 +15,24 @@ describe('score', () => {
     expect(options[0].score).to.equal(1)
   })
 
+  it('score can be set with the score property', () => {
+    const grammar = <literal text='test' score={2} />
+
+    const options = compileAndTraverse(grammar, '')
+
+    expect(options).to.have.length(1)
+    expect(options[0].score).to.equal(2)
+  })
+
+  it('score can be multiplied with the multiplier property', () => {
+    const grammar = <placeholder multiplier={2}><literal text='test' score={4} /></placeholder>
+
+    const options = compileAndTraverse(grammar, 'test')
+
+    expect(options).to.have.length(1)
+    expect(options[0].score).to.equal(8)
+  })
+
   it('score is passed on from literals through choices', () => {
     const grammar = (
       <choice>

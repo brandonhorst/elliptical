@@ -129,6 +129,9 @@ function addOutbound (element, traverse) {
       if (element.props.score != null) {
         mods.score = element.props.score
       }
+      if (element.props.multiplier != null) {
+        mods.score = element.props.multiplier * (element.props.score == null ? output.score : element.props.score)
+      }
       _.forEach([
         ['qualifiers', 'qualifier'],
         ['arguments', 'argument'],
