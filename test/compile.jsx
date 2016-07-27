@@ -77,7 +77,7 @@ describe('compile', () => {
       }
     }
 
-    compile(<literal text='test' />, processor)
+    compile(<literal text='test' />, processor)('')
     expect(descSpy).to.have.been.calledOnce;
   })
 
@@ -95,7 +95,7 @@ describe('compile', () => {
       }
     }
 
-    compile(<Test>{[<literal text='a' />, [<literal text='b' />]]}</Test>)
+    compile(<Test>{[<literal text='a' />, [<literal text='b' />]]}</Test>)('')
     expect(describeSpy).to.have.been.calledOnce
   })
 })
