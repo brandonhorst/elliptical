@@ -32,13 +32,14 @@ function describe ({props}) {
     text: '',
     decorate: false,
     allowInput: true,
-    strategy: 'start'
+    strategy: 'start',
+    limitDecoration: true
   })
 
   if (props.decorate) {
     if (props.allowInput) {
       return (
-        <choice>
+        <choice limit={props.limitDecoration ? 1 : undefined}>
           <literal text={props.text} strategy={props.strategy} />
           <raw func={(input) => decorateFunc(input, props.text)} />
         </choice>

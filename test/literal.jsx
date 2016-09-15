@@ -83,6 +83,45 @@ describe('literal', () => {
       }])
     })
 
+    it('decorates an input (limited)', () => {
+      const grammar = (
+        <sequence>
+          <literal text='b' decorate />
+          <freetext />
+        </sequence>
+      )
+      const options = compileAndTraverse(grammar, 'ba')
+
+      expect(options).to.eql([{
+        text: '',
+        words: [{text: 'b', input: true}, {text: 'a', input: true}],
+        result: {},
+        score: 1.1,
+        qualifiers: [],
+        categories: [],
+        arguments: [],
+        annotations:[]
+      }])
+    })
+
+    it('decorates an input (not limited)', () => {
+      const grammar = (
+        <sequence>
+          <literal text='b' decorate limitDecoration={false} />
+          <freetext />
+        </sequence>
+      )
+      const options = compileAndTraverse(grammar, 'ba')
+
+      expect(options).to.have.length(2)
+      expect(options[0].words).to.eql(
+        [{text: 'b', input: true}, {text: 'a', input: true}]
+      )
+      expect(options[1].words).to.eql(
+        [{text: 'b', input: false}, {text: 'ba', input: true}]
+      )
+    })
+
     it('allows allowinput to be false', () => {
       const grammar = (
         <sequence>
