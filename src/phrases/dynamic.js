@@ -3,7 +3,7 @@ import {limitIterator, substrings} from '../utils'
 
 function * optionsForString (string, option, element, traverse) {
   const description = element.props.describe
-    ? element.props.describe(string)
+    ? element.props.describe(string, option)
     : undefined
 
   if (description) {

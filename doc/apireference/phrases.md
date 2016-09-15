@@ -473,8 +473,9 @@ Generate grammars dynamically based upon input.
 
 ### Props
 
-- `describe`: Function(input:String) - This function is called with each
-  input substring. If it returns an `Element`, that element will be parsed
+- `describe: Function(input:String, option:Option)` - This function is called
+  with each input substring. It is also passed the current `option`, which contains
+  the current `result`. If it returns an `Element`, that element will be parsed
   with that input in place of this element.
 - `splitOn: String | RegExp` - Argument to `String::split` to determine
   which substrings to attempt parsing.
