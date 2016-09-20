@@ -51,8 +51,8 @@ describe('placeholder', () => {
   })
 
   it('suppresses empty inputs by default', () => {
-    function func (input) {
-      if (input === 'v') {
+    function func (option) {
+      if (option.text === 'v') {
         return [{
           words: [{text: 'value', input: true}],
           remaining: '',

@@ -9,7 +9,7 @@ export default {
     const trueItems = _.map(props.items, itemify)
 
     return <raw
-      func={(input) => compute(input, trueItems, props)}
+      func={(option) => compute(option.text, trueItems, props)}
       limit={props.limit} />
   }
 }

@@ -8,8 +8,17 @@ import { expect } from 'chai'
 
 describe('raw', () => {
   it('adds to words, sets text and result', () => {
-    function func (input) {
-      expect(input).to.equal('t')
+    function func (option) {
+      expect(option).to.eql({
+        text: 't',
+        words: [],
+        score: 1,
+        callbacks: [],
+        qualifiers: [],
+        arguments: [],
+        categories: [],
+        annotations:[]
+      })
       return [{
         remaining: null,
         result: 'val',
@@ -32,8 +41,18 @@ describe('raw', () => {
   })
 
   it('adds to words, sets text and result with a generator', () => {
-    function * func (input) {
-      expect(input).to.equal('t')
+    function * func (option) {
+      expect(option).to.eql({
+        text: 't',
+        words: [],
+        score: 1,
+        callbacks: [],
+        qualifiers: [],
+        arguments: [],
+        categories: [],
+        annotations:[]
+      })
+
       yield {
         remaining: null,
         result: 'val',

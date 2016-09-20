@@ -3,7 +3,7 @@ import createElement from '../element'
 import { substrings } from '../utils'
 
 function describe ({props}) {
-  return <raw func={(input) => filterInput(input, props)} limit={props.limit} />
+  return <raw func={(option) => filterInput(option.text, props)} limit={props.limit} />
 }
 
 function * filterInput (input, props) {

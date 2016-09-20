@@ -41,14 +41,14 @@ function describe ({props}) {
       return (
         <choice limit={props.limitDecoration ? 1 : undefined}>
           <literal text={props.text} strategy={props.strategy} />
-          <raw func={(input) => decorateFunc(input, props.text)} />
+          <raw func={(option) => decorateFunc(option.text, props.text)} />
         </choice>
       )
     } else {
-      return <raw func={(input) => decorateFunc(input, props.text)} />
+      return <raw func={(option) => decorateFunc(option.text, props.text)} />
     }
   } else {
-    return <raw func={(input) => compute(input, props.text, props.strategy)} />
+    return <raw func={(option) => compute(option.text, props.text, props.strategy)} />
   }
 }
 

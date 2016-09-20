@@ -42,7 +42,7 @@ function * optionsFromRawOutputs (option, rawOutputs) {
 function * visit (option, {props}) {
   if (!props.func) return
 
-  const rawOutputs = props.func(option.text)
+  const rawOutputs = props.func(option)
   const outputs = optionsFromRawOutputs(option, rawOutputs)
 
   yield * limitIterator(outputs, props.limit)
