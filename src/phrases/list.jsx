@@ -36,10 +36,10 @@ function * doOneMatch (input, inputLower, items, match, alreadyYielded) {
     const matchObj = match({input, inputLower, text: item.text, textLower: item.textLower})
     if (matchObj) {
       matchObj.result = item.value
-      matchObj.qualifiers = item.qualifiers
-      matchObj.categories = item.categories
-      matchObj.arguments = item.arguments
-      matchObj.annotations = item.annotations
+      if (item.qualifiers) { matchObj.qualifiers = item.qualifiers }
+      if (item.categories) { matchObj.categories = item.categories }
+      if (item.arguments) { matchObj.arguments = item.arguments }
+      if (item.annotations) { matchObj.annotations = item.annotations }
       alreadyYielded[i] = true
       yield matchObj
     }
@@ -64,12 +64,5 @@ function * doAppropriateMatches (input, items, props) {
 
 function * compute (input, items, props) {
   const resultIterator = doAppropriateMatches(input, items, props)
-  
-  if (props.value != null) {
-    for (let output of resultIterator) {
-      yield _.assign({}, output, {result: props.value})
-    }
-  } else {
-    yield * resultIterator
-  }
+  yield * resultIterator
 }
