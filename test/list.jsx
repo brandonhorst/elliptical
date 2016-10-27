@@ -257,4 +257,51 @@ describe('list', () => {
       ]
     }])
   })
+
+  it('unique=false does not suggests identical value options', () => {
+    const grammar = <list items={[
+      {text: 'testa', value: 'test'},
+      {text: 'testb', value: 'test'}
+    ]} />
+
+    const options = compileAndTraverse(grammar, '')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'testa', input: false}],
+      result: 'test',
+      score: 1,
+      categories: [],
+      arguments: [],
+      qualifiers: [],
+      annotations:[]
+    }, {
+      text: null,
+      words: [{text: 'testb', input: false}],
+      result: 'test',
+      score: 1,
+      categories: [],
+      arguments: [],
+      qualifiers: [],
+      annotations:[]
+    }])
+  })
+
+  it('unique=true does not suggest identical value options', () => {
+    const grammar = <list items={[
+      {text: 'testa', value: 'test'},
+      {text: 'testb', value: 'test'}
+    ]} unique />
+
+    const options = compileAndTraverse(grammar, '')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'testa', input: false}],
+      result: 'test',
+      score: 1,
+      categories: [],
+      arguments: [],
+      qualifiers: [],
+      annotations:[]
+    }])
+  })
 })
