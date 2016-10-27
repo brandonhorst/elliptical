@@ -2,6 +2,7 @@
 /* eslint-env mocha */
 
 import createElement from '../src/element'
+import unique from '../src/unique'
 import {compileAndTraverse} from './_util'
 
 import { expect } from 'chai'
@@ -320,14 +321,54 @@ describe('repeat', () => {
     const grammar = (
       <repeat unique>
         <choice>
-          <literal text='a' value='a' />
-          <literal text='b' value='b' />
+          <literal text='a' value='1' />
+          <literal text='b' value='1' />
         </choice>
       </repeat>
     )
 
-    const options = compileAndTraverse(grammar, 'aa')
+    const options = compileAndTraverse(grammar, 'ab')
     expect(options).to.eql([])
+  })
+
+  it('unique rejects non-unique repeated elements (using symbol)', () => {
+    const grammar = (
+      <repeat unique>
+        <choice>
+          <literal text='a' value={{val: 1, [unique]: 'test'}} />
+          <literal text='b' value={{val: 2, [unique]: 'test'}} />
+        </choice>
+      </repeat>
+    )
+
+    const options = compileAndTraverse(grammar, 'ab')
+    expect(options).to.eql([])
+  })
+
+  it('unique accepts non-unique repeated elements (using symbol)', () => {
+    const grammar = (
+      <repeat unique>
+        <choice>
+          <literal text='a' value={{val: 2, [unique]: '1'}} />
+          <literal text='b' value={{val: 2, [unique]: 'test'}} />
+        </choice>
+      </repeat>
+    )
+
+    const options = compileAndTraverse(grammar, 'ab')
+    expect(options).to.eql([{
+      text: '',
+      words: [
+        {text: 'a', input: true},
+        {text: 'b', input: true}
+      ],
+      result: [{val: 2}, {val: 2}],
+      score: 1,
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
+    }])
   })
 
   it('unique rejects non-unique repeated elements (deep)', () => {

@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import {checkAgainstResultList} from '../unique'
 
 const defaultProps = {
   max: Number.MAX_SAFE_INTEGER,
@@ -52,8 +53,7 @@ function * callParseChild (index, option, child, props, traverse) {
   const trueOption = _.assign({}, option, mods)
 
   for (let output of traverse(child, trueOption)) {
-    if (props.unique &&
-        _.some(option.result, _.partial(_.isEqual, _, output.result))) {
+    if (props.unique && !checkAgainstResultList(output.result, option.result)) {
       return
     }
 

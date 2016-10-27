@@ -2,6 +2,7 @@
 /* eslint-env mocha */
 
 import createElement from '../src/element'
+import unique from '../src/unique'
 import {compileAndTraverse} from './_util'
 
 import { expect } from 'chai'
@@ -297,6 +298,25 @@ describe('list', () => {
       text: null,
       words: [{text: 'testa', input: false}],
       result: 'test',
+      score: 1,
+      categories: [],
+      arguments: [],
+      qualifiers: [],
+      annotations:[]
+    }])
+  })
+
+  it('unique=true does not suggest identical value options using the unique symbol', () => {
+    const grammar = <list items={[
+      {text: 'testa', value: {val: 1, [unique]: 'same'}},
+      {text: 'testb', value: {val: 2, [unique]: 'same'}}
+    ]} unique />
+
+    const options = compileAndTraverse(grammar, '')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'testa', input: false}],
+      result: {val: 1},
       score: 1,
       categories: [],
       arguments: [],

@@ -1,6 +1,7 @@
 /** @jsx createElement */
 import _ from 'lodash'
 import createElement from '../element'
+import {checkAgainstUniqueList, addToUniqueList} from '../unique'
 import { nullMatch, beginningMatch, anywhereMatch, fuzzyMatch } from '../match'
 
 export default {
@@ -26,17 +27,13 @@ function itemify (item) {
   return object
 }
 
-function * doOneMatch (input, inputLower, items, match, alreadyYieldedIndicies, alreadyYieldedValues) {
+function * doOneMatch (input, inputLower, items, match, alreadyYieldedIndicies, uniqueList, unique) {
   // Need to use for-of so we can use yield, no fun _.forEach here
   let i = -1
   for (let item of items) {
     i++
     if (alreadyYieldedIndicies[i]) { continue }
-    if (alreadyYieldedValues && item.value &&
-      _.some(alreadyYieldedValues, _.partial(_.isEqual, _, item.value))) {
-      continue
-    }
-
+    if (unique && !checkAgainstUniqueList(item.value, uniqueList)) { continue }
 
     const matchObj = match({input, inputLower, text: item.text, textLower: item.textLower})
     if (matchObj) {
@@ -46,8 +43,8 @@ function * doOneMatch (input, inputLower, items, match, alreadyYieldedIndicies, 
       if (item.arguments) { matchObj.arguments = item.arguments }
       if (item.annotations) { matchObj.annotations = item.annotations }
       alreadyYieldedIndicies[i] = true
-      if (alreadyYieldedValues && item.value) {
-        alreadyYieldedValues.push(item.value)
+      if (unique) {
+        addToUniqueList(item.value, uniqueList)
       }
       yield matchObj
     }
@@ -58,16 +55,16 @@ function * doAppropriateMatches (input, items, props) {
   const inputLower = _.deburr(input ? input.toLowerCase() : null)
 
   const alreadyYieldedIndicies = []
-  const alreadyYieldedValues = props.unique ? [] : null
-  yield* doOneMatch(input, inputLower, items, nullMatch, alreadyYieldedIndicies, alreadyYieldedValues)
-  yield* doOneMatch(input, inputLower, items, beginningMatch, alreadyYieldedIndicies, alreadyYieldedValues)
+  const uniqueList = props.unique ? [] : null
+  yield* doOneMatch(input, inputLower, items, nullMatch, alreadyYieldedIndicies, uniqueList, props.unique)
+  yield* doOneMatch(input, inputLower, items, beginningMatch, alreadyYieldedIndicies, uniqueList, props.unique)
 
   if (props.strategy === 'contain' || props.strategy === 'fuzzy') {
-    yield* doOneMatch(input, inputLower, items, anywhereMatch, alreadyYieldedIndicies, alreadyYieldedValues)
+    yield* doOneMatch(input, inputLower, items, anywhereMatch, alreadyYieldedIndicies, uniqueList, props.unique)
   }
 
   if (props.strategy === 'fuzzy') {
-    yield* doOneMatch(input, inputLower, items, fuzzyMatch, alreadyYieldedIndicies, alreadyYieldedValues)
+    yield* doOneMatch(input, inputLower, items, fuzzyMatch, alreadyYieldedIndicies, uniqueList, props.unique)
   }
 }
 
