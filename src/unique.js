@@ -1,5 +1,5 @@
 import _ from 'lodash'
-const unique = Symbol('lacona-unique-key')
+const unique = Symbol.for('lacona-unique-key')
 
 export default unique
 
