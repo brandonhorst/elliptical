@@ -9,7 +9,7 @@ import sinonChai from 'sinon-chai'
 
 chai.use(sinonChai)
 
-describe('augment', () => {
+describe('mapResult', () => {
   it('modifies a result', () => {
     const mapSpy = spy()
     const FakeTest = {}

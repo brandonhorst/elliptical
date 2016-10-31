@@ -9,37 +9,30 @@ function applyDefaults (element) {
   })
 }
 
-function compileAndAddToMap (subElement, process, elementMap) {
-  let traverse
-  try {
-    traverse = compileNonRoot(subElement, process)
-  } catch (e) {
-    const message = `Element failed compilation. Element: ${JSON.stringify(subElement)}, Message: ${e.message}`
-    e.message = message
-    throw e
-  }
+function compileAndAddToMap (subElement, process, elementMap, {errors}) {
+  const traverse = compileNonRoot(subElement, process, {errors})
 
   elementMap.set(subElement, traverse)
 
   return traverse
 }
 
-function next (elementMap, process, subElement, option) {
+function next (elementMap, process, subElement, option, {errors}) {
   let traverser = elementMap.get(subElement)
   if (traverser) {
     return traverser(option)
   } else {
-    const newTraverser = compileAndAddToMap(subElement, process, elementMap)
+    const newTraverser = compileAndAddToMap(subElement, process, elementMap, {errors})
     return newTraverser(option)
   }
 }
 
-function compileProp (prop, process, elementMap) {
+function compileProp (prop, process, elementMap, {errors}) {
   if (prop && prop.type && prop.props && prop.children &&
       (_.isPlainObject(prop.type) || _.isString(prop.type)) &&
       _.isPlainObject(prop.props) && _.isArray(prop.children)) {
     // We can be pretty sure this is an element,
-    return compileAndAddToMap(prop, process, elementMap)
+    return compileAndAddToMap(prop, process, elementMap, {errors})
   } else {
     return prop
   }
@@ -51,7 +44,20 @@ function getPhrase(element) {
     : element.type
 }
 
-function compileNonRoot (element, process) {
+function tryRunning (func, errors, messages, defaultIfError = null) {
+  if (errors === 'log') {
+    try {
+      return func()
+    } catch (e) {
+      console.error(...messages, e)
+      return defaultIfError
+    }
+  } else {
+    return func()
+  }
+}
+
+function compileNonRoot (element, process, {errors}) {
   // ignore null elements
   if (element == null) return () => []
 
@@ -59,7 +65,7 @@ function compileNonRoot (element, process) {
   element = applyDefaults(element)
 
   if (process) {
-    element = process(element)
+    element = tryRunning(() => process(element), errors, ['An error occurred processing', element])
 
     // allow process calls to nullify elements
     if (element == null) return () => []
@@ -70,19 +76,20 @@ function compileNonRoot (element, process) {
   // call describe
   if (phrase.describe) {
     if (phrase.lazy === false) {
-      const description = phrase.describe(element)
-      const traverse = compileNonRoot(description, process)
-      return addOutbound(element, traverse)
+      const description = tryRunning(() => phrase.describe(element), errors, ['An error occurred describing', element])
+
+      const traverse = compileNonRoot(description, process, {errors})
+      return addOutbound(element, traverse, {errors})
     } else {
       let subTraverse
       function traverse (input) {
         if (!subTraverse) {
-          const description = phrase.describe(element)
-          subTraverse = compileNonRoot(description, process)
+          const description = tryRunning(() => phrase.describe(element), errors, ['An error occurred dynamically describing', element])
+          subTraverse = compileNonRoot(description, process, {errors})
         }
         return subTraverse(input)
       }
-      return addOutbound(element, traverse)
+      return addOutbound(element, traverse, {errors})
     }
   }
 
@@ -90,33 +97,37 @@ function compileNonRoot (element, process) {
 
   // if there's no describe, check to see if any props are elements
   // and compile those
-  _.forEach(element.props, (prop) => compileProp(prop, process, elementMap))
+  _.forEach(element.props, (prop) => compileProp(prop, process, elementMap, {errors}))
 
   // generate the traverse thunk
   _.forEach(element.children, (child) => {
-    return compileAndAddToMap(child, process, elementMap)
+    return compileAndAddToMap(child, process, elementMap, {errors})
   })
 
-  const subTraverse = (subElem, option) => next(elementMap, process, subElem, option)
-  const traverse = (option) => phrase.visit(option, element, subTraverse)
+  const subTraverse = (subElem, option) => next(elementMap, process, subElem, option, {errors})
+  const traverse = (option) => {
+    return tryRunning(() => phrase.visit(option, element, subTraverse), errors, ['An error occurred visiting', element], [])
+  }
 
-  return addOutbound(element, traverse)
+  return addOutbound(element, traverse, {errors})
 }
 
-function addOutbound (element, traverse) {
+function addOutbound (element, traverse, {errors}) {
   return function * (option) {
     const start = option.words.length
 
     for (let output of traverse(option)) {
       if (isComplete(output)) {
         if (element.type.mapResult) {
-          const newResult = element.type.mapResult(output.result, element)
+          const newResult = tryRunning(() => element.type.mapResult(output.result, element), errors, ['An error occurred in mapResult of', element], output.result)
           output = _.assign({}, output, {result: newResult})
         }
 
-        if (element.type.filterResult &&
-            !element.type.filterResult(output.result, element)) {
-          continue
+        if (element.type.filterResult) {
+          const filterResultResult = tryRunning(() => element.type.filterResult(output.result, element), errors, ['An error occurred in filterResult of', element], true)
+          if (!filterResultResult) {
+            continue
+          }
         }
       }
 
@@ -152,8 +163,8 @@ function addOutbound (element, traverse) {
   }
 }
 
-export default function compile (element, process) {
-  const compiled = compileNonRoot(element, process)
+export default function compile (element, process, {errors = 'none'} = {}) {
+  const compiled = compileNonRoot(element, process, {errors})
   return function traverse (input) {
     const postProcessed = postProcess(compiled, input)
     const allOutputs = Array.from(postProcessed)
@@ -164,6 +175,7 @@ export default function compile (element, process) {
 function * postProcess (compiled, input) {
   const option = createOption({text: input})
   const outputs = compiled(option)
+
   for (let output of outputs) {
     if (output.text === '' || output.text == null) {
       _.forEach(output.callbacks, callback => callback())

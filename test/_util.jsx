@@ -8,7 +8,7 @@ export function text (input) {
   return _.map(input.words, word => word.text || word.label).join('')
 }
 
-export function compileAndTraverse (element, input) {
-  const traverse = compile(element)
+export function compileAndTraverse (element, input, options) {
+  const traverse = compile(element, null, options)
   return traverse(input)
 }
