@@ -1,6 +1,6 @@
 {
   "name": "elliptical",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Interactive natural-language interfaces",
   "main": "lib-node/index.js",
   "jsnext:main": "lib-es/index.js",
