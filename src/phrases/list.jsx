@@ -7,7 +7,10 @@ import { nullMatch, beginningMatch, anywhereMatch, fuzzyMatch } from '../match'
 export default {
   describe ({props}) {
     props = _.defaults({}, props, {strategy: 'start'})
-    const trueItems = _.map(props.items, itemify)
+    const trueItems = _.chain(props.items)
+      .reject(item => item == null)
+      .map(itemify)
+      .value()
 
     return <raw
       func={(option) => compute(option.text, trueItems, props)}

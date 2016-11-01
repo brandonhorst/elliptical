@@ -33,6 +33,22 @@ describe('list', () => {
     }])
   })
 
+  it('ignores nulls', () => {
+    const grammar = <list items={[null, 'testb']} />
+
+    const options = compileAndTraverse(grammar, '')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'testb', input: false}],
+      result: undefined,
+      score: 1,
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[]
+    }])
+  })
+
   it('suggests normally with contain', () => {
     const grammar = <list items={['testa', 'testb']} strategy='contain' />
 
