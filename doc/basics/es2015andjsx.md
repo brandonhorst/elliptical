@@ -24,7 +24,7 @@ code will throw lots of `React is not defined` errors.
 
 You can specify this pragma it in each of your
 files with a `@jsx` pragma comment. You will need to put this comment
-at the top of every file that imports `element`.
+at the top of every file that imports `createElement`.
 
 ```js
 /** @jsx createElement */
