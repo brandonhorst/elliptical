@@ -29,7 +29,8 @@ function modifyOption(option, rawOutput) {
     handleAdditions(rawOutput, 'categories', 'category', start, end),
     handleAdditions(rawOutput, 'arguments', 'argument', start, end),
     handleAdditions(rawOutput, 'annotations', 'annotation', start, end),
-    handleAdditions(rawOutput, 'qualifiers', 'qualifier', start, end)
+    handleAdditions(rawOutput, 'qualifiers', 'qualifier', start, end),
+    rawOutput.data ? {data: _.concat(option.data, [rawOutput.data])} : {}
   )
 }
 

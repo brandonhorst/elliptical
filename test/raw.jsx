@@ -17,7 +17,8 @@ describe('raw', () => {
         qualifiers: [],
         arguments: [],
         categories: [],
-        annotations:[]
+        annotations:[],
+        data: []
       })
       return [{
         remaining: null,
@@ -36,7 +37,8 @@ describe('raw', () => {
       qualifiers: [],
       arguments: [],
       categories: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -50,7 +52,8 @@ describe('raw', () => {
         qualifiers: [],
         arguments: [],
         categories: [],
-        annotations:[]
+        annotations:[],
+        data: []
       })
 
       yield {
@@ -70,7 +73,8 @@ describe('raw', () => {
       qualifiers: [],
       arguments: [],
       categories: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -94,7 +98,8 @@ describe('raw', () => {
       qualifiers: [],
       arguments: [],
       categories: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -121,7 +126,8 @@ describe('raw', () => {
       qualifiers: [{value: 'a', start: 0, end: 1}],
       arguments: [{value: 'a', start: 0, end: 1}],
       categories: [{value: 'a', start: 0, end: 1}],
-      annotations: [{value: 'a', start: 0, end: 1}]
+      annotations: [{value: 'a', start: 0, end: 1}],
+      data: []
     }])
   })
 
@@ -148,7 +154,33 @@ describe('raw', () => {
       qualifiers: [],
       arguments: [],
       categories: [],
-      annotations:[]
+      annotations:[],
+      data: []
+    }])
+  })
+
+  it('supports data', () => {
+    function func (input) {
+      return [{
+        remaining: null,
+        result: 'val',
+        words: [{text: 'tex', input: false}],
+        data: 3
+      }]
+    }
+
+    const options = compileAndTraverse(<raw func={func} limit={1} />, '')
+
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'tex', input: false}],
+      result: 'val',
+      score: 1,
+      qualifiers: [],
+      arguments: [],
+      categories: [],
+      annotations:[],
+      data: [3]
     }])
   })
 })

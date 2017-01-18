@@ -67,7 +67,8 @@ describe('errors = "log"', () => {
       result: "test",
       score: 1,
       text: null,
-      words: [{"input": false, "text": "test"}]
+      words: [{"input": false, "text": "test"}],
+      data: []
     }])
     expect(console.error).to.have.been.calledOnce
   })
@@ -93,7 +94,8 @@ describe('errors = "log"', () => {
       result: "test",
       score: 1,
       text: null,
-      words: [{"input": false, "text": "test"}]
+      words: [{"input": false, "text": "test"}],
+      data: []
     }])
     
     expect(console.error).to.have.been.calledOnce

@@ -26,9 +26,10 @@ describe('freetext', () => {
       result: 'validValue',
       score: options[0].score,
       qualifiers: [],
-      annotations: [],
       categories: [],
-      arguments: []
+      arguments: [],
+      annotations: [],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'invalidValue')
@@ -47,7 +48,8 @@ describe('freetext', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations: []
+      annotations: [],
+      data: []
     }])
   })
 
@@ -70,7 +72,8 @@ describe('freetext', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations: []
+      annotations: [],
+      data: []
     }])
     expect(filterSpy).to.have.been.calledOnce
   })
@@ -98,7 +101,8 @@ describe('freetext', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations: []
+      annotations: [],
+      data: []
     }, {
       text: null,
       words: [
@@ -110,7 +114,8 @@ describe('freetext', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations: []
+      annotations: [],
+      data: []
     }, {
       text: null,
       words: [
@@ -122,7 +127,8 @@ describe('freetext', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations: []
+      annotations: [],
+      data: []
     }])
   })
 
@@ -146,7 +152,8 @@ describe('freetext', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations: []
+      annotations: [],
+      data: []
     }, {
       text: '',
       words: [
@@ -158,7 +165,8 @@ describe('freetext', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations: []
+      annotations: [],
+      data: []
     }])
   })
 
@@ -185,7 +193,8 @@ describe('freetext', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations: []
+      annotations: [],
+      data: []
     }, {
       text: null,
       words: [
@@ -197,7 +206,8 @@ describe('freetext', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations: []
+      annotations: [],
+      data: []
     }, {
       text: null,
       words: [
@@ -209,7 +219,8 @@ describe('freetext', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations: []
+      annotations: [],
+      data: []
     }])
   })
 })

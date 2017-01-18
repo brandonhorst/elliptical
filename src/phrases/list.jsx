@@ -45,6 +45,7 @@ function * doOneMatch (input, inputLower, items, match, alreadyYieldedIndicies, 
       if (item.categories) { matchObj.categories = item.categories }
       if (item.arguments) { matchObj.arguments = item.arguments }
       if (item.annotations) { matchObj.annotations = item.annotations }
+      if (item.data) { matchObj.data = item.data }
       alreadyYieldedIndicies[i] = true
       if (unique) {
         addToUniqueList(item.value, uniqueList)

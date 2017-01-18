@@ -20,7 +20,8 @@ describe('list', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [{text: 'testb', input: false}],
@@ -29,7 +30,8 @@ describe('list', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -45,7 +47,8 @@ describe('list', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -61,7 +64,8 @@ describe('list', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [{text: 'testb', input: false}],
@@ -70,7 +74,8 @@ describe('list', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -86,7 +91,8 @@ describe('list', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -102,7 +108,8 @@ describe('list', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -121,7 +128,8 @@ describe('list', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [{text: 'z', input: false}, {text: 'test', input: true}],
@@ -130,7 +138,8 @@ describe('list', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -147,7 +156,8 @@ describe('list', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -164,7 +174,8 @@ describe('list', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -181,7 +192,8 @@ describe('list', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [{text: 'testb', input: false}],
@@ -190,7 +202,8 @@ describe('list', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [{text: 'testc', input: false}],
@@ -199,7 +212,8 @@ describe('list', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -237,7 +251,8 @@ describe('list', () => {
       categories: [
         {value: 'a', start: 0, end: 1},
         {value: 'b', start: 0, end: 1}
-      ]
+      ],
+      data: []
     }])
   })
 
@@ -271,7 +286,8 @@ describe('list', () => {
       ],
       categories: [
         {value: 'a', start: 0, end: 1}
-      ]
+      ],
+      data: []
     }])
   })
 
@@ -290,7 +306,8 @@ describe('list', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations: [],
+      data: []
     }, {
       text: null,
       words: [{text: 'testb', input: false}],
@@ -299,7 +316,8 @@ describe('list', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations: [],
+      data: []
     }])
   })
 
@@ -318,7 +336,8 @@ describe('list', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations: [],
+      data: []
     }])
   })
 
@@ -337,7 +356,28 @@ describe('list', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations: [],
+      data: []
+    }])
+  })
+
+  it('supports data', () => {
+    const grammar = <list items={[
+      {text: 'testa', value: 'test', data: 2},
+      {text: 'testb', value: 'test', data: 3}
+    ]} unique />
+
+    const options = compileAndTraverse(grammar, 'testa')
+    expect(options).to.eql([{
+      text: '',
+      words: [{text: 'testa', input: true}],
+      result: 'test',
+      score: 1,
+      categories: [],
+      arguments: [],
+      qualifiers: [],
+      annotations: [],
+      data: [2]
     }])
   })
 })

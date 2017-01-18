@@ -20,7 +20,8 @@ describe('literal', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -36,7 +37,8 @@ describe('literal', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -58,7 +60,8 @@ describe('literal', () => {
         qualifiers: [],
         categories: [],
         arguments: [],
-        annotations:[]
+        annotations:[],
+        data: []
       }])
     })
 
@@ -79,7 +82,8 @@ describe('literal', () => {
         qualifiers: [],
         categories: [],
         arguments: [],
-        annotations:[]
+        annotations:[],
+        data: []
       }])
     })
 
@@ -100,7 +104,8 @@ describe('literal', () => {
         qualifiers: [],
         categories: [],
         arguments: [],
-        annotations:[]
+        annotations:[],
+        data: []
       }])
     })
 
@@ -140,7 +145,8 @@ describe('literal', () => {
         qualifiers: [],
         categories: [],
         arguments: [],
-        annotations:[]
+        annotations:[],
+        data: []
       }])
 
       options = compileAndTraverse(grammar, 'b')

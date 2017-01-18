@@ -9,6 +9,7 @@ export default function createOption (mods) {
     categories: [],
     arguments: [],
     score: 1,
-    callbacks: []
+    callbacks: [],
+    data: []
   })
 }

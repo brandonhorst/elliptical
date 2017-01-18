@@ -116,7 +116,13 @@ function addOutbound (element, traverse, {errors}) {
   return function * (option) {
     const start = option.words.length
 
-    for (let output of traverse(option)) {
+    const mods = {}
+    if (element.props.data != null) {
+      mods.data = _.concat(option.data, [element.props.data])
+    }
+    const newOption = _.assign({}, option, mods)
+
+    for (let output of traverse(newOption)) {
       if (isComplete(output)) {
         if (element.type.mapResult) {
           const newResult = tryRunning(() => element.type.mapResult(output.result, element), errors, ['An error occurred in mapResult of', element], output.result)

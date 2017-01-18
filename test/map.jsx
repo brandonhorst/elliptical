@@ -30,7 +30,8 @@ describe('map', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations: []
+      annotations: [],
+      data: []
     }])
   })
 
@@ -54,7 +55,8 @@ describe('map', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations: []
+      annotations: [],
+      data: []
     }])
   })
 

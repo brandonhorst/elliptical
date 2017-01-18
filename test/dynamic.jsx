@@ -24,7 +24,8 @@ describe('dynamic', () => {
       qualifiers: [],
       annotations: [],
       categories: [],
-      arguments: []
+      arguments: [],
+      data: []
     }])
   })
 
@@ -55,7 +56,8 @@ describe('dynamic', () => {
       qualifiers: [],
       annotations: [],
       categories: [],
-      arguments: []
+      arguments: [],
+      data: []
     }])
   })
 })

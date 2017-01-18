@@ -30,7 +30,8 @@ describe('tap', () => {
       categories: [],
       arguments: [],
       annotations: [],
-      callbacks: []
+      callbacks: [],
+      data: []
     })
 
     expect(outSpy).to.have.been.calledOnce
@@ -43,7 +44,8 @@ describe('tap', () => {
       categories: [],
       arguments: [],
       annotations: [],
-      callbacks: []
+      callbacks: [],
+      data: []
     })
   })
 })

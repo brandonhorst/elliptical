@@ -41,7 +41,8 @@ describe('repeat', () => {
         qualifiers: [],
         categories: [],
         arguments: [],
-        annotations:[]
+        annotations:[],
+        data: []
       }])
     })
 
@@ -66,7 +67,8 @@ describe('repeat', () => {
         qualifiers: [],
         categories: [],
         arguments: [],
-        annotations:[]
+        annotations:[],
+        data: []
       }])
     })
 
@@ -90,7 +92,8 @@ describe('repeat', () => {
         qualifiers: [],
         categories: [],
         arguments: [],
-        annotations:[]
+        annotations:[],
+        data: []
       }, {
         text: null,
         words: [
@@ -105,7 +108,8 @@ describe('repeat', () => {
         qualifiers: [],
         categories: [],
         arguments: [],
-        annotations:[]
+        annotations:[],
+        data: []
       }])
     })
 
@@ -132,7 +136,8 @@ describe('repeat', () => {
         qualifiers: [],
         categories: [],
         arguments: [],
-        annotations:[]
+        annotations:[],
+        data: []
       }, {
         text: null,
         words: [
@@ -145,7 +150,8 @@ describe('repeat', () => {
         qualifiers: [],
         categories: [],
         arguments: [],
-        annotations:[]
+        annotations:[],
+        data: []
       }])
     })
   })
@@ -169,7 +175,8 @@ describe('repeat', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [{text: 'b', input: false}],
@@ -178,7 +185,8 @@ describe('repeat', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -208,7 +216,8 @@ describe('repeat', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -232,7 +241,8 @@ describe('repeat', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -255,7 +265,8 @@ describe('repeat', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [
@@ -268,7 +279,8 @@ describe('repeat', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -291,7 +303,8 @@ describe('repeat', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -313,7 +326,8 @@ describe('repeat', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -367,7 +381,8 @@ describe('repeat', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -407,7 +422,8 @@ describe('repeat', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -433,7 +449,8 @@ describe('repeat', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -461,7 +478,8 @@ describe('repeat', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -492,7 +510,29 @@ describe('repeat', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
+    }])
+  })
+
+  it('works with data', () => {
+    const grammar = <repeat data={1}><literal text='x ' data={2} /></repeat>
+
+    const options = compileAndTraverse(grammar, 'x x')
+    expect(options).to.eql([{
+      text: null,
+      words: [
+        {text: 'x ', input: true},
+        {text: 'x', input: true},
+        {text: ' ', input: false},
+      ],
+      result: [undefined, undefined],
+      score: 1,
+      qualifiers: [],
+      categories: [],
+      arguments: [],
+      annotations:[],
+      data: [1, 2, 2]
     }])
   })
 })

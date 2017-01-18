@@ -24,7 +24,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -49,7 +50,8 @@ describe('sequence', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [
@@ -62,7 +64,8 @@ describe('sequence', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -84,7 +87,8 @@ describe('sequence', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'super')
@@ -96,7 +100,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [{text: 'super', input: true}, {text: 'man', input: false}],
@@ -105,7 +110,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'superm')
@@ -121,7 +127,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -144,7 +151,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'super')
@@ -156,7 +164,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'superman')
@@ -171,7 +180,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [
@@ -184,7 +194,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'supermanr')
@@ -201,7 +212,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -224,7 +236,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [{text: 'the', input: false}, {text: 'super', input: false}],
@@ -233,7 +246,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'the')
@@ -245,7 +259,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [{text: 'the', input: true}, {text: 'man', input: false}],
@@ -254,7 +269,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [{text: 'the', input: true}, {text: 'super', input: false}],
@@ -263,7 +279,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'thesuper')
@@ -275,7 +292,8 @@ describe('sequence', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [
@@ -288,7 +306,8 @@ describe('sequence', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'thesuperm')
@@ -305,7 +324,8 @@ describe('sequence', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -329,7 +349,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [{text: 'the', input: false}, {text: 'super', input: false}],
@@ -338,7 +359,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'the')
@@ -350,7 +372,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [{text: 'the', input: true}, {text: 'rocks', input: false}],
@@ -359,7 +382,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [
@@ -372,7 +396,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [{text: 'the', input: true}, {text: 'super', input: false}],
@@ -381,7 +406,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'thesuper')
@@ -393,7 +419,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [
@@ -406,7 +433,8 @@ describe('sequence', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [
@@ -420,7 +448,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'thesuperm')
@@ -438,7 +467,8 @@ describe('sequence', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -468,7 +498,8 @@ describe('sequence', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [{text: 'the', input: false}, {text: 'super', input: false}],
@@ -477,7 +508,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'the')
@@ -489,7 +521,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [{text: 'the', input: true}, {text: 'rocks', input: false}],
@@ -498,7 +531,8 @@ describe('sequence', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [{text: 'the', input: true}, {text: 'man', input: false}],
@@ -507,7 +541,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [{text: 'the', input: true}, {text: 'super', input: false}],
@@ -516,7 +551,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'thesuper')
@@ -528,7 +564,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [
@@ -541,7 +578,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [
@@ -554,7 +592,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'thesuperm')
@@ -571,7 +610,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'thesuperman')
@@ -587,7 +627,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [
@@ -601,7 +642,8 @@ describe('sequence', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'thesupermanr')
@@ -619,7 +661,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -645,7 +688,8 @@ describe('sequence', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [
@@ -657,7 +701,8 @@ describe('sequence', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -682,7 +727,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -707,7 +753,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [
@@ -719,7 +766,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -745,7 +793,8 @@ describe('sequence', () => {
       categories: [],
       arguments: [],
       qualifiers: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -774,7 +823,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -805,7 +855,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -830,7 +881,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [
@@ -843,7 +895,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -867,7 +920,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -895,7 +949,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -918,7 +973,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -940,7 +996,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }, {
       text: null,
       words: [
@@ -952,7 +1009,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
   })
 
@@ -978,7 +1036,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'atest')
@@ -993,7 +1052,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'testatest')
@@ -1022,7 +1082,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'atest')
@@ -1037,7 +1098,8 @@ describe('sequence', () => {
       qualifiers: [],
       categories: [],
       arguments: [],
-      annotations:[]
+      annotations:[],
+      data: []
     }])
 
     options = compileAndTraverse(grammar, 'testatest')
