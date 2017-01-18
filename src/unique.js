@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import stringify from 'json-stable-stringify'
 const unique = Symbol.for('lacona-unique-key')
 
 export default unique
@@ -13,38 +14,32 @@ function getUniqueValue (result) {
       return result[unique]
     }
   } else {
-    return result
+    return stringify(result)
   }
 }
 
-export function checkAgainstUniqueList(result, uniqueList) {
-  if (result == null) return true
-
-  const value = getUniqueValue(result)
-
-  if (_.isObject(value)) {
-    return !_.some(uniqueList, _.partial(_.isEqual, _, value))
-  } else {
-    return !_.includes(uniqueList, value)
-  }
+export function checkAgainstUniqueSet(uniqueSet, ...results) {
+  return !_.chain(results)
+    .reject(result => result == null)
+    .map(getUniqueValue)
+    .every(value => uniqueSet.has(value))
+    .value()
 }
 
-export function checkAgainstResultList(result, resultList) {
-  if (result == null) return true
-
-  const value = getUniqueValue(result)
-
-  if (_.isObject(value)) {
-    return !_.some(resultList, compareResult => _.isEqual(getUniqueValue(compareResult), value))
-  } else {
-    return !_.some(resultList, compareResult => getUniqueValue(compareResult) === value)
-  }
+export function checkAgainstResultList(resultList, ...results) {
+  return !_.chain(results)
+    .reject(result => result == null)
+    .map(getUniqueValue)
+    .every(value => _.some(resultList, compareResult => getUniqueValue(compareResult) === value))
+    .value()
 }
 
-export function addToUniqueList(result, uniqueList) {
-  const value = getUniqueValue(result)
-
-  if (result != null) {
-    uniqueList.splice(uniqueList.length, 0, value)
-  }
+export function addToUniqueSet(uniqueSet, ...results) {
+  _.chain(results)
+    .reject(result => result == null)
+    .map(getUniqueValue)
+    .forEach(value => {
+      uniqueSet.add(value)
+    })
+    .value()
 }

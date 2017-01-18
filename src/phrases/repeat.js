@@ -53,7 +53,7 @@ function * callParseChild (index, option, child, props, traverse) {
   const trueOption = _.assign({}, option, mods)
 
   for (let output of traverse(child, trueOption)) {
-    if (props.unique && !checkAgainstResultList(output.result, option.result)) {
+    if (props.unique && !checkAgainstResultList(option.result, output.result)) {
       return
     }
 
