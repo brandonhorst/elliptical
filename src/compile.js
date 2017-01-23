@@ -38,7 +38,7 @@ function compileProp (prop, process, elementMap, {errors}) {
   }
 }
 
-function getPhrase(element) {
+function getPhrase (element) {
   return _.isString(element.type)
     ? phrases[element.type]
     : element.type
@@ -82,7 +82,7 @@ function compileNonRoot (element, process, {errors}) {
       return addOutbound(element, traverse, {errors})
     } else {
       let subTraverse
-      function traverse (input) {
+      const traverse = (input) => {
         if (!subTraverse) {
           const description = tryRunning(() => phrase.describe(element), errors, ['An error occurred dynamically describing', element])
           subTraverse = compileNonRoot(description, process, {errors})
