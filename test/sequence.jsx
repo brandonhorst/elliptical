@@ -1043,4 +1043,11 @@ describe('sequence', () => {
     options = compileAndTraverse(grammar, 'testatest')
     expect(options).to.eql([])
   })
+
+  it('does not emit if empty', () => {
+    const grammar = <sequence></sequence>
+
+    const options = compileAndTraverse(grammar, '')
+    expect(options).to.eql([])
+  })
 })
