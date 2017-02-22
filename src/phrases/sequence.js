@@ -4,9 +4,10 @@ import {limitIterator} from '../utils'
 function * visit (option, {props: {unique = false}, children}, traverse) {
   const mods = {result: {}, score: 1}
   const trueOption = _.assign({}, option, mods)
-  const iterator = parseChildControl(0, trueOption, unique, children, traverse)
-
-  yield * iterator
+  if (children.length) {
+    const iterator = parseChildControl(0, trueOption, unique, children, traverse)
+    yield * iterator
+  }
 }
 
 function shouldDoEllipsis (index, option, children) {
