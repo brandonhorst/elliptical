@@ -26,11 +26,12 @@ function itemify (item) {
   if (object.argument != null) { object.arguments = [object.argument] }
   if (object.category != null) { object.categories = [object.category] }
   if (object.annotation != null) { object.annotations = [object.annotation] }
+  if (object.synonymGroup != null) { object.synonymGroups = [object.synonymGroup] }
 
   return object
 }
 
-function * doOneMatch (input, inputLower, items, match, alreadyYieldedIndicies, uniqueSet, unique) {
+function * doOneMatch ({input, inputLower, items, match, alreadyYieldedIndicies, synonymSet, uniqueSet, unique}) {
   // Need to use for-of so we can use yield, no fun _.forEach here
   let i = -1
   for (let item of items) {
@@ -40,6 +41,7 @@ function * doOneMatch (input, inputLower, items, match, alreadyYieldedIndicies, 
       const uniques = unique === 'array' ? item.value : [item.value]
       if (!checkAgainstUniqueSet(uniqueSet, ...uniques)) { continue }
     }
+    if (item.synonymGroups && !checkAgainstUniqueSet(synonymSet, ...item.synonymGroups)) { continue }
 
     const matchObj = match({input, inputLower, text: item.text, textLower: item.textLower})
     if (matchObj) {
@@ -50,9 +52,15 @@ function * doOneMatch (input, inputLower, items, match, alreadyYieldedIndicies, 
       if (item.annotations) { matchObj.annotations = item.annotations }
       if (item.data) { matchObj.data = item.data }
       alreadyYieldedIndicies[i] = true
+      if (item.synonymGroups) {
+
+      }
       if (unique) {
         const uniques = unique === 'array' ? item.value : [item.value]
         addToUniqueSet(uniqueSet, ...uniques)
+      }
+      if (item.synonymGroups) {
+        addToUniqueSet(synonymSet, ...item.synonymGroups)
       }
       yield matchObj
     }
@@ -64,15 +72,19 @@ function * doAppropriateMatches (input, items, props) {
 
   const alreadyYieldedIndicies = []
   const uniqueSet = props.unique ? new Set() : null
-  yield* doOneMatch(input, inputLower, items, nullMatch, alreadyYieldedIndicies, uniqueSet, props.unique)
-  yield* doOneMatch(input, inputLower, items, beginningMatch, alreadyYieldedIndicies, uniqueSet, props.unique)
+  const synonymSet = new Set()
+  const options = {
+    input, inputLower, items, alreadyYieldedIndicies, uniqueSet, synonymSet, unique: props.unique
+  }
+  yield* doOneMatch(_.assign({}, options, {match: nullMatch}))
+  yield* doOneMatch(_.assign({}, options, {match: beginningMatch}))
 
   if (props.strategy === 'contain' || props.strategy === 'fuzzy') {
-    yield* doOneMatch(input, inputLower, items, anywhereMatch, alreadyYieldedIndicies, uniqueSet, props.unique)
+    yield* doOneMatch(_.assign({}, options, {match: anywhereMatch}))
   }
 
   if (props.strategy === 'fuzzy') {
-    yield* doOneMatch(input, inputLower, items, fuzzyMatch, alreadyYieldedIndicies, uniqueSet, props.unique)
+    yield* doOneMatch(_.assign({}, options, {match: fuzzyMatch}))
   }
 }
 

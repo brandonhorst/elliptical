@@ -168,4 +168,33 @@ describe('choice', () => {
     expect(options).to.have.length(1)
     expect(text(options[0])).to.equal('rightalso')
   })
+
+  it('respects synonymGroup', () => {
+    const grammar = (
+      <choice>
+        <literal text='testa' synonymGroup={0} />
+        <literal text='testb' synonymGroup={1} />
+        <literal text='testc' synonymGroup={1} />
+      </choice>
+    )
+
+    const options = compileAndTraverse(grammar, '')
+    expect(options).to.have.length(2)
+    expect(text(options[0])).to.equal('testa')
+    expect(text(options[1])).to.equal('testb')
+  })
+
+  it('respects synonymGroups', () => {
+    const grammar = (
+      <choice>
+        <literal text='testa' synonymGroups={[0, 1]} />
+        <literal text='testb' synonymGroups={[1, 2]} />
+        <literal text='testc' synonymGroups={[0]} />
+      </choice>
+    )
+
+    const options = compileAndTraverse(grammar, '')
+    expect(text(options[0])).to.equal('testa')
+    expect(text(options[1])).to.equal('testb')
+  })
 })

@@ -291,6 +291,68 @@ describe('list', () => {
     }])
   })
 
+  it('respects synonymGroup', () => {
+    const grammar = <list items={[
+      {text: 'testa', value: 'a', synonymGroup: 0},
+      {text: 'testb', value: 'b', synonymGroup: 1},
+      {text: 'testc', value: 'c', synonymGroup: 1}
+    ]} unique='array' />
+
+    const options = compileAndTraverse(grammar, '')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'testa', input: false}],
+      result: 'a',
+      score: 1,
+      categories: [],
+      arguments: [],
+      qualifiers: [],
+      annotations: [],
+      data: []
+    }, {
+      text: null,
+      words: [{text: 'testb', input: false}],
+      result: 'b',
+      score: 1,
+      categories: [],
+      arguments: [],
+      qualifiers: [],
+      annotations: [],
+      data: []
+    }])
+  })
+
+  it('respects synonymGroups', () => {
+    const grammar = <list items={[
+      {text: 'testa', value: 'a', synonymGroups: [0, 1]},
+      {text: 'testb', value: 'b', synonymGroups: [1, 2]},
+      {text: 'testc', value: 'c', synonymGroups: [0]}
+    ]} unique='array' />
+
+    const options = compileAndTraverse(grammar, '')
+    expect(options).to.eql([{
+      text: null,
+      words: [{text: 'testa', input: false}],
+      result: 'a',
+      score: 1,
+      categories: [],
+      arguments: [],
+      qualifiers: [],
+      annotations: [],
+      data: []
+    }, {
+      text: null,
+      words: [{text: 'testb', input: false}],
+      result: 'b',
+      score: 1,
+      categories: [],
+      arguments: [],
+      qualifiers: [],
+      annotations: [],
+      data: []
+    }])
+  })
+
   it('unique=false does not suggests identical value options', () => {
     const grammar = <list items={[
       {text: 'testa', value: 'test'},
