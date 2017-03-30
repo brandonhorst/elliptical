@@ -25,6 +25,29 @@ describe('compile', () => {
     expect(compiled).to.be.an.instanceof(Function)
   })
 
+  it('accepts strings', () => {
+    const Test = {
+      * visit (option) {
+        expect(option.text).to.equal('test')
+        expect(option.something).to.be.undefined
+      }
+    }
+    const compiled = compile(<Test />)
+    compiled('test')
+  })
+
+  it('accepts objects', () => {
+    const opt = {text: 'test', something: 'else'}
+    const Test = {
+      * visit (option) {
+        expect(option.text).to.equal('test')
+        expect(option.something).to.equal('else')
+      }
+    }
+    const compiled = compile(<Test />)
+    compiled(opt)
+  })
+
   it('passes props to describe', () => {
     const Test = {
       describe ({props, children}) {

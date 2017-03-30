@@ -172,14 +172,15 @@ function addOutbound (element, traverse, {errors}) {
 export default function compile (element, process, {errors = 'none'} = {}) {
   const compiled = compileNonRoot(element, process, {errors})
   return function traverse (input) {
-    const postProcessed = postProcess(compiled, input)
+    const inputObject = _.isString(input) ? {text: input} : input
+    const postProcessed = postProcess(compiled, inputObject)
     const allOutputs = Array.from(postProcessed)
     return _.sortBy(allOutputs, (output) => -output.score)
   }
 }
 
-function * postProcess (compiled, input) {
-  const option = createOption({text: input})
+function * postProcess (compiled, inputObject) {
+  const option = createOption(inputObject)
   const outputs = compiled(option)
 
   for (let output of outputs) {
