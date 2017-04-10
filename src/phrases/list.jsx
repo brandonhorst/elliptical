@@ -52,15 +52,14 @@ function * doOneMatch ({input, inputLower, items, match, alreadyYieldedIndicies,
       if (item.annotations) { matchObj.annotations = item.annotations }
       if (item.data) { matchObj.data = item.data }
       alreadyYieldedIndicies[i] = true
-      if (item.synonymGroups) {
-
-      }
-      if (unique) {
-        const uniques = unique === 'array' ? item.value : [item.value]
-        addToUniqueSet(uniqueSet, ...uniques)
-      }
-      if (item.synonymGroups) {
-        addToUniqueSet(synonymSet, ...item.synonymGroups)
+      matchObj.callback = () => {
+        if (unique) {
+          const uniques = unique === 'array' ? item.value : [item.value]
+          addToUniqueSet(uniqueSet, ...uniques)
+        }
+        if (item.synonymGroups) {
+          addToUniqueSet(synonymSet, ...item.synonymGroups)
+        }
       }
       yield matchObj
     }

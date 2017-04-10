@@ -17,7 +17,6 @@ function modifyOption(option, rawOutput) {
   const words = option.words.concat(rawOutput.words)
   const end = words.length
 
-
   return _.assign({},
     option,
     {
@@ -30,7 +29,8 @@ function modifyOption(option, rawOutput) {
     handleAdditions(rawOutput, 'arguments', 'argument', start, end),
     handleAdditions(rawOutput, 'annotations', 'annotation', start, end),
     handleAdditions(rawOutput, 'qualifiers', 'qualifier', start, end),
-    rawOutput.data ? {data: _.concat(option.data, [rawOutput.data])} : {}
+    rawOutput.data ? {data: _.concat(option.data, [rawOutput.data])} : {},
+    rawOutput.callback ? {callbacks: _.concat(option.callbacks, [rawOutput.callback])} : {}
   )
 }
 

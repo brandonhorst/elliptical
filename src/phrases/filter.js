@@ -1,8 +1,7 @@
 import {isComplete} from '../utils'
 
 const defaultProps = {
-  skipIncomplete: false,
-  option: false
+  skipIncomplete: false
 }
 
 function * visit (option, {props, children}, traverse) {
