@@ -13,7 +13,9 @@ function * traverseChild (option, child, traverse, synonymSet, synonymGroups) {
       toYield = _.assign({}, output, {result})
     }
     if (synonymGroups) {
-      addToUniqueSet(synonymSet, ...synonymGroups)
+      toYield = _.assign({}, output, {
+        callbacks: _.concat(output.callbacks, [() => addToUniqueSet(synonymSet, ...synonymGroups)])
+      })
     }
     yield toYield
   }
