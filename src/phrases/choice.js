@@ -10,10 +10,10 @@ function * traverseChild (option, child, traverse, synonymSet, synonymGroups) {
     let toYield = output
     if (child.props.id != null) {
       const result = {[child.props.id]: output.result}
-      toYield = _.assign({}, output, {result})
+      toYield = _.assign({}, toYield, {result})
     }
     if (synonymGroups) {
-      toYield = _.assign({}, output, {
+      toYield = _.assign({}, toYield, {
         callbacks: _.concat(output.callbacks, [() => addToUniqueSet(synonymSet, ...synonymGroups)])
       })
     }
