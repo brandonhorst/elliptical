@@ -10,8 +10,8 @@ function * filterInput (input, props) {
   for (let substring of substrings(input || '', props)) {
     if (!props.filter || props.filter(substring)) {
       const score = props.greedy
-        ? 0.1 + (1 - (1 / substring.length))
-        : 0.1 + (1 / substring.length)
+        ? 0.1 + (1 - (1 / (substring.length + 1)))
+        : 0.1 + (1 / (substring.length + 1))
       yield {
         words: [{text: substring, input: true}],
         result: substring,

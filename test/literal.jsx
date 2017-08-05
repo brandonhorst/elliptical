@@ -100,7 +100,7 @@ describe('literal', () => {
         text: '',
         words: [{text: 'b', input: true}, {text: 'a', input: true}],
         result: {},
-        score: 1.1,
+        score: 0.6,
         qualifiers: [],
         categories: [],
         arguments: [],
